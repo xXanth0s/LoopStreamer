@@ -4,6 +4,7 @@ import {
   createProtocol,
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib';
+import * as path from "path";
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -15,22 +16,25 @@ let win: BrowserWindow | null;
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 
 function createWindow() {
+
+  console.log('i am very stupid')
+  console.log('static variable', path.resolve(__dirname, 'js', 'content.js') );
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      preload: process.env.WEBPACK_DEV_SERVER_URL + 'content/main.js'
+      nodeIntegration: false,
+      nodeIntegrationInSubFrames: false,
+      preload: path.resolve(__dirname, 'js', 'content.js'),
     },
   });
 
-
-  console.log(process.env.WEBPACK_DEV_SERVER_URL + 'content/main.js')
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
     // win.loadURL('https://vivo.sx/97a0e64871');
+    win.loadURL('https://google.de');
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol('app');
@@ -42,8 +46,12 @@ function createWindow() {
     win = null;
   });
 
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('test')
+  win.webContents.on('did-frame-finish-load', () => {
+    console.log(22)
+    if(win) {
+      console.log('sending message to content script')
+      win.webContents.send('test')
+    }
   })
 }
 
