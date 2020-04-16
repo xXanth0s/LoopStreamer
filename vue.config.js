@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const path = require('path');
 
 module.exports = {
   lintOnSave: false,
@@ -21,6 +22,7 @@ module.exports = {
       chunks: ['chunk-vendors', 'chunk-common', 'index'],
     },
     content: 'src/content/main.ts',
+    background: 'src/background.ts',
     // content: {
     //   entry: 'src/content/main.ts',
     //   target: 'electron-preload',
@@ -30,7 +32,7 @@ module.exports = {
     devServer: {
       writeToDisk: true,
     },
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     plugins: [
       new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [`${__dirname}/dist_electron/*.hot-update.*`],
@@ -43,6 +45,6 @@ module.exports = {
   }),
 
   pluginOptions: {
-    mainProcessWatch: ['src/content/main.ts'],
+    mainProcessWatch: [path.resolve(__dirname, 'src', 'content', 'main.ts')],
   },
 };
