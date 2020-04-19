@@ -1,9 +1,5 @@
-
-import { app, protocol, BrowserWindow } from 'electron';
-import {
-  createProtocol,
-  /* installVueDevtools */
-} from 'vue-cli-plugin-electron-builder/lib';
+import {app, BrowserWindow} from 'electron';
+import {createProtocol,} from 'vue-cli-plugin-electron-builder/lib';
 import * as path from 'path';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -23,18 +19,18 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
       nodeIntegrationInSubFrames: false,
-      // preload: path.resolve(__dirname, 'js', 'content.js'),
-      preload: 'C:\\Users\\maxis\\Projects\\LoopStreamer_UI\\src\\content.js',
+      preload: path.resolve(__dirname, 'js', 'content.js'),
+      // preload: 'C:\\Users\\maxis\\Projects\\LoopStreamer_UI\\src\\content.js',
     },
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    // win.loadURL('https://vivo.sx/97a0e64871');
+    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    win.loadURL('https://vivo.sx/97a0e64871');
     // win.loadURL('https://google.de');
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
