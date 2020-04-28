@@ -5,28 +5,33 @@ module.exports = {
   pages: {
     index: {
       // entry for the page
-      entry: 'src/main.ts',
+      entry: 'src/app/src/main.ts',
       // the source template
-      template: 'public/index.html',
+      template: 'src/app/public/index.html',
       // output as dist/index.html
       filename: 'index.html',
       // when using title option,
       // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'Index Page',
+      title: 'LoopStreamer',
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
       chunks: ['chunk-vendors', 'chunk-common', 'index'],
     },
     background: 'src/background/background.ts',
+
   },
   configureWebpack: () => ({
+    target: 'electron-renderer',
     devtool: 'source-map',
+    node: {
+      __dirname: true,
+    },
   }),
 
   pluginOptions: {
     electronBuilder: {
       mainProcessFile: 'src/background/background.ts',
-      mainProcessWatch: ['src/**/*.ts'],
+      mainProcessWatch: ['src/content/*.ts'],
     },
   },
 };

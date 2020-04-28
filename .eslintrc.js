@@ -15,6 +15,13 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'linebreak-style': 'off',
+    'arrow-parens': 'off',
+    'lines-between-class-members': 'off',
+    'no-plusplus': 'off',
+    'class-methods-use-this': 'off',
+    'function-paren-newline': 'off',
+    'no-return-assign': 'off',
+    'vue/script-indent': ['error', 2, { 'baseIndent': 2 }]
   },
   overrides: [
     {
@@ -26,5 +33,12 @@ module.exports = {
         jest: true,
       },
     },
+    {
+      files: ['*.vue'],
+      rules: {
+        indent: 'off',
+        'max-len': ["error", { "code": 140 }]
+      }
+    }
   ],
 };

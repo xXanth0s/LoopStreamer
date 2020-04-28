@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   entry: {
@@ -11,6 +12,9 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist_electron/js'),
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js'],
   },
 
   module: {
@@ -31,7 +35,13 @@ module.exports = {
           'sass-loader',
         ],
       },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
     ],
-
   },
+  plugins: [
+    new VueLoaderPlugin(),
+  ],
 };

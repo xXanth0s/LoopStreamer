@@ -1,6 +1,7 @@
 import {app, BrowserWindow} from 'electron';
 import {createProtocol,} from 'vue-cli-plugin-electron-builder/lib';
 import * as path from 'path';
+import backgroundStore, { initStore } from '../store/store/background-store';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -14,13 +15,13 @@ let win: BrowserWindow | null;
 function createWindow() {
   console.log('i am very stupid', __dirname);
   console.log('static variable', path.resolve(app.getAppPath(), 'js', 'content.js'));
+  initStore();
   // Create the browser window.
   win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1800,
+    height: 1200,
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: true,
       nodeIntegrationInSubFrames: false,
       preload: path.resolve(__dirname, 'js', 'content.js'),
       // preload: 'C:\\Users\\maxis\\Projects\\LoopStreamer_UI\\src\\content.js',
@@ -29,8 +30,8 @@ function createWindow() {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    win.loadURL('https://vivo.sx/97a0e64871');
+    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    // win.loadURL('https://vivo.sx/97a0e64871');
     // win.loadURL('https://google.de');
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
