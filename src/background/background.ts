@@ -1,7 +1,9 @@
-import {app, BrowserWindow} from 'electron';
-import {createProtocol,} from 'vue-cli-plugin-electron-builder/lib';
+import { app, BrowserWindow } from 'electron';
+import { createProtocol, } from 'vue-cli-plugin-electron-builder/lib';
 import * as path from 'path';
-import backgroundStore, { initStore } from '../store/store/background-store';
+import { initStore } from '../store/store/background-store';
+import WebContents = Electron.WebContents;
+import { fromEvent } from 'rxjs';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -21,18 +23,23 @@ function createWindow() {
     width: 1800,
     height: 1200,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       nodeIntegrationInSubFrames: false,
       preload: path.resolve(__dirname, 'js', 'content.js'),
       // preload: 'C:\\Users\\maxis\\Projects\\LoopStreamer_UI\\src\\content.js',
     },
   });
 
+
+  fromEvent(app, 'browser-window-created').subscribe( (data) => {
+    console.log(`new webContents with Url`, data);
+  })
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
     // win.loadURL('https://vivo.sx/97a0e64871');
-    // win.loadURL('https://google.de');
+    win.loadURL('https://bs.to');
     if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol('app');
@@ -44,7 +51,7 @@ function createWindow() {
     win = null;
   });
 
-  win.webContents.on('did-frame-finish-load', () => {
+  win.webContents.on('dom-ready', () => {
     console.log(22);
     if (win) {
       console.log('sending message to content script');
