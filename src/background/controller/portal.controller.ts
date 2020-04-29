@@ -56,7 +56,7 @@ export class PortalController {
             if (!this.store.selectSync(getActivePortalTabId)) {
                 await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalHref);
             }
-            const nextEpisodeLink = await this.messageService.sendMessageToPortalTab<string>(createGetNextVideoLinkMessage());
+            const nextEpisodeLink = await this.messageService.sendMessageToPortalTab(createGetNextVideoLinkMessage());
             if (nextEpisodeLink) {
                 await this.openPortalUrl(nextEpisodeLink);
                 return this.openCurrentEpisode();
@@ -73,7 +73,7 @@ export class PortalController {
             if (!this.store.selectSync(getActivePortalTabId)) {
                 await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalHref);
             }
-            const previousEpisode = await this.messageService.sendMessageToPortalTab<string>(createGetPreviousVideoLinkMessage());
+            const previousEpisode = await this.messageService.sendMessageToPortalTab(createGetPreviousVideoLinkMessage());
             if (previousEpisode) {
                 await this.openPortalUrl(previousEpisode);
                 return this.openCurrentEpisode();

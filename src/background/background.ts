@@ -4,6 +4,8 @@ import * as path from 'path';
 import { initStore } from '../store/store/background-store';
 import WebContents = Electron.WebContents;
 import { fromEvent } from 'rxjs';
+import {ipcRenderer, ipcMain} from 'electron'
+import { createGetActiveVideoInformation } from '../browserMessages/messages/portal.messages';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -54,8 +56,12 @@ function createWindow() {
   win.webContents.on('dom-ready', () => {
     console.log(22);
     if (win) {
+      const message = createGetActiveVideoInformation(true);
       console.log('sending message to content script');
-      win.webContents.send('test');
+      ipcMain.once(`${message.type}_reply`, (event, args) => {
+        console.log('reply from renderer', args)
+      })
+      win.webContents.send(message.type, message);
     }
   });
 }

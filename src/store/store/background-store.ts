@@ -1,16 +1,13 @@
-import {configureStore} from '@reduxjs/toolkit';
-import lastWatchedSeriesSlice, {setLastWatchedSeriesAction} from '../reducers/lastWatchedSeries.reducer';
-import seriesSlice, {initSeriesAction} from '../reducers/series.reducer';
-import portalsSlice, {updatePortalsAction} from '../reducers/portals.reducer';
-import {optionsSlice, updateOptionsAction} from '../reducers/options.reducer';
-import {StateModel} from '../models/state.model';
-import {providorsReducer, updateProvidorsAction} from '../reducers/providors.reducer';
-import {BrowserStorageMiddlerware} from '../middleware/browser-storage.middleware';
-import {browser} from 'webextension-polyfill-ts';
-import {controlStateSlice} from '../reducers/control-state.reducer';
+import { configureStore } from '@reduxjs/toolkit';
+import lastWatchedSeriesSlice from '../reducers/lastWatchedSeries.reducer';
+import seriesSlice from '../reducers/series.reducer';
+import portalsSlice from '../reducers/portals.reducer';
+import { optionsSlice } from '../reducers/options.reducer';
+import { StateModel } from '../models/state.model';
+import { providorsReducer } from '../reducers/providors.reducer';
+import { controlStateSlice } from '../reducers/control-state.reducer';
 // @ts-ignore
-import {composeWithDevTools} from 'remote-redux-devtools';
-import { forwardToRenderer, triggerAlias, replayActionMain } from 'electron-redux';
+import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 

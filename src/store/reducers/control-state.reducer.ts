@@ -5,7 +5,6 @@ import Providor from '../models/providor.model';
 import {LoopStreamerStatus} from '../enums/loop-streamer-status.enum';
 import {VIDEO_STATUS} from '../enums/video-status.enum';
 import {Windows} from 'webextension-polyfill-ts';
-import WindowState = Windows.WindowState;
 
 //
 // const initialControlState: ControlState = {
