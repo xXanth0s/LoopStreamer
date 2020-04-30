@@ -32,8 +32,6 @@ const backgroundStore = configureStore<StateModel>({
 });
 
 
-replayActionMain(backgroundStore);
-
 export const initStore = async function(): Promise<void> {
 
     replayActionMain(backgroundStore);

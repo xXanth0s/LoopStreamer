@@ -10,8 +10,9 @@ import {WindowController} from './window.controller';
 import Series from '../../store/models/series.model';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { createStartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
-import { setLastWatchedSeriesAction } from 'src/store/reducers/lastWatchedSeries.reducer';
-import { setVidoeTabIdAction } from 'src/store/reducers/control-state.reducer';
+import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
+import { setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
+import { WindowService } from '../services/window.service';
 
 @injectable()
 export class VideoController {
@@ -19,6 +20,7 @@ export class VideoController {
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
+        @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
         @inject(BACKGROUND_TYPES.TabController) private readonly tabController: TabController,
         @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
@@ -35,13 +37,12 @@ export class VideoController {
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (tabId) => {
             this.windowController.setCurrentWindowState();
-            await this.tabController.setActive(tabId);
             await this.messageService.sendMessageToVideoTab(createStartVideoProvidorMessage(seriesInfo));
             this.windowController.makeWindowFullscreen();
             this.store.dispatch(setLastWatchedSeriesAction(seriesInfo.key))
         });
 
-        await this.tabController.openTab(seriesInfo.lastEpisodeWatched.providorHref);
+        this.windowService.openWindow(seriesInfo.lastEpisodeWatched.providorHref);
     }
 
     public reset(): void {

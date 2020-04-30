@@ -4,7 +4,6 @@ import Portal from '../models/portal.model';
 import Providor from '../models/providor.model';
 import {LoopStreamerStatus} from '../enums/loop-streamer-status.enum';
 import {VIDEO_STATUS} from '../enums/video-status.enum';
-import {Windows} from 'webextension-polyfill-ts';
 
 //
 // const initialControlState: ControlState = {
@@ -89,7 +88,7 @@ const toggleWindowState = (state: ControlState): ControlState => {
 };
 
 const setCurrentWindowState = (state: ControlState, currentWindowState: ControlState['currentWindowState']): ControlState => {
-    let previousWindowState: Windows.WindowState | undefined = 'fullscreen';
+    let previousWindowState =  'fullscreen';
     if(currentWindowState === 'fullscreen') {
         previousWindowState =  state.currentWindowState === 'fullscreen' ? state.previousWindowState : state.currentWindowState;
     }

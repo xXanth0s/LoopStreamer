@@ -1,21 +1,22 @@
-import {inject, injectable} from 'inversify';
-import {BACKGROUND_TYPES} from '../container/BACKGROUND_TYPES';
-import {PortalController} from './portal.controller';
-import {VideoController} from './video.controller';
-import {TabController} from './tab.controller';
-import {browser} from 'webextension-polyfill-ts';
-import {MessageService} from '../../shared/services/message.service';
-import {SHARED_TYPES} from '../../shared/constants/SHARED_TYPES';
-import {StoreService} from '../../shared/services/store.service';
-import {ProvidorService} from '../services/providor.service';
-import {WindowController} from './window.controller';
+import { inject, injectable } from 'inversify';
+import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
+import { PortalController } from './portal.controller';
+import { VideoController } from './video.controller';
+import { TabController } from './tab.controller';
+import { MessageService } from '../../shared/services/message.service';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+import { StoreService } from '../../shared/services/store.service';
+import { ProvidorService } from '../services/providor.service';
+import { WindowController } from './window.controller';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { StartSeriesMessage } from '../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { LoopStreamerStatus } from '../../store/enums/loop-streamer-status.enum';
-import { setLoopStreamerStatusAction, resetControlStateAction } from 'src/store/reducers/control-state.reducer';
+import { resetControlStateAction, setLoopStreamerStatusAction } from '../../store/reducers/control-state.reducer';
+import { WindowService } from '../services/window.service';
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 
 @injectable()
 export class RootBackgroundController {
@@ -30,12 +31,29 @@ export class RootBackgroundController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
+                @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
                 @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService) {
     }
 
     public initialize(): void {
         if (!this.isInitialized) {
-            browser.runtime.onMessage.addListener(message => this.handleMessage(message));
+            // browser.runtime.onMessage.addListener(message => this.handleMessage(message));
+        }
+    }
+
+    public openStartPage(): void {
+        let href: string;
+        const isDev = process.env.WEBPACK_DEV_SERVER_URL;
+        if (isDev) {
+            href = process.env.WEBPACK_DEV_SERVER_URL as string;
+        } else {
+            createProtocol('app');
+            href = 'app://./index.html'
+        }
+
+        const window = this.windowService.openWindow(href, true);
+        if(isDev) {
+            window.webContents.openDevTools();
         }
     }
 

@@ -1,5 +1,4 @@
 import {inject, injectable} from 'inversify';
-import {browser} from 'webextension-polyfill-ts';
 import {CONTENT_TYPES} from '../container/CONTENT_TYPES';
 import {PortalService} from '../services/portal.service';
 import {ProvidorService} from '../services/providor.service';
@@ -11,7 +10,7 @@ import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { GetActiveVideoInformation } from '../../browserMessages/messages/portal.messages';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 import Series from '../../store/models/series.model';
-import ipcRenderer = Electron.ipcRenderer;
+import {ipcRenderer} from 'electron' ;
 
 @injectable()
 export class RootContentController {
@@ -25,7 +24,7 @@ export class RootContentController {
 
         ipcRenderer.on(MessageType.PORTAL_GET_VIDEO_INFORMATION, (event, args: GetActiveVideoInformation) => {
             event.returnValue
-            this.getInformationForOpenVideo(args.payload, event.sender.);
+            // this.getInformationForOpenVideo(args.payload, event.sender.);
         })
         // @ts-ignore
         browser.runtime.onMessage.addListener((request, sender, sendResponse) => this.handleOnMessageRequest(request, sendResponse));

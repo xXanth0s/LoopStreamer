@@ -1,20 +1,20 @@
-import {inject, injectable} from 'inversify';
-import {StoreService} from '../../shared/services/store.service';
-import {browser, Tabs} from 'webextension-polyfill-ts';
-import { filter, first, switchMap, takeUntil } from 'rxjs/operators';
-import {SHARED_TYPES} from '../../shared/constants/SHARED_TYPES';
-import {BACKGROUND_TYPES} from '../container/BACKGROUND_TYPES';
-import {ProvidorService} from '../services/providor.service';
-import { from, fromEvent, merge, Subject } from 'rxjs';
-import {WindowController} from './window.controller';
-import { getVideoTabId } from '../../store/selectors/control-state.selector';
-import { setVidoeTabIdAction, setVideoWindowIdAction, setIsUserOnVideoPageAction, setActivePortalTabIdAction } from 'src/store/reducers/control-state.reducer';
+import { inject, injectable } from 'inversify';
+import { StoreService } from '../../shared/services/store.service';
+import { first, takeUntil } from 'rxjs/operators';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
+import { ProvidorService } from '../services/providor.service';
+import { fromEvent, Subject } from 'rxjs';
+import { WindowController } from './window.controller';
+import {
+    setActivePortalTabIdAction,
+    setIsUserOnVideoPageAction,
+    setVidoeTabIdAction
+} from '../../store/reducers/control-state.reducer';
 import { getActivePortal } from '../../store/selectors/portals.selector';
-import Tab = Tabs.Tab;
 import { WindowService } from '../services/window.service';
-import BrowserView = Electron.BrowserView;
-import { app } from "electron";
-import BrowserWindow = Electron.BrowserWindow;
+import { app, BrowserWindow } from "electron";
+import path from "path";
 
 type WindowCreatedEvent = {event: Event, browserWindow: BrowserWindow};
 
@@ -123,28 +123,14 @@ export class TabController {
         this.takeUntilPortal$.next();
     }
 
-    public async closeTab(tabId: number): Promise<void> {
+    public async closeTab(tabId: number): Promise<BrowserWindow> {
         if (tabId) {
-            return browser.tabs.remove(tabId);
+            return BrowserWindow.fromId(tabId);
         }
-    }
-
-    public async openTab(href: string): Promise<Tabs.Tab> {
-        return browser.tabs.create({active: true, url: href});
-    }
-
-    public async setActive(tabId: number): Promise<void> {
-        await browser.tabs.update(tabId, {active: true});
     }
 
     public isUserOnVideoTab(): boolean {
         return this.isUserOnVideoTabVal
-    }
-
-    private checkIfUserIsOnNewTab(tab: Tabs.Tab): boolean {
-        // @ts-ignore
-        const url = tab.url || tab.pendingUrl;
-        return url === 'chrome://newtab/';
     }
 
     // private async isPageLoadFinished(tab: Tab, changeInfo: TabChangeInfo): Promise<boolean> {
@@ -158,17 +144,17 @@ export class TabController {
     //
     //     return false;
     // }
-
-    private isPortalTab(tab: Tabs.Tab): boolean {
-        const portal = this.store.selectSync(getActivePortal);
-
-        const regex = new RegExp(portal?.regex, 'i');
-        if (regex.test(tab.url)) {
-            this.store.dispatch(setIsUserOnVideoPageAction(false));
-            this.store.dispatch(setActivePortalTabIdAction(tab.id));
-            return true;
-        }
-
-        return false;
-    }
+    //
+    // private isPortalTab(tab: Tabs.Tab): boolean {
+    //     const portal = this.store.selectSync(getActivePortal);
+    //
+    //     const regex = new RegExp(portal?.regex, 'i');
+    //     if (regex.test(tab.url)) {
+    //         this.store.dispatch(setIsUserOnVideoPageAction(false));
+    //         this.store.dispatch(setActivePortalTabIdAction(tab.id));
+    //         return true;
+    //     }
+    //
+    //     return false;
+    // }
 }

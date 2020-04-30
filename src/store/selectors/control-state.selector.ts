@@ -1,8 +1,6 @@
 import {StateModel} from '../models/state.model';
 import {ControlState} from '../models/control-state.model';
 import {LoopStreamerStatus} from '../enums/loop-streamer-status.enum';
-import {Windows} from 'webextension-polyfill-ts';
-import WindowState = Windows.WindowState;
 
 export const getControlState = (state: StateModel): ControlState => state.controlState;
 

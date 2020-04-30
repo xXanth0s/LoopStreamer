@@ -3,7 +3,7 @@ import {SHARED_TYPES} from '../../shared/constants/SHARED_TYPES';
 import {StoreService} from '../../shared/services/store.service';
 import Providor from '../../store/models/providor.model';
 import { getActiveProvidor, getActiveSortedProvidors } from '../../store/selectors/providors.selector';
-import { setActiveProvidorAction } from 'src/store/reducers/control-state.reducer';
+import { setActiveProvidorAction } from '../../store/reducers/control-state.reducer';
 
 @injectable()
 export class ProvidorService {

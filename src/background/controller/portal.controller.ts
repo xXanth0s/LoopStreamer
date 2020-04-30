@@ -1,6 +1,5 @@
 import {inject, injectable} from 'inversify';
 import {StoreService} from '../../shared/services/store.service';
-import {browser, Tabs} from 'webextension-polyfill-ts';
 import {SHARED_TYPES} from '../../shared/constants/SHARED_TYPES';
 import {MessageService} from '../../shared/services/message.service';
 import {BACKGROUND_TYPES} from '../container/BACKGROUND_TYPES';
@@ -15,7 +14,7 @@ import {
 import { getLastWatchedSeries } from '../../store/selectors/lastWatchedSeries.selector';
 import { getActivePortalTabId, getAllPortals } from '../../store/selectors/portals.selector';
 import Portal from '../../store/models/portal.model';
-import { setActivePortalAction, setActivePortalTabIdAction } from 'src/store/reducers/control-state.reducer';
+import { setActivePortalAction, setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { WindowService } from '../services/window.service';
 import { fromEvent } from 'rxjs';
@@ -94,26 +93,26 @@ export class PortalController {
     }
 
     public async getActivePortal(): Promise<Portal> {
-        const portalTabId = this.store.selectSync(getActivePortalTabId);
-        let tab: Tabs.Tab;
-        if (portalTabId) {
-            tab = await browser.tabs.get(portalTabId);
-        } else {
-            const tabs = await browser.tabs.query({active: true, currentWindow: true});
-            tab = tabs[0];
-        }
-        let portals = this.store.selectSync(getAllPortals);
-        if (tab) {
-            portals = portals.filter(portal => {
-                const regex = new RegExp(portal.regex, 'i');
-                return regex.test(tab.url);
-            });
-            if (portals.length) {
-                this.store.dispatch(setActivePortalAction(portals[0].key));
-                this.store.dispatch(setActivePortalTabIdAction(tab.id));
-                return portals[0];
-            }
-        }
+        // const portalTabId = this.store.selectSync(getActivePortalTabId);
+        // let tab: Tabs.Tab;
+        // if (portalTabId) {
+        //     tab = await browser.tabs.get(portalTabId);
+        // } else {
+        //     const tabs = await browser.tabs.query({active: true, currentWindow: true});
+        //     tab = tabs[0];
+        // }
+        // let portals = this.store.selectSync(getAllPortals);
+        // if (tab) {
+        //     portals = portals.filter(portal => {
+        //         const regex = new RegExp(portal.regex, 'i');
+        //         return regex.test(tab.url);
+        //     });
+        //     if (portals.length) {
+        //         this.store.dispatch(setActivePortalAction(portals[0].key));
+        //         this.store.dispatch(setActivePortalTabIdAction(tab.id));
+        //         return portals[0];
+        //     }
+        // }
 
         return null;
     }

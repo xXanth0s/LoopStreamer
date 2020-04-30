@@ -5,8 +5,7 @@ import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
-import { ipcRenderer, ipcMain } from 'electron'
-import BrowserWindow = Electron.BrowserWindow;
+import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron'
 
 @injectable()
 export class MessageService {
@@ -18,7 +17,6 @@ export class MessageService {
 
     public async sendMessageToBackground<T, R>(message: Message<T, R>): Promise<R> {
         return ipcRenderer.invoke(message.type, message.payload);
-
     }
 
     public async sendMessageToPortalTab<T, R>(message: Message<T, R>): Promise<R> {
@@ -40,6 +38,10 @@ export class MessageService {
     public setControllerType(controllerType: ControllerType): void {
         this.controllerType = controllerType;
         console.info(controllerType)
+    }
+
+    public replyToSender<T, R>(message: Message<T, R>, sender: WebContents | IpcRenderer, args: R): void {
+        sender.send(this.getReplyChannel(message), args);
     }
 
     private sendMessageToBrowserWindow<T, R>(browserWindowId: number, message: Message<T, R>): Promise<R> {
