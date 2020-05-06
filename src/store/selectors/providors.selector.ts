@@ -3,6 +3,8 @@ import Providor from '../models/providor.model';
 
 export const getAllProvidors = (state: StateModel): Providor[] => Object.values(state.providors);
 
+export const getAllUsedProvidors = (state: StateModel): Providor[] => Object.values(state.providors).filter(providor => providor.isUsed);
+
 export const getProvidorForKey = (state: StateModel, providorKey: Providor['key']): Providor => {
     const providor = state.providors[providorKey];
     if(!providor) {

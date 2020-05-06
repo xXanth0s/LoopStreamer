@@ -1,3 +1,4 @@
 export enum PORTALS {
-    BS = 'BurningSeries'
+    BS = 'BurningSeries',
+    NONE = 'None'
 }

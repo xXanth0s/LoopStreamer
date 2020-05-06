@@ -84,8 +84,6 @@ body {
 .cont-box{
   padding-top: 15px;
   padding-left: 15px;
-  margin-top: 50px;
-  min-height: 50px;
   border: 1px solid $borderColor;
   border-radius: 5px;
   background-color: lighten($background-white, 8%);
@@ -181,4 +179,9 @@ body {
 
 .portal-selector {
   margin-bottom: 30px;
+}
+
+
+.row [class*='col-'] {
+  transition: flex 0.5s ease-in-out, max-width .5s ease-in-out;
 }

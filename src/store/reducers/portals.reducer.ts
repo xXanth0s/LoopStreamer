@@ -3,19 +3,20 @@ import Portal from '../models/portal.model';
 import {mapArrayToObject} from '../utils/selector.utils';
 import {PORTALS} from '../enums/portals.enum';
 
-const updatePortals = (portals: Portal[]): { [key: string]: Portal } => {
+const updatePortals = (portals: Portal[]): { [key in PORTALS]: Portal } => {
+    // @ts-ignore
     return mapArrayToObject(portals, 'key');
 };
 
-const initialPortalsData: { [key: string]: Portal } = {
-    'bs': {
-        key: 'bs',
+const initialPortalsData: { [key in PORTALS]?: Portal } = {
+    [PORTALS.BS]: {
+        key: PORTALS.BS,
         index: 0,
         regex: '^https:\/\/bs.to\/serie',
         controllerName: PORTALS.BS,
-        url: 'https://bs.to/',
-        name: 'burning series',
-        iframeRegex: 'https://bs.to/out/*'
+        baseUrl: 'https://bs.to',
+        seriesListUrl: 'https://bs.to/andere-serien',
+        name: 'Burning Series',
     }
 };
 
@@ -23,7 +24,7 @@ const portalsSlice = createSlice({
     name: 'portals',
     initialState: initialPortalsData,
     reducers: {
-        updatePortalsAction: (state: { [key: string]: Portal }, action: PayloadAction<Portal[]>) => updatePortals(action.payload)
+        updatePortalsAction: (state: { [key in PORTALS]: Portal }, action: PayloadAction<Portal[]>) => updatePortals(action.payload)
     }
 });
 

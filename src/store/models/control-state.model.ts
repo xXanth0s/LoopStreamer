@@ -11,6 +11,7 @@ export interface ControlState {
     isUserOnVideoPage: boolean;
     portalTabId?: number;
     videoTabId?: number;
+    optionsWindowId?: number;
     videoWindowId?: number;
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
@@ -20,4 +21,5 @@ export interface ControlState {
     activeVideoUrl?: string;
     currentWindowState?: string;
     previousWindowState?: string;
+    expandedSeriesOptionsPage?: Series['key'];
 }

@@ -1,12 +1,14 @@
-import SeriesEpisodeInfo from './series-episode-info.model'
+import SeriesEpisode from './series-episode.model'
+import { SeriesSeason } from './series-season.model';
 
 export default interface Series {
-    key: string,
-    title: string,
-    lastEpisodeWatched?: SeriesEpisodeInfo,
-    startTimeConfigured?: boolean,
-    endTimeConfigured?: boolean,
-    imageHref: string,
-    scipStartTime?: number,
-    scipEndTime?: number
+    key: string;
+    title: string;
+    lastEpisodeWatched?: SeriesEpisode['key'];
+    seasons: SeriesSeason['key'][];
+    startTimeConfigured?: boolean;
+    endTimeConfigured?: boolean;
+    posterHref: string;
+    scipStartTime?: number;
+    scipEndTime?: number;
 }

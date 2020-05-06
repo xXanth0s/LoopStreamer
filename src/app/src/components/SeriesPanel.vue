@@ -4,7 +4,7 @@
             <transition name="fade" mode="out-in">
                 <div v-if="!hideContent" key="front">
                     <div class="preview-image">
-                        <img :src="series.imageHref" @click="changeView()" alt="Avatar">
+                        <img :src="series.posterHref" @click="changeView()" alt="Avatar">
                     </div>
                     <div class="card-container-bottom">
                         {{series.title}}
@@ -116,10 +116,10 @@
 
         get CurrentEpisode() {
             if (this.series.lastEpisodeWatched) {
-                if (this.series.lastEpisodeWatched.timestamp === -1) {
-                    return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode + 1}`;
-                }
-                return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode}`;
+                // if (this.series.lastEpisodeWatched.timestamp === -1) {
+                //     return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode + 1}`;
+                // }
+                // return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode}`;
             }
             return '';
         }

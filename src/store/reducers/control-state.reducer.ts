@@ -1,19 +1,13 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ControlState} from '../models/control-state.model';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ControlState } from '../models/control-state.model';
 import Portal from '../models/portal.model';
 import Providor from '../models/providor.model';
-import {LoopStreamerStatus} from '../enums/loop-streamer-status.enum';
-import {VIDEO_STATUS} from '../enums/video-status.enum';
-
-//
-// const initialControlState: ControlState = {
-//     videoStatus: VIDEO_STATUS.None,
-//     loopStreamerStatus: LoopStreamerStatus.IDLE,
-//     isUserOnVideoPage: false,
-// } ;
+import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
+import { VIDEO_STATUS } from '../enums/video-status.enum';
+import { PORTALS } from '../enums/portals.enum';
 
 const initialControlState: ControlState = {
-    "activePortal": "bs",
+    "activePortal": PORTALS.BS,
     "activeProvidor": "Vivo",
     "isUserOnVideoPage": false,
     "loopStreamerStatus": LoopStreamerStatus.PLAYING,
@@ -57,6 +51,12 @@ const setIsUserOnVideoPage = function (state: ControlState, isUserOnVideoPage: C
 
 const resetControlState = (): ControlState => initialControlState;
 
+const setOptionsWindowIdId = (state: ControlState, optionsWindowId: ControlState['optionsWindowId']): ControlState => {
+    return {
+        ...state,
+        optionsWindowId
+    }
+};
 const setVidoeTabId = (state: ControlState, videoTabId: ControlState['videoTabId']): ControlState => {
     return {
         ...state,
@@ -99,6 +99,13 @@ const setCurrentWindowState = (state: ControlState, currentWindowState: ControlS
     }
 };
 
+function setExpandedSeriesOptionsPage(state: ControlState, expandedSeriesOptionsPage: string): ControlState {
+    return {
+        ...state,
+        expandedSeriesOptionsPage
+    }
+}
+
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -107,6 +114,7 @@ export const controlStateSlice = createSlice({
         setActivePortalAction: (state: ControlState, action: PayloadAction<Portal['key']>) => setActivePortal(state, action.payload),
         setActivePortalTabIdAction: (state: ControlState, action: PayloadAction<number>) => setActivePortalTabId(state, action.payload),
         setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) => setActiveProvidor(state, action.payload),
+        setOptionsWindowIdAction: (state: ControlState, action: PayloadAction<ControlState['optionsWindowId']>) => setOptionsWindowIdId(state, action.payload),
         setVidoeTabIdAction: (state: ControlState, action: PayloadAction<ControlState['videoTabId']>) => setVidoeTabId(state, action.payload),
         setVideoWindowIdAction: (state: ControlState, action: PayloadAction<ControlState['videoWindowId']>) => setVideoWindowId(state, action.payload),
         setIsUserOnVideoPageAction: (state: ControlState, action: PayloadAction<ControlState['isUserOnVideoPage']>) => setIsUserOnVideoPage(state, action.payload),
@@ -114,11 +122,13 @@ export const controlStateSlice = createSlice({
         resetControlStateAction: () => resetControlState(),
         toggleWindowStateAction: (state: ControlState) => toggleWindowState(state),
         setCurrentWindowStateAction: (state: ControlState, action: PayloadAction<ControlState['currentWindowState']>) => setCurrentWindowState(state, action.payload),
+        setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) => setExpandedSeriesOptionsPage(state, action.payload),
     }
 });
 
 export const {
     updateControlStateAction,
+    setOptionsWindowIdAction,
     setActivePortalAction,
     setActivePortalTabIdAction,
     setActiveProvidorAction,
@@ -129,4 +139,5 @@ export const {
     setLoopStreamerStatusAction,
     toggleWindowStateAction,
     setCurrentWindowStateAction,
+    setExpandedSeriesOptionsPageAction,
 } = controlStateSlice.actions;

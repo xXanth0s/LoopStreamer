@@ -14,7 +14,7 @@
                             <el-collapse-item title="Verfügbare Streamingportale" name="1">
                                 <ul>
                                     <li v-for="portal in portals" v-bind:key="portal.key">
-                                        <a :href="portal.url">{{portal.name}}</a>
+                                        <a :href="portal.baseUrl">{{portal.name}}</a>
                                     </li>
                                 </ul>
                             </el-collapse-item>

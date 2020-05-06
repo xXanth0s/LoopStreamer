@@ -16,11 +16,12 @@ export class MessageService {
 
 
     public async sendMessageToBackground<T, R>(message: Message<T, R>): Promise<R> {
-        return ipcRenderer.invoke(message.type, message.payload);
+        return ipcRenderer.invoke(message.type, message);
     }
 
     public async sendMessageToPortalTab<T, R>(message: Message<T, R>): Promise<R> {
         const portalTabId: number = this.storeService.selectSync(getActivePortalTabId);
+        console.log(portalTabId)
         if (portalTabId) {
             return this.sendMessageToBrowserWindow(portalTabId, message);
         }

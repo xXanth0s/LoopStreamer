@@ -1,12 +1,11 @@
 import {PORTALS} from '../enums/portals.enum';
 
 export default interface Portal {
-    key: string,
+    key: PORTALS,
     index: number,
     regex: string,
     controllerName: PORTALS,
-    url: string,
-    // redirectUrl: string,
+    baseUrl: string,
+    seriesListUrl: string,
     name: string,
-    iframeRegex: string
 }

@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import BootstrapVue, {IconsPlugin} from 'bootstrap-vue';
+// import BootstrapVue, {IconsPlugin} from 'bootstrap-vue';
 import {fromEvent} from 'rxjs';
 import {debounceTime, filter, tap} from 'rxjs/operators';
 
 import {Prop, Watch} from 'vue-property-decorator'
-import SeriesEpisodeInfo from '../../../store/models/series-episode-info.model';
+import SeriesEpisode from '../../../store/models/series-episode.model';
 import {injectable} from 'inversify';
 import {SHARED_TYPES} from '../../../shared/constants/SHARED_TYPES';
 import {MessageService} from '../../../shared/services/message.service';
@@ -28,18 +28,29 @@ import {inversifyContentContainer} from '../../container/container';
             @mouseover="isMouseOnButton = true"
             @mouseleave="isMouseOnButton = false">
             <transition name="fade">
-                <b-button-group v-if="showButtons">
-                    <b-button  variant="primary" :disabled="!episodeInfo.hasPreviousEpisode" @click.stop.prevent="previous"  title="Vorherige Episode">
-                        <b-icon icon="chevron-left" font-scale="3"></b-icon>
-                    </b-button>
-                    <b-button variant="primary" @click.stop.prevent="toggleFullscreenMode" :title="fullscreenTitle">
-                        <b-icon icon="arrows-angle-expand" v-if="!isFullscreen" font-scale="3"></b-icon>
-                        <b-icon icon="arrows-angle-contract" v-if="isFullscreen" font-scale="3"></b-icon>
-                    </b-button>
-                    <b-button variant="primary" :disabled="!episodeInfo.hasNextEpisode" @click.stop.prevent="next" title="Nächste Episode">
-                        <b-icon icon="chevron-right" font-scale="3"></b-icon>
-                    </b-button>
-                </b-button-group>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary active">
+                        <input type="radio" name="options" id="option1" autocomplete="off" checked> Active
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="option2" autocomplete="off"> Radio
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="option3" autocomplete="off"> Radio
+                    </label>
+                </div>
+<!--                <b-button-group v-if="showButtons">-->
+<!--                    <b-button  variant="primary" :disabled="!episodeInfo.hasPreviousEpisode" @click.stop.prevent="previous"  title="Vorherige Episode">-->
+<!--                        <b-icon icon="chevron-left" font-scale="3"></b-icon>-->
+<!--                    </b-button>-->
+<!--                    <b-button variant="primary" @click.stop.prevent="toggleFullscreenMode" :title="fullscreenTitle">-->
+<!--                        <b-icon icon="arrows-angle-expand" v-if="!isFullscreen" font-scale="3"></b-icon>-->
+<!--                        <b-icon icon="arrows-angle-contract" v-if="isFullscreen" font-scale="3"></b-icon>-->
+<!--                    </b-button>-->
+<!--                    <b-button variant="primary" :disabled="!episodeInfo.hasNextEpisode" @click.stop.prevent="next" title="Nächste Episode">-->
+<!--                        <b-icon icon="chevron-right" font-scale="3"></b-icon>-->
+<!--                    </b-button>-->
+<!--                </b-button-group>-->
             </transition>
           </div>`
 })
@@ -52,7 +63,7 @@ export default class ButtonComponent extends Vue {
     private readonly openFullscreenTitle = 'Vollbild';
 
     @Prop(Object)
-    private episodeInfo: SeriesEpisodeInfo;
+    private episodeInfo: SeriesEpisode;
 
     public get isFullscreen() {
         return this.fullscreen;
@@ -128,7 +139,7 @@ export default class ButtonComponent extends Vue {
 }
 
 
-export const addVideoButtons = function(episodeInfo: SeriesEpisodeInfo): void {
+export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
     const containerId = 'ls-video-buttons';
     const buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('id', containerId);
@@ -136,8 +147,8 @@ export const addVideoButtons = function(episodeInfo: SeriesEpisodeInfo): void {
 
     document.body.appendChild(buttonContainer);
 
-    Vue.use(BootstrapVue);
-    Vue.use(IconsPlugin);
+    // Vue.use(BootstrapVue);
+    // Vue.use(IconsPlugin);
     new Vue({
         render: h => h(ButtonComponent, {
             props: {

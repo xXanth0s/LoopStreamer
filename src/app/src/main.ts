@@ -5,8 +5,11 @@ import router from './router'
 import MainPage from './MainPage.vue';
 import {Button, Col, Collapse, CollapseItem, InputNumber, Menu, MenuItem, Row, Switch, Tabs, Tooltip} from 'element-ui';
 import BootstrapVue from 'bootstrap-vue';
+import { initBrowserStore } from '../../store/store/browser-store';
 
 Vue.config.productionTip = false;
+
+initBrowserStore();
 
 Vue.use(Switch);
 Vue.use(InputNumber);

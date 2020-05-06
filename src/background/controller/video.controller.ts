@@ -42,7 +42,7 @@ export class VideoController {
             this.store.dispatch(setLastWatchedSeriesAction(seriesInfo.key))
         });
 
-        this.windowService.openWindow(seriesInfo.lastEpisodeWatched.providorHref);
+        // this.windowService.openWindow(seriesInfo.lastEpisodeWatched.providorHref);
     }
 
     public reset(): void {

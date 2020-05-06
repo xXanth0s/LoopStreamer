@@ -1,5 +1,5 @@
 import {inject, injectable} from 'inversify';
-import SeriesEpisodeInfo from '../../store/models/series-episode-info.model';
+import SeriesEpisode from '../../store/models/series-episode.model';
 import {combineLatest, Subject, timer} from 'rxjs';
 import {filter, takeUntil, throttleTime} from 'rxjs/operators';
 import {
@@ -45,13 +45,13 @@ export class VideoController {
         if (!this.isActive) {
             this.isActive = true;
             const episodeInfo = seriesInfo.lastEpisodeWatched;
-            videoElement.play().then(() => this.onVideoStarted(videoElement, episodeInfo));
+            // videoElement.play().then(() => this.onVideoStarted(videoElement, episodeInfo));
             this.store.dispatch(updateSeriesAction(seriesInfo));
             this.startErrorTimer(this.timeout);
         }
     }
 
-    private onVideoStarted(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private onVideoStarted(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         this.initOnTimeUpdateObservable(video);
         this.videoStarted$.next();
         this.setStartTime(video, episodeInfo);
@@ -73,7 +73,7 @@ export class VideoController {
         })
     }
 
-    private updateSeriesInfo(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private updateSeriesInfo(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         this.onTimeUpdate$.pipe(
             throttleTime(1000),
         ).subscribe(async () => {
@@ -82,7 +82,7 @@ export class VideoController {
         })
     }
 
-    private endTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private endTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const seriesInfo$ = this.store.selectBehaviour(getSeriesByKey, episodeInfo.seriesKey).pipe(
             filter<Series>(Boolean)
         );
@@ -118,26 +118,26 @@ export class VideoController {
         ).subscribe(() => this.videoEnded());
     }
 
-    private setStartTime(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private setStartTime(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const series = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
-        if (series?.lastEpisodeWatched?.episode === episodeInfo.episode
-            && series?.lastEpisodeWatched?.season === episodeInfo.season
-            && series?.lastEpisodeWatched.timestamp) {
-            video.currentTime = series.lastEpisodeWatched.timestamp;
-        } else if (series?.startTimeConfigured) {
-            if (series.scipStartTime) {
-                video.currentTime = series.scipStartTime;
-            }
-        } else {
-            this.openSetStartTimePopup(video, episodeInfo);
-        }
+        // if (series?.lastEpisodeWatched?.episode === episodeInfo.episode
+        //     && series?.lastEpisodeWatched?.season === episodeInfo.season
+        //     && series?.lastEpisodeWatched.timestamp) {
+        //     video.currentTime = series.lastEpisodeWatched.timestamp;
+        // } else if (series?.startTimeConfigured) {
+        //     if (series.scipStartTime) {
+        //         video.currentTime = series.scipStartTime;
+        //     }
+        // } else {
+        //     this.openSetStartTimePopup(video, episodeInfo);
+        // }
     }
 
     public addFullscreenClass(nodeElement: HTMLElement): void {
         nodeElement.classList.add(FULL_SCREEN_VIDEO);
     }
 
-    private openSetStartTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private openSetStartTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         if(!Boolean(episodeInfo.timestamp)) {
             this.notificationService.openSetStartTimePopup(
                 () => {
@@ -152,7 +152,7 @@ export class VideoController {
         }
     }
 
-    private openSetEndTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisodeInfo): void {
+    private openSetEndTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         this.notificationService.openSetEndTimePopup(
             async () => {
                 await this.store.dispatch(setEndTimeForSeriesAction({
@@ -169,7 +169,7 @@ export class VideoController {
             })
     }
 
-    private openEndTimePopup(episodeInfo: SeriesEpisodeInfo): void {
+    private openEndTimePopup(episodeInfo: SeriesEpisode): void {
         if (episodeInfo.hasNextEpisode) {
             this.notificationService.openEndTimePopup(
                 () => {

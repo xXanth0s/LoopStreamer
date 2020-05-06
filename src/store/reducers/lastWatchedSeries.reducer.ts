@@ -13,7 +13,7 @@ const lastWatchedSeriesSlice = createSlice({
     initialState,
     reducers: {
         setLastWatchedSeriesAction : (state: Series['key'], action: PayloadAction<Series['key']>) => setLastWatchedEpisode(state, action.payload),
-    }
+    },
 });
 
 

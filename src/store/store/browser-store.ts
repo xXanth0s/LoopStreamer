@@ -16,10 +16,10 @@ import {
     getInitialStateRenderer,
 } from 'electron-redux';
 import path  from 'path';
+import seriesSeasonsReducer from '../reducers/series-season.reducer';
+import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 const __dirname = path.resolve();
 
-console.log(process.env.NODE_ENV );
-console.log(__dirname );
 const initialState = getInitialStateRenderer();
 
 const browserStore = configureStore<StateModel>({
@@ -29,7 +29,9 @@ const browserStore = configureStore<StateModel>({
         providors: providorsReducer.reducer,
         lastWatchedSeries: lastWatchedSeriesSlice.reducer,
         series: seriesSlice.reducer,
-        portals: portalsSlice.reducer
+        portals: portalsSlice.reducer,
+        seriesSeasons: seriesSeasonsReducer.reducer,
+        seriesEpisodes: seriesEpisodesReducer.reducer,
     },
     preloadedState: initialState,
     middleware: [
@@ -38,7 +40,9 @@ const browserStore = configureStore<StateModel>({
     devTools: true,
 });
 
+export const initBrowserStore = () => {
+    replayActionRenderer(browserStore);
 
-replayActionRenderer(browserStore);
+}
 
 export default browserStore;

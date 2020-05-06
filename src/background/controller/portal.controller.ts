@@ -1,23 +1,34 @@
-import {inject, injectable} from 'inversify';
-import {StoreService} from '../../shared/services/store.service';
-import {SHARED_TYPES} from '../../shared/constants/SHARED_TYPES';
-import {MessageService} from '../../shared/services/message.service';
-import {BACKGROUND_TYPES} from '../container/BACKGROUND_TYPES';
-import {TabController} from './tab.controller';
-import {VideoController} from './video.controller';
-import { filter, first, takeUntil } from 'rxjs/operators';
+import { inject, injectable } from 'inversify';
+import { StoreService } from '../../shared/services/store.service';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+import { MessageService } from '../../shared/services/message.service';
+import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
+import { TabController } from './tab.controller';
+import { VideoController } from './video.controller';
+import { first } from 'rxjs/operators';
 import Series from '../../store/models/series.model';
 import {
     createGetActiveVideoInformation,
-    createGetNextVideoLinkMessage, createGetPreviousVideoLinkMessage
+    createGetAllSeriesFromPortalMessage,
+    createGetEpisodesForSeasonMessage,
+    createGetNextVideoLinkMessage,
+    createGetPreviousVideoLinkMessage,
+    createGetSeriesInformationMessage
 } from '../../browserMessages/messages/portal.messages';
 import { getLastWatchedSeries } from '../../store/selectors/lastWatchedSeries.selector';
-import { getActivePortalTabId, getAllPortals } from '../../store/selectors/portals.selector';
+import { getActivePortalTabId, getPortalForKey } from '../../store/selectors/portals.selector';
 import Portal from '../../store/models/portal.model';
-import { setActivePortalAction, setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { WindowService } from '../services/window.service';
 import { fromEvent } from 'rxjs';
+import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
+import { PORTALS } from '../../store/enums/portals.enum';
+import { setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
+import { SeriesSeason } from '../../store/models/series-season.model';
+import { SeriesInfoDto } from '../../dto/series-info.dto';
+import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
+import { Message } from '../../browserMessages/messages/message.interface';
+import { getSeriesSeasonByKey } from '../../store/selectors/series-season.selector';
 
 @injectable()
 export class PortalController {
@@ -30,6 +41,23 @@ export class PortalController {
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController) {
     }
 
+
+    public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesMetaInfoDto[]> {
+        const portal = this.store.selectSync(getPortalForKey, portalKey);
+        return this.openPageAndGetDataForMessage(portal.seriesListUrl, createGetAllSeriesFromPortalMessage());
+    }
+
+    public async getSeriesInformation(seriesInfo: SeriesMetaInfoDto): Promise<SeriesInfoDto> {
+        return this.openPageAndGetDataForMessage(seriesInfo.link, createGetSeriesInformationMessage());
+    }
+
+    public async getEpisodesForSeason(seasonKey: string, portal: PORTALS): Promise<SeriesEpisodeDto[]> {
+        const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey)
+        if(seriesSeason) {
+            return this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portal], createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
+        }
+        return null
+    }
 
     public async getActiveVideoInformation(withVideoLink: boolean, fallbackPortalUrl?: string): Promise<Series> {
         let result: Series = null;
@@ -50,46 +78,25 @@ export class PortalController {
 
     public async openNextEpisode(): Promise<boolean> {
         const lastSeriesWatched = this.store.selectSync(getLastWatchedSeries);
-        const seriesInfo = await this.getActiveVideoInformation(false, lastSeriesWatched?.lastEpisodeWatched?.portalHref);
-        if (seriesInfo?.lastEpisodeWatched?.hasNextEpisode) {
-            if (!this.store.selectSync(getActivePortalTabId)) {
-                await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalHref);
-            }
-            const nextEpisodeLink = await this.messageService.sendMessageToPortalTab(createGetNextVideoLinkMessage());
-            if (nextEpisodeLink) {
-                await this.openPortalUrl(nextEpisodeLink);
-                return this.openCurrentEpisode();
-            }
-        }
 
         return false;
     }
 
     public async openPreviousEpisode(): Promise<boolean> {
         const lastSeriesWatched = this.store.selectSync(getLastWatchedSeries);
-        const seriesInfo = await this.getActiveVideoInformation(false, lastSeriesWatched?.lastEpisodeWatched?.portalHref);
-        if (seriesInfo?.lastEpisodeWatched?.hasPreviousEpisode) {
-            if (!this.store.selectSync(getActivePortalTabId)) {
-                await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalHref);
-            }
-            const previousEpisode = await this.messageService.sendMessageToPortalTab(createGetPreviousVideoLinkMessage());
-            if (previousEpisode) {
-                await this.openPortalUrl(previousEpisode);
-                return this.openCurrentEpisode();
-            }
-        }
+        // if (seriesInfo?.lastEpisodeWatched?.hasPreviousEpisode) {
+        //     if (!this.store.selectSync(getActivePortalTabId)) {
+        //         await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalLinks);
+        //     }
+        //     const previousEpisode = await this.messageService.sendMessageToPortalTab(createGetPreviousVideoLinkMessage());
+        //     if (previousEpisode) {
+        //         await this.openPortalUrl(previousEpisode);
+        //         return this.openCurrentEpisode();
+        //     }
+        // }
 
         return false;
 
-    }
-
-    public async openCurrentEpisode(): Promise<boolean> {
-        const seriesInfo = await this.getActiveVideoInformation(true);
-        if (seriesInfo?.lastEpisodeWatched?.providorHref) {
-            await this.videoController.startVideo(seriesInfo);
-            return true;
-        }
-        return false;
     }
 
     public async getActivePortal(): Promise<Portal> {
@@ -119,16 +126,37 @@ export class PortalController {
 
     public async startLastWatchedEpisodeOfSeries(seriesKey: Series['key']): Promise<void> {
         const series = await this.store.selectSync(getSeriesByKey, seriesKey);
-        await this.openPortalUrl(series.lastEpisodeWatched.portalHref);
-        this.openCurrentEpisode();
     }
 
     public async openPortalUrl(url: string): Promise<void> {
-        const { webContents } = this.windowService.getPortalWindow();
-        webContents.loadURL(url);
-        return fromEvent<void>(webContents,'dom-ready').pipe(
+        let window = this.windowService.getPortalWindow();
+        if(!window) {
+            window = this.windowService.openWindow(url);
+            this.store.dispatch(setActivePortalTabIdAction(window.id));
+        } else {
+            window.webContents.loadURL(url);
+
+        }
+        this.tabController.startAdBlockerForPortal();
+        return fromEvent<void>(window.webContents,'dom-ready').pipe(
             first()
         ).toPromise();
+        // return new Promise(resolve => {
+        //     return fromEvent<void>(window.webContents,'dom-ready').pipe(
+        //         first()
+        //     ).subscribe(() => resolve());
+        // });
+    }
 
+    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, message: Message<T, R>): Promise<R> {
+        await this.openPortalUrl(portalUrl);
+        const result = await this.messageService.sendMessageToPortalTab(message);
+        this.closePortalWindow();
+        return result;
+    }
+
+    private closePortalWindow(): void {
+        this.windowService.getPortalWindow()?.close();
+        this.tabController.stopPortalAdBlock();
     }
 }

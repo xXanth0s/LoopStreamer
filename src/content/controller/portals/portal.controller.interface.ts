@@ -1,6 +1,9 @@
 import Series from '../../../store/models/series.model';
 import Providor from '../../../store/models/providor.model';
-import SeriesEpisodeInfo from '../../../store/models/series-episode-info.model';
+import SeriesEpisode from '../../../store/models/series-episode.model';
+import { SeriesMetaInfoDto } from '../../../dto/series-meta-info.dto';
+import { SeriesInfoDto } from '../../../dto/series-info.dto';
+import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 
 export interface IPortalController {
 
@@ -8,9 +11,13 @@ export interface IPortalController {
 
     isVideoOpenWithProvidor(): Providor | null;
 
-    getSeriesInfo(withVideoLink: boolean): Promise<Series>;
+    getEpisodeInfo(withVideoLink: boolean): Promise<SeriesEpisodeDto>;
 
-    getEpisodeInfo(withVideoLink: boolean): Promise<SeriesEpisodeInfo>;
+    getLinkForEpisodeWithOffset(offset: number): Promise<string>;
 
-    getLinkForEpisodeWithOffset(offset: number): Promise<string>
+    getAllSeriesInfo(): SeriesMetaInfoDto[];
+
+    getSeriesMetaInformation(): SeriesInfoDto;
+
+    getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[];
 }

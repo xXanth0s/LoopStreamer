@@ -8,6 +8,8 @@ import { providorsReducer } from '../reducers/providors.reducer';
 import { controlStateSlice } from '../reducers/control-state.reducer';
 // @ts-ignore
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
+import seriesSeasonsReducer from '../reducers/series-season.reducer';
+import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
@@ -18,7 +20,9 @@ const backgroundStore = configureStore<StateModel>({
         providors: providorsReducer.reducer,
         lastWatchedSeries: lastWatchedSeriesSlice.reducer,
         series: seriesSlice.reducer,
-        portals: portalsSlice.reducer
+        portals: portalsSlice.reducer,
+        seriesSeasons: seriesSeasonsReducer.reducer,
+        seriesEpisodes: seriesEpisodesReducer.reducer,
     },
     // @ts-ignore
     middleware: [
