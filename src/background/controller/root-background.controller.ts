@@ -29,6 +29,7 @@ import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
+import messages from '../../app/constants/messages';
 
 @injectable()
 export class RootBackgroundController {
@@ -147,6 +148,7 @@ export class RootBackgroundController {
     }
 
     private async getSeriesInformationFromPortalHandler({payload}: GetSeriesInformationFromPortalMessage): Promise<Series> {
+        console.log('getSeriesInformationFromPortalHandler', payload)
         const seriesInfo = await this.portalController.getSeriesInformation(payload);
         return this.seriesService.addSeries(seriesInfo);
     }

@@ -56,6 +56,7 @@
     import { SeriesMetaViewModel } from '../models/series-meta-view.model';
     import { getKeyForSeriesTitle } from '../../../store/utils/key.utils';
     import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
+    import {allSeriesMock} from '../mocks/all-series.mock';
 
     @Component({
         name: 'welcome-page',
@@ -91,7 +92,7 @@
             this.showSpinner = true;
             try {
                 const seriesResult = await this.messageService.sendMessageToBackground(message);
-                debugger
+                // const seriesResult = allSeriesMock as SeriesMetaInfoDto[];
                 this.series = seriesResult.map(metaInfo => ({
                     ...metaInfo,
                     key: getKeyForSeriesTitle(metaInfo.title),

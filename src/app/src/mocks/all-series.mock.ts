@@ -49,7 +49,7 @@ export const allSeriesMock = [
         link: 'https://bs.to/serie/Black-Sails',
         title: 'Black Sails',
         portal: 'BurningSeries'
-    }
+    },
     {
         link: 'https://bs.to/serie/Young-Justice',
         title: 'Young Justice',

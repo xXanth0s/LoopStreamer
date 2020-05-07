@@ -14,8 +14,8 @@ const initialPortalsData: { [key in PORTALS]?: Portal } = {
         index: 0,
         regex: '^https:\/\/bs.to\/serie',
         controllerName: PORTALS.BS,
-        baseUrl: 'https://bs.to',
-        seriesListUrl: 'https://bs.to/andere-serien',
+        baseUrl: 'https://burningseries.co/',
+        seriesListUrl: 'https://burningseries.co/andere-serien',
         name: 'Burning Series',
     }
 };

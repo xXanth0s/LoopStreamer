@@ -5,7 +5,7 @@
                          v-for="series in seriesList"
                          v-bind:key="series.key"
                          v-bind:series="series"
-                         @click="test()">
+                         @tile-clicked="seasonSelected">
             </series-tile>
         </div>
         <div class="row">
@@ -16,20 +16,20 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
-    import { Prop } from 'vue-property-decorator';
-    import Component from 'vue-class-component';
-    import { takeUntil } from 'rxjs/operators';
-    import { Subject } from 'rxjs';
-    import { optionsContainer } from '../../container/container';
-    import { StoreService } from '../../../../shared/services/store.service';
-    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { MessageService } from '../../../../shared/services/message.service';
-    import { setExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
-    import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
-    import SeriesTile from './SeriesTile.vue';
-    import { isAnySeriesExpandedOnOptionsPage } from '../../../../store/selectors/control-state.selector';
-    import SeriesDetailView from './SeriesDetailView.vue';
+    import Vue from "vue";
+    import {Prop, Watch} from "vue-property-decorator";
+    import Component from "vue-class-component";
+    import {takeUntil} from "rxjs/operators";
+    import {Subject} from "rxjs";
+    import {optionsContainer} from "../../container/container";
+    import {StoreService} from "../../../../shared/services/store.service";
+    import {SHARED_TYPES} from "../../../../shared/constants/SHARED_TYPES";
+    import {MessageService} from "../../../../shared/services/message.service";
+    import {setExpandedSeriesOptionsPageAction} from "../../../../store/reducers/control-state.reducer";
+    import {SeriesMetaViewModel} from "../../models/series-meta-view.model";
+    import SeriesTile from "./SeriesTile.vue";
+    import {isAnySeriesExpandedOnOptionsPage} from "../../../../store/selectors/control-state.selector";
+    import SeriesDetailView from "./SeriesDetailView.vue";
 
 
     @Component({
@@ -42,7 +42,7 @@
     export default class SeriesListRow extends Vue {
         private readonly takeUntil$ = new Subject();
 
-        @Prop(Object)
+        @Prop(Array)
         private seriesList: SeriesMetaViewModel[];
 
         private openSeries: SeriesMetaViewModel = null;
@@ -64,15 +64,14 @@
         }
 
         public async seasonSelected(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
-            console.log('seasonSelected', seriesMetaInfo)
             this.store.dispatch(setExpandedSeriesOptionsPageAction(seriesMetaInfo.key));
             this.openSeries = seriesMetaInfo;
         }
 
-        public mounted(): void {
-            console.log( this.seriesList);
-            const keys = this.seriesList.map(series => series.key);
-            this.store.selectBehaviour(isAnySeriesExpandedOnOptionsPage, keys).pipe(
+        @Watch('seriesList', { immediate: true })
+        public initializeSeriesList(seriesList: SeriesMetaViewModel[]): void {
+            const keys = seriesList.map(series => series.key);
+            this.store.select(isAnySeriesExpandedOnOptionsPage, keys).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isAnySeriesSelected => {
                 if (!isAnySeriesSelected) {
