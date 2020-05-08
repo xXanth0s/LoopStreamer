@@ -13,6 +13,9 @@ import { createStartVideoProvidorMessage } from '../../browserMessages/messages/
 import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
 import { setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
+import { ProvidorLink } from '../models/providor-link.model';
+import SeriesEpisode from '../../store/models/series-episode.model';
+import { PROVIDORS } from '../../store/enums/providors.enum';
 
 @injectable()
 export class VideoController {
@@ -27,7 +30,7 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesInfo: Series): Promise<void> {
+    public async startVideo(seriesEpisode: SeriesEpisode, providor: PROVIDORS): Promise<void> {
         this.reset();
         this.tabController.startAddBlockerForProvidor();
 
@@ -36,13 +39,14 @@ export class VideoController {
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (tabId) => {
-            this.windowController.setCurrentWindowState();
-            await this.messageService.sendMessageToVideoTab(createStartVideoProvidorMessage(seriesInfo));
-            this.windowController.makeWindowFullscreen();
-            this.store.dispatch(setLastWatchedSeriesAction(seriesInfo.key))
+            // this.windowController.setCurrentWindowState();
+            this.messageService.sendMessageToVideoTab(createStartVideoProvidorMessage(seriesEpisode, providor));
+            // this.windowController.makeWindowFullscreen();
+            this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
+            this.windowService.getProvidorWindow().show();
         });
 
-        // this.windowService.openWindow(seriesInfo.lastEpisodeWatched.providorHref);
+        this.windowService.openWindow(seriesEpisode.providorLinks[providor]);
     }
 
     public reset(): void {

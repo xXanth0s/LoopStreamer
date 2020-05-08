@@ -14,7 +14,7 @@ import {
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
     OpenNextVideoMessage,
-    OpenPreviousVideoMessage,
+    OpenPreviousVideoMessage, StartEpisodeMessage,
     StartSeriesMessage,
     ToggleFullscreenModeMessage,
     VideoFinishedMessage,
@@ -30,6 +30,7 @@ import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import messages from '../../app/constants/messages';
+import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 
 @injectable()
 export class RootBackgroundController {
@@ -62,100 +63,119 @@ export class RootBackgroundController {
             this.windowService.addReduxDevTools();
         } else {
             createProtocol('app');
-            href = 'app://./index.html'
+            href = 'app://./index.html';
         }
 
         const window = this.windowService.openWindow(href, { nodeIntegration: true, visible: true });
         this.store.dispatch(setOptionsWindowIdAction(window.id));
-        if(isDev) {
+        if (isDev) {
             window.webContents.openDevTools();
         }
     }
 
     private initializeHandler(): void {
-        ipcMain.on(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
             this.videoFinishedHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_TOGGLE_FULLSCREEN, (event, message: ToggleFullscreenModeMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_TOGGLE_FULLSCREEN, (event, message: ToggleFullscreenModeMessage) => {
             this.windowController.toggleWindowState();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_WINDOW_RESIZED, (event, message: WindowResizedMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_WINDOW_RESIZED, (event, message: WindowResizedMessage) => {
             this.windowController.setCurrentWindowState();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
             this.nextVideoHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
             this.previousVideoHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) =>  {
+        ipcMain.on(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
             this.continueSeriesHandler(message);
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
-            async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> =>  {
-            return this.getAllVideosFromPortalHandler(message);
+        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage) => {
+            this.startEpisodeHandler(message);
         });
+
+        ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
+            async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
+                return this.getAllVideosFromPortalHandler(message);
+            });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_INFORMATION,
-            async (event, message: GetSeriesInformationFromPortalMessage): Promise<Series> =>  {
-            return this.getSeriesInformationFromPortalHandler(message);
-        });
+            async (event, message: GetSeriesInformationFromPortalMessage): Promise<Series> => {
+                return this.getSeriesInformationFromPortalHandler(message);
+            });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_EPISODES_FOR_SEASON,
-            async (event, message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> =>  {
-            return this.getSeriesEpisodeForSeasonHandler(message);
-        });
+            async (event, message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> => {
+                console.log(message);
+                return this.getSeriesEpisodeForSeasonHandler(message);
+            });
     }
 
     private async videoFinishedHandler(): Promise<void> {
         if (this.tabController.isUserOnVideoTab()) {
             this.store.stopPlayer();
-            await this.portalController.openNextEpisode();
+            // await this.portalController.openNextEpisode();
         }
     }
 
     private async previousVideoHandler(): Promise<void> {
         this.store.stopPlayer();
-        const isNextVideoAvailable = await this.portalController.openPreviousEpisode();
-        if (!isNextVideoAvailable) {
-            console.error(`${MessageType.BACKGROUND_PREVIOUS_VIDEO}: no next episode available`)
-        }
+        // const isNextVideoAvailable = await this.portalController.openPreviousEpisode();
+        // if (!isNextVideoAvailable) {
+        //     console.error(`${MessageType.BACKGROUND_PREVIOUS_VIDEO}: no next episode available`)
+        // }
     }
 
     private async nextVideoHandler(): Promise<void> {
         this.store.stopPlayer();
-        const isNextVideoAvailable = await this.portalController.openNextEpisode();
-        if (!isNextVideoAvailable) {
-            console.error(`${MessageType.BACKGROUND_NEXT_VIDEO}: no next episode available`)
-        }
+        // const isNextVideoAvailable = await this.portalController.openNextEpisode();
+        // if (!isNextVideoAvailable) {
+        //     console.error(`${MessageType.BACKGROUND_NEXT_VIDEO}: no next episode available`)
+        // }
     }
 
-    private continueSeriesHandler({payload}: StartSeriesMessage): void {
+    private continueSeriesHandler({ payload }: StartSeriesMessage): void {
         this.resetController();
         this.store.stopPlayer();
         const series = this.store.selectSync(getSeriesByKey, payload);
-        this.videoController.startVideo(series);
+        // this.videoController.startVideo(series);
     }
 
-    private async getAllVideosFromPortalHandler({payload}: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> {
+    private async getAllVideosFromPortalHandler({ payload }: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> {
         return this.portalController.getAllSeriesFromPortal(payload);
     }
 
-    private async getSeriesInformationFromPortalHandler({payload}: GetSeriesInformationFromPortalMessage): Promise<Series> {
-        console.log('getSeriesInformationFromPortalHandler', payload)
+    private async getSeriesInformationFromPortalHandler({ payload }: GetSeriesInformationFromPortalMessage): Promise<Series> {
+        console.log('getSeriesInformationFromPortalHandler', payload);
         const seriesInfo = await this.portalController.getSeriesInformation(payload);
         return this.seriesService.addSeries(seriesInfo);
     }
 
-    private async getSeriesEpisodeForSeasonHandler({payload}: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> {
-        const episodeDtos = await this.portalController.getEpisodesForSeason(payload.seriesSeasonKey, payload.portal);
+    private async getSeriesEpisodeForSeasonHandler(message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> {
+        const { portal, seriesSeasonKey } = message.payload;
+
+        const episodeDtos = await this.portalController.getEpisodesForSeason(seriesSeasonKey, portal);
+        console.log(episodeDtos);
         return this.seriesService.addSeriesEpisodes(episodeDtos);
+    }
+
+    private async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
+        const { portal, episodeKey } = message.payload;
+        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
+        console.log('providorLink', providorLink);
+        console.log(providorLink);
+        if (providorLink.link) {
+            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
+            this.videoController.startVideo(episodeInfo, providorLink.providor);
+        }
     }
 
     private resetController(): void {
@@ -163,4 +183,5 @@ export class RootBackgroundController {
         this.store.stopPlayer();
         this.videoController.reset();
     }
+
 }

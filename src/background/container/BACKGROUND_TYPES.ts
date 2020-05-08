@@ -5,6 +5,7 @@ const BACKGROUND_TYPES = {
     TabController: Symbol.for('TabController'),
     WindowController: Symbol.for('WindowController'),
     ProvidorService: Symbol.for('ProvidorService'),
+    PortalService: Symbol.for('PortalService'),
     WindowService: Symbol.for('WindowService'),
 };
 

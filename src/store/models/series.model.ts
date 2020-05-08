@@ -4,6 +4,7 @@ import { SeriesSeason } from './series-season.model';
 export default interface Series {
     key: string;
     title: string;
+    description?: string;
     lastEpisodeWatched?: SeriesEpisode['key'];
     seasons: SeriesSeason['key'][];
     startTimeConfigured?: boolean;

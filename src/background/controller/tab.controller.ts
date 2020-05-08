@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
-import { first, takeUntil } from 'rxjs/operators';
+import { first, map, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
@@ -13,10 +13,11 @@ import {
 } from '../../store/reducers/control-state.reducer';
 import { getActivePortal } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, WebContents } from "electron";
 import path from "path";
+import { PortalService } from '../services/portalService';
 
-type WindowCreatedEvent = {event: Event, browserWindow: BrowserWindow};
+type WebContensCreatedEvent = {event: Event, webContents: WebContents};
 
 @injectable()
 export class TabController {
@@ -29,6 +30,7 @@ export class TabController {
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
+                @inject(BACKGROUND_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
@@ -74,19 +76,20 @@ export class TabController {
         // });
         //
 
-        fromEvent<WindowCreatedEvent>(app, 'browser-window-created').pipe(
+        fromEvent<WebContensCreatedEvent>(app, 'web-contents-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             takeUntil(this.takeUntilProvidor$),
         ).subscribe(data => {
-            const {webContents} = data.browserWindow;
+            const {webContents} = data;
+            const window = BrowserWindow.fromWebContents(webContents)
             if(this.providorService.isUrlValid(webContents.getURL())) {
                 fromEvent<Event>(webContents,'dom-ready').pipe(
                     first()
                 ).subscribe(() => {
-                    this.store.dispatch(setVidoeTabIdAction(data.browserWindow.id));
+                    this.store.dispatch(setVidoeTabIdAction(window.id));
                 })
             } else {
-                data.browserWindow.close();
+                window.close();
             }
         })
         //
@@ -105,6 +108,24 @@ export class TabController {
     }
 
     public startAdBlockerForPortal(): void {
+        app.on('web-contents-created')
+        fromEvent(app, 'web-contents-created').pipe(
+            map(data => ({event: data[0], webContents: [1]})),
+            takeUntil(this.store.playerHasStopped()),
+            takeUntil(this.takeUntilPortal$),
+        ).subscribe(data => {
+            console.log('startAdBlockerForPortal', data)
+            const { webContents } = data
+            const window = BrowserWindow.fromWebContents(webContents)
+            if(this.portalService.isUrlValid(webContents.getURL())) {
+                const window = this.windowService.getPortalWindow();
+                window.close();
+                this.store.dispatch(setActivePortalTabIdAction(window.id))
+            } else {
+                window.close();
+            }
+        })
+
         // browserRx.tabs.onActivated.pipe(
         //     takeUntil(merge(this.store.playerHasStopped(), this.takeUntilPortal$)),
         // ).subscribe(async (event) => {

@@ -5,7 +5,7 @@ export default interface  SeriesEpisode {
     key: string;
     seriesKey: string;
     season: number;
-    episode: number;
+    episodeNumber: number;
     hasNextEpisode?: boolean;
     hasPreviousEpisode?: boolean;
     portalLinks: { [key in PORTALS]: {

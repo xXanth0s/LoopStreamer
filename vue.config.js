@@ -32,7 +32,6 @@ module.exports = {
     electronBuilder: {
       mainProcessFile: 'src/background/background.ts',
       mainProcessWatch: [
-        'src/content/**/*.ts',
         'src/shared/**/*.ts',
         'src/store/**/*.ts',
         'src/background/**/*.ts',

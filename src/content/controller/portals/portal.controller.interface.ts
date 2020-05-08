@@ -4,16 +4,13 @@ import SeriesEpisode from '../../../store/models/series-episode.model';
 import { SeriesMetaInfoDto } from '../../../dto/series-meta-info.dto';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
 import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
+import { PROVIDORS } from '../../../store/enums/providors.enum';
 
 export interface IPortalController {
 
-    getLinkForOpenVideo(): boolean;
+    getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string>;
 
     isVideoOpenWithProvidor(): Providor | null;
-
-    getEpisodeInfo(withVideoLink: boolean): Promise<SeriesEpisodeDto>;
-
-    getLinkForEpisodeWithOffset(offset: number): Promise<string>;
 
     getAllSeriesInfo(): SeriesMetaInfoDto[];
 

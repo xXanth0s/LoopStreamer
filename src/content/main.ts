@@ -1,7 +1,7 @@
 import { inversifyContentContainer } from './container/container';
 import { ipcRenderer } from 'electron'
 import { MessageType } from '../browserMessages/enum/message-type.enum';
-import { GetActiveVideoInformation } from '../browserMessages/messages/portal.messages';
+import { GetProvidorLinkForEpisode } from '../browserMessages/messages/portal.messages';
 import { RootContentController } from './controller/root-content.controller';
 import { CONTENT_TYPES } from './container/CONTENT_TYPES';
 import { initBrowserStore } from '../store/store/browser-store';

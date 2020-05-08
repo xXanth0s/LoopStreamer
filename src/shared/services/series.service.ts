@@ -9,9 +9,10 @@ import Series from '../../store/models/series.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import { addSeriesEpisodeAction } from '../../store/reducers/series-episode.reducer';
+import { addSeriesEpisodeAction, addProvidorLinkToEpisodeAction } from '../../store/reducers/series-episode.reducer';
 import { SeriesSeason } from '../../store/models/series-season.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { ProvidorLink } from '../../background/models/providor-link.model';
 
 @injectable()
 export class SeriesService {
@@ -29,6 +30,7 @@ export class SeriesService {
             const seriesSeason: SeriesSeason = {
                 key,
                 seriesKey,
+
                 seasonNumber: +seasonNumber,
                 // @ts-ignore
                 portalLinks: {[seriesInfo.portal]: seriesInfo.seasonsLinks[seasonNumber]},
@@ -46,14 +48,15 @@ export class SeriesService {
 
         episodeDtos.forEach(episodeDto => {
             const seriesKey = getKeyForSeriesTitle(episodeDto.seriesTitle);
-            const key = getKeyForSeriesEpisode(episodeDto.seriesTitle, episodeDto.seasonNumber, episodeDto.epdisodeNumber);
+            console.log(seriesKey)
+            const key = getKeyForSeriesEpisode(seriesKey, episodeDto.seasonNumber, episodeDto.epdisodeNumber);
             episodeKeys.push(key);
-
+            console.log(episodeKeys)
             const episode: SeriesEpisode = {
                 key,
                 seriesKey,
                 season: episodeDto.seasonNumber,
-                episode: episodeDto.epdisodeNumber,
+                episodeNumber: episodeDto.epdisodeNumber,
                 // @ts-ignore
                 portalLinks: {
                     [episodeDto.portal]: episodeDto.portalLinks
@@ -65,5 +68,11 @@ export class SeriesService {
         });
 
         return episodeKeys.map(key => this.store.selectSync(getSeriesEpisodeByKey, key));
+    }
+
+    addProvidorLinkToSeries(episodeKey: string,providorLink: ProvidorLink) {
+        this.store.dispatch(addProvidorLinkToEpisodeAction({episodeKey, providorLink}))
+
+        return this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
     }
 }

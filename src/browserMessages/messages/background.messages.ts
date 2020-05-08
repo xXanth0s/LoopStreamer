@@ -74,6 +74,7 @@ export const createGetSeriesInformationFromPortalMessage = (seriesMetaInfoDto: S
 });
 export type GetSeriesInformationFromPortalMessage = ReturnType<typeof createGetSeriesInformationFromPortalMessage>;
 
+
 export const createGetSeriesEpisodesForSeasonMessage = (portal: PORTALS, seriesSeasonKey: string) : Message<{portal: PORTALS, seriesSeasonKey: string}, SeriesEpisode[]> => ({
     type: MessageType.BACKGROUND_GET_SERIES_EPISODES_FOR_SEASON,
     destinationController: ControllerType.BACKGROUND,
@@ -84,5 +85,17 @@ export const createGetSeriesEpisodesForSeasonMessage = (portal: PORTALS, seriesS
     }
 });
 export type GetSeriesEpisodesForSeasonMessage = ReturnType<typeof createGetSeriesEpisodesForSeasonMessage>;
+
+
+export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], portal: PORTALS) : Message<{episodeKey: SeriesEpisode['key'], portal: PORTALS}> => ({
+    type: MessageType.BACKGROUND_START_EPISODE,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: {
+        portal,
+        episodeKey
+    }
+});
+export type StartEpisodeMessage = ReturnType<typeof createStartEpisodeMessage>;
 
 

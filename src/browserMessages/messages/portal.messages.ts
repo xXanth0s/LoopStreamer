@@ -1,19 +1,19 @@
-import {MessageType} from '../enum/message-type.enum';
-import {Message} from './message.interface';
-import {ControllerType} from '../enum/controller.type';
-import Series from '../../store/models/series.model';
+import { MessageType } from '../enum/message-type.enum';
+import { Message } from './message.interface';
+import { ControllerType } from '../enum/controller.type';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
-import { SeriesSeason } from '../../store/models/series-season.model';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
+import { PROVIDORS } from '../../store/enums/providors.enum';
+import SeriesEpisode from '../../store/models/series-episode.model';
 
-export const createGetActiveVideoInformation = (withVideoLink: boolean): Message<boolean, Series> => ({
-    type: MessageType.PORTAL_GET_VIDEO_INFORMATION,
+export const createGetProvidorLinkForEpisode = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode }, string> => ({
+    type: MessageType.PORTAL_GET_PROVIDOR_LINK_FOR_EPISODE,
     destinationController: ControllerType.PORTAL,
-    payload: withVideoLink,
     hasReply: true,
+    payload: { providor, episodeInfo }
 });
-export type GetActiveVideoInformation = ReturnType<typeof createGetActiveVideoInformation>;
+export type GetProvidorLinkForEpisode = ReturnType<typeof createGetProvidorLinkForEpisode>;
 
 
 export const createGetNextVideoLinkMessage = (): Message<undefined, string> => ({

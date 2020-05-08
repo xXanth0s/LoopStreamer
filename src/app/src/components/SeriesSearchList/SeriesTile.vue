@@ -1,10 +1,10 @@
 <template>
 
     <div class="pt-2 px-1 col-4" @click="tileClicked">
-        <div class="card">
+        <div class="card"  :class="{'active-item': isSelected}">
 
             <div class="card-body">
-                <div class="title text-center" :class="{'fat-title': isSelected}">
+                <div class="title text-center">
                     {{series.title}}
                 </div>
             </div>

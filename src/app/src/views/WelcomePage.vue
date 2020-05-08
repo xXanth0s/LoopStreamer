@@ -29,11 +29,13 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <series-list-row v-for="(seriesChunk, index) in filteredSeries" :key="index"
-                                     :series-list="seriesChunk">
-                    </series-list-row>
-                </div>
+                <series-list-row
+                        class="px-3"
+                        v-for="seriesChunk in filteredSeries"
+                        :key="seriesChunk[0].title"
+                        :series-list="seriesChunk"
+                        :selected-protal="selectedPortal">
+                </series-list-row>
             </div>
         </div>
     </div>
@@ -56,13 +58,13 @@
     import { SeriesMetaViewModel } from '../models/series-meta-view.model';
     import { getKeyForSeriesTitle } from '../../../store/utils/key.utils';
     import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
-    import {allSeriesMock} from '../mocks/all-series.mock';
+    import { allSeriesMock } from '../mocks/all-series.mock';
 
     @Component({
         name: 'welcome-page',
         components: {
             SeriesTile,
-            SeriesListRow
+            SeriesListRow,
         },
     })
     export default class WelcomePage extends Vue {
@@ -98,7 +100,7 @@
                     key: getKeyForSeriesTitle(metaInfo.title),
                 })).sort((a, b) => a.title.localeCompare(b.title));
 
-                this.filteredSeries = this.convertSeriesToChunks(this.series);
+                this.filteredSeries = this.convertSeriesToChunks(this.series).slice(0, 100);
             } catch (e) {
                 console.error('Error occured, while loading all seires', e);
             } finally {
@@ -109,12 +111,12 @@
         @Watch('searchText')
         public searchChanged(): void {
             const sortedArrays = this.series.filter(serie => serie.title.toLowerCase().includes(this.searchText.toLowerCase()));
-            this.filteredSeries = this.convertSeriesToChunks(sortedArrays);
+            this.filteredSeries = this.convertSeriesToChunks(sortedArrays).slice(0, 100);
         }
 
         private convertSeriesToChunks(series: SeriesMetaViewModel[]): SeriesMetaViewModel[][] {
             const result = [];
-            this.series.forEach((value, currentIndex) => {
+            series.forEach((value, currentIndex) => {
                 const index = Math.floor(currentIndex / this.seriesTilesPerRow);
                 const previous = result[index] || [];
                 result[index] = [

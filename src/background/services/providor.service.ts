@@ -8,7 +8,9 @@ import { setActiveProvidorAction } from '../../store/reducers/control-state.redu
 @injectable()
 export class ProvidorService {
 
-    @inject(SHARED_TYPES.StoreService) private readonly store: StoreService;
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    }
+
 
     public isUrlValid(url?: string): boolean {
         if(url) {

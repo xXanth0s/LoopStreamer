@@ -101,13 +101,15 @@ function addSeries(state: {[key: string]: Series}, seriesInfo: SeriesInfoDto): {
 
     const title = seriesInfo.title ? seriesInfo.title : oldSeries.title;
     const posterHref = seriesInfo.posterHref ? seriesInfo.posterHref : oldSeries.posterHref;
+    const description = seriesInfo.description ? seriesInfo.description : oldSeries.description;
 
     return {
         ...state,
         [key]: {
             ...oldSeries,
             posterHref,
-            title
+            title,
+            description,
         }
 
     }

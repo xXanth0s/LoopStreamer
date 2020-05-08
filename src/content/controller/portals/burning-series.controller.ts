@@ -12,6 +12,8 @@ import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors } from '../../../store/selectors/providors.selector';
 import { getKeyForSeriesTitle } from '../../../store/utils/key.utils';
+import SeriesEpisode from '../../../store/models/series-episode.model';
+import { PROVIDORS } from '../../../store/enums/providors.enum';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -29,7 +31,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesImageSelector = (): string => (document.querySelector("#sp_right > img") as HTMLImageElement)?.src;
     private readonly episodeLinksSelector = (): NodeListOf<HTMLElement> => document.querySelectorAll('div.epiInfo');
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seriesContainer")?.querySelectorAll("a");
-    private readonly getActiveSeasonSelector = (): number => +document.querySelector('#seasons > ul > li.s1.active')?.innerHTML;
+    private readonly seriesDescriptionSelector = (): string => document.querySelector("#sp_left > p")?.textContent || '';
 
     constructor(@inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
@@ -49,86 +51,6 @@ export class BurningSeriesController implements IPortalController {
         return null;
     }
 
-    public async getEpisodeInfo(withVideoLink: boolean): Promise<SeriesEpisodeDto> {
-        const seasonNumber = +this.seriesActiveSeasonSelector()?.textContent;
-        const epdisodeNumber = +this.seriesEpisodeSelector()?.textContent;
-        if (seasonNumber && epdisodeNumber) {
-            const portalHref = window.location.href;
-            const seriesKey = getKeyForSeriesTitle(this.seriesTitleSelector());
-            const providorHref = withVideoLink ? await this.getLinkForActiveVideo() : '';
-            let providorLinks = {};
-            const providor = await this.providorService.getCurrentProvidor();
-            if (providorHref) {
-                providorLinks = { [providor.controllerName]: providorHref };
-            }
-            //
-            // return {
-            //     seasonNumber,
-            //     epdisodeNumber,
-            //     seriesKey,
-            //     providorLinks,
-            //     portalLinks: { [providor.controllerName]: portalHref },
-            // }
-        }
-
-        return null;
-    }
-
-    public async getLinkForActiveVideo(): Promise<string> {
-        const link = this.videoUrlSelector() as HTMLLinkElement;
-        if (link) {
-            return link.href;
-        }
-
-        if (this.isVideoOpenWithProvidor()) {
-            const playButtonElement = this.videoContainerSelector() as HTMLElement;
-            simulateEvent(playButtonElement,
-                'click',
-                { pointerX: playButtonElement.clientTop, pointerY: playButtonElement.clientLeft }
-            );
-            return new Promise((resolve) => {
-                const videoContainer = this.videoContainerSelector();
-
-                const config = { attributes: false, childList: true, subtree: true };
-
-                const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
-                    const link = this.videoUrlSelector() as HTMLLinkElement;
-                    if (link) {
-                        resolve(link.href);
-                        observer.disconnect();
-                    }
-                };
-
-                const observer = new MutationObserver(callback);
-                observer.observe(videoContainer, config);
-            });
-        }
-
-        return '';
-    }
-
-    public async getLinkForEpisodeWithOffset(offset: number): Promise<string> {
-        const links = await this.getHTMLLinksForEpispdeWithOffset(offset);
-        let link: string = '';
-        await this.providorService.reset();
-        do {
-            const providor = await this.providorService.getNextProvidor();
-            if (!providor) {
-                break;
-            }
-
-            const linkNode = links
-                .find(node => {
-                    return providor.names.some(name => {
-                        return node.href.toLowerCase().includes(name.toLowerCase())
-                    })
-                });
-            link = linkNode?.href;
-        } while (!link);
-
-        return link;
-    }
-
     public getAllSeriesInfo(): SeriesMetaInfoDto[] {
         const links = this.seriesOverviewListLinkSelector();
         const collection = [ ...links ];
@@ -144,63 +66,36 @@ export class BurningSeriesController implements IPortalController {
         })
     }
 
-    private getHTMLLinksForEpispdeWithOffset(offset: number): HTMLLinkElement[] {
-        let result: HTMLLinkElement[] = [];
-        if (this.hasNextEpisode()) {
-            const currentEpisode = +this.seriesEpisodeSelector().textContent;
-            const episodeLinks = Array.from(this.episodeLinksSelector());
-            result = episodeLinks
-                .filter(node => node.classList.contains(`${currentEpisode + offset}`))
-                .flatMap(node => Array.from(node.querySelectorAll<HTMLLinkElement>('a')));
-        }
-
-        return result;
-    }
-
-    private hasNextEpisode(): boolean {
-        return Boolean(this.seriesEpisodeSelector().nextElementSibling);
-    }
-
-    private hasPreviousEpisode(): boolean {
-        return Boolean(this.seriesEpisodeSelector().previousElementSibling);
-    }
-
-    private mapTitleToKey(title: string): string {
-        return title?.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s/g, "-");
-    }
-
     getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[] {
-        const activeSeason = this.getActiveSeasonSelector();
         let episodeDtos = [];
-        if (activeSeason === seasonNumber) {
-            const seriesTitle = this.seriesTitleSelector();
-            const providors = this.store.selectSync(getAllUsedProvidors);
-            const episodes = [ ...this.seriesSeasonEpisodesSelector() ];
-            episodeDtos = episodes.map((episode, index) => {
-                const portalLinks = providors.reduce((obj, providor) => {
-                    const titleElement = this.getElementWithTitle<HTMLAnchorElement>(episode, providor.names);
-                    if(titleElement) {
-                        obj[providor.controllerName] = titleElement;
-                    }
-
-                    return obj;
-                }, {})
-
-                return {
-                    seriesTitle,
-                    seasonNumber,
-                    portalLinks,
-                    epdisodeNumber: ++index,
-                    providorLinks: {},
-                    portal: this.portalKey,
+        const seriesTitle = this.seriesTitleSelector();
+        const providors = this.store.selectSync(getAllUsedProvidors);
+        const episodes = [ ...this.seriesSeasonEpisodesSelector() ];
+        episodeDtos = episodes.map((episode, index) => {
+            const portalLinks = providors.reduce((obj, providor) => {
+                const titleElement = this.getElementWithTitle<HTMLAnchorElement>(episode, providor.names);
+                if (titleElement) {
+                    obj[providor.controllerName] = titleElement.href;
                 }
-            })
-        }
+
+                return obj;
+            }, {})
+
+            return {
+                seriesTitle,
+                seasonNumber,
+                portalLinks,
+                epdisodeNumber: ++index,
+                providorLinks: {},
+                portal: this.portalKey,
+            }
+        })
         return episodeDtos;
     }
 
     getSeriesMetaInformation(): SeriesInfoDto {
         const title = this.seriesTitleSelector();
+        const description = this.seriesDescriptionSelector();
         const posterHref = this.seriesImageSelector()
         const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
@@ -211,6 +106,7 @@ export class BurningSeriesController implements IPortalController {
 
         return {
             title,
+            description,
             posterHref,
             seasonsLinks,
             link,
@@ -227,7 +123,40 @@ export class BurningSeriesController implements IPortalController {
         return result;
     }
 
-    getLinkForOpenVideo(): boolean {
-        return false;
+    public async getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
+
+        debugger;
+        if (this.getActiveProvidor()?.controllerName === providor) {
+            const link = this.videoUrlSelector() as HTMLLinkElement;
+            if (link) {
+                return link.href;
+            }
+
+            if (this.isVideoOpenWithProvidor()) {
+                const playButtonElement = this.videoContainerSelector() as HTMLElement;
+                simulateEvent(playButtonElement,
+                    'click',
+                    { pointerX: playButtonElement.clientTop, pointerY: playButtonElement.clientLeft }
+                );
+                return new Promise((resolve) => {
+                    const videoContainer = this.videoContainerSelector();
+
+                    const config = { attributes: false, childList: true, subtree: true };
+
+                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
+                        const link = this.videoUrlSelector() as HTMLLinkElement;
+                        if (link) {
+                            resolve(link.href);
+                            observer.disconnect();
+                        }
+                    };
+
+                    const observer = new MutationObserver(callback);
+                    observer.observe(videoContainer, config);
+                });
+            }
+        } else {
+            return '';
+        }
     }
 }

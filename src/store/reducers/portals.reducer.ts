@@ -12,7 +12,7 @@ const initialPortalsData: { [key in PORTALS]?: Portal } = {
     [PORTALS.BS]: {
         key: PORTALS.BS,
         index: 0,
-        regex: '^https:\/\/bs.to\/serie',
+        urlRegex: '^https://burningseries',
         controllerName: PORTALS.BS,
         baseUrl: 'https://burningseries.co/',
         seriesListUrl: 'https://burningseries.co/andere-serien',

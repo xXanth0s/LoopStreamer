@@ -11,6 +11,7 @@ import {setActiveProvidorAction} from '../../store/reducers/control-state.reduce
 import {getContentTypeForProvidor} from '../container/CONTENT_TYPES';
 import {inversifyContentContainer} from '../container/container';
 import {IProvidorController} from '../controller/providors/providor.controller.interface';
+import { PROVIDORS } from '../../store/enums/providors.enum';
 
 @injectable()
 export class ProvidorService {
@@ -36,15 +37,9 @@ export class ProvidorService {
         return providor;
     }
 
-    public async getProvidorController(): Promise<IProvidorController> {
-        const providor = await this.getCurrentProvidor();
-        if (!this._providorController && providor) {
-            const symbol = getContentTypeForProvidor(providor.controllerName);
-            this._providorController = inversifyContentContainer.get<IProvidorController>(symbol);
-        }
-        if (!this._providorController) {
-            console.error('ProvidorService.getProvidorController: No controller found');
-        }
+    public getProvidorController(providorKey: PROVIDORS): IProvidorController {
+        const symbol = getContentTypeForProvidor(providorKey);
+        this._providorController = inversifyContentContainer.get<IProvidorController>(symbol);
 
         return this._providorController;
     }

@@ -41,22 +41,22 @@ export class VideoController {
     // TODO: remove ugly hack for multiple initializations
     private isActive = false;
 
-    public startVideo(videoElement: HTMLVideoElement, seriesInfo: Series): void {
+    public startVideo(videoElement: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         if (!this.isActive) {
             this.isActive = true;
-            const episodeInfo = seriesInfo.lastEpisodeWatched;
-            // videoElement.play().then(() => this.onVideoStarted(videoElement, episodeInfo));
-            this.store.dispatch(updateSeriesAction(seriesInfo));
+            const seriesInfo = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey)
+            videoElement.play().then(() => this.onVideoStarted(videoElement, episodeInfo, seriesInfo));
+            // this.store.dispatch(updateSeriesAction(seriesInfo));
             this.startErrorTimer(this.timeout);
         }
     }
 
-    private onVideoStarted(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
+    private onVideoStarted(video: HTMLVideoElement, episodeInfo: SeriesEpisode, seriesInfo: Series): void {
         this.initOnTimeUpdateObservable(video);
         this.videoStarted$.next();
-        this.setStartTime(video, episodeInfo);
-        this.updateSeriesInfo(video, episodeInfo);
-        this.endTimeListener(video, episodeInfo);
+        // this.setStartTime(video, episodeInfo);
+        // this.updateSeriesInfo(video, episodeInfo);
+        // this.endTimeListener(video, episodeInfo);
         this.videoFinishedListener(video);
         addVideoButtons(episodeInfo);
     }

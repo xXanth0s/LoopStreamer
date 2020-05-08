@@ -3,6 +3,7 @@ import {inject, injectable} from 'inversify';
 import {CONTENT_TYPES} from '../../container/CONTENT_TYPES';
 import {VideoController} from '../video.controller';
 import Series from '../../../store/models/series.model';
+import SeriesEpisode from '../../../store/models/series-episode.model';
 
 @injectable()
 export class VivoController implements IProvidorController{
@@ -15,10 +16,10 @@ export class VivoController implements IProvidorController{
     private readonly videoContainer = (): HTMLVideoElement => document.querySelector("div.stream-content > div");
 
 
-    public startVideo(seriesInfo: Series): boolean {
+    public startVideo(seriesEpisode: SeriesEpisode): boolean {
         const videoElement = this.videoSelector();
         if(videoElement) {
-            this.videoController.startVideo(videoElement, seriesInfo);
+            this.videoController.startVideo(videoElement, seriesEpisode);
             this.lightSwitchButton()?.remove();
             this.videoController.addFullscreenClass(this.videoContainer());
             return true;

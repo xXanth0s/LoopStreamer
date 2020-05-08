@@ -5,30 +5,27 @@ import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { TabController } from './tab.controller';
 import { VideoController } from './video.controller';
-import { first } from 'rxjs/operators';
-import Series from '../../store/models/series.model';
+import { debounceTime, first, mapTo, switchMap } from 'rxjs/operators';
 import {
-    createGetActiveVideoInformation,
     createGetAllSeriesFromPortalMessage,
     createGetEpisodesForSeasonMessage,
-    createGetNextVideoLinkMessage,
-    createGetPreviousVideoLinkMessage,
+    createGetProvidorLinkForEpisode,
     createGetSeriesInformationMessage
 } from '../../browserMessages/messages/portal.messages';
-import { getLastWatchedSeries } from '../../store/selectors/lastWatchedSeries.selector';
 import { getActivePortalTabId, getPortalForKey } from '../../store/selectors/portals.selector';
-import Portal from '../../store/models/portal.model';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { WindowService } from '../services/window.service';
-import { fromEvent } from 'rxjs';
+import { fromEvent, Observable } from 'rxjs';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
-import { SeriesSeason } from '../../store/models/series-season.model';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getSeriesSeasonByKey } from '../../store/selectors/series-season.selector';
+import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { ProvidorService } from '../services/providor.service';
+import { ProvidorLink } from '../models/providor-link.model';
+import { BrowserWindow } from 'electron';
 
 @injectable()
 export class PortalController {
@@ -37,6 +34,7 @@ export class PortalController {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
+                @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(BACKGROUND_TYPES.TabController) private readonly tabController: TabController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController) {
     }
@@ -53,106 +51,55 @@ export class PortalController {
 
     public async getEpisodesForSeason(seasonKey: string, portal: PORTALS): Promise<SeriesEpisodeDto[]> {
         const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey)
+        console.log(seriesSeason)
         if(seriesSeason) {
             return this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portal], createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
         }
         return null
     }
 
-    public async getActiveVideoInformation(withVideoLink: boolean, fallbackPortalUrl?: string): Promise<Series> {
-        let result: Series = null;
-        const portal = await this.getActivePortal();
-        if (portal) {
-            this.tabController.startAdBlockerForPortal();
-            result = await this.messageService.sendMessageToPortalTab(createGetActiveVideoInformation(withVideoLink));
-            this.tabController.stopPortalAdBlock();
-        } else if (fallbackPortalUrl) {
-            await this.openPortalUrl(fallbackPortalUrl);
-            return this.getActiveVideoInformation(withVideoLink);
-        } else {
-            console.error('PortalController: No portal tab found')
+    public async getProvidorLinkForEpisode(episodeKey: string, portal: PORTALS): Promise<ProvidorLink> {
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+        const providor = this.providorService.getCurrentProvidor()?.controllerName;
+        const portalLink = episode?.portalLinks[portal][providor];
+        if(portalLink) {
+            const link = await this.openPageAndGetDataForMessage(portalLink, createGetProvidorLinkForEpisode(episode, providor));
+            return {
+                providor,
+                link
+            }
         }
-
-        return result;
-    }
-
-    public async openNextEpisode(): Promise<boolean> {
-        const lastSeriesWatched = this.store.selectSync(getLastWatchedSeries);
-
-        return false;
-    }
-
-    public async openPreviousEpisode(): Promise<boolean> {
-        const lastSeriesWatched = this.store.selectSync(getLastWatchedSeries);
-        // if (seriesInfo?.lastEpisodeWatched?.hasPreviousEpisode) {
-        //     if (!this.store.selectSync(getActivePortalTabId)) {
-        //         await this.openPortalUrl(seriesInfo?.lastEpisodeWatched?.portalLinks);
-        //     }
-        //     const previousEpisode = await this.messageService.sendMessageToPortalTab(createGetPreviousVideoLinkMessage());
-        //     if (previousEpisode) {
-        //         await this.openPortalUrl(previousEpisode);
-        //         return this.openCurrentEpisode();
-        //     }
-        // }
-
-        return false;
-
-    }
-
-    public async getActivePortal(): Promise<Portal> {
-        // const portalTabId = this.store.selectSync(getActivePortalTabId);
-        // let tab: Tabs.Tab;
-        // if (portalTabId) {
-        //     tab = await browser.tabs.get(portalTabId);
-        // } else {
-        //     const tabs = await browser.tabs.query({active: true, currentWindow: true});
-        //     tab = tabs[0];
-        // }
-        // let portals = this.store.selectSync(getAllPortals);
-        // if (tab) {
-        //     portals = portals.filter(portal => {
-        //         const regex = new RegExp(portal.regex, 'i');
-        //         return regex.test(tab.url);
-        //     });
-        //     if (portals.length) {
-        //         this.store.dispatch(setActivePortalAction(portals[0].key));
-        //         this.store.dispatch(setActivePortalTabIdAction(tab.id));
-        //         return portals[0];
-        //     }
-        // }
-
         return null;
     }
 
-    public async startLastWatchedEpisodeOfSeries(seriesKey: Series['key']): Promise<void> {
-        const series = await this.store.selectSync(getSeriesByKey, seriesKey);
-    }
+    private openPortalUrl(url: string): Observable<BrowserWindow> {
 
-    public async openPortalUrl(url: string): Promise<void> {
-        let window = this.windowService.getPortalWindow();
-        if(!window) {
-            window = this.windowService.openWindow(url);
-            this.store.dispatch(setActivePortalTabIdAction(window.id));
-        } else {
-            window.webContents.loadURL(url);
-
-        }
+        // const window = this.windowService.openWindow(url);
+        const window = this.windowService.openWindow(url, {nodeIntegration: false, visible: true});
+        this.store.dispatch(setActivePortalTabIdAction(window.id));
         this.tabController.startAdBlockerForPortal();
-        return fromEvent<void>(window.webContents,'dom-ready').pipe(
-            first()
-        ).toPromise();
-        // return new Promise(resolve => {
-        //     return fromEvent<void>(window.webContents,'dom-ready').pipe(
-        //         first()
-        //     ).subscribe(() => resolve());
-        // });
+        return this.store.selectBehaviour(getActivePortalTabId).pipe(
+            switchMap((tabId) => {
+                const portalWindow = BrowserWindow.fromId(tabId);
+                return fromEvent<void>(portalWindow.webContents,'dom-ready').pipe(
+                    debounceTime(1000),
+                    first(),
+                    mapTo(portalWindow),
+                );
+            } )
+        );
     }
 
     private async openPageAndGetDataForMessage<T, R>(portalUrl: string, message: Message<T, R>): Promise<R> {
-        await this.openPortalUrl(portalUrl);
-        const result = await this.messageService.sendMessageToPortalTab(message);
-        this.closePortalWindow();
-        return result;
+        return new Promise<R>(resolve => {
+            const sub = this.openPortalUrl(portalUrl).subscribe(async () => {
+                const result = await this.messageService.sendMessageToPortalTab(message);
+                this.closePortalWindow();
+                console.log(`openPageAndGetDataForMessage for ${message.type}`, result)
+                sub.unsubscribe()
+                resolve(result);
+            });
+        });
     }
 
     private closePortalWindow(): void {

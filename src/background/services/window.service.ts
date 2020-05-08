@@ -26,7 +26,15 @@ export class WindowService {
     public getPortalWindow(): BrowserWindow {
         const id = this.store.selectSync(getActivePortalTabId);
         if (id) {
-            return BrowserWindow.fromId(this.store.selectSync(getActivePortalTabId));
+            return BrowserWindow.fromId(id);
+        }
+        return null;
+    }
+
+    public getProvidorWindow(): BrowserWindow {
+        const id = this.store.selectSync(getVideoTabId);
+        if (id) {
+            return BrowserWindow.fromId(id);
         }
         return null;
     }

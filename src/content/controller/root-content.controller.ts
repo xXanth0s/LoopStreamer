@@ -6,7 +6,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
-    GetActiveVideoInformation,
+    GetProvidorLinkForEpisode,
     GetAllSeriesFromPortalMessage,
     GetEpisodesForSeasonMessage,
     GetNextVideoLinkMessage,
@@ -15,6 +15,9 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import Series from '../../store/models/series.model';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
+import SeriesEpisode from '../../store/models/series-episode.model';
+import { PROVIDORS } from '../../store/enums/providors.enum';
+import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 
 @injectable()
 export class RootContentController {
@@ -25,16 +28,8 @@ export class RootContentController {
     }
 
     public init(): void {
-        ipcRenderer.on(MessageType.PORTAL_GET_VIDEO_INFORMATION, (event, message: GetActiveVideoInformation) => {
-            this.getVideoInformationHandler(event, message);
-        });
-
-        ipcRenderer.on(MessageType.PORTAL_NEXT_EPISODE_LINK, (event, message: GetNextVideoLinkMessage) => {
-            this.getNextVideoLinkHandler(event, message);
-        });
-
-        ipcRenderer.on(MessageType.PORTAL_PREVIOUS_EPISODE_LINK, (event, message: GetPreviousVideoLinkMessage) => {
-            this.getPerviousVideoLinkHandler(event, message)
+        ipcRenderer.on(MessageType.PORTAL_GET_PROVIDOR_LINK_FOR_EPISODE, (event, message: GetProvidorLinkForEpisode) => {
+            this.getProvidorLinkHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_ALL_SERIES, (event, message: GetAllSeriesFromPortalMessage) => {
@@ -52,21 +47,17 @@ export class RootContentController {
             this.getSeasonsEpisodeInformationHandler(event, message);
         });
 
+        ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoProvidorMessage) => {
+            console.log(message)
+            this.startVideoForProvidorHandler(event, message);
+        });
+
     }
 
-    private async getVideoInformationHandler(event: IpcRendererEvent, message: GetActiveVideoInformation): Promise<void> {
-        const result = await this.getInformationForOpenVideo(message.payload);
+    private async getProvidorLinkHandler(event: IpcRendererEvent, message: GetProvidorLinkForEpisode): Promise<void> {
+        const { providor, episodeInfo } = message.payload
+        const result = await this.portalService.getPortalController().getProvidorLinkForEpisode(episodeInfo, providor);
         this.messageService.replyToSender(message, event.sender, result);
-    }
-
-    private async getNextVideoLinkHandler(event: IpcRendererEvent, message: GetNextVideoLinkMessage): Promise<void> {
-        const link = await this.portalService.getPortalController()?.getLinkForEpisodeWithOffset(1);
-        this.messageService.replyToSender(message, event.sender, link);
-    }
-
-    private async getPerviousVideoLinkHandler(event: IpcRendererEvent, message: GetNextVideoLinkMessage): Promise<void> {
-        const link = await this.portalService.getPortalController()?.getLinkForEpisodeWithOffset(-1);
-        this.messageService.replyToSender(message, event.sender, link);
     }
 
     private async getAllSeriesFromPortalHandler(event: IpcRendererEvent, message: GetAllSeriesFromPortalMessage): Promise<void> {
@@ -84,14 +75,8 @@ export class RootContentController {
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
-    async getInformationForOpenVideo(withVideoLink: boolean): Promise<Series> {
-        const providor = this.portalService.getPortalController().isVideoOpenWithProvidor();
-        if (providor) {
-            this.providorService.setActiveProvidor(providor);
-            // const seriesInfo = await this.portalService.getPortalController().getSeriesInfo(withVideoLink);
-            // return seriesInfo;
-        } else {
-            return null;
-        }
+    private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoProvidorMessage) {
+        const {providor, episodeInfo} = message.payload
+        this.providorService.getProvidorController(providor)?.startVideo(episodeInfo)
     }
 }

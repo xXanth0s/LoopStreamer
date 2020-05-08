@@ -14,6 +14,7 @@ import {WindowController} from '../controller/window.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { WindowService } from '../services/window.service';
 import { SeriesService } from '../../shared/services/series.service';
+import { PortalService } from '../services/portalService';
 
 const inversifyContainer = new Container();
 
@@ -28,6 +29,7 @@ inversifyContainer.bind(SHARED_TYPES.SeriesService).to(SeriesService).inSingleto
 
 // services
 inversifyContainer.bind(BACKGROUND_TYPES.ProvidorService).to(ProvidorService).inSingletonScope();
+inversifyContainer.bind(BACKGROUND_TYPES.PortalService).to(PortalService).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.WindowService).to(WindowService).inSingletonScope();
 
 //controller

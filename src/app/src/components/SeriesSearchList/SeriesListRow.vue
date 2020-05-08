@@ -9,27 +9,33 @@
             </series-tile>
         </div>
         <div class="row">
-            <series-detail-view :seriesMetaInfo="openSeries" :isExpanded="isAnySeriesSelected" class="col">
+            <series-detail-view
+                    :seriesMetaInfo="openSeries"
+                    :isExpanded="isAnySeriesSelected"
+                    :selected-protal="selectedProtal"
+                    class="col">
             </series-detail-view>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import {Prop, Watch} from "vue-property-decorator";
-    import Component from "vue-class-component";
-    import {takeUntil} from "rxjs/operators";
-    import {Subject} from "rxjs";
-    import {optionsContainer} from "../../container/container";
-    import {StoreService} from "../../../../shared/services/store.service";
-    import {SHARED_TYPES} from "../../../../shared/constants/SHARED_TYPES";
-    import {MessageService} from "../../../../shared/services/message.service";
-    import {setExpandedSeriesOptionsPageAction} from "../../../../store/reducers/control-state.reducer";
-    import {SeriesMetaViewModel} from "../../models/series-meta-view.model";
-    import SeriesTile from "./SeriesTile.vue";
-    import {isAnySeriesExpandedOnOptionsPage} from "../../../../store/selectors/control-state.selector";
-    import SeriesDetailView from "./SeriesDetailView.vue";
+    import Vue from 'vue';
+    import { Prop, Watch } from 'vue-property-decorator';
+    import Component from 'vue-class-component';
+    import { takeUntil } from 'rxjs/operators';
+    import { Subject } from 'rxjs';
+    import { optionsContainer } from '../../container/container';
+    import { StoreService } from '../../../../shared/services/store.service';
+    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
+    import { MessageService } from '../../../../shared/services/message.service';
+    import { setExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
+    import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
+    import SeriesTile from './SeriesTile.vue';
+    import { isAnySeriesExpandedOnOptionsPage } from '../../../../store/selectors/control-state.selector';
+    import SeriesDetailView from './SeriesDetailView.vue';
+    import Portal from '../../../../store/models/portal.model';
+    import { PORTALS } from '../../../../store/enums/portals.enum';
 
 
     @Component({
@@ -44,6 +50,9 @@
 
         @Prop(Array)
         private seriesList: SeriesMetaViewModel[];
+
+        @Prop(String)
+        private selectedProtal: PORTALS;
 
         private openSeries: SeriesMetaViewModel = null;
         private isAnySeriesSelected = false;
@@ -60,7 +69,7 @@
         }
 
         public test() {
-            console.log('test')
+            console.log('test');
         }
 
         public async seasonSelected(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
