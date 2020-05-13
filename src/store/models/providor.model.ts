@@ -1,12 +1,11 @@
-import {PROVIDORS} from '../enums/providors.enum';
+import { PROVIDORS } from '../enums/providors.enum';
+import Website from './website';
 
-export default interface Providor {
+export default interface Providor extends Website {
     key: string,
     names: string[],
     index: number,
-    url: string,
     controllerName: PROVIDORS,
     icon: string,
-    urlRegex: string,
     isUsed: boolean
 }

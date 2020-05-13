@@ -1,7 +1,7 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Providor from '../models/providor.model';
-import {mapArrayToObject} from '../utils/selector.utils';
-import {PROVIDORS} from '../enums/providors.enum';
+import { mapArrayToObject } from '../utils/selector.utils';
+import { PROVIDORS } from '../enums/providors.enum';
 
 const initialState: {[key: string]: Providor} = {
     Vivo : {
@@ -9,7 +9,7 @@ const initialState: {[key: string]: Providor} = {
         names: ['Vivo'],
         index: 1,
         urlRegex: '^https://vivo',
-        url: 'https://vivo.sx/*',
+        baseUrl: 'https://vivo.sx/*',
         controllerName: PROVIDORS.Vivo,
         isUsed: true,
         icon: '/assets/images/providors/vivo.png',

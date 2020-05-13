@@ -1,7 +1,7 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Portal from '../models/portal.model';
-import {mapArrayToObject} from '../utils/selector.utils';
-import {PORTALS} from '../enums/portals.enum';
+import { mapArrayToObject } from '../utils/selector.utils';
+import { PORTALS } from '../enums/portals.enum';
 
 const updatePortals = (portals: Portal[]): { [key in PORTALS]: Portal } => {
     // @ts-ignore
@@ -12,10 +12,10 @@ const initialPortalsData: { [key in PORTALS]?: Portal } = {
     [PORTALS.BS]: {
         key: PORTALS.BS,
         index: 0,
-        urlRegex: '^https://burningseries',
+        urlRegex: '^https://bs',
         controllerName: PORTALS.BS,
-        baseUrl: 'https://burningseries.co/',
-        seriesListUrl: 'https://burningseries.co/andere-serien',
+        baseUrl: 'https://bs.to/',
+        seriesListUrl: 'https://bs.to/andere-serien',
         name: 'Burning Series',
     }
 };

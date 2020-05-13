@@ -14,7 +14,8 @@ import {
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
     OpenNextVideoMessage,
-    OpenPreviousVideoMessage, StartEpisodeMessage,
+    OpenPreviousVideoMessage,
+    StartEpisodeMessage,
     StartSeriesMessage,
     ToggleFullscreenModeMessage,
     VideoFinishedMessage,
@@ -24,13 +25,11 @@ import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { resetControlStateAction, setOptionsWindowIdAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import { ipcMain } from 'electron';
+import { ipcMain, session } from 'electron';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import messages from '../../app/constants/messages';
-import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 
 @injectable()
 export class RootBackgroundController {
@@ -52,6 +51,8 @@ export class RootBackgroundController {
         if (!this.isInitialized) {
             this.initializeHandler();
             this.isInitialized = true;
+            const sessionInstance = session.fromPartition('persist:');
+            this.windowService.setDefaultUserAgent(sessionInstance);
         }
     }
 

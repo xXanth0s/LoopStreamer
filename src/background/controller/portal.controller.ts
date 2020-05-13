@@ -5,7 +5,7 @@ import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { TabController } from './tab.controller';
 import { VideoController } from './video.controller';
-import { debounceTime, first, mapTo, switchMap } from 'rxjs/operators';
+import { debounceTime, first, mapTo, switchMap, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetEpisodesForSeasonMessage,
@@ -26,6 +26,7 @@ import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.sele
 import { ProvidorService } from '../services/providor.service';
 import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
+import Portal from '../../store/models/portal.model';
 
 @injectable()
 export class PortalController {
@@ -42,28 +43,30 @@ export class PortalController {
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesMetaInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
-        return this.openPageAndGetDataForMessage(portal.seriesListUrl, createGetAllSeriesFromPortalMessage());
+        return this.openPageAndGetDataForMessage(portal.seriesListUrl, portal, createGetAllSeriesFromPortalMessage());
     }
 
     public async getSeriesInformation(seriesInfo: SeriesMetaInfoDto): Promise<SeriesInfoDto> {
-        return this.openPageAndGetDataForMessage(seriesInfo.link, createGetSeriesInformationMessage());
+        const portal = this.store.selectSync(getPortalForKey, seriesInfo.portal);
+        return this.openPageAndGetDataForMessage(seriesInfo.link, portal, createGetSeriesInformationMessage());
     }
 
-    public async getEpisodesForSeason(seasonKey: string, portal: PORTALS): Promise<SeriesEpisodeDto[]> {
+    public async getEpisodesForSeason(seasonKey: string, portalKey: PORTALS): Promise<SeriesEpisodeDto[]> {
         const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey)
-        console.log(seriesSeason)
         if(seriesSeason) {
-            return this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portal], createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
+            const portal = this.store.selectSync(getPortalForKey, portalKey);
+            return this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portalKey], portal, createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
         }
         return null
     }
 
-    public async getProvidorLinkForEpisode(episodeKey: string, portal: PORTALS): Promise<ProvidorLink> {
+    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const providor = this.providorService.getCurrentProvidor()?.controllerName;
-        const portalLink = episode?.portalLinks[portal][providor];
+        const portalLink = episode?.portalLinks[portalKey][providor];
         if(portalLink) {
-            const link = await this.openPageAndGetDataForMessage(portalLink, createGetProvidorLinkForEpisode(episode, providor));
+            const portal = this.store.selectSync(getPortalForKey, portalKey);
+            const link = await this.openPageAndGetDataForMessage(portalLink, portal, createGetProvidorLinkForEpisode(episode, providor));
             return {
                 providor,
                 link
@@ -72,38 +75,45 @@ export class PortalController {
         return null;
     }
 
-    private openPortalUrl(url: string): Observable<BrowserWindow> {
+    private openPortalUrl(url: string, portal: Portal): Observable<BrowserWindow> {
 
         // const window = this.windowService.openWindow(url);
-        const window = this.windowService.openWindow(url, {nodeIntegration: false, visible: true});
-        this.store.dispatch(setActivePortalTabIdAction(window.id));
-        this.tabController.startAdBlockerForPortal();
-        return this.store.selectBehaviour(getActivePortalTabId).pipe(
-            switchMap((tabId) => {
-                const portalWindow = BrowserWindow.fromId(tabId);
-                return fromEvent<void>(portalWindow.webContents,'dom-ready').pipe(
+        const window$ = this.tabController.getNewWindowsForWebsiteOrLink(portal, url);
+        return window$.pipe(
+            switchMap((window) => {
+                return fromEvent<void>(window.webContents,'dom-ready').pipe(
+                    tap(() => this.setNewPortalWindow(window)),
                     debounceTime(1000),
                     first(),
-                    mapTo(portalWindow),
+                    mapTo(window),
                 );
             } )
-        );
+        )
     }
 
-    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, message: Message<T, R>): Promise<R> {
+    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portal: Portal, message: Message<T, R>): Promise<R> {
         return new Promise<R>(resolve => {
-            const sub = this.openPortalUrl(portalUrl).subscribe(async () => {
-                const result = await this.messageService.sendMessageToPortalTab(message);
-                this.closePortalWindow();
-                console.log(`openPageAndGetDataForMessage for ${message.type}`, result)
-                sub.unsubscribe()
-                resolve(result);
+            // const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
+            const sub = this.openPortalUrl('https://s.to/redirect/6349887', portal).subscribe(async (window) => {
+                // const result = await this.messageService.sendMessageToPortalTab(message);
+                // window.close();
+                // sub.unsubscribe()
+                // resolve(result);
             });
         });
     }
 
-    private closePortalWindow(): void {
-        this.windowService.getPortalWindow()?.close();
-        this.tabController.stopPortalAdBlock();
+    private setNewPortalWindow(newPortalWindow: Electron.BrowserWindow): void {
+        const oldWindowId = this.store.selectSync(getActivePortalTabId);
+        if(oldWindowId === newPortalWindow.id) {
+            return;
+        }
+
+        if(oldWindowId !== undefined) {
+            // const oldWindow = BrowserWindow.fromId(oldWindowId);
+            // oldWindow?.close();
+        }
+
+        this.store.dispatch(setActivePortalTabIdAction(newPortalWindow.id))
     }
 }

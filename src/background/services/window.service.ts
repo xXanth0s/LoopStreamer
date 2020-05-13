@@ -1,15 +1,14 @@
 import { inject, injectable } from 'inversify';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, BrowserWindowConstructorOptions, Session } from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
-import path from "path";
-import os from 'os';
-import { BrowserWindowConstructorOptions } from 'electron';
 
 @injectable()
 export class WindowService {
+
+    private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
@@ -39,11 +38,16 @@ export class WindowService {
         return null;
     }
 
+    public setDefaultUserAgent(session: Session): void {
+        session.setUserAgent(this.userAgent);
+    }
+
     public openWindow(href: string, config = { nodeIntegration: false, visible: false }): BrowserWindow {
         const windowConfig = this.getDefaultConfig(config);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href);
         window.webContents.openDevTools();
+        window.webContents.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
         return window;
     }
 
@@ -52,9 +56,14 @@ export class WindowService {
             width: 1800,
             height: 1200,
             show: config.visible,
+            frame: true,
             webPreferences: {
-                nodeIntegration: config.nodeIntegration,
-                preload: path.resolve(__dirname, 'js', 'content.js'),
+                nodeIntegration: true,
+                // preload: path.resolve(__dirname, 'js', 'content.js'),
+                webSecurity: false,
+                allowRunningInsecureContent: true,
+                experimentalFeatures: true,
+                contextIsolation: !config.nodeIntegration
             },
         }
     }

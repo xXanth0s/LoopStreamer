@@ -1,23 +1,20 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
-import { first, map, takeUntil } from 'rxjs/operators';
+import { debounceTime, finalize, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
-import { fromEvent, Subject } from 'rxjs';
+import { fromEvent, Observable, Subject } from 'rxjs';
 import { WindowController } from './window.controller';
-import {
-    setActivePortalTabIdAction,
-    setIsUserOnVideoPageAction,
-    setVidoeTabIdAction
-} from '../../store/reducers/control-state.reducer';
-import { getActivePortal } from '../../store/selectors/portals.selector';
+import { setActivePortalTabIdAction, setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
-import { app, BrowserWindow, WebContents } from "electron";
-import path from "path";
+import { app, BrowserWindow, session, webContents } from 'electron';
 import { PortalService } from '../services/portalService';
+import Website from '../../store/models/website';
+import { getActivePortalTabId } from '../../store/selectors/portals.selector';
+import OnBeforeSendHeadersListenerDetails = Electron.OnBeforeSendHeadersListenerDetails;
 
-type WebContensCreatedEvent = {event: Event, webContents: WebContents};
+type WebContensCreatedEvent = { event: Event, webContents: webContents };
 
 @injectable()
 export class TabController {
@@ -43,55 +40,22 @@ export class TabController {
         this.isUserOnVideoTabVal = true;
 
 
-        // browserRx.tabs.onActivated.pipe(
-        //     takeUntil(this.store.playerHasStopped()),
-        //     takeUntil(this.takeUntilProvidor$),
-        // ).subscribe(async (event) => {
-        //     const tab = await browser.tabs.get(event.activeInfo.tabId);
-        //     const providorTabId = this.store.selectSync(getVideoTabId);
-        //
-        //     // @ts-ignore
-        //     if (this.providorService.isUrlValid(tab.url || tab.pendingUrl)) {
-        //         this.isUserOnVideoTabVal = true;
-        //         return
-        //     }
-        //
-        //     if (this.checkIfUserIsOnNewTab(tab)) {
-        //         this.isUserOnVideoTabVal = false;
-        //         return;
-        //     }
-        //
-        //     if (this.isPortalTab(tab)) {
-        //         this.isUserOnVideoTabVal = false;
-        //         return;
-        //     }
-        //
-        //     if (tab.openerTabId && tab.openerTabId === providorTabId) {
-        //         this.closeTab(tab.id);
-        //         this.isUserOnVideoTabVal = true;
-        //         return;
-        //     }
-        //
-        //     this.isUserOnVideoTabVal = false;
-        // });
-        //
-
         fromEvent<WebContensCreatedEvent>(app, 'web-contents-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             takeUntil(this.takeUntilProvidor$),
         ).subscribe(data => {
-            const {webContents} = data;
-            const window = BrowserWindow.fromWebContents(webContents)
-            if(this.providorService.isUrlValid(webContents.getURL())) {
-                fromEvent<Event>(webContents,'dom-ready').pipe(
+            const { webContents } = data;
+            const window = BrowserWindow.fromWebContents(webContents);
+            if (this.providorService.isUrlValid(webContents.getURL())) {
+                fromEvent<Event>(webContents, 'dom-ready').pipe(
                     first()
                 ).subscribe(() => {
                     this.store.dispatch(setVidoeTabIdAction(window.id));
-                })
+                });
             } else {
-                window.close();
+                // window.close();
             }
-        })
+        });
         //
         // app.on('br')
         // fromEvent(this.windowService.getVideoWindow().webContents, 'new-window')
@@ -107,33 +71,50 @@ export class TabController {
         // })
     }
 
-    public startAdBlockerForPortal(): void {
-        app.on('web-contents-created')
-        fromEvent(app, 'web-contents-created').pipe(
-            map(data => ({event: data[0], webContents: [1]})),
-            takeUntil(this.store.playerHasStopped()),
-            takeUntil(this.takeUntilPortal$),
-        ).subscribe(data => {
-            console.log('startAdBlockerForPortal', data)
-            const { webContents } = data
-            const window = BrowserWindow.fromWebContents(webContents)
-            if(this.portalService.isUrlValid(webContents.getURL())) {
-                const window = this.windowService.getPortalWindow();
-                window.close();
-                this.store.dispatch(setActivePortalTabIdAction(window.id))
-            } else {
-                window.close();
+    public getNewWindowsForWebsiteOrLink(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
+        const subject$ = new Subject<BrowserWindow>();
+        const filter = { urls: [ '*://*/*' ] };
+        let oldWindowIds = BrowserWindow.getAllWindows().map(_window => _window.id);
+        const sessionInstance = session.fromPartition('persist:');
+        sessionInstance.webRequest.onBeforeSendHeaders(filter, (details: OnBeforeSendHeadersListenerDetails, callback): void => {
+            if (details.resourceType !== 'mainFrame') {
+                callback({ cancel: false });
+                return;
             }
-        })
+            const regex = new RegExp(allowedPage.urlRegex, 'i');
+            const isValid = regex.test(details.url) || details.url.includes(linkToOpen);
+            if (isValid) {
+                const newWindowIds = BrowserWindow.getAllWindows().map(window => window.id);
+                const newWindowId = newWindowIds.filter(window => !oldWindowIds.includes(window));
+                oldWindowIds = newWindowIds;
+                if (newWindowId.length) {
 
-        // browserRx.tabs.onActivated.pipe(
-        //     takeUntil(merge(this.store.playerHasStopped(), this.takeUntilPortal$)),
-        // ).subscribe(async (event) => {
-        //     const tab = await browser.tabs.get(event.activeInfo.tabId);
-        //     if (!this.isPortalTab(tab)) {
-        //         this.closeTab(tab.id);
-        //     }
-        // });
+                    const window = BrowserWindow.fromId(newWindowId[0]);
+                    // window.webContents.openDevTools();
+                    subject$.next(window);
+                }
+            }
+
+            details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
+            callback({ cancel: !isValid, requestHeaders: details.requestHeaders });
+        });
+
+        // this.windowService.openWindow(linkToOpen)
+        this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
+        return subject$.pipe(
+            finalize(() => sessionInstance.webRequest.onBeforeRequest(filter, null))
+        );
+
+    }
+
+    public waitTillDomIsReady(windowId: number): Promise<void> {
+        return new Promise<void>(resolve => {
+            const window = BrowserWindow.fromId(windowId);
+            return fromEvent<void>(window, 'dom-ready').pipe(
+                debounceTime(1000),
+                first(),
+            );
+        });
     }
 
     public stopPortalAdBlock(): void {
@@ -151,7 +132,7 @@ export class TabController {
     }
 
     public isUserOnVideoTab(): boolean {
-        return this.isUserOnVideoTabVal
+        return this.isUserOnVideoTabVal;
     }
 
     // private async isPageLoadFinished(tab: Tab, changeInfo: TabChangeInfo): Promise<boolean> {
@@ -178,4 +159,25 @@ export class TabController {
     //
     //     return false;
     // }
+
+    private isPortalRequestValid(details: Electron.OnBeforeRequestListenerDetails, portal: Website): boolean {
+        let isValid = true;
+        if (details.resourceType === 'mainFrame') {
+            const regex = new RegExp(portal.urlRegex, 'i');
+            isValid = regex.test(details.url);
+            if (isValid) {
+                this.updatePortalTabId(details.webContentsId);
+            }
+        }
+        return isValid;
+    }
+
+    private updatePortalTabId(webContentsId: number): void {
+        const oldWindowId = this.store.selectSync(getActivePortalTabId);
+        const window = BrowserWindow.fromWebContents(webContents.fromId(webContentsId));
+        if (window.id !== oldWindowId) {
+            this.store.dispatch(setActivePortalTabIdAction(window.id));
+            // BrowserWindow.fromId(oldWindowId).close();
+        }
+    }
 }

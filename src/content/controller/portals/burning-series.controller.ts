@@ -11,7 +11,6 @@ import { SeriesInfoDto } from '../../../dto/series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors } from '../../../store/selectors/providors.selector';
-import { getKeyForSeriesTitle } from '../../../store/utils/key.utils';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 
@@ -124,8 +123,10 @@ export class BurningSeriesController implements IPortalController {
     }
 
     public async getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
-
-        debugger;
+        // return timer(100000).pipe(
+        //     mapTo('')
+        // ).toPromise();
+        debugger
         if (this.getActiveProvidor()?.controllerName === providor) {
             const link = this.videoUrlSelector() as HTMLLinkElement;
             if (link) {

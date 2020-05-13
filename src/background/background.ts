@@ -2,11 +2,12 @@ import { BACKGROUND_TYPES } from './container/BACKGROUND_TYPES';
 import { RootBackgroundController } from './controller/root-background.controller';
 import { inversifyContainer } from './container/container';
 import { initStore } from '../store/store/background-store';
-import { app } from "electron";
+import { app } from 'electron';
 
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+app.commandLine.appendSwitch ("disable-http-cache");
 async function initialize(): Promise<void> {
    await initStore();
    const rootController = inversifyContainer.get<RootBackgroundController>(BACKGROUND_TYPES.RootController);
@@ -53,18 +54,18 @@ app.on('ready', async () => {
    }
    initialize();
 });
-
-// Exit cleanly on request from parent process in development mode.
-if (isDevelopment) {
-   if (process.platform === 'win32') {
-      process.on('message', (data) => {
-         if (data === 'graceful-exit') {
-            app.quit();
-         }
-      });
-   } else {
-      process.on('SIGTERM', () => {
-         app.quit();
-      });
-   }
-}
+//
+// // Exit cleanly on request from parent process in development mode.
+// if (isDevelopment) {
+//    if (process.platform === 'win32') {
+//       process.on('message', (data) => {
+//          if (data === 'graceful-exit') {
+//             app.quit();
+//          }
+//       });
+//    } else {
+//       process.on('SIGTERM', () => {
+//          app.quit();
+//       });
+//    }
+// }
