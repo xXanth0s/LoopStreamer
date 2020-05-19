@@ -2,6 +2,7 @@
   "name": "loopstreamer_ui",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -21,6 +22,7 @@
     "@reduxjs/toolkit": "^1.2.5",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.7.0",
+    "copy-webpack-plugin": "^5.1.1",
     "core-js": "^3.6.4",
     "electron-redux": "^1.4.0",
     "element-ui": "^2.13.0",
@@ -39,6 +41,7 @@
     "vue-router": "^3.1.6",
     "vuedraggable": "^2.23.2",
     "webextension-polyfill-ts": "^0.14.0",
+    "webpack-extension-reloader": "^1.1.4",
     "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
