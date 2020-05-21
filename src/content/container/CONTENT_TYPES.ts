@@ -1,5 +1,5 @@
-import {PORTALS} from '../../store/enums/portals.enum';
-import {PROVIDORS} from '../../store/enums/providors.enum';
+import { PORTALS } from '../../store/enums/portals.enum';
+import { PROVIDORS } from '../../store/enums/providors.enum';
 
 const CONTENT_TYPES = {
     RootController: Symbol.for('RootContentController'),
@@ -25,11 +25,11 @@ export { CONTENT_TYPES };
 export const getContentTypeForPortal = (portal: PORTALS): symbol => {
     switch (portal) {
         case PORTALS.BS: return CONTENT_TYPES.BurningSeries;
-    };
+    }
 };
 
 export const getContentTypeForProvidor = (providor: PROVIDORS): symbol => {
     switch (providor) {
         case PROVIDORS.Vivo: return CONTENT_TYPES.Vivo;
-    };
+    }
 };

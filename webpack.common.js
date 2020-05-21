@@ -11,8 +11,8 @@ module.exports = {
     'js/content': [
       './src/content/main.ts',
     ],
-    'extension/background': './extension/background/main.ts',
-    'extension/content': './extension/content/main.ts',
+    'extension/background': './extension/src/background/main.ts',
+    'extension/content': './extension/src/content/main.ts',
   },
   target: 'electron-preload',
   output: {

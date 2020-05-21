@@ -6,17 +6,12 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
-    GetProvidorLinkForEpisode,
     GetAllSeriesFromPortalMessage,
     GetEpisodesForSeasonMessage,
-    GetNextVideoLinkMessage,
-    GetPreviousVideoLinkMessage,
+    GetProvidorLinkForEpisode,
     GetSeriesInformationMessage
 } from '../../browserMessages/messages/portal.messages';
-import Series from '../../store/models/series.model';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import SeriesEpisode from '../../store/models/series-episode.model';
-import { PROVIDORS } from '../../store/enums/providors.enum';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 
 @injectable()
