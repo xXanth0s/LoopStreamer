@@ -23,7 +23,6 @@
     import { Emit, Prop } from 'vue-property-decorator';
     import Component from 'vue-class-component';
 
-
     @Component({
         name: 'delete-modal',
     })

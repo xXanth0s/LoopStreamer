@@ -1,5 +1,6 @@
 .DS_Store
-../node_modules
+.idea
+node_modules
 /dist
 
 /tests/e2e/videos/

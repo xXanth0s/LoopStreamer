@@ -35,8 +35,6 @@
                                                  :min="0"></el-input-number>
                             </b-col>
                         </b-row>
-
-
                         <b-row class="form-group">
                             <b-col cols="3">
                                 <label class="card-label">Outro
@@ -50,8 +48,6 @@
                                                  :min="0"></el-input-number>
                             </b-col>
                         </b-row>
-
-
                         <b-row>
                             <b-col>
                                 <b-button block variant="primary" @click="save">Speichern</b-button>
@@ -196,7 +192,6 @@
             cursor: pointer;
         }
 
-
         .heading {
             min-height: 48px;
             width: 100%;
@@ -204,7 +199,6 @@
             border-bottom: 2px;
             transform: translateY(25%);
             font-size: 18px;
-
 
             h4 {
                 min-height: 38px;
@@ -239,7 +233,6 @@
             border-radius: 0;
         }
     }
-
 
     .card-label {
         margin-top: 5px;

@@ -21,7 +21,8 @@ module.exports = {
     'class-methods-use-this': 'off',
     'function-paren-newline': 'off',
     'no-return-assign': 'off',
-    'vue/script-indent': ['error', 2, { 'baseIndent': 2 }]
+    'vue/script-indent': ['error', 2, { 'baseIndent': 2 }],
+    'array-bracket-spacing': 'off'
   },
   overrides: [
     {

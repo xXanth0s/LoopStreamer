@@ -10,8 +10,6 @@
                 <providors-panel class="card-container panel col mx-3" :providors="providors"
                                  v-on:save="saveProvidors"></providors-panel>
         </b-row>
-
-
     </div>
 </template>
 
@@ -43,7 +41,6 @@
 
         private options: Options = null;
         private providors: Providor[] = [];
-
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);

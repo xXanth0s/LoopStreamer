@@ -36,12 +36,11 @@
     import SeriesDetailView from './SeriesDetailView.vue';
     import { PORTALS } from '../../../../store/enums/portals.enum';
 
-
     @Component({
         name: 'series-list-row',
         components: {
             SeriesTile,
-            SeriesDetailView
+            SeriesDetailView,
         },
     })
     export default class SeriesListRow extends Vue {

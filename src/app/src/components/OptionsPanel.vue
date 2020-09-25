@@ -33,7 +33,6 @@
                     <i class="el-icon-info"></i>
                 </el-tooltip>
 
-
             </div>
             <div class="col-sm-3">
                 <el-switch class="float-right"
@@ -142,7 +141,6 @@
 </script>
 
 <style lang="scss" scoped>
-
 
     .btn-bottom {
         position: absolute;

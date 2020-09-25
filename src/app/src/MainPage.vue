@@ -30,9 +30,8 @@
 
 </script>
 
-
 <style lang="scss" scoped>
-    @import '../../../../styles/variables';
+    @import 'styles/variables';
 
     .header {
         top: 0;

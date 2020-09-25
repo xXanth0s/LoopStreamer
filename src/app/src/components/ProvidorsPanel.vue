@@ -121,8 +121,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import "../../../../../styles/variables";
-
+    @import "styles/variables";
 
     .btn-bottom {
         position: absolute;
@@ -130,11 +129,9 @@
         right: 24px;
     }
 
-
     .drag-item {
         cursor: move;
     }
-
 
     .drop-area {
         border: 1px solid $borderColor;

@@ -98,7 +98,6 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-
         @Watch('seriesMetaInfo', { immediate: true })
         public async loadSeriesData(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
             if (seriesMetaInfo) {
@@ -126,7 +125,6 @@
             }
         }
 
-
         public async episodeClicked(episode: SeriesEpisode): Promise<void> {
             this.messageService.sendMessageToBackground(createStartEpisodeMessage(episode.key, this.selectedProtal));
         }
@@ -137,10 +135,9 @@
     }
 </script>
 
-
 <style lang="scss" scoped>
 
-    @import "../../../../../../styles/variables";
+    @import "styles/variables";
 
     $accordionHeight: 300px;
 

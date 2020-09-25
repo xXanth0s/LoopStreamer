@@ -50,7 +50,6 @@
 
         @Emit()
         public tileClicked(): SeriesMetaViewModel {
-            console.log('clicked')
             return this.series;
         }
 
@@ -59,10 +58,6 @@
                 takeUntil(this.takeUntil$),
             ).subscribe(isSelected => this.isSelected = isSelected);
         }
-
-
-
-
     }
 </script>
 

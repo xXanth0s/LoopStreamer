@@ -69,9 +69,9 @@
     "spectron": "^10.0.0",
     "terser-webpack-plugin": "^2.3.5",
     "typescript": "~3.8.3",
-    "vue-cli-plugin-electron-builder": "~2.0.0-beta.6",
+    "vue-cli-plugin-electron-builder": "^2.0.0-rc.4",
     "vue-loader": "^15.9.1",
-    "vue-template-compiler": "^2.6.11",
+    "vue-template-compiler": "^2.6.12",
     "webpack-cli": "^3.3.11"
   }
 }
