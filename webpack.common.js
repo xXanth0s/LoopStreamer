@@ -61,16 +61,8 @@ module.exports = {
         to: 'assets',
       },
       {
-        from: 'assets',
-        to: 'extension/assets',
-      },
-      {
-        from: './extension/_locales',
-        to: 'extension/_locales',
-      },
-      {
-        from: './extension/manifest.json',
-        to: 'extension/manifest.json',
+        from: 'state.json',
+        to: 'state.json',
       },
     ]),
   ],
