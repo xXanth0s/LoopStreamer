@@ -10,8 +10,15 @@ import { controlStateSlice } from '../reducers/control-state.reducer';
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
+
+
+const pathToFile = path.resolve(__dirname, 'state.json');
+const jsonData = fs.readFileSync(pathToFile);
+const preloadedState: StateModel = JSON.parse(jsonData.toString());
 
 const backgroundStore = configureStore<StateModel>({
     reducer: {
@@ -33,11 +40,14 @@ const backgroundStore = configureStore<StateModel>({
     // enhancers: [
     //     composeEnhancers.apply(BrowserStorageMiddlerware)
     // ]
+    preloadedState
 });
 
 
 export const initStore = async function(): Promise<void> {
-
+    const pathToFile = path.resolve(__dirname, 'state.json');
+    const jsonData = fs.readFileSync(pathToFile);
+    console.log(jsonData.toString());
     replayActionMain(backgroundStore);
     // const chromeStorage: StateModel = (await browser.storage.local.get()) as StateModel;
     // if(Object.entries(chromeStorage).length) {
