@@ -45,9 +45,6 @@ const backgroundStore = configureStore<StateModel>({
 
 
 export const initStore = async function(): Promise<void> {
-    const pathToFile = path.resolve(__dirname, 'state.json');
-    const jsonData = fs.readFileSync(pathToFile);
-    console.log(jsonData.toString());
     replayActionMain(backgroundStore);
     // const chromeStorage: StateModel = (await browser.storage.local.get()) as StateModel;
     // if(Object.entries(chromeStorage).length) {

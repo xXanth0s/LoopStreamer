@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { filter, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
 import { Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
@@ -30,21 +30,18 @@ export class VideoController {
 
     public async startVideo(seriesEpisode: SeriesEpisode, providor: PROVIDORS): Promise<void> {
         this.reset();
-        this.tabController.startAddBlockerForProvidor();
+        const activeWindow$ = this.tabController.obenVideoForProvidorAndStartAdblocker(seriesEpisode.providorLinks[providor]);
 
-        this.store.select(getVideoTabId).pipe(
-            filter<number>(Boolean),
+        activeWindow$.pipe(
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
-        ).subscribe(async (tabId) => {
+        ).subscribe(async (window) => {
             // this.windowController.setCurrentWindowState();
             this.messageService.sendMessageToVideoTab(createStartVideoProvidorMessage(seriesEpisode, providor));
             // this.windowController.makeWindowFullscreen();
             this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
             this.windowService.getProvidorWindow().show();
         });
-
-        this.windowService.openWindow(seriesEpisode.providorLinks[providor]);
     }
 
     public reset(): void {

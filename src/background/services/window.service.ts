@@ -1,9 +1,24 @@
 import { inject, injectable } from 'inversify';
-import { BrowserWindow, BrowserWindowConstructorOptions, Session } from 'electron';
+import {
+    BeforeSendResponse,
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    OnBeforeSendHeadersListenerDetails,
+    Referrer,
+    Session
+} from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
+import * as path from 'path';
+
+
+export type OpenWindowConfig = {
+    nodeIntegration?: boolean;
+    visible?: boolean;
+    httpReferrer?:  string| Referrer;
+}
 
 @injectable()
 export class WindowService {
@@ -42,28 +57,36 @@ export class WindowService {
         session.setUserAgent(this.userAgent);
     }
 
-    public openWindow(href: string, config = { nodeIntegration: false, visible: false }): BrowserWindow {
+    public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
         const windowConfig = this.getDefaultConfig(config);
         const window = new BrowserWindow(windowConfig);
-        window.loadURL(href);
+        window.loadURL(href, { httpReferrer: config.httpReferrer });
         window.webContents.openDevTools();
-        window.webContents.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
+        this.setUserAgentForSession(window.webContents.session);
         return window;
     }
 
-    private getDefaultConfig(config = { nodeIntegration: false, visible: false }): BrowserWindowConstructorOptions {
+    public setUserAgentForSession(newSession: Session): void {
+        newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
+            details.requestHeaders['userAgent'] = this.userAgent;
+            callback({cancel: false, requestHeaders: details.requestHeaders});
+        })
+    }
+
+    private getDefaultConfig(config?: OpenWindowConfig): BrowserWindowConstructorOptions {
         return {
             width: 1800,
             height: 1200,
             show: config.visible,
             frame: true,
             webPreferences: {
-                nodeIntegration: true,
-                // preload: path.resolve(__dirname, 'js', 'content.js'),
-                webSecurity: false,
+                nodeIntegration: Boolean(config?.nodeIntegration),
+                preload: path.resolve(__dirname, 'js', 'content.js'),
+                webSecurity: true,
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,
-                contextIsolation: !config.nodeIntegration
+                contextIsolation: !Boolean(config?.nodeIntegration),
+                partition: 'persist:'
             },
         }
     }

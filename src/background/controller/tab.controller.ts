@@ -1,14 +1,14 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
-import { debounceTime, finalize, first, takeUntil } from 'rxjs/operators';
+import { debounceTime, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 import { WindowController } from './window.controller';
 import { setActivePortalTabIdAction, setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
-import { app, BrowserWindow, session, webContents } from 'electron';
+import { app, BrowserWindow, webContents } from 'electron';
 import { PortalService } from '../services/portalService';
 import Website from '../../store/models/website';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
@@ -32,13 +32,11 @@ export class TabController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
-    public startAddBlockerForProvidor(): void {
+    public obenVideoForProvidorAndStartAdblocker(url: string): Observable<BrowserWindow> {
         this.globalIndex++;
 
-        const index = this.globalIndex;
-
         this.isUserOnVideoTabVal = true;
-
+        const activeWindow$ = new Subject<BrowserWindow>();
 
         fromEvent<WebContensCreatedEvent>(app, 'web-contents-created').pipe(
             takeUntil(this.store.playerHasStopped()),
@@ -46,37 +44,50 @@ export class TabController {
         ).subscribe(data => {
             const { webContents } = data;
             const window = BrowserWindow.fromWebContents(webContents);
-            if (this.providorService.isUrlValid(webContents.getURL())) {
+            if (url === webContents.getURL()) {
+                return;
+            }
+            if (this.providorService.isUrlValidForActiveProvidor(webContents.getURL())) {
                 fromEvent<Event>(webContents, 'dom-ready').pipe(
                     first()
                 ).subscribe(() => {
                     this.store.dispatch(setVidoeTabIdAction(window.id));
+                    activeWindow$.next(window);
                 });
             } else {
-                // window.close();
+                window.close();
             }
         });
-        //
-        // app.on('br')
-        // fromEvent(this.windowService.getVideoWindow().webContents, 'new-window')
-        //     .pipe(
-        //     takeUntil(this.store.playerHasStopped()),
-        //     takeUntil(this.takeUntilProvidor$),
-        // ).subscribe((event) => {
-        //     const providorTabId = this.store.selectSync(getVideoTabId);
-        //     // if (event.tabId === providorTabId) {
-        //     //     this.store.stopPlayer();
-        //     //     this.windowController.setDefaultState()
-        //     // }
-        // })
+
+        this.windowService.openWindow(url, null);
+
+        return activeWindow$;
     }
 
     public getNewWindowsForWebsiteOrLink(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
-        const subject$ = new Subject<BrowserWindow>();
+        const window = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
+        const subject$ = new BehaviorSubject<BrowserWindow>(window);
+        this.startAdblockForWindowSession(window, allowedPage, linkToOpen, subject$);
+
+        // this.windowService.openWindow(linkToOpen)
+        return subject$;
+
+    }
+
+    public getNewWindowsForWebsiteOrLink2(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
+        let window = this.windowService.openWindow(linkToOpen, { visible: true });
+        const subject$ = new BehaviorSubject<BrowserWindow>(window);
+
+        fromEvent(window.webContents, '')
+        this.startAdblockerForWindow(window, allowedPage, linkToOpen, subject$);
+
+        return subject$.asObservable();
+    }
+
+    private startAdblockForWindowSession(window: BrowserWindow, allowedPage: Website, linkToOpen: string, subject$: Subject<BrowserWindow>): void {
         const filter = { urls: [ '*://*/*' ] };
         let oldWindowIds = BrowserWindow.getAllWindows().map(_window => _window.id);
-        const sessionInstance = session.fromPartition('persist:');
-        sessionInstance.webRequest.onBeforeSendHeaders(filter, (details: OnBeforeSendHeadersListenerDetails, callback): void => {
+        window.webContents.session.webRequest.onBeforeSendHeaders(filter, (details: OnBeforeSendHeadersListenerDetails, callback): void => {
             if (details.resourceType !== 'mainFrame') {
                 callback({ cancel: false });
                 return;
@@ -88,24 +99,37 @@ export class TabController {
                 const newWindowId = newWindowIds.filter(window => !oldWindowIds.includes(window));
                 oldWindowIds = newWindowIds;
                 if (newWindowId.length) {
-
-                    const window = BrowserWindow.fromId(newWindowId[0]);
-                    // window.webContents.openDevTools();
-                    subject$.next(window);
+                    const newWindow = BrowserWindow.fromId(newWindowId[0]);
+                    newWindow.webContents.openDevTools();
+                    this.startAdblockerForWindow(newWindow, allowedPage, linkToOpen, subject$);
+                    this.windowService.setUserAgentForSession(newWindow.webContents.session);
+                    // window.close();
+                    subject$.next(newWindow);
                 }
             }
 
-            details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
             callback({ cancel: !isValid, requestHeaders: details.requestHeaders });
         });
-
-        // this.windowService.openWindow(linkToOpen)
-        this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
-        return subject$.pipe(
-            finalize(() => sessionInstance.webRequest.onBeforeRequest(filter, null))
-        );
-
     }
+
+    startAdblockerForWindow(window: BrowserWindow, allowedPage: Website, linkToOpen: string, subject$: Subject<BrowserWindow>) {
+        window.webContents.on('new-window', (event, url, frameName, disposition, options, additionalFeatures, referrer) =>  {
+            event.preventDefault();
+            if(!this.isNewWindow(url, allowedPage, linkToOpen)) {
+                return;
+            }
+            // window.close();
+            const newWindow = this.windowService.openWindow(linkToOpen, {httpReferrer: referrer})
+            subject$.next(newWindow);
+            this.startAdblockerForWindow(newWindow, allowedPage, linkToOpen, subject$);
+        })
+    }
+
+    private isNewWindow(newUrl: string, allowedPage: Website, linkToOpen: string): boolean {
+        const regex = new RegExp(allowedPage.urlRegex, 'i');
+        return regex.test(newUrl) || newUrl.includes(linkToOpen);
+    }
+
 
     public waitTillDomIsReady(windowId: number): Promise<void> {
         return new Promise<void>(resolve => {

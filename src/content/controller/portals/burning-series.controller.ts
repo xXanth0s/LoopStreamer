@@ -126,7 +126,6 @@ export class BurningSeriesController implements IPortalController {
         // return timer(100000).pipe(
         //     mapTo('')
         // ).toPromise();
-        debugger
         if (this.getActiveProvidor()?.controllerName === providor) {
             const link = this.videoUrlSelector() as HTMLLinkElement;
             if (link) {

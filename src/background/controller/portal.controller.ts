@@ -93,12 +93,12 @@ export class PortalController {
 
     private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portal: Portal, message: Message<T, R>): Promise<R> {
         return new Promise<R>(resolve => {
-            // const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
-            const sub = this.openPortalUrl('https://s.to/redirect/6349887', portal).subscribe(async (window) => {
-                // const result = await this.messageService.sendMessageToPortalTab(message);
-                // window.close();
-                // sub.unsubscribe()
-                // resolve(result);
+            const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
+                console.log('new Window', window.id);
+                const result = await this.messageService.sendMessageToPortalTab(message);
+                window.close();
+                sub.unsubscribe()
+                resolve(result);
             });
         });
     }

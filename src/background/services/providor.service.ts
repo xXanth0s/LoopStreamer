@@ -12,7 +12,7 @@ export class ProvidorService {
     }
 
 
-    public isUrlValid(url?: string): boolean {
+    public isUrlValidForActiveProvidor(url?: string): boolean {
         if(url) {
             const providor = this.getCurrentProvidor();
 

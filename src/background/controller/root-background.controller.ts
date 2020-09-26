@@ -10,6 +10,7 @@ import { ProvidorService } from '../services/providor.service';
 import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
+    createStartEpisodeMessage,
     GetAllAvailableSeriesFromPortalMessage,
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
@@ -30,6 +31,7 @@ import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
+import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
 export class RootBackgroundController {
@@ -99,13 +101,16 @@ export class RootBackgroundController {
             this.continueSeriesHandler(message);
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): void => {
             this.startEpisodeHandler(message);
         });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
-            async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
-                return this.getAllVideosFromPortalHandler(message);
+            // async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
+            (event, message: GetAllAvailableSeriesFromPortalMessage) => {
+                    const newMessage = createStartEpisodeMessage('24-S5-E4', PORTALS.BS);
+                    this.startEpisodeHandler(newMessage);
+                // return this.getAllVideosFromPortalHandler(message);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_INFORMATION,
@@ -171,6 +176,7 @@ export class RootBackgroundController {
     private async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
         const { portal, episodeKey } = message.payload;
         const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
+
         console.log('providorLink', providorLink);
         console.log(providorLink);
         if (providorLink.link) {

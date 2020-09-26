@@ -8,3 +8,4 @@ const contentController = inversifyContentContainer.get<RootContentController>(C
 
 contentController.init();
 
+console.log('content script loaded')
