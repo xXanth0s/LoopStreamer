@@ -12,6 +12,7 @@ import { StoreService } from '../../shared/services/store.service';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
 import * as path from 'path';
+import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 
 
 export type OpenWindowConfig = {
@@ -19,6 +20,10 @@ export type OpenWindowConfig = {
     visible?: boolean;
     httpReferrer?:  string| Referrer;
     fullscreen?: boolean;
+
+    // load script to website with LoopStreamer functionality,
+    // @default: true
+    preloadScript?: boolean
 }
 
 @injectable()
@@ -59,9 +64,10 @@ export class WindowService {
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
-        const windowConfig = this.getConfig(config);
+        let finalConfig = {...DefaultOpenWindowConfig, ...config};
+        const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
-        window.loadURL(href, { httpReferrer: config.httpReferrer });
+        window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
         window.webContents.openDevTools();
         this.setUserAgentForSession(window.webContents.session);
         return window;
@@ -75,20 +81,20 @@ export class WindowService {
         })
     }
 
-    private getConfig(config?: OpenWindowConfig): BrowserWindowConstructorOptions {
+    private getConfig(config?: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
         return {
             width: 1800,
             height: 1200,
-            fullscreen: config?.fullscreen,
-            show: config?.visible,
+            fullscreen: config.fullscreen,
+            show: config.visible,
             frame: true,
             webPreferences: {
-                nodeIntegration: Boolean(config?.nodeIntegration),
-                preload: path.resolve(__dirname, 'js', 'content.js'),
+                nodeIntegration: Boolean(config.nodeIntegration),
+                preload: config.preloadScript ? path.resolve(__dirname, 'js', 'content.js') : undefined,
                 webSecurity: true,
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,
-                contextIsolation: !Boolean(config?.nodeIntegration),
+                contextIsolation: !Boolean(config.nodeIntegration),
                 partition: 'persist:',
 
             },

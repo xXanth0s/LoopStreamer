@@ -69,7 +69,7 @@ export class RootBackgroundController {
             href = 'app://./index.html';
         }
 
-        const window = this.windowService.openWindow(href, { nodeIntegration: true, visible: true });
+        const window = this.windowService.openWindow(href, { nodeIntegration: true, visible: true, preloadScript: false });
         this.store.dispatch(setOptionsWindowIdAction(window.id));
         if (isDev) {
             window.webContents.openDevTools();
