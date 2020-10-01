@@ -4,7 +4,6 @@ import { BACKGROUND_TYPES } from './BACKGROUND_TYPES';
 import { RootBackgroundController } from '../controller/root-background.controller';
 import { VideoController } from '../controller/video.controller';
 import { PortalController } from '../controller/portal.controller';
-import { TabController } from '../controller/tab.controller';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
@@ -35,7 +34,6 @@ inversifyContainer.bind(BACKGROUND_TYPES.WindowService).to(WindowService).inSing
 //controller
 inversifyContainer.bind(BACKGROUND_TYPES.VideoController).to(VideoController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.PortalController).to(PortalController).inSingletonScope();
-inversifyContainer.bind(BACKGROUND_TYPES.TabController).to(TabController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.WindowController).to(WindowController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.RootController).to(RootBackgroundController).inSingletonScope();
 

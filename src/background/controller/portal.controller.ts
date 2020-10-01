@@ -3,7 +3,6 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { TabController } from './tab.controller';
 import { VideoController } from './video.controller';
 import { debounceTime, first, mapTo, switchMap, tap } from 'rxjs/operators';
 import {
@@ -27,6 +26,7 @@ import { ProvidorService } from '../services/providor.service';
 import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
 import Portal from '../../store/models/portal.model';
+import { WindowController } from './window.controller';
 
 @injectable()
 export class PortalController {
@@ -36,7 +36,7 @@ export class PortalController {
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
                 @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(BACKGROUND_TYPES.TabController) private readonly tabController: TabController,
+                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController) {
     }
 
@@ -78,7 +78,7 @@ export class PortalController {
     private openPortalUrl(url: string, portal: Portal): Observable<BrowserWindow> {
 
         // const window = this.windowService.openWindow(url);
-        const window$ = this.tabController.openLinkForWebsite(portal, url);
+        const window$ = this.windowController.openLinkForWebsite(portal, url);
         return window$.pipe(
             switchMap((window) => {
                 return fromEvent<void>(window.webContents,'dom-ready').pipe(

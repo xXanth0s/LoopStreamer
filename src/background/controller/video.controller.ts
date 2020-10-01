@@ -5,7 +5,6 @@ import { debounceTime, first, mapTo, switchMap, takeUntil, tap } from 'rxjs/oper
 import { MessageService } from '../../shared/services/message.service';
 import { fromEvent, Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { TabController } from './tab.controller';
 import { WindowController } from './window.controller';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { createStartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
@@ -25,7 +24,6 @@ export class VideoController {
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
         @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
-        @inject(BACKGROUND_TYPES.TabController) private readonly tabController: TabController,
         @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
@@ -51,7 +49,7 @@ export class VideoController {
 
     public reset(): void {
         const providorTabId = this.store.selectSync(getVideoTabId);
-        this.tabController.closeTab(providorTabId);
+        this.windowController.closeTab(providorTabId);
         this.takeUntil$.next();
         this.store.dispatch(setVidoeTabIdAction(null));
     }
@@ -60,7 +58,7 @@ export class VideoController {
     private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
 
         // const window = this.windowService.openWindow(url);
-        const window$ = this.tabController.openLinkForWebsite(providor, url);
+        const window$ = this.windowController.openLinkForWebsite(providor, url);
         return window$.pipe(
             switchMap((window) => {
                 return fromEvent<void>(window.webContents,'dom-ready').pipe(

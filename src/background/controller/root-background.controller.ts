@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { PortalController } from './portal.controller';
 import { VideoController } from './video.controller';
-import { TabController } from './tab.controller';
 import { MessageService } from '../../shared/services/message.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
@@ -40,7 +39,6 @@ export class RootBackgroundController {
 
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController,
-                @inject(BACKGROUND_TYPES.TabController) private readonly tabController: TabController,
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
@@ -126,7 +124,7 @@ export class RootBackgroundController {
     }
 
     private async videoFinishedHandler(): Promise<void> {
-        if (this.tabController.isUserOnVideoTab()) {
+        if (this.windowController.isUserOnVideoTab()) {
             this.store.stopPlayer();
             // await this.portalController.openNextEpisode();
         }

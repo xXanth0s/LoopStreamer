@@ -2,11 +2,7 @@ import { inject, injectable } from 'inversify';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { combineLatest, Subject, timer } from 'rxjs';
 import { filter, takeUntil, throttleTime } from 'rxjs/operators';
-import {
-    setEndTimeForSeriesAction,
-    setStartTimeForSeriesAction,
-    updateSeriesEpisodeAction
-} from '../../store/reducers/series.reducer';
+import { updateSeriesEpisodeAction } from '../../store/reducers/series.reducer';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { FULL_SCREEN_VIDEO } from '../constants/class-names';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
@@ -138,45 +134,45 @@ export class VideoController {
 
     private openSetStartTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         if(!Boolean(episodeInfo.timestamp)) {
-            this.notificationService.openSetStartTimePopup(
-                () => {
-                    this.store.dispatch(setStartTimeForSeriesAction({
-                        key: episodeInfo.seriesKey,
-                        scipStartTime: video.currentTime
-                    }))
-                },
-                () => {
-                    this.store.dispatch(setStartTimeForSeriesAction({key: episodeInfo.seriesKey, scipStartTime: undefined}))
-                })
+            // this.notificationService.openSetStartTimePopup(
+            //     () => {
+            //         this.store.dispatch(setStartTimeForSeriesAction({
+            //             key: episodeInfo.seriesKey,
+            //             scipStartTime: video.currentTime
+            //         }))
+            //     },
+            //     () => {
+            //         this.store.dispatch(setStartTimeForSeriesAction({key: episodeInfo.seriesKey, scipStartTime: undefined}))
+            //     })
         }
     }
 
     private openSetEndTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        this.notificationService.openSetEndTimePopup(
-            async () => {
-                await this.store.dispatch(setEndTimeForSeriesAction({
-                    key: episodeInfo.seriesKey,
-                    scipEndTime: video.currentTime
-                }));
-                this.videoEnded();
-            },
-            async () => {
-                await this.store.dispatch(setEndTimeForSeriesAction({
-                    key: episodeInfo.seriesKey,
-                    scipEndTime: undefined
-                }))
-            })
+        // this.notificationService.openSetEndTimePopup(
+        //     async () => {
+        //         await this.store.dispatch(setEndTimeForSeriesAction({
+        //             key: episodeInfo.seriesKey,
+        //             scipEndTime: video.currentTime
+        //         }));
+        //         this.videoEnded();
+        //     },
+        //     async () => {
+        //         await this.store.dispatch(setEndTimeForSeriesAction({
+        //             key: episodeInfo.seriesKey,
+        //             scipEndTime: undefined
+        //         }))
+        //     })
     }
 
     private openEndTimePopup(episodeInfo: SeriesEpisode): void {
         if (episodeInfo.hasNextEpisode) {
-            this.notificationService.openEndTimePopup(
-                () => {
-                    this.videoEnded();
-                },
-                () => {
-                    this.stopAutoPlay$.next();
-                })
+            // this.notificationService.openEndTimePopup(
+            //     () => {
+            //         this.videoEnded();
+            //     },
+            //     () => {
+            //         this.stopAutoPlay$.next();
+            //     })
         }
     }
 
