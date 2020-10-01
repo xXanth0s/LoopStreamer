@@ -98,7 +98,7 @@ export class RootBackgroundController {
         });
 
         ipcMain.handle(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
-            console.log('continue series', message)
+            console.log('in continue series handler')
             this.continueSeriesHandler(message);
         });
 
@@ -153,9 +153,10 @@ export class RootBackgroundController {
         this.resetController();
         this.store.stopPlayer();
         const series = this.store.selectSync(getSeriesByKey, payload);
-        const episode = this.store.selectSync(getSeriesEpisodeByKey, series?.lastEpisodeWatched);
-        console.log(episode)
-        this.videoController.startVideo(episode, PROVIDORS.Vivo);
+        const seriesEpisode = this.store.selectSync(getSeriesEpisodeByKey, series?.lastEpisodeWatched);
+
+        // TO-DO replace hardcoded Vivo with last used Providor
+        this.videoController.startVideo(seriesEpisode, PROVIDORS.Vivo);
     }
 
     private async getAllVideosFromPortalHandler({ payload }: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> {

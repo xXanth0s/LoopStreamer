@@ -41,6 +41,7 @@
       "scipEndTime": 0,
       "startTimeConfigured": false,
       "endTimeConfigured": false,
+      "lastEpisodeWatched": "24-S5-E4",
       "posterHref": "https://bs.to/public/images/cover/3.jpg",
       "title": "24",
       "seasons": [
@@ -258,7 +259,9 @@
           "Vivo": "https://bs.to/serie/24/5/4-Tag-5-10-00-Uhr-11-00-Uhr/en/vivo"
         }
       },
-      "providorLinks": {}
+      "providorLinks": {
+        "Vivo": "https://vivo.sx/7674862985"
+      }
     },
     "24-S5-E5": {
       "key": "24-S5-E5",
