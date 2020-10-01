@@ -5,10 +5,11 @@ import Providor from '../models/providor.model';
 import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { VIDEO_STATUS } from '../enums/video-status.enum';
 import { PORTALS } from '../enums/portals.enum';
+import { PROVIDORS } from '../enums/providors.enum';
 
 const initialControlState: ControlState = {
     "activePortal": PORTALS.BS,
-    "activeProvidor": "Vivo",
+    "activeProvidor": PROVIDORS.Vivo,
     "isUserOnVideoPage": false,
     "loopStreamerStatus": LoopStreamerStatus.PLAYING,
     "videoStatus": VIDEO_STATUS.None,
@@ -116,7 +117,7 @@ export const controlStateSlice = createSlice({
         setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) => setActiveProvidor(state, action.payload),
         setOptionsWindowIdAction: (state: ControlState, action: PayloadAction<ControlState['optionsWindowId']>) => setOptionsWindowIdId(state, action.payload),
         setVidoeTabIdAction: (state: ControlState, action: PayloadAction<ControlState['videoTabId']>) => setVidoeTabId(state, action.payload),
-        setVideoWindowIdAction: (state: ControlState, action: PayloadAction<ControlState['videoWindowId']>) => setVideoWindowId(state, action.payload),
+        setActiveVideoWindowIdAction: (state: ControlState, action: PayloadAction<ControlState['videoWindowId']>) => setVideoWindowId(state, action.payload),
         setIsUserOnVideoPageAction: (state: ControlState, action: PayloadAction<ControlState['isUserOnVideoPage']>) => setIsUserOnVideoPage(state, action.payload),
         setLoopStreamerStatusAction: (state: ControlState, action: PayloadAction<ControlState['loopStreamerStatus']>) => setLoopStreamerStatus(state, action.payload),
         resetControlStateAction: () => resetControlState(),
@@ -134,7 +135,7 @@ export const {
     setActiveProvidorAction,
     resetControlStateAction,
     setVidoeTabIdAction,
-    setVideoWindowIdAction,
+    setActiveVideoWindowIdAction,
     setIsUserOnVideoPageAction,
     setLoopStreamerStatusAction,
     toggleWindowStateAction,

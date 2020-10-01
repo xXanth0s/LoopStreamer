@@ -34,7 +34,7 @@ function addProvidorLinkToEpisode(state: StateModel['seriesEpisodes'], { payload
         return;
     }
 
-    episode.portalLinks[providorLink.providor] = providorLink.link;
+    episode.providorLinks[providorLink.providor] = providorLink.link;
 }
 
 const seriesEpisodesReducer = createSlice({

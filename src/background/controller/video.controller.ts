@@ -1,19 +1,22 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { takeUntil } from 'rxjs/operators';
+import { debounceTime, first, mapTo, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
-import { Subject } from 'rxjs';
+import { fromEvent, Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { TabController } from './tab.controller';
 import { WindowController } from './window.controller';
 import { getVideoTabId } from '../../store/selectors/control-state.selector';
 import { createStartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
-import { setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
+import { setActiveVideoWindowIdAction, setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { PROVIDORS } from '../../store/enums/providors.enum';
+import { getProvidorForKey } from '../../store/selectors/providors.selector';
+import { BrowserWindow } from 'electron';
+import Providor from '../../store/models/providor.model';
 
 @injectable()
 export class VideoController {
@@ -28,19 +31,21 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesEpisode: SeriesEpisode, providor: PROVIDORS): Promise<void> {
+    public async startVideo(seriesEpisode: SeriesEpisode, providorKey: PROVIDORS): Promise<void> {
         this.reset();
-        const activeWindow$ = this.tabController.obenVideoForProvidorAndStartAdblocker(seriesEpisode.providorLinks[providor]);
+        const providor = this.store.selectSync(getProvidorForKey, providorKey)
+        const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
 
         activeWindow$.pipe(
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (window) => {
+            debugger
             // this.windowController.setCurrentWindowState();
-            this.messageService.sendMessageToVideoTab(createStartVideoProvidorMessage(seriesEpisode, providor));
+            this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode, providorKey));
             // this.windowController.makeWindowFullscreen();
             this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
-            this.windowService.getProvidorWindow().show();
+            window.show();
         });
     }
 
@@ -49,5 +54,28 @@ export class VideoController {
         this.tabController.closeTab(providorTabId);
         this.takeUntil$.next();
         this.store.dispatch(setVidoeTabIdAction(null));
+    }
+
+
+    private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
+
+        // const window = this.windowService.openWindow(url);
+        const window$ = this.tabController.openLinkForWebsite(providor, url);
+        return window$.pipe(
+            switchMap((window) => {
+                return fromEvent<void>(window.webContents,'dom-ready').pipe(
+                    tap(() => this.setNewVideoWindow(window)),
+                    debounceTime(1000),
+                    first(),
+                    mapTo(window),
+                );
+            } )
+        )
+    }
+
+
+
+    private setNewVideoWindow(newVideoWindow: Electron.BrowserWindow): void {
+        this.store.dispatch(setActiveVideoWindowIdAction(newVideoWindow.id))
     }
 }

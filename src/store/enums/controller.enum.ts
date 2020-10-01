@@ -6,7 +6,7 @@ export enum Controller {
     Notification = 'notification',
     Shared = "shared",
     Openload = "openload",
-    Vivo = "vivo",
+    Vivo = "Vivo",
     StreamCloud = 'streamcloud',
     StreamMango = 'streamango',
     NowVideo = 'nowvideo',

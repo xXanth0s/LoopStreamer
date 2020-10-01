@@ -19,7 +19,7 @@ export const isLoopStreamerInactive = (state: StateModel): boolean => {
 export const loopStreamerStatus = (state: StateModel): LoopStreamerStatus => state.controlState.loopStreamerStatus;
 
 // @ts-ignore
-export const getVideoTabId = (state: StateModel): number => state.controlState.videoTabId;
+export const getVideoTabId = (state: StateModel): number => state.controlState.videoWindowId;
 
 // @ts-ignore
 export const getVideoWindowId = (state: StateModel): number => state.controlState.videoWindowId;

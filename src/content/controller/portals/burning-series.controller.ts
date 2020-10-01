@@ -13,6 +13,7 @@ import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors } from '../../../store/selectors/providors.selector';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
+import { RecaptchaService } from '../../services/recaptchaService';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -22,18 +23,16 @@ export class BurningSeriesController implements IPortalController {
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
     private readonly videoUrlSelector = () => document.querySelector('section > div.hoster-player > a');
-    private readonly seriesActiveSeasonSelector = () => document.querySelector('#seasons > ul > li.active');
     private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seasons").querySelectorAll("a")
-    private readonly seriesEpisodeSelector = () => document.querySelector('#episodes > ul > li');
     private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLTableRowElement> => document.querySelector('.episodes').querySelectorAll('tr');
     private readonly seriesTitleSelector = () => document.querySelector("#sp_left > h2")?.textContent?.trim().split('\n')[0];
     private readonly seriesImageSelector = (): string => (document.querySelector("#sp_right > img") as HTMLImageElement)?.src;
-    private readonly episodeLinksSelector = (): NodeListOf<HTMLElement> => document.querySelectorAll('div.epiInfo');
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seriesContainer")?.querySelectorAll("a");
     private readonly seriesDescriptionSelector = (): string => document.querySelector("#sp_left > p")?.textContent || '';
 
     constructor(@inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+                @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
+                @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService) {
     }
 
     isVideoOpenWithProvidor(): Providor | null {
@@ -126,6 +125,7 @@ export class BurningSeriesController implements IPortalController {
         // return timer(100000).pipe(
         //     mapTo('')
         // ).toPromise();
+        this.recaptchaService.checkForRecaptcha();
         if (this.getActiveProvidor()?.controllerName === providor) {
             const link = this.videoUrlSelector() as HTMLLinkElement;
             if (link) {

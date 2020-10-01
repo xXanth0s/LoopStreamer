@@ -5,7 +5,7 @@ import { PROVIDORS } from '../enums/providors.enum';
 
 const initialState: {[key: string]: Providor} = {
     Vivo : {
-        key: 'Vivo',
+        key: PROVIDORS.Vivo,
         names: ['Vivo'],
         index: 1,
         urlRegex: '^https://vivo',

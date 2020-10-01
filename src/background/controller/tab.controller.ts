@@ -32,7 +32,7 @@ export class TabController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
-    public obenVideoForProvidorAndStartAdblocker(url: string): Observable<BrowserWindow> {
+    public openVideoForProvidorAndStartAdblocker(url: string): Observable<BrowserWindow> {
         this.globalIndex++;
 
         this.isUserOnVideoTabVal = true;
@@ -64,7 +64,7 @@ export class TabController {
         return activeWindow$;
     }
 
-    public getNewWindowsForWebsiteOrLink(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
+    public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
         const window = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
         const subject$ = new BehaviorSubject<BrowserWindow>(window);
         this.startAdblockForWindowSession(window, allowedPage, linkToOpen, subject$);
@@ -101,11 +101,13 @@ export class TabController {
                 if (newWindowId.length) {
                     const newWindow = BrowserWindow.fromId(newWindowId[0]);
                     newWindow.webContents.openDevTools();
-                    this.startAdblockerForWindow(newWindow, allowedPage, linkToOpen, subject$);
+                    this.startAdblockForWindowSession(newWindow, allowedPage, linkToOpen, subject$);
                     this.windowService.setUserAgentForSession(newWindow.webContents.session);
                     // window.close();
                     subject$.next(newWindow);
                 }
+            } else {
+                console.log('canceling page', details)
             }
 
             callback({ cancel: !isValid, requestHeaders: details.requestHeaders });

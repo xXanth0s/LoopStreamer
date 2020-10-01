@@ -68,6 +68,6 @@ export class ProvidorService {
     }
 
     public reset(): Promise<void> {
-        return this.store.dispatch(setActiveProvidorAction('')) as Promise<void>;
+        return this.store.dispatch(setActiveProvidorAction(PROVIDORS.None)) as Promise<void>;
     }
 }

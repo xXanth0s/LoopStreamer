@@ -18,6 +18,7 @@ export type OpenWindowConfig = {
     nodeIntegration?: boolean;
     visible?: boolean;
     httpReferrer?:  string| Referrer;
+    fullscreen?: boolean;
 }
 
 @injectable()
@@ -58,7 +59,7 @@ export class WindowService {
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
-        const windowConfig = this.getDefaultConfig(config);
+        const windowConfig = this.getConfig(config);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: config.httpReferrer });
         window.webContents.openDevTools();
@@ -67,17 +68,19 @@ export class WindowService {
     }
 
     public setUserAgentForSession(newSession: Session): void {
+        console.log('setting user agent')
         newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
             details.requestHeaders['userAgent'] = this.userAgent;
             callback({cancel: false, requestHeaders: details.requestHeaders});
         })
     }
 
-    private getDefaultConfig(config?: OpenWindowConfig): BrowserWindowConstructorOptions {
+    private getConfig(config?: OpenWindowConfig): BrowserWindowConstructorOptions {
         return {
             width: 1800,
             height: 1200,
-            show: config.visible,
+            fullscreen: config?.fullscreen,
+            show: config?.visible,
             frame: true,
             webPreferences: {
                 nodeIntegration: Boolean(config?.nodeIntegration),
@@ -86,7 +89,8 @@ export class WindowService {
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,
                 contextIsolation: !Boolean(config?.nodeIntegration),
-                partition: 'persist:'
+                partition: 'persist:',
+
             },
         }
     }

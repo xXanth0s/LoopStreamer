@@ -62,7 +62,7 @@ export class PortalController {
 
     public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
-        const providor = this.providorService.getCurrentProvidor()?.controllerName;
+        const providor = this.providorService.getCurrentProvidor()?.key;
         const portalLink = episode?.portalLinks[portalKey][providor];
         if(portalLink) {
             const portal = this.store.selectSync(getPortalForKey, portalKey);
@@ -78,7 +78,7 @@ export class PortalController {
     private openPortalUrl(url: string, portal: Portal): Observable<BrowserWindow> {
 
         // const window = this.windowService.openWindow(url);
-        const window$ = this.tabController.getNewWindowsForWebsiteOrLink(portal, url);
+        const window$ = this.tabController.openLinkForWebsite(portal, url);
         return window$.pipe(
             switchMap((window) => {
                 return fromEvent<void>(window.webContents,'dom-ready').pipe(

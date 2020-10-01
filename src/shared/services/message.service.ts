@@ -4,7 +4,7 @@ import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
-import { getVideoTabId } from '../../store/selectors/control-state.selector';
+import { getVideoWindowId } from '../../store/selectors/control-state.selector';
 import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
 
 @injectable()
@@ -27,8 +27,8 @@ export class MessageService {
         return null;
     }
 
-    public async sendMessageToVideoTab<T, R>(message: Message<T, R>): Promise<R | null> {
-        const videoTabId: number = this.storeService.selectSync(getVideoTabId);
+    public async sendMessageToVideoWindow<T, R>(message: Message<T, R>): Promise<R | null> {
+        const videoTabId: number = this.storeService.selectSync(getVideoWindowId);
         if (videoTabId) {
             return this.sendMessageToBrowserWindow(videoTabId, message);
         }

@@ -9,12 +9,13 @@ const CONTENT_TYPES = {
     NotificationService: Symbol.for('NotificationService'),
     PortalService: Symbol.for('PortalService'),
     ProvidorService: Symbol.for('ProvidorService'),
+    RecaptchaService: Symbol.for('RecaptchaService'),
 
     // Portals
     BurningSeries: Symbol.for('BurningSeries'),
 
     // Providors
-    Vivo: Symbol.for('Vovp'),
+    Vivo: Symbol.for('Vivo'),
 
 
 };
