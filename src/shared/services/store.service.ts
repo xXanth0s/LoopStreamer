@@ -3,7 +3,10 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, finalize } from 'rxjs/operators';
 import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { IStoreService } from './store.service.interface';
+import { ActionCreatorWithOptionalPayload } from '@reduxjs/toolkit';
 import { StateModel } from '../../store/models/state.model';
+
+type SelectorArguments<T, P> = P extends (state: T, ...args: infer A) => any ? A : never;
 
 @injectable()
 export class StoreService {
@@ -13,30 +16,30 @@ export class StoreService {
 
     private playerHasStopped$ = new Subject();
 
-    public selectSync<T>(selector: (state: any, ...args: any[]) => T, ...args: any[]): T {
+    public selectSync<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): ReturnType<P> {
         return selector(this.store.getState(), ...args);
     }
 
-    public select<T>(selector: (state: any, ...args: any[]) => T, ...args: any[]): Observable<T> {
-        const subject = new Subject<T>();
+    public select<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
+        const subject = new Subject<StateModel>();
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public selectCopy<T>(selector: (state: any, ...args: any[]) => T, ...args: any[]): Observable<T> {
-        const subject = new Subject<T>();
+    public selectCopy<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
+        const subject = new Subject<P>();
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public selectBehaviour<T>(selector: (state: any, ...args: any[]) => T, ...args: any[]): Observable<T> {
-        const subject = new BehaviorSubject<T>(selector(this.store.getState()));
+    public selectBehaviour<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
+        const subject = new BehaviorSubject<P>(selector(this.store.getState()));
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public dispatch(action: any): void | Promise<void> {
+    public dispatch(action: ReturnType<ActionCreatorWithOptionalPayload<any>>): void | Promise<void> {
         return this.store.dispatch(action);
     }
 
-    private selectHelper<T>(subject: Subject<T>, selector: (state: any, ...args: any[]) => T, ...args: any[]): Observable<T> {
+    private selectHelper<P>(subject: Subject<P>, selector: (state: any, ...args: any[]) => P, ...args: any[]): Observable<P> {
         const unsubscribe = this.store.subscribe(() => {
             const result = selector(this.store.getState(), ...args);
             subject.next(result);

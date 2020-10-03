@@ -31,6 +31,8 @@ import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { PORTALS } from '../../store/enums/portals.enum';
+import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { PROVIDORS } from '../../store/enums/providors.enum';
 
 @injectable()
 export class RootBackgroundController {
@@ -95,7 +97,8 @@ export class RootBackgroundController {
             this.previousVideoHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
+            console.log('continue series', message)
             this.continueSeriesHandler(message);
         });
 
@@ -150,7 +153,9 @@ export class RootBackgroundController {
         this.resetController();
         this.store.stopPlayer();
         const series = this.store.selectSync(getSeriesByKey, payload);
-        // this.videoController.startVideo(series);
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, series?.lastEpisodeWatched);
+        console.log(episode)
+        this.videoController.startVideo(episode, PROVIDORS.Vivo);
     }
 
     private async getAllVideosFromPortalHandler({ payload }: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> {

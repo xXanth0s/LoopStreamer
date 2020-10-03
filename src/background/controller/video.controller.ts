@@ -31,7 +31,7 @@ export class VideoController {
 
     public async startVideo(seriesEpisode: SeriesEpisode, providorKey: PROVIDORS): Promise<void> {
         this.reset();
-        const providor = this.store.selectSync(getProvidorForKey, providorKey)
+        const providor = this.store.selectSync(getProvidorForKey, providorKey);
         const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
 
         activeWindow$.pipe(

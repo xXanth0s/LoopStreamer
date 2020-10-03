@@ -38,9 +38,9 @@ export class WindowService {
     private _portalWindow: BrowserWindow;
 
     public addReduxDevTools(): void {
-        // BrowserWindow.addDevToolsExtension(
-        //     path.join(os.homedir(), '/AppData/Local/Google/Chrome/User Data/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0')
-        // )
+        BrowserWindow.addDevToolsExtension(
+            path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
+        )
     }
 
     public getPortalWindow(): BrowserWindow {

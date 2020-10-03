@@ -61,6 +61,10 @@ module.exports = {
         to: 'assets',
       },
       {
+        from: 'extensions',
+        to: 'extensions',
+      },
+      {
         from: 'state.json',
         to: 'state.json',
       },
