@@ -43,6 +43,7 @@
       "endTimeConfigured": false,
       "posterHref": "https://bs.to/public/images/cover/3.jpg",
       "title": "24",
+      "lastEpisodeWatched": "24-S1-E5",
       "seasons": [
         "24-S1",
         "24-S2",
@@ -558,7 +559,9 @@
           "Vivo": "https://bs.to/serie/24/1/5-Tag-1-04-00-05-00-Uhr/en/vivo"
         }
       },
-      "providorLinks": {}
+      "providorLinks": {
+         "Vivo": "https://vivo.sx/f8ada4d8bd"
+      }
     },
     "24-S1-E6": {
       "key": "24-S1-E6",

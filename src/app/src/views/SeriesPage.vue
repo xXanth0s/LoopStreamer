@@ -51,7 +51,7 @@
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
     import { removeSeriesAction, resetSeriesAction, updateSeriesAction } from '../../../store/reducers/series.reducer';
-    import { getAllSeries } from '../../../store/selectors/series.selector';
+    import { getAllSeries, getAllWatchedSeries } from "../../../store/selectors/series.selector";
     import { getAllPortals } from '../../../store/selectors/portals.selector';
     import messages from '../../constants/messages';
     import Series from '../../../store/models/series.model';
@@ -78,7 +78,7 @@
         }
 
         public mounted(): void {
-            this.store.selectBehaviour(getAllSeries).pipe(
+            this.store.selectBehaviour(getAllWatchedSeries).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(series => this.series = series);
 
