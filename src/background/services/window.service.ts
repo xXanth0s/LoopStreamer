@@ -89,14 +89,13 @@ export class WindowService {
             show: config.visible,
             frame: true,
             webPreferences: {
-                nodeIntegration: Boolean(config.nodeIntegration),
+                nodeIntegration: config.nodeIntegration,
                 preload: config.preloadScript ? path.resolve(__dirname, 'js', 'content.js') : undefined,
                 webSecurity: true,
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,
-                contextIsolation: !Boolean(config.nodeIntegration),
+                contextIsolation: !config.nodeIntegration,
                 partition: 'persist:',
-
             },
         }
     }
