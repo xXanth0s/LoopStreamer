@@ -9,6 +9,8 @@ import {
 } from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
+import { getVideoTabId } from '../../store/selectors/control-state.selector';
+import { getActivePortalTabId } from '../../store/selectors/portals.selector';
 import * as path from 'path';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 
@@ -36,6 +38,22 @@ export class WindowService {
         BrowserWindow.addDevToolsExtension(
             path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
         )
+    }
+
+    public getPortalWindow(): BrowserWindow {
+        const id = this.store.selectSync(getActivePortalTabId);
+        if (id) {
+            return BrowserWindow.fromId(id);
+        }
+        return null;
+    }
+
+    public getProvidorWindow(): BrowserWindow {
+        const id = this.store.selectSync(getVideoTabId);
+        if (id) {
+            return BrowserWindow.fromId(id);
+        }
+        return null;
     }
 
     public setDefaultUserAgent(session: Session): void {
