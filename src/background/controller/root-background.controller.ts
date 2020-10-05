@@ -178,6 +178,7 @@ export class RootBackgroundController {
     }
 
     private async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
+        this.store.stopPlayer();
         const { portal, episodeKey } = message.payload;
         const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
 

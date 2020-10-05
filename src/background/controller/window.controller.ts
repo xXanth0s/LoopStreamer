@@ -7,12 +7,18 @@ import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { fromEvent, Observable, race, Subject, timer } from 'rxjs';
 import Website from '../../store/models/website';
-import { BrowserWindow, OnBeforeSendHeadersListenerDetails } from 'electron';
+import { app, BrowserWindow, OnSendHeadersListenerDetails } from 'electron';
+import { filter, map, mapTo, startWith, switchMap, takeUntil } from 'rxjs/operators';
+
+
+type WebContensCreatedEvent = [ Event, BrowserWindow ];
 
 @injectable()
 export class WindowController {
+
+    private readonly requestFilter = { urls: [ '*://*/*' ] };
 
     private isUserOnVideoTabVal = false;
 
@@ -30,7 +36,6 @@ export class WindowController {
     public async makeWindowFullscreen(): Promise<void> {
         const windowId = this.store.selectSync(getVideoWindowId);
         if (windowId) {
-            // await chromme.windows.update(windowId, {state: 'fullscreen'});
             this.store.dispatch(setCurrentWindowStateAction('fullscreen'));
         } else {
             console.error('WindowController.makeWindowFullscreen: No videoWindowId provided');
@@ -49,47 +54,28 @@ export class WindowController {
         // await chrome.windows.update(activeWindow.id, {state: newWindowState});
     }
 
-
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
-        const window = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
-        const subject$ = new BehaviorSubject<BrowserWindow>(window);
-        this.startAdblockForWindowSession(window, allowedPage, linkToOpen, subject$);
-
-        // this.windowService.openWindow(linkToOpen)
-        return subject$;
-
-    }
-
-
-
-    private startAdblockForWindowSession(window: BrowserWindow, allowedPage: Website, linkToOpen: string, subject$: Subject<BrowserWindow>): void {
-        const filter = { urls: [ '*://*/*' ] };
-        let oldWindowIds = BrowserWindow.getAllWindows().map(_window => _window.id);
-        window.webContents.session.webRequest.onBeforeSendHeaders(filter, (details: OnBeforeSendHeadersListenerDetails, callback): void => {
-            if (details.resourceType !== 'mainFrame') {
-                callback({ cancel: false });
-                return;
-            }
-            const regex = new RegExp(allowedPage.urlRegex, 'i');
-            const isValid = regex.test(details.url) || details.url.includes(linkToOpen);
-            if (isValid) {
-                const newWindowIds = BrowserWindow.getAllWindows().map(window => window.id);
-                const newWindowId = newWindowIds.filter(window => !oldWindowIds.includes(window));
-                oldWindowIds = newWindowIds;
-                if (newWindowId.length) {
-                    const newWindow = BrowserWindow.fromId(newWindowId[0]);
-                    newWindow.webContents.openDevTools();
-                    this.startAdblockForWindowSession(newWindow, allowedPage, linkToOpen, subject$);
-                    this.windowService.setUserAgentForSession(newWindow.webContents.session);
-                    // window.close();
-                    subject$.next(newWindow);
-                }
-            } else {
-                console.log('canceling page', details)
-            }
-
-            callback({ cancel: !isValid, requestHeaders: details.requestHeaders });
-        });
+        const originalWindow = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
+        return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
+            takeUntil(this.store.playerHasStopped()),
+            map(data => data[1]),
+            filter(Boolean),
+            switchMap((window: BrowserWindow) => {
+                console.log(45);
+                return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
+                    map(isValid => {
+                        console.log('is valid', isValid);
+                        if (isValid) {
+                            return window;
+                        }
+                        this.windowService.closeWindow(window)
+                        return null;
+                    }),
+                );
+            }),
+            filter<BrowserWindow>(Boolean),
+            startWith(originalWindow),
+        );
     }
 
     public async closeTab(tabId: number): Promise<BrowserWindow> {
@@ -102,4 +88,34 @@ export class WindowController {
         return this.isUserOnVideoTabVal;
     }
 
+    private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
+        window.hide();
+        const sub$ = new Subject<boolean>();
+        const timeout$ = timer(100).pipe(
+            mapTo(false)
+        );
+
+        window.webContents.session.webRequest.onSendHeaders(this.requestFilter, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
+            if (resourceType !== 'mainFrame') {
+                return;
+            }
+
+            if (!this.isUrlValid(url, allowedPage, validLink)) {
+                sub$.next(false);
+            } else {
+                window.show();
+                sub$.next(true);
+            }
+
+            window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
+        });
+
+        return race(sub$, timeout$);
+    }
+
+    private isUrlValid(url: string, allowedPage: Website, validLink: string): boolean {
+        const regex = new RegExp(allowedPage.urlRegex, 'i');
+
+        return regex.test(url) || url.includes(validLink);
+    }
 }

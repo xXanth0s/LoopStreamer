@@ -38,10 +38,7 @@ export class VideoController {
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (window) => {
-            debugger
-            // this.windowController.setCurrentWindowState();
             this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode, providorKey));
-            // this.windowController.makeWindowFullscreen();
             this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
             window.show();
         });
@@ -56,8 +53,6 @@ export class VideoController {
 
 
     private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
-
-        // const window = this.windowService.openWindow(url);
         const window$ = this.windowController.openLinkForWebsite(providor, url);
         return window$.pipe(
             switchMap((window) => {

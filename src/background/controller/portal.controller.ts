@@ -31,7 +31,6 @@ import { WindowController } from './window.controller';
 @injectable()
 export class PortalController {
 
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
@@ -39,7 +38,6 @@ export class PortalController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController) {
     }
-
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesMetaInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
@@ -76,10 +74,7 @@ export class PortalController {
     }
 
     private openPortalUrl(url: string, portal: Portal): Observable<BrowserWindow> {
-
-        // const window = this.windowService.openWindow(url);
-        const window$ = this.windowController.openLinkForWebsite(portal, url);
-        return window$.pipe(
+        return this.windowController.openLinkForWebsite(portal, url).pipe(
             switchMap((window) => {
                 return fromEvent<void>(window.webContents,'dom-ready').pipe(
                     tap(() => this.setNewPortalWindow(window)),
@@ -94,9 +89,8 @@ export class PortalController {
     private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portal: Portal, message: Message<T, R>): Promise<R> {
         return new Promise<R>(resolve => {
             const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
-                console.log('new Window', window.id);
                 const result = await this.messageService.sendMessageToPortalTab(message);
-                window.close();
+                this.windowService.closeWindow(window);
                 sub.unsubscribe()
                 resolve(result);
             });
