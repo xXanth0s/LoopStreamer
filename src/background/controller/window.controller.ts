@@ -55,6 +55,7 @@ export class WindowController {
     }
 
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
+        this.store.stopPlayer();
         const originalWindow = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
         return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
             takeUntil(this.store.playerHasStopped()),
@@ -64,7 +65,6 @@ export class WindowController {
                 console.log(45);
                 return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
-                        console.log('is valid', isValid);
                         if (isValid) {
                             return window;
                         }
@@ -90,14 +90,20 @@ export class WindowController {
 
     private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
         window.hide();
+        let listening = true
         const sub$ = new Subject<boolean>();
         const timeout$ = timer(100).pipe(
             mapTo(false)
         );
 
-        window.webContents.session.webRequest.onSendHeaders(this.requestFilter, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
-            if (resourceType !== 'mainFrame') {
+        const listener = {...this.requestFilter};
+        window.webContents.session.webRequest.onSendHeaders(listener, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
+            if (resourceType !== 'mainFrame' || !listening) {
                 return;
+            }
+            listening = false;
+            if(!window.isDestroyed()) {
+                window.webContents.session.webRequest.onSendHeaders(listener, null);
             }
 
             if (!this.isUrlValid(url, allowedPage, validLink)) {
@@ -106,8 +112,6 @@ export class WindowController {
                 window.show();
                 sub$.next(true);
             }
-
-            window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
         });
 
         return race(sub$, timeout$);

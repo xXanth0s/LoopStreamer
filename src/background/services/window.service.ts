@@ -65,7 +65,7 @@ export class WindowService {
         const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        // window.webContents.openDevTools();
+        window.webContents.openDevTools();
         this.setUserAgentForSession(window.webContents.session);
         return window;
     }
