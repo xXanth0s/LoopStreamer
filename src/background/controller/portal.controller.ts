@@ -27,6 +27,7 @@ import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
 import Portal from '../../store/models/portal.model';
 import { WindowController } from './window.controller';
+import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 
 @injectable()
 export class PortalController {
@@ -75,14 +76,10 @@ export class PortalController {
 
     private openPortalUrl(url: string, portal: Portal): Observable<BrowserWindow> {
         return this.windowController.openLinkForWebsite(portal, url).pipe(
-            switchMap((window) => {
-                return fromEvent<void>(window.webContents,'dom-ready').pipe(
-                    tap(() => this.setNewPortalWindow(window)),
-                    debounceTime(1000),
-                    first(),
-                    mapTo(window),
-                );
-            } )
+            waitTillPageLoadFinished(),
+            tap(window => this.setNewPortalWindow(window)),
+            debounceTime(1000),
+            first(),
         )
     }
 

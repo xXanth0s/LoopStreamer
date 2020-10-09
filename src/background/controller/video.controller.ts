@@ -16,6 +16,7 @@ import { PROVIDORS } from '../../store/enums/providors.enum';
 import { getProvidorForKey } from '../../store/selectors/providors.selector';
 import { BrowserWindow } from 'electron';
 import Providor from '../../store/models/providor.model';
+import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 
 @injectable()
 export class VideoController {
@@ -55,14 +56,10 @@ export class VideoController {
     private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
         const window$ = this.windowController.openLinkForWebsite(providor, url);
         return window$.pipe(
-            switchMap((window) => {
-                return fromEvent<void>(window.webContents,'dom-ready').pipe(
-                    tap(() => this.setNewVideoWindow(window)),
-                    debounceTime(1000),
-                    first(),
-                    mapTo(window),
-                );
-            } )
+            waitTillPageLoadFinished(),
+            tap(window => this.setNewVideoWindow(window)),
+            debounceTime(1000),
+            first(),
         )
     }
 
