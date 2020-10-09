@@ -4,6 +4,7 @@ import { PROVIDORS } from '../../store/enums/providors.enum';
 const CONTENT_TYPES = {
     RootController: Symbol.for('RootContentController'),
     VideoController: Symbol.for('VideoController'),
+    TestController: Symbol.for('TestController'),
 
     // Services
     NotificationService: Symbol.for('NotificationService'),

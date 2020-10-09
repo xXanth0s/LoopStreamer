@@ -9,7 +9,6 @@ import { ProvidorService } from '../services/providor.service';
 import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
-    createStartEpisodeMessage,
     GetAllAvailableSeriesFromPortalMessage,
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
@@ -22,7 +21,11 @@ import {
     WindowResizedMessage
 } from '../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
-import { resetControlStateAction, setOptionsWindowIdAction } from '../../store/reducers/control-state.reducer';
+import {
+    resetControlStateAction,
+    setActivePortalTabIdAction,
+    setOptionsWindowIdAction
+} from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { ipcMain, session } from 'electron';
@@ -30,9 +33,14 @@ import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import { PORTALS } from '../../store/enums/portals.enum';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { PROVIDORS } from '../../store/enums/providors.enum';
+import Website from '../../store/models/website';
+import { createGetAllSeriesFromPortalMessage } from '../../browserMessages/messages/portal.messages';
+import { switchMap } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
+import { createStartTestRecaptcha } from '../../browserMessages/messages/test.messages';
 
 @injectable()
 export class RootBackgroundController {
@@ -98,7 +106,7 @@ export class RootBackgroundController {
         });
 
         ipcMain.handle(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
-            console.log('in continue series handler')
+            console.log('in continue series handler');
             this.continueSeriesHandler(message);
         });
 
@@ -109,9 +117,10 @@ export class RootBackgroundController {
         ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
             // async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
             (event, message: GetAllAvailableSeriesFromPortalMessage) => {
-                    const newMessage = createStartEpisodeMessage('24-S5-E4', PORTALS.BS);
-                    this.startEpisodeHandler(newMessage);
+                    // const newMessage = createStartEpisodeMessage('24-S5-E4', PORTALS.BS);
+                    // this.startEpisodeHandler(newMessage);
                 // return this.getAllVideosFromPortalHandler(message);
+                this.testRecaptchaHandler();
             });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_INFORMATION,
@@ -188,6 +197,20 @@ export class RootBackgroundController {
             const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
             this.videoController.startVideo(episodeInfo, providorLink.providor);
         }
+    }
+
+    private testRecaptchaHandler(): void {
+        const testWebsite: Website = {
+            baseUrl: 'localhost',
+            urlRegex: 'localhost',
+        };
+
+        this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
+            waitTillPageLoadFinished()
+        ).subscribe(window => {
+            this.store.dispatch(setActivePortalTabIdAction(window.id));
+            this.messageService.sendMessageToPortalTab(createStartTestRecaptcha());
+        })
     }
 
     private resetController(): void {

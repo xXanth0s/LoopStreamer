@@ -62,13 +62,13 @@ export class WindowController {
             map(data => data[1]),
             filter(Boolean),
             switchMap((window: BrowserWindow) => {
-                console.log(45);
                 return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
+                        window.webContents.openDevTools();
                         if (isValid) {
                             return window;
                         }
-                        this.windowService.closeWindow(window)
+                        this.windowService.closeWindow(window);
                         return null;
                     }),
                 );
@@ -90,7 +90,7 @@ export class WindowController {
 
     private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
         window.hide();
-        let listening = true
+        let listening = true;
         const sub$ = new Subject<boolean>();
         const timeout$ = timer(100).pipe(
             mapTo(false)

@@ -45,7 +45,7 @@ export class MessageService {
     }
 
     private sendMessageToBrowserWindow<T, R>(browserWindowId: number, message: Message<T, R>): Promise<R> {
-        console.log('sending message to widow, ', browserWindowId);
+        console.log('sending message to window, ', browserWindowId);
         console.log(message);
         const browserWindow = BrowserWindow.fromId(browserWindowId);
         browserWindow.webContents.send(message.type, this.updateMessage(message));

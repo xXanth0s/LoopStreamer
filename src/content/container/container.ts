@@ -14,6 +14,7 @@ import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portal.service';
 import { RecaptchaService } from '../services/recaptchaService';
 import { NotificationService } from '../services/notification.service';
+import { TestController } from '../controller/test.controller';
 
 const inversifyContentContainer = new Container();
 
@@ -32,6 +33,7 @@ inversifyContentContainer.bind(CONTENT_TYPES.NotificationService).to(Notificatio
 // Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.RootController).to(RootContentController).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.VideoController).to(VideoController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.TestController).to(TestController).inSingletonScope();
 //
 // Portal Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.BurningSeries).to(BurningSeriesController).inSingletonScope();

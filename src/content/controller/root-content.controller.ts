@@ -13,12 +13,16 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
+import { RecaptchaService } from '../services/recaptchaService';
+import { TestController } from './test.controller';
 
 @injectable()
 export class RootContentController {
 
     constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
+                @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
+                @inject(CONTENT_TYPES.TestController) private readonly testController: TestController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
 
@@ -28,29 +32,33 @@ export class RootContentController {
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_ALL_SERIES, (event, message: GetAllSeriesFromPortalMessage) => {
-            console.log(message)
+            console.log(message);
             this.getAllSeriesFromPortalHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION, (event, message: GetSeriesInformationMessage) => {
-            console.log(message)
+            console.log(message);
             this.getSeriesMetaInformationHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_EPISODES_FOR_SEASON, (event, message: GetEpisodesForSeasonMessage) => {
-            console.log(message)
+            console.log(message);
             this.getSeasonsEpisodeInformationHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoProvidorMessage) => {
-            console.log(message)
+            console.log(message);
             this.startVideoForProvidorHandler(event, message);
+        });
+
+        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_RECAPTCHA, (event, message: StartVideoProvidorMessage) => {
+            this.testController.executeRecaptchaChallenge();
         });
 
     }
 
     private async getProvidorLinkHandler(event: IpcRendererEvent, message: GetProvidorLinkForEpisode): Promise<void> {
-        const { providor, episodeInfo } = message.payload
+        const {providor, episodeInfo} = message.payload;
         const result = await this.portalService.getPortalController().getProvidorLinkForEpisode(episodeInfo, providor);
         this.messageService.replyToSender(message, event.sender, result);
     }
@@ -71,7 +79,7 @@ export class RootContentController {
     }
 
     private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoProvidorMessage) {
-        const {providor, episodeInfo} = message.payload
+        const {providor, episodeInfo} = message.payload;
         this.providorService.getProvidorController(providor)?.startVideo(episodeInfo)
     }
 }

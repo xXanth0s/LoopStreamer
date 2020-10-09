@@ -4,4 +4,5 @@ export enum ControllerType {
     PROVIDOR = 'PROVIDOR',
     OPTIONS = 'OPTIONS',
     POPUP = 'POPUP',
+    TEST = 'TEST',
 }
