@@ -56,13 +56,13 @@ export class WindowController {
 
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
         this.store.stopPlayer();
-        const originalWindow = this.windowService.openWindow(linkToOpen, { visible: true, nodeIntegration: false });
+        const originalWindow = this.windowService.openWindow(linkToOpen, { visible: false, nodeIntegration: false });
         return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             map(data => data[1]),
             filter(Boolean),
             switchMap((window: BrowserWindow) => {
-                return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
+            return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
                         window.webContents.openDevTools();
                         if (isValid) {

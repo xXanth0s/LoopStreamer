@@ -24,6 +24,9 @@ export class RootContentController {
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(CONTENT_TYPES.TestController) private readonly testController: TestController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.recaptchaService.checkForRecaptcha();
+        })
     }
 
     public init(): void {

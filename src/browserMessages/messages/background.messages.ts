@@ -97,3 +97,11 @@ export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], port
 export type StartEpisodeMessage = ReturnType<typeof createStartEpisodeMessage>;
 
 
+export const createRecaptchaRecognizedMessage = () : Message => ({
+    type: MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+});
+export type RecaptchaRecognizedMessage = ReturnType<typeof createRecaptchaRecognizedMessage>;
+
+

@@ -4,7 +4,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { VideoController } from './video.controller';
-import { debounceTime, first, mapTo, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, first, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetEpisodesForSeasonMessage,
@@ -13,7 +13,7 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import { getActivePortalTabId, getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
-import { fromEvent, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
@@ -88,7 +88,7 @@ export class PortalController {
             const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
                 const result = await this.messageService.sendMessageToPortalTab(message);
                 this.windowService.closeWindow(window);
-                sub.unsubscribe()
+                sub.unsubscribe();
                 resolve(result);
             });
         });

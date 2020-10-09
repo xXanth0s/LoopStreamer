@@ -13,7 +13,7 @@ import {
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
     OpenNextVideoMessage,
-    OpenPreviousVideoMessage,
+    OpenPreviousVideoMessage, RecaptchaRecognizedMessage,
     StartEpisodeMessage,
     StartSeriesMessage,
     ToggleFullscreenModeMessage,
@@ -28,7 +28,7 @@ import {
 } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import { ipcMain, session } from 'electron';
+import { ipcMain, session, IpcMainInvokeEvent, WebContents, BrowserWindow } from 'electron';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
@@ -133,6 +133,11 @@ export class RootBackgroundController {
                 console.log(message);
                 return this.getSeriesEpisodeForSeasonHandler(message);
             });
+
+        ipcMain.handle(MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
+            (event, message: RecaptchaRecognizedMessage): void => {
+                this.recaptchaRecognizedHandler(event, message);
+            });
     }
 
     private async videoFinishedHandler(): Promise<void> {
@@ -197,6 +202,11 @@ export class RootBackgroundController {
             const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
             this.videoController.startVideo(episodeInfo, providorLink.providor);
         }
+    }
+
+    private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        window.show();
     }
 
     private testRecaptchaHandler(): void {
