@@ -13,7 +13,6 @@ import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors } from '../../../store/selectors/providors.selector';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
-import { RecaptchaService } from '../../services/recaptchaService';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -31,8 +30,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesDescriptionSelector = (): string => document.querySelector("#sp_left > p")?.textContent || '';
 
     constructor(@inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService) {
+                @inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
     isVideoOpenWithProvidor(): Providor | null {
@@ -125,7 +123,6 @@ export class BurningSeriesController implements IPortalController {
         // return timer(100000).pipe(
         //     mapTo('')
         // ).toPromise();
-        this.recaptchaService.checkForRecaptcha();
         if (this.getActiveProvidor()?.controllerName === providor) {
             const link = this.videoUrlSelector() as HTMLLinkElement;
             if (link) {

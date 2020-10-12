@@ -13,8 +13,8 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
-import { RecaptchaService } from '../services/recaptchaService';
 import { TestController } from './test.controller';
+import { RecaptchaService } from '../services/recaptcha.service';
 
 @injectable()
 export class RootContentController {

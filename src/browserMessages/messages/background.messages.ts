@@ -5,6 +5,7 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import Series from '../../store/models/series.model';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
+import { DomElementSize } from '../../dto/dom-element-size.model';
 
 export const createVideoFinishedMessage = (): Message<SeriesEpisode> => ({
     type: MessageType.BACKGROUND_VIDEO_FINISHED,
@@ -97,10 +98,11 @@ export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], port
 export type StartEpisodeMessage = ReturnType<typeof createStartEpisodeMessage>;
 
 
-export const createRecaptchaRecognizedMessage = () : Message => ({
+export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize) : Message<DomElementSize> => ({
     type: MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
+    payload: domElementSize
 });
 export type RecaptchaRecognizedMessage = ReturnType<typeof createRecaptchaRecognizedMessage>;
 

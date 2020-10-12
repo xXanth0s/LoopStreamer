@@ -12,9 +12,9 @@ import { VideoController } from '../controller/video.controller';
 import { RootContentController } from '../controller/root-content.controller';
 import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portal.service';
-import { RecaptchaService } from '../services/recaptchaService';
 import { NotificationService } from '../services/notification.service';
 import { TestController } from '../controller/test.controller';
+import { RecaptchaService } from '../services/recaptcha.service';
 
 const inversifyContentContainer = new Container();
 

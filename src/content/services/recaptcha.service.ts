@@ -3,7 +3,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { Observable, Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { isDomElementVisible } from '../ustils/dom.utils';
+import { getDomElementSize, isDomElementVisible } from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 
 @injectable()
@@ -19,8 +19,9 @@ export class RecaptchaService {
     public checkForRecaptcha(): void {
         this.checkForRecaptchaContainer().pipe(
             switchMap(container => this.checkForRecaptchaChallenge(container))
-        ).subscribe(() => {
-            this.messageService.sendMessageToBackground(createRecaptchaRecognizedMessage());
+        ).subscribe(recaptchaElement => {
+            const size = getDomElementSize(recaptchaElement);
+            this.messageService.sendMessageToBackground(createRecaptchaRecognizedMessage(size));
         })
     }
 
@@ -29,7 +30,6 @@ export class RecaptchaService {
         const bodyElement = document.querySelector('body');
 
         const callback = () => {
-            console.log('in checkForRecaptchaContainer mutation callback');
             const recaptchaContainer = this.recaptchaContainerSelector();
             if (recaptchaContainer) {
                 observer.disconnect();

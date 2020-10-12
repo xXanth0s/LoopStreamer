@@ -206,6 +206,8 @@ export class RootBackgroundController {
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
+        const { width, height } = message.payload;
+        window.setSize(width, height);
         window.show();
     }
 
