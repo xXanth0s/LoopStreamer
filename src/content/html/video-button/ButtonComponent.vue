@@ -1,20 +1,22 @@
 <template>
-    <div class="ls-video-buttons"
-         @mouseover="isMouseOnButton = true"
-         @mouseleave="isMouseOnButton = false">
-        <transition name="fade">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-secondary active">
-                    <input type="radio" name="options" id="option1" autocomplete="off" checked> Active
-                </label>
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="option2" autocomplete="off"> Radio
-                </label>
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="option3" autocomplete="off"> Radio
-                </label>
-            </div>
-        </transition>
+    <div class="ls-container">
+        <div class="ls-video-buttons"
+             @mouseover="isMouseOnButton = true"
+             @mouseleave="isMouseOnButton = false">
+            <transition name="fade">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-secondary active">
+                        <input type="radio" name="options" id="option1" autocomplete="off" checked> Active
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="option2" autocomplete="off"> Radio
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="options" id="option3" autocomplete="off"> Radio
+                    </label>
+                </div>
+            </transition>
+        </div>
     </div>
 </template>
 

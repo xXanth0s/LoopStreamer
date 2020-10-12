@@ -23,7 +23,7 @@ import {
 } from '../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { resetControlStateAction, setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
-import { WindowService } from '../services/window.service';
+import { OpenWindowConfig, WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent, session } from 'electron';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
@@ -32,13 +32,17 @@ import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { PROVIDORS } from '../../store/enums/providors.enum';
-import Website from '../../store/models/website';
-import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
-import { createStartTestRecaptchaMessage } from '../../browserMessages/messages/test.messages';
 import { WindowType } from '../../store/enums/window-type.enum';
+import { FRAME_HEIGHT, FRAME_WIDTH } from '../../shared/constants/electron-data';
 
 @injectable()
 export class RootBackgroundController {
+
+    private readonly appWindowConfig: OpenWindowConfig = {
+        nodeIntegration: true,
+        visible: true,
+        preloadScript: false
+    };
 
     private isInitialized = false;
 
@@ -72,9 +76,9 @@ export class RootBackgroundController {
             href = 'app://./index.html';
         }
 
-        const window = this.windowService.openWindow(href, { nodeIntegration: true, visible: true, preloadScript: false });
+        const window = this.windowService.openWindow(href, this.appWindowConfig);
 
-        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.APP}))
+        this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: window.id, windowType: WindowType.APP }));
         if (isDev) {
             window.webContents.openDevTools();
         }
@@ -198,22 +202,8 @@ export class RootBackgroundController {
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
-        window.setSize(width, height);
+        window.setSize(width + FRAME_WIDTH, height + FRAME_HEIGHT);
         window.show();
-    }
-
-    private testRecaptchaHandler(): void {
-        const testWebsite: Website = {
-            baseUrl: 'localhost',
-            urlRegex: 'localhost',
-        };
-
-        this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
-            waitTillPageLoadFinished()
-        ).subscribe(window => {
-            this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
-            this.messageService.sendMessageToPortalTab(createStartTestRecaptchaMessage());
-        })
     }
 
     private resetController(): void {

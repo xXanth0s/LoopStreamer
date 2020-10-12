@@ -1,10 +1,16 @@
 @import "~izitoast/dist/css/iziToast.min.css";
-@import "../../../styles/bootstrap-customized";
-@import '~bootstrap/scss/_functions';
-@import '~bootstrap/scss/_variables';
-@import '~bootstrap/scss/_mixins';
-@import '~bootstrap/scss/_buttons';
-@import '~bootstrap-vue/src/index.scss';
+.ls-container {
+    @import "../../../styles/bootstrap-customized";
+    @import '~bootstrap/scss/_functions';
+    @import '~bootstrap/scss/_variables';
+    @import '~bootstrap/scss/_mixins';
+    @import '~bootstrap/scss/_buttons';
+    @import '~bootstrap-vue/src/index.scss';
+}
+
+body {
+    overflow: hidden;
+}
 
 .ls-full-screen-video {
     position: fixed !important;
@@ -37,4 +43,10 @@
     .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
         opacity: 0;
     }
+}
+
+.ls-invisible {
+    visibility: hidden;
+    max-width: 0px;
+    max-height: 0px;
 }

@@ -15,6 +15,8 @@ import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 import { TestController } from './test.controller';
 import { RecaptchaService } from '../services/recaptcha.service';
+// @ts-ignore
+import styles from '../styles/content.scss';
 
 @injectable()
 export class RootContentController {
@@ -25,6 +27,7 @@ export class RootContentController {
                 @inject(CONTENT_TYPES.TestController) private readonly testController: TestController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
+            styles.use()
             this.recaptchaService.checkForRecaptcha();
         })
     }

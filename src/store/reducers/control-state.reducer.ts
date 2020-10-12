@@ -100,7 +100,6 @@ function setWindowIdForWindowType(state: ControlState, { windowType, windowId }:
     }
 }
 
-console.log('initial State ', initialControlState)
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
