@@ -6,12 +6,9 @@ export default interface  SeriesEpisode {
     seriesKey: string;
     season: number;
     episodeNumber: number;
-    hasNextEpisode?: boolean;
-    hasPreviousEpisode?: boolean;
     portalLinks: { [key in PORTALS]: {
         [key in PROVIDORS]: string
     } };
     providorLinks: { [key in PROVIDORS]?: string }
-    providorHref?: string;
     timestamp?: number;
 }

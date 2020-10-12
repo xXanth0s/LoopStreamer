@@ -1,8 +1,10 @@
+import Series from '../models/series.model';
+
 export const getKeyForSeriesTitle = (seriesTitle: string): string => {
     return seriesTitle?.toLowerCase().replace(/[^\w\s]/g,'').replace(/\s/g, "-");
 }
 
-export const getKeyForSeriesSeason = (seriesKey: string, seasonNumber: number): string => {
+export const getKeyForSeriesSeason = (seriesKey: Series['key'], seasonNumber: number): string => {
     return `${seriesKey}-S${seasonNumber}`;
 }
 
