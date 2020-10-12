@@ -65,7 +65,7 @@ export class WindowService {
         const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        // window.webContents.openDevTools();
+        window.webContents.openDevTools();
         this.setUserAgentForSession(window.webContents.session);
         return window;
     }
@@ -91,9 +91,10 @@ export class WindowService {
             fullscreen: config.fullscreen,
             show: config.visible,
             frame: true,
+            fullscreenable: false,
             webPreferences: {
                 nodeIntegration: config.nodeIntegration,
-                preload: config.preloadScript ? path.resolve(__dirname, 'js', 'content.js') : undefined,
+                preload: config.preloadScript ? path.resolve(__dirname, 'content.js') : undefined,
                 webSecurity: true,
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,

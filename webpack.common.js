@@ -6,13 +6,16 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    'js/content': [
+    content: [
       path.resolve(__dirname, 'src', 'content', 'main.ts'),
     ],
   },
   target: 'electron-preload',
   output: {
+    chunkFilename: '[name].bundle.js',
     filename: '[name].js',
+    crossOriginLoading: 'anonymous',
+
     path: path.resolve(__dirname, 'dist_electron'),
   },
   resolve: {

@@ -13,7 +13,6 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
-import { TestController } from './test.controller';
 import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
 import styles from '../styles/content.scss';
@@ -24,7 +23,6 @@ export class RootContentController {
     constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
-                @inject(CONTENT_TYPES.TestController) private readonly testController: TestController,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
             styles.use()
@@ -55,10 +53,6 @@ export class RootContentController {
         ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoProvidorMessage) => {
             console.log(message);
             this.startVideoForProvidorHandler(event, message);
-        });
-
-        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_RECAPTCHA, (event, message: StartVideoProvidorMessage) => {
-            this.testController.executeRecaptchaChallenge();
         });
 
     }

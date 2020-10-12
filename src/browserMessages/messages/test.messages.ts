@@ -9,11 +9,25 @@ export const createStartTestRecaptchaMessage = (): Message => ({
 });
 export type StartTestRecaptchaMessage = ReturnType<typeof createStartTestRecaptchaMessage>;
 
+export const createTestNotificationMessage = (): Message => ({
+    type: MessageType.TEST_CONTENT_START_TEST_NOTIFICATION,
+    destinationController: ControllerType.TEST,
+    hasReply: false,
+});
+export type TestNotificationMessage = ReturnType<typeof createTestNotificationMessage>;
 
-export const createStartTestEpisodeOverBS = (): Message => ({
+export const createOpenTestPageMessage = (): Message => ({
+    type: MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+});
+export type OpenTestPageMessage = ReturnType<typeof createOpenTestPageMessage>;
+
+
+export const createStartTestEpisodeOverBSMessage = (): Message => ({
     type: MessageType.TEST_BACKGROUND_START_TEST_EPISODE_OVER_BS,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
 });
-export type StartTestEpisodeOverBS = ReturnType<typeof createStartTestEpisodeOverBS>;
+export type StartTestEpisodeOverBSMessage = ReturnType<typeof createStartTestEpisodeOverBSMessage>;
 

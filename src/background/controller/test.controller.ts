@@ -7,13 +7,20 @@ import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
 import { ipcMain } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
-import {
-    createStartEpisodeMessage,
-    RecaptchaRecognizedMessage
-} from '../../browserMessages/messages/background.messages';
+import { createStartEpisodeMessage } from '../../browserMessages/messages/background.messages';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { MessageService } from '../../shared/services/message.service';
 import { RootBackgroundController } from './root-background.controller';
+import {
+    createTestNotificationMessage,
+    OpenTestPageMessage,
+    StartTestEpisodeOverBSMessage
+} from '../../browserMessages/messages/test.messages';
+import { WindowController } from './window.controller';
+import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
+import Website from '../../store/models/website';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
+import { WindowType } from '../../store/enums/window-type.enum';
 
 
 @injectable()
@@ -25,13 +32,30 @@ export class TestController {
                 @inject(BACKGROUND_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.RootController) private readonly rootController: RootBackgroundController,
+                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
     }
 
     public initializeHandler(): void {
         ipcMain.handle(MessageType.TEST_BACKGROUND_START_TEST_EPISODE_OVER_BS,
-            (event, message: RecaptchaRecognizedMessage): void => {
+            (event, message: StartTestEpisodeOverBSMessage): void => {
                 this.rootController.startEpisodeHandler(createStartEpisodeMessage('24-S5-E4', PORTALS.BS));
+            });
+
+        ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
+            (event, message: OpenTestPageMessage): void => {
+                const testWebsite: Website = {
+                    baseUrl: 'localhost',
+                    urlRegex: 'localhost',
+                };
+
+                this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
+                    waitTillPageLoadFinished()
+                ).subscribe(window => {
+                    window.show();
+                    this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
+                    this.messageService.sendMessageToPortalTab(createTestNotificationMessage());
+                })
             });
     }
 }
