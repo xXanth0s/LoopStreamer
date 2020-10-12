@@ -3,6 +3,7 @@ import { ControlState } from '../models/control-state.model';
 import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { Windows } from 'webextension-polyfill-ts';
 import Series from '../models/series.model';
+import { WindowType } from '../enums/window-type.enum';
 import WindowState = Windows.WindowState;
 
 export const getControlState = (state: StateModel): ControlState => state.controlState;
@@ -18,11 +19,7 @@ export const isLoopStreamerInactive = (state: StateModel): boolean => {
 
 export const loopStreamerStatus = (state: StateModel): LoopStreamerStatus => state.controlState.loopStreamerStatus;
 
-// @ts-ignore
-export const getVideoTabId = (state: StateModel): number => state.controlState.videoWindowId;
-
-// @ts-ignore
-export const getVideoWindowId = (state: StateModel): number => state.controlState.videoWindowId;
+export const getVideoWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.VIDEO]?.windowId;
 
 export const isVideoFullScreen = (state: StateModel): boolean => state.controlState.currentWindowState === 'fullscreen';
 

@@ -9,7 +9,7 @@ import {
 } from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
-import { getVideoTabId } from '../../store/selectors/control-state.selector';
+import { getVideoWindowId } from '../../store/selectors/control-state.selector';
 import { getActivePortalTabId } from '../../store/selectors/portals.selector';
 import * as path from 'path';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
@@ -49,7 +49,7 @@ export class WindowService {
     }
 
     public getProvidorWindow(): BrowserWindow {
-        const id = this.store.selectSync(getVideoTabId);
+        const id = this.store.selectSync(getVideoWindowId);
         if (id) {
             return BrowserWindow.fromId(id);
         }
@@ -65,7 +65,7 @@ export class WindowService {
         const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        // window.webContents.openDevTools();
+        window.webContents.openDevTools();
         this.setUserAgentForSession(window.webContents.session);
         return window;
     }
@@ -102,5 +102,4 @@ export class WindowService {
             },
         }
     }
-
 }

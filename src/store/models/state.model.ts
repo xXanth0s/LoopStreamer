@@ -14,5 +14,5 @@ export interface StateModel {
     series: { [key: string]: Series };
     lastWatchedSeries: Series['key'];
     seriesEpisodes: { [key: string]: SeriesEpisode };
-    seriesSeasons: {[key: string]: SeriesSeason};
+    seriesSeasons: { [key: string]: SeriesSeason };
 }

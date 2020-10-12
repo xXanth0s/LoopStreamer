@@ -1,15 +1,15 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { debounceTime, first, mapTo, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, first, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowController } from './window.controller';
-import { getVideoTabId } from '../../store/selectors/control-state.selector';
+import { getVideoWindowId } from '../../store/selectors/control-state.selector';
 import { createStartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
 import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
-import { setActiveVideoWindowIdAction, setVidoeTabIdAction } from '../../store/reducers/control-state.reducer';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { PROVIDORS } from '../../store/enums/providors.enum';
@@ -17,6 +17,7 @@ import { getProvidorForKey } from '../../store/selectors/providors.selector';
 import { BrowserWindow } from 'electron';
 import Providor from '../../store/models/providor.model';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
+import { WindowType } from '../../store/enums/window-type.enum';
 
 @injectable()
 export class VideoController {
@@ -46,12 +47,11 @@ export class VideoController {
     }
 
     public reset(): void {
-        const providorTabId = this.store.selectSync(getVideoTabId);
-        this.windowController.closeTab(providorTabId);
+        const videoWindowId = this.store.selectSync(getVideoWindowId);
+        this.windowController.closeTab(videoWindowId);
         this.takeUntil$.next();
-        this.store.dispatch(setVidoeTabIdAction(null));
+        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: null, windowType: WindowType.VIDEO}));
     }
-
 
     private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
         const window$ = this.windowController.openLinkForWebsite(providor, url);
@@ -63,9 +63,7 @@ export class VideoController {
         )
     }
 
-
-
     private setNewVideoWindow(newVideoWindow: Electron.BrowserWindow): void {
-        this.store.dispatch(setActiveVideoWindowIdAction(newVideoWindow.id))
+        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: newVideoWindow.id, windowType: WindowType.VIDEO}))
     }
 }

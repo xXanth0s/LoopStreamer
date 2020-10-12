@@ -16,7 +16,7 @@ import { WindowService } from '../services/window.service';
 import { Observable } from 'rxjs';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
-import { setActivePortalTabIdAction } from '../../store/reducers/control-state.reducer';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
@@ -28,6 +28,7 @@ import { BrowserWindow } from 'electron';
 import Portal from '../../store/models/portal.model';
 import { WindowController } from './window.controller';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
+import { WindowType } from '../../store/enums/window-type.enum';
 
 @injectable()
 export class PortalController {
@@ -104,7 +105,6 @@ export class PortalController {
             // const oldWindow = BrowserWindow.fromId(oldWindowId);
             // oldWindow?.close();
         }
-
-        this.store.dispatch(setActivePortalTabIdAction(newPortalWindow.id))
+        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: newPortalWindow.id, windowType: WindowType.PORTAL}))
     }
 }
