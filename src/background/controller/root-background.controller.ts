@@ -9,7 +9,6 @@ import { ProvidorService } from '../services/providor.service';
 import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
-    createStartEpisodeMessage,
     GetAllAvailableSeriesFromPortalMessage,
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
@@ -35,9 +34,8 @@ import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.sele
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import Website from '../../store/models/website';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
-import { createStartTestRecaptcha } from '../../browserMessages/messages/test.messages';
+import { createStartTestRecaptchaMessage } from '../../browserMessages/messages/test.messages';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
 export class RootBackgroundController {
@@ -115,10 +113,7 @@ export class RootBackgroundController {
         ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
             // async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
             (event, message: GetAllAvailableSeriesFromPortalMessage) => {
-                    const newMessage = createStartEpisodeMessage('24-S5-E4', PORTALS.BS);
-                    this.startEpisodeHandler(newMessage);
-                // return this.getAllVideosFromPortalHandler(message);
-                // this.testRecaptchaHandler();
+                return this.getAllVideosFromPortalHandler(message);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_INFORMATION,
@@ -136,6 +131,17 @@ export class RootBackgroundController {
             (event, message: RecaptchaRecognizedMessage): void => {
                 this.recaptchaRecognizedHandler(event, message);
             });
+    }
+
+    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
+        this.store.stopPlayer();
+        const { portal, episodeKey } = message.payload;
+        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
+
+        if (providorLink.link) {
+            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
+            this.videoController.startVideo(episodeInfo, providorLink.providor);
+        }
     }
 
     private async videoFinishedHandler(): Promise<void> {
@@ -189,17 +195,6 @@ export class RootBackgroundController {
         return this.seriesService.addSeriesEpisodes(episodeDtos);
     }
 
-    private async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
-        this.store.stopPlayer();
-        const { portal, episodeKey } = message.payload;
-        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
-
-        if (providorLink.link) {
-            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
-            this.videoController.startVideo(episodeInfo, providorLink.providor);
-        }
-    }
-
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
@@ -217,7 +212,7 @@ export class RootBackgroundController {
             waitTillPageLoadFinished()
         ).subscribe(window => {
             this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
-            this.messageService.sendMessageToPortalTab(createStartTestRecaptcha());
+            this.messageService.sendMessageToPortalTab(createStartTestRecaptchaMessage());
         })
     }
 

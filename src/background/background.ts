@@ -3,9 +3,9 @@ import { RootBackgroundController } from './controller/root-background.controlle
 import { inversifyContainer } from './container/container';
 import { initStore } from '../store/store/background-store';
 import { app } from 'electron';
+import { isDevelopment } from '../utils/environment.utils';
+import { TestController } from './controller/test.controller';
 
-
-const isDevelopment = process.env.NODE_ENV !== 'production';
 
 app.commandLine.appendSwitch ("disable-http-cache");
 async function initialize(): Promise<void> {
@@ -13,6 +13,10 @@ async function initialize(): Promise<void> {
    const rootController = inversifyContainer.get<RootBackgroundController>(BACKGROUND_TYPES.RootController);
    rootController.initialize();
    rootController.openStartPage();
+   if(isDevelopment()) {
+      const testController = inversifyContainer.get<TestController>(BACKGROUND_TYPES.TestController);
+      testController.initializeHandler();
+   }
 }
 
 
@@ -38,20 +42,6 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-   if (isDevelopment && !process.env.IS_TEST) {
-      // Install Vue Devtools
-      // Devtools extensions are broken in Electron 6.0.0 and greater
-      // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-      // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-      // If you are not using Windows 10 dark mode, you may uncomment these lines
-      // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
-      // try {
-      //   await installVueDevtools()
-      // } catch (e) {
-      //   console.error('Vue Devtools failed to install:', e.toString())
-      // }
-
-   }
    initialize();
 });
 //

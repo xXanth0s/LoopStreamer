@@ -4,7 +4,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { VideoController } from './video.controller';
-import { debounceTime, first, tap } from 'rxjs/operators';
+import { debounceTime, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetEpisodesForSeasonMessage,
@@ -80,7 +80,6 @@ export class PortalController {
             waitTillPageLoadFinished(),
             tap(window => this.setNewPortalWindow(window)),
             debounceTime(1000),
-            first(),
         )
     }
 

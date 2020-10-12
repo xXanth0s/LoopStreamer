@@ -14,6 +14,7 @@ import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { WindowService } from '../services/window.service';
 import { SeriesService } from '../../shared/services/series.service';
 import { PortalService } from '../services/portalService';
+import { TestController } from '../controller/test.controller';
 
 const inversifyContainer = new Container();
 
@@ -36,5 +37,6 @@ inversifyContainer.bind(BACKGROUND_TYPES.VideoController).to(VideoController).in
 inversifyContainer.bind(BACKGROUND_TYPES.PortalController).to(PortalController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.WindowController).to(WindowController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.RootController).to(RootBackgroundController).inSingletonScope();
+inversifyContainer.bind(BACKGROUND_TYPES.TestController).to(TestController).inSingletonScope();
 
 export {inversifyContainer};

@@ -6,6 +6,7 @@
                 <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_PAGE">Meine Serien</b-nav-item>
                 <b-nav-item exact exact-active-class="active" :to="routesConst.SETTINGS_PAGE">Einstellungen</b-nav-item>
                 <b-nav-item exact exact-active-class="active" :to="routesConst.FAQ_PAGE">FAQ</b-nav-item>
+                <b-nav-item v-if="isDev" exact exact-active-class="active" :to="routesConst.TEST_PAGE">Test</b-nav-item>
             </b-nav>
         </div>
         <div class="container">
@@ -22,10 +23,12 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { globalRoutes } from '../constants/globalRoutes';
+    import { isDevelopment } from '../../utils/environment.utils';
 
     @Component({})
     export default class MainPage extends Vue {
-        private routesConst = globalRoutes;
+        private readonly routesConst = globalRoutes;
+        private readonly isDev = isDevelopment()
     }
 
 </script>

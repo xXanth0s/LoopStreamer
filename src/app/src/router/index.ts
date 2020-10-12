@@ -5,39 +5,44 @@ import WelcomePage from '../views/WelcomePage.vue';
 import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
 import SeriesPage from '../views/SeriesPage.vue';
+import TestPage from '../views/TestPage.vue';
+import { isDevelopment } from '../../../utils/environment.utils';
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
-    path: `/${globalRoutes.HOME_PAGE}`,
-    component: WelcomePage
-  },
-  {
-    path: `/${globalRoutes.SETTINGS_PAGE}`,
-    component: SettingsPage
-  },
-  {
-    path: `/${globalRoutes.SERIES_PAGE}`,
-    component: SeriesPage
-  },
-  {
-    path: `/${globalRoutes.FAQ_PAGE}`,
-    component: InfoPage
-  },
-  { path: '/', redirect:  `/${globalRoutes.HOME_PAGE}` }
-  // {
-  //   path: `/${globalRoutes.SERIES_PAGE}`,
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
+let routes = [
+    {
+        path: `/${globalRoutes.HOME_PAGE}`,
+        component: WelcomePage
+    },
+    {
+        path: `/${globalRoutes.SETTINGS_PAGE}`,
+        component: SettingsPage
+    },
+    {
+        path: `/${globalRoutes.SERIES_PAGE}`,
+        component: SeriesPage
+    },
+    {
+        path: `/${globalRoutes.FAQ_PAGE}`,
+        component: InfoPage
+    },
+    {
+        path: `/${globalRoutes.TEST_PAGE}`,
+        component: TestPage
+    },
+    {
+        path: '/',
+        redirect: isDevelopment() ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`
+    },
 ];
 
+if (!isDevelopment()) {
+    routes = routes.filter(route => route.component !== TestPage);
+}
+
 const router = new VueRouter({
-  routes
+    routes
 });
 
-export default router
+export default router;
