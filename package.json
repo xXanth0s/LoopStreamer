@@ -19,11 +19,13 @@
   "main": "dist_electron/index.js",
   "dependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
+    "@cliqz/adblocker-electron": "^1.18.3",
     "@reduxjs/toolkit": "^1.2.5",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.7.0",
     "copy-webpack-plugin": "^5.1.1",
     "core-js": "^3.6.4",
+    "cross-fetch": "^3.0.6",
     "css-loader": "^4.3.0",
     "electron-redux": "^1.4.0",
     "element-ui": "^2.13.0",

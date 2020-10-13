@@ -25,7 +25,7 @@ import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { resetControlStateAction, setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { OpenWindowConfig, WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent, session } from 'electron';
+import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
@@ -60,8 +60,6 @@ export class RootBackgroundController {
         if (!this.isInitialized) {
             this.initializeHandler();
             this.isInitialized = true;
-            const sessionInstance = session.fromPartition('persist:');
-            this.windowService.setDefaultUserAgent(sessionInstance);
         }
     }
 
@@ -75,7 +73,6 @@ export class RootBackgroundController {
             createProtocol('app');
             href = 'app://./index.html';
         }
-        this.windowService.addUBlockDevTools();
 
         const window = this.windowService.openWindow(href, this.appWindowConfig);
 

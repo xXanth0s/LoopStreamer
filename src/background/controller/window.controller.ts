@@ -55,7 +55,7 @@ export class WindowController {
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
         this.store.stopPlayer();
         const originalWindow = this.windowService.openWindow(linkToOpen, { nodeIntegration: false });
-        this.windowService.hideNewWindows(originalWindow);
+        this.windowService.addDefaultHandlingForNewWindow(originalWindow);
         return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             map(data => data[1]),
@@ -64,7 +64,7 @@ export class WindowController {
                 return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
                         if (isValid) {
-                            this.windowService.hideNewWindows(window);
+                            this.windowService.addDefaultHandlingForNewWindow(window);
                             return window;
                         }
                         this.windowService.closeWindow(window);
