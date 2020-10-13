@@ -78,7 +78,6 @@ export class NotificationService {
 
     public async openEndTimePopup(timeoutSeconds: number, continueFn: () => void, cancel: () => void): Promise<void> {
         const iziToast = await this.iziToast;
-        debugger
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,

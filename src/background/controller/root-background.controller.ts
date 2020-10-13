@@ -30,10 +30,15 @@ import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import {
+    getNextEpisode,
+    getPreviousEpisode,
+    getSeriesEpisodeByKey
+} from '../../store/selectors/series-episode.selector';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { FRAME_HEIGHT, FRAME_WIDTH } from '../../shared/constants/electron-data';
+import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
 export class RootBackgroundController {
@@ -96,11 +101,11 @@ export class RootBackgroundController {
         });
 
         ipcMain.handle(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
-            this.nextVideoHandler();
+            this.nextVideoHandler(message);
         });
 
         ipcMain.handle(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
-            this.previousVideoHandler();
+            this.previousVideoHandler(message);
         });
 
         ipcMain.handle(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
@@ -138,12 +143,7 @@ export class RootBackgroundController {
     public async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
         this.store.stopPlayer();
         const { portal, episodeKey } = message.payload;
-        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
-
-        if (providorLink.link) {
-            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
-            this.videoController.startVideo(episodeInfo, providorLink.providor);
-        }
+        await this.startEpisode(episodeKey, portal);
     }
 
     private async videoFinishedHandler(): Promise<void> {
@@ -151,20 +151,20 @@ export class RootBackgroundController {
             // await this.portalController.openNextEpisode();
     }
 
-    private async previousVideoHandler(): Promise<void> {
+    private async previousVideoHandler({payload}: OpenPreviousVideoMessage): Promise<void> {
         this.store.stopPlayer();
-        // const isNextVideoAvailable = await this.portalController.openPreviousEpisode();
-        // if (!isNextVideoAvailable) {
-        //     console.error(`${MessageType.BACKGROUND_PREVIOUS_VIDEO}: no next episode available`)
-        // }
+        const previousEpisode = this.store.selectSync(getPreviousEpisode, payload);
+        if(previousEpisode) {
+            await this.startEpisode(previousEpisode.key, PORTALS.BS);
+        }
     }
 
-    private async nextVideoHandler(): Promise<void> {
+    private async nextVideoHandler({payload}: OpenNextVideoMessage): Promise<void> {
         this.store.stopPlayer();
-        // const isNextVideoAvailable = await this.portalController.openNextEpisode();
-        // if (!isNextVideoAvailable) {
-        //     console.error(`${MessageType.BACKGROUND_NEXT_VIDEO}: no next episode available`)
-        // }
+        const nextEpisode = this.store.selectSync(getNextEpisode, payload);
+        if(nextEpisode) {
+            await this.startEpisode(nextEpisode.key, PORTALS.BS);
+        }
     }
 
     private continueSeriesHandler({ payload }: StartSeriesMessage): void {
@@ -206,6 +206,16 @@ export class RootBackgroundController {
         this.store.dispatch(resetControlStateAction());
         this.store.stopPlayer();
         this.videoController.reset();
+    }
+
+    private async startEpisode(episodeKey: SeriesEpisode['key'], portal: PORTALS): Promise<boolean> {
+        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
+
+        if (providorLink.link) {
+            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
+            return this.videoController.startVideo(episodeInfo, providorLink.providor);
+        }
+        return false;
     }
 
 }

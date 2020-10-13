@@ -31,17 +31,19 @@ export const createWindowResizedMessage = (): Message => ({
 export type WindowResizedMessage = ReturnType<typeof createWindowResizedMessage>;
 
 
-export const createOpenNextVideoMessage = (): Message => ({
+export const createOpenNextVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
     type: MessageType.BACKGROUND_NEXT_VIDEO,
     destinationController: ControllerType.BACKGROUND,
+    payload: activeEpisodeKey,
     hasReply: false,
 });
 export type OpenNextVideoMessage = ReturnType<typeof createOpenNextVideoMessage>;
 
 
-export const createOpenPreviousVideoMessage = (): Message => ({
+export const createOpenPreviousVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
     type: MessageType.BACKGROUND_PREVIOUS_VIDEO,
     destinationController: ControllerType.BACKGROUND,
+    payload: activeEpisodeKey,
     hasReply: false,
 });
 export type OpenPreviousVideoMessage = ReturnType<typeof createOpenPreviousVideoMessage>;

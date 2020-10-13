@@ -1,13 +1,13 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { debounceTime, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, map, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
 import { Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowController } from './window.controller';
 import { getVideoWindowId } from '../../store/selectors/control-state.selector';
-import { createStartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
+import { createStartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
@@ -31,19 +31,24 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesEpisode: SeriesEpisode, providorKey: PROVIDORS): Promise<void> {
+    public async startVideo(seriesEpisode: SeriesEpisode, providorKey: PROVIDORS): Promise<boolean> {
         this.reset();
         const providor = this.store.selectSync(getProvidorForKey, providorKey);
         const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
 
-        activeWindow$.pipe(
+        return activeWindow$.pipe(
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
-        ).subscribe(async (window) => {
-            this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode.key, providorKey));
-            this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey));
-            window.show();
-        });
+            map(async window => {
+                const hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisode.key, providorKey));
+                if(hasVideo) {
+                    this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey));
+                    window.show();
+                }
+
+                return hasVideo
+            })
+        ).toPromise()
     }
 
     public reset(): void {

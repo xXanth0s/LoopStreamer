@@ -12,7 +12,7 @@ import {
     GetSeriesInformationMessage
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { StartVideoProvidorMessage } from '../../browserMessages/messages/providor.messages';
+import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
 import styles from '../styles/content.scss';
@@ -50,7 +50,7 @@ export class RootContentController {
             this.getSeasonsEpisodeInformationHandler(event, message);
         });
 
-        ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoProvidorMessage) => {
+        ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoMessage) => {
             console.log(message);
             this.startVideoForProvidorHandler(event, message);
         });
@@ -78,8 +78,9 @@ export class RootContentController {
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
-    private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoProvidorMessage) {
+    private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoMessage): void {
         const { providor, episodeKey } = message.payload;
-        this.providorService.getProvidorController(providor)?.startVideo(episodeKey);
+        const result = Boolean(this.providorService.getProvidorController(providor)?.startVideo(episodeKey));
+        this.messageService.replyToSender(message, event.sender, result);
     }
 }
