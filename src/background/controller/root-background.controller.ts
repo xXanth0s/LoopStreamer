@@ -75,6 +75,7 @@ export class RootBackgroundController {
             createProtocol('app');
             href = 'app://./index.html';
         }
+        this.windowService.addUBlockDevTools();
 
         const window = this.windowService.openWindow(href, this.appWindowConfig);
 
@@ -149,10 +150,8 @@ export class RootBackgroundController {
     }
 
     private async videoFinishedHandler(): Promise<void> {
-        if (this.windowController.isUserOnVideoTab()) {
             this.store.stopPlayer();
             // await this.portalController.openNextEpisode();
-        }
     }
 
     private async previousVideoHandler(): Promise<void> {

@@ -20,8 +20,6 @@ export class WindowController {
 
     private readonly requestFilter = { urls: [ '*://*/*' ] };
 
-    private isUserOnVideoTabVal = false;
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(BACKGROUND_TYPES.PortalService) private readonly portalService: PortalService,
@@ -62,7 +60,7 @@ export class WindowController {
             map(data => data[1]),
             filter(Boolean),
             switchMap((window: BrowserWindow) => {
-            return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
+                return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
                         if (isValid) {
                             return window;
@@ -77,16 +75,6 @@ export class WindowController {
         );
     }
 
-    public async closeTab(tabId: number): Promise<BrowserWindow> {
-        if (tabId) {
-            return BrowserWindow.fromId(tabId);
-        }
-    }
-
-    public isUserOnVideoTab(): boolean {
-        return this.isUserOnVideoTabVal;
-    }
-
     private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
         window.hide();
         let listening = true;
@@ -95,14 +83,14 @@ export class WindowController {
             mapTo(false)
         );
 
-        const listener = {...this.requestFilter};
+        const listener = { ...this.requestFilter };
         window.webContents.session.webRequest.onSendHeaders(listener, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
             if (resourceType !== 'mainFrame' || !listening) {
                 return;
             }
             listening = false;
-            if(!window.isDestroyed()) {
-                window.webContents.session.webRequest.onSendHeaders(listener, null);
+            if (window.isDestroyed()) {
+                return;
             }
 
             if (!this.isUrlValid(url, allowedPage, validLink)) {

@@ -9,8 +9,6 @@ import {
 } from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
-import { getVideoWindowId } from '../../store/selectors/control-state.selector';
-import { getActivePortalTabId } from '../../store/selectors/portals.selector';
 import * as path from 'path';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 
@@ -40,20 +38,10 @@ export class WindowService {
         )
     }
 
-    public getPortalWindow(): BrowserWindow {
-        const id = this.store.selectSync(getActivePortalTabId);
-        if (id) {
-            return BrowserWindow.fromId(id);
-        }
-        return null;
-    }
-
-    public getProvidorWindow(): BrowserWindow {
-        const id = this.store.selectSync(getVideoWindowId);
-        if (id) {
-            return BrowserWindow.fromId(id);
-        }
-        return null;
+    public addUBlockDevTools(): void {
+        BrowserWindow.addDevToolsExtension(
+            path.join(__dirname, 'extensions', 'ublock', process.env.U_BLOCK_VERSION)
+        )
     }
 
     public setDefaultUserAgent(session: Session): void {

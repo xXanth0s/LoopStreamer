@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { debounceTime, first, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
 import { Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
@@ -41,16 +41,18 @@ export class VideoController {
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (window) => {
             this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode.key, providorKey));
-            this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
+            this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey));
             window.show();
         });
     }
 
     public reset(): void {
         const videoWindowId = this.store.selectSync(getVideoWindowId);
-        this.windowController.closeTab(videoWindowId);
-        this.takeUntil$.next();
-        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: null, windowType: WindowType.VIDEO}));
+        if (videoWindowId) {
+            const videoWindow = BrowserWindow.fromId(videoWindowId);
+            this.windowService.closeWindow(videoWindow);
+            this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
+        }
     }
 
     private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
@@ -59,11 +61,13 @@ export class VideoController {
             waitTillPageLoadFinished(),
             tap(window => this.setNewVideoWindow(window)),
             debounceTime(1000),
-            first(),
-        )
+        );
     }
 
     private setNewVideoWindow(newVideoWindow: Electron.BrowserWindow): void {
-        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: newVideoWindow.id, windowType: WindowType.VIDEO}))
+        this.store.dispatch(setWindowIdForWindowTypeAction({
+            windowId: newVideoWindow.id,
+            windowType: WindowType.VIDEO
+        }));
     }
 }
