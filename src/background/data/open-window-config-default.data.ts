@@ -5,5 +5,5 @@ export const DefaultOpenWindowConfig: Required<OpenWindowConfig> = {
     httpReferrer: null,
     nodeIntegration: false,
     preloadScript: true,
-    visible: false
+    visible: Boolean(+process.env.SHOW_NEW_WINDOWS)
 }
