@@ -25,9 +25,9 @@ export class RootContentController {
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
-            styles.use()
+            styles.use();
             this.recaptchaService.checkForRecaptcha();
-        })
+        });
     }
 
     public init(): void {
@@ -58,7 +58,7 @@ export class RootContentController {
     }
 
     private async getProvidorLinkHandler(event: IpcRendererEvent, message: GetProvidorLinkForEpisode): Promise<void> {
-        const {providor, episodeInfo} = message.payload;
+        const { providor, episodeInfo } = message.payload;
         const result = await this.portalService.getPortalController().getProvidorLinkForEpisode(episodeInfo, providor);
         this.messageService.replyToSender(message, event.sender, result);
     }
@@ -79,7 +79,7 @@ export class RootContentController {
     }
 
     private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoProvidorMessage) {
-        const {providor, episodeInfo} = message.payload;
-        this.providorService.getProvidorController(providor)?.startVideo(episodeInfo)
+        const { providor, episodeKey } = message.payload;
+        this.providorService.getProvidorController(providor)?.startVideo(episodeKey);
     }
 }

@@ -4,7 +4,7 @@ import { IziToast, IziToastPosition, IziToastSettings, IziToastTransitionIn, Izi
 @injectable()
 export class NotificationService {
 
-    private readonly defaultConfig: IziToastSettings  = {
+    private readonly defaultConfig: IziToastSettings = {
         transitionIn: 'fadeInLeft' as IziToastTransitionIn,
         transitionOut: 'fadeOutRight' as IziToastTransitionOut,
         position: 'topRight' as IziToastPosition,
@@ -18,24 +18,21 @@ export class NotificationService {
         timeout: 0,
     };
 
-    private _iziToast: IziToast = null
+    private _iziToast: IziToast = null;
 
     private get iziToast(): Promise<IziToast> {
         return new Promise<IziToast>(resolve => {
 
-            if(this._iziToast) {
+            if (this._iziToast) {
                 resolve(this._iziToast);
-            } else {
-                console.log('try to load izitoast')
-                // @ts-ignore
-                import(/* webpackChunkName: "iziToast" */ 'iziToast').then((iziToast: IziToast) => {
-                    console.log('izitoast loaded')
-                    this._iziToast = iziToast;
-                    resolve(this._iziToast);
-                })
+                return;
             }
-
-        })
+            // @ts-ignore
+            import(/* webpackChunkName: "iziToast" */ 'iziToast').then((iziToast: IziToast) => {
+                this._iziToast = iziToast;
+                resolve(this._iziToast);
+            });
+        });
     }
 
     public async openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void): Promise<void> {
@@ -45,58 +42,87 @@ export class NotificationService {
             title: 'Intro definieren',
             message: 'Die zu überspringenden Zeit setzen',
             buttons: [
-                ['<button>Jetzt setzen</button>', () => {
-                    iziToast.destroy();
+                [ '<button>Jetzt setzen</button>', (instance, toast) => {
                     setStartTime();
-                }, false],
-                ['<button>Nicht überspringen</button>', () => {
-                    iziToast.destroy();
+                    this.closeToast(instance, toast);
+                }, false ],
+                [ '<button>Nicht überspringen</button>', (instance, toast) => {
                     doNotSetStarttime();
-                }, false]
+                    this.closeToast(instance, toast);
+                }, false ]
             ]
         });
     }
 
-    public async openSetEndTimePopup(setEndTime: () => void, doNotSetStarttime: () => void): Promise<void> {
+    public async openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, continueFn: () => void): Promise<void> {
         const iziToast = await this.iziToast;
         iziToast.show({
             ...this.defaultConfig,
+            timeout: timeoutSeconds * 1000,
+            resetOnHover: false,
             title: 'Outro definieren',
             message: 'Die zu überspringenden Zeit setzen',
+            onClosed: continueFn,
             buttons: [
-                ['<button>Jetzt setzen</button>', () => {
-                    iziToast.destroy();
+                [ '<button>Jetzt setzen</button>', (instance, toast) => {
                     setEndTime();
-                }, false],
-                ['<button>Nicht überspringen</button>', () => {
-                    iziToast.destroy();
+                    this.closeToast(instance, toast);
+                }, false ],
+                [ '<button>Nicht überspringen</button>', (instance, toast) => {
                     doNotSetStarttime();
-                }, false]
+                    this.closeToast(instance, toast);
+                }, false ]
             ]
         });
     }
 
-    public async openEndTimePopup(continueFn: () => void, cancel: () => void): Promise<void> {
+    public async openEndTimePopup(timeoutSeconds: number, continueFn: () => void, cancel: () => void): Promise<void> {
         const iziToast = await this.iziToast;
-        console.log('startingEndTimePopup')
         debugger
         iziToast.show({
             ...this.defaultConfig,
-            timeout: 10000,
+            timeout: timeoutSeconds * 1000,
             progressBar: true,
             title: 'Video Beendet',
             message: 'Nächste Episode',
             onClosed: continueFn,
             buttons: [
-                ['<button>Fortsetzen</button>', () => {
-                    iziToast.destroy();
+                [ '<button>Fortsetzen</button>', (instance, toast) => {
                     continueFn();
-                }, false],
-                ['<button>Nicht überspringen</button>', () => {
-                    iziToast.destroy();
+                    this.closeToast(instance, toast);
+                }, false ],
+                [ '<button>Nicht überspringen</button>', (instance, toast) => {
                     cancel();
-                }, false]
+                    this.closeToast(instance, toast);
+                }, false ]
             ]
         });
+    }
+
+
+    public async openEpisodeLimitReachedPopup(continueFn: () => void, cancel: () => void): Promise<void> {
+        const iziToast = await this.iziToast;
+        iziToast.show({
+            ...this.defaultConfig,
+            timeout: 0,
+            progressBar: false,
+            title: 'Serie fortsetzen',
+            message: 'Wollen Sie die Serie fortsetzen?',
+            onClosed: continueFn,
+            buttons: [
+                [ '<button>Fortsetzen</button>', (instance, toast) => {
+                    continueFn();
+                    this.closeToast(instance, toast);
+                }, false ],
+                [ '<button>Abbrechen</button>', (instance, toast) => {
+                    cancel();
+                    this.closeToast(instance, toast);
+                }, false ]
+            ]
+        });
+    }
+
+    private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
+        instance.hide({ transitionOut: 'fadeOut' }, htmlElement, 'button');
     }
 }

@@ -8,6 +8,7 @@ import { BrowserWindowStateModel } from './browser-window-state.model';
 
 export interface ControlState {
     videoStatus: VIDEO_STATUS;
+    playedEpisodes: number;
     loopStreamerStatus: LoopStreamerStatus;
     isUserOnVideoPage: boolean;
     activePortal?: Portal['key'];

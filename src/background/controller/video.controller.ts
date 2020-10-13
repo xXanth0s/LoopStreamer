@@ -40,7 +40,7 @@ export class VideoController {
             takeUntil(this.takeUntil$),
             takeUntil(this.store.playerHasStopped()),
         ).subscribe(async (window) => {
-            this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode, providorKey));
+            this.messageService.sendMessageToVideoWindow(createStartVideoProvidorMessage(seriesEpisode.key, providorKey));
             this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey))
             window.show();
         });

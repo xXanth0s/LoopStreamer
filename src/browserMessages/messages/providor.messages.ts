@@ -4,10 +4,10 @@ import { ControllerType } from '../enum/controller.type';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 
-export const createStartVideoProvidorMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{episodeInfo: SeriesEpisode, providor: PROVIDORS}> => ({
+export const createStartVideoProvidorMessage = (episodeKey: SeriesEpisode['key'], providor: PROVIDORS): Message<{episodeKey: SeriesEpisode['key'], providor: PROVIDORS}> => ({
     type: MessageType.PROVIDOR_START_VIDEO,
     destinationController: ControllerType.PROVIDOR,
-    payload: { episodeInfo, providor },
+    payload: { episodeKey, providor },
     hasReply: false,
 });
 

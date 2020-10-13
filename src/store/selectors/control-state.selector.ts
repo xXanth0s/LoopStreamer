@@ -33,3 +33,9 @@ export const isAnySeriesExpandedOnOptionsPage = (state: StateModel, seriesKeys: 
     return seriesKeys.some(key => key === state.controlState.expandedSeriesOptionsPage);
 }
 
+export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean => {
+    const playedEpisodes = state.controlState.playedEpisodes;
+    const episodesToPlay = state.options.episodesToPlay;
+
+    return episodesToPlay !== 0 && playedEpisodes >= episodesToPlay;
+}

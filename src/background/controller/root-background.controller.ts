@@ -85,23 +85,23 @@ export class RootBackgroundController {
     }
 
     private initializeHandler(): void {
-        ipcMain.on(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
             this.videoFinishedHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_TOGGLE_FULLSCREEN, (event, message: ToggleFullscreenModeMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_FULLSCREEN, (event, message: ToggleFullscreenModeMessage) => {
             this.windowController.toggleWindowState();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_WINDOW_RESIZED, (event, message: WindowResizedMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_WINDOW_RESIZED, (event, message: WindowResizedMessage) => {
             this.windowController.setCurrentWindowState();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
             this.nextVideoHandler();
         });
 
-        ipcMain.on(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
+        ipcMain.handle(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
             this.previousVideoHandler();
         });
 

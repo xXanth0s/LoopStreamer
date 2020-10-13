@@ -13,7 +13,8 @@
     "episodesToPlay": 0,
     "makeFullscreen": false,
     "showNotifications": false,
-    "timeTillRequestPopup": 180,
+    "timeTillSetEndtimePopup": 180,
+    "timeForEntimeCountdown": 15,
     "prepareVideo": false,
     "allowUserShare": false,
     "scipIfNoVideo": false,
@@ -44,7 +45,6 @@
       "lastEpisodeWatched": "24-S5-E4",
       "posterHref": "https://bs.to/public/images/cover/3.jpg",
       "title": "24",
-      "lastEpisodeWatched": "24-S1-E5",
       "seasons": [
         "24-S1",
         "24-S2",

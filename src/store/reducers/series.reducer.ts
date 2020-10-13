@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Series from '../models/series.model';
 import { mapArrayToObject } from '../utils/selector.utils';
-import SeriesEpisode from '../models/series-episode.model';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { getKeyForSeriesTitle } from '../utils/key.utils';
 import { addSeriesSeasonAction } from './series-season.reducer';
@@ -11,12 +10,12 @@ import { SeriesSeason } from '../models/series-season.model';
 // const initialState: {[key: string]: Series} = seriesMock;
 const initialState: StateModel['series'] = {
     'family-guy': {
-        endTimeConfigured: false,
+        isEndTimeConfigured: false,
         posterHref: "https://bs.to/public/images/cover/82.jpg",
         key: "family-guy",
         scipEndTime: 0,
         scipStartTime: 0,
-        startTimeConfigured: false,
+        isStartTimeConfigured: false,
         title: "Family Guy",
         seasons: []
     }
@@ -43,21 +42,13 @@ const updateSeries = (state: {[key: string]: Series}, series: Partial<Series>): 
     return state;
 };
 
-
-const updateSeriesEpisode = (state: {[key: string]: Series}, episode: SeriesEpisode): {[key: string]: Series}  => {
-    const series = state[episode.seriesKey];
-    if(series){
-    }
-    return state
-};
-
 const resetSeries = (state: {[key: string]: Series}, key:  Series['key']): {[key: string]: Series}  => {
     const series = state[key];
     state[key] = {
         ...series,
-        endTimeConfigured: false,
+        isEndTimeConfigured: false,
         lastEpisodeWatched: undefined,
-        startTimeConfigured: false,
+        isStartTimeConfigured: false,
         scipEndTime: 0,
         scipStartTime: 0
     };
@@ -68,7 +59,7 @@ const setStartTimeForSeries = (state: {[key: string]: Series}, key:  Series['key
     const series = state[key];
     state[key] = {
         ...series,
-        startTimeConfigured: true,
+        isStartTimeConfigured: true,
         scipStartTime
     };
     return state;
@@ -79,7 +70,7 @@ const setEndTimeForSeries = (state: {[key: string]: Series}, key:  Series['key']
     state[key] = {
         ...series,
         scipEndTime,
-        endTimeConfigured: true
+        isEndTimeConfigured: true
     };
     return state;
 };
@@ -112,7 +103,6 @@ function addSeries(state: {[key: string]: Series}, seriesInfo: SeriesInfoDto): {
         }
 
     }
-    return undefined;
 }
 
 const addSeriesSeason = (state: StateModel['series'], seriesSeason: SeriesSeason): void => {
@@ -128,7 +118,6 @@ const seriesSlice = createSlice({
     reducers: {
         removeSeriesAction: (state: {[key: string]: Series}, action: PayloadAction<Series['key']>) => removeSeries(state, action.payload),
         updateSeriesAction: (state: {[key: string]: Series}, action: PayloadAction<Series>) => updateSeries(state, action.payload),
-        updateSeriesEpisodeAction: (state: {[key: string]: Series}, action: PayloadAction<SeriesEpisode>) => updateSeriesEpisode(state, action.payload),
         setStartTimeForSeriesAction: (state: {[key: string]: Series}, action: PayloadAction<{key: Series['key'], scipStartTime?: Series['scipStartTime']}>) => setStartTimeForSeries(state, action.payload.key, action.payload.scipStartTime),
         setEndTimeForSeriesAction: (state: {[key: string]: Series}, action: PayloadAction<{key: Series['key'], scipEndTime?: Series['scipStartTime']}>) => setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
         resetSeriesAction: (state: {[key: string]: Series}, action: PayloadAction<Series['key']>) => resetSeries(state, action.payload),
@@ -143,7 +132,6 @@ export const {
     removeSeriesAction,
     updateSeriesAction,
     resetSeriesAction,
-    updateSeriesEpisodeAction,
     setStartTimeForSeriesAction,
     setEndTimeForSeriesAction,
     addSeriesAction
@@ -157,8 +145,8 @@ const generateEmptySeries = function (): Series {
         key: '',
         scipStartTime: 0,
         scipEndTime: 0,
-        startTimeConfigured: false,
-        endTimeConfigured: false,
+        isStartTimeConfigured: false,
+        isEndTimeConfigured: false,
         posterHref: '',
         title: '',
         seasons: []

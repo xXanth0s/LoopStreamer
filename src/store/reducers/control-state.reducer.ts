@@ -12,6 +12,7 @@ import { StateModel } from '../models/state.model';
 const initialControlState: StateModel['controlState'] = {
     activePortal: PORTALS.BS,
     activeProvidor: PROVIDORS.Vivo,
+    playedEpisodes: 0,
     isUserOnVideoPage: false,
     loopStreamerStatus: LoopStreamerStatus.PLAYING,
     videoStatus: VIDEO_STATUS.None,
@@ -37,13 +38,6 @@ const setActiveProvidor = function (state: ControlState, activeProvidor: Provido
     return {
         ...state,
         activeProvidor
-    };
-};
-
-const setIsUserOnVideoPage = function (state: ControlState, isUserOnVideoPage: ControlState['isUserOnVideoPage']): ControlState {
-    return {
-        ...state,
-        isUserOnVideoPage
     };
 };
 

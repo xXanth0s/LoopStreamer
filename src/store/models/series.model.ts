@@ -7,8 +7,8 @@ export default interface Series {
     description?: string;
     lastEpisodeWatched?: SeriesEpisode['key'];
     seasons: SeriesSeason['key'][];
-    startTimeConfigured?: boolean;
-    endTimeConfigured?: boolean;
+    isStartTimeConfigured?: boolean;
+    isEndTimeConfigured?: boolean;
     posterHref: string;
     scipStartTime?: number;
     scipEndTime?: number;

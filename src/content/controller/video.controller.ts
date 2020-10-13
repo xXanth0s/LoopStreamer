@@ -1,27 +1,30 @@
 import { inject, injectable } from 'inversify';
-import SeriesEpisode from '../../store/models/series-episode.model';
-import { combineLatest, Subject, timer } from 'rxjs';
-import { filter, takeUntil, throttleTime } from 'rxjs/operators';
-import { updateSeriesEpisodeAction } from '../../store/reducers/series.reducer';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
-import { FULL_SCREEN_VIDEO } from '../constants/class-names';
+import { Observable, Subject, timer } from 'rxjs';
+import { first, takeUntil, throttleTime } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
-import { NotificationService } from '../services/notification.service';
-import { getOptions } from '../../store/selectors/options.selector';
-import Series from '../../store/models/series.model';
 import { MessageService } from '../../shared/services/message.service';
-import { createVideoFinishedMessage } from '../../browserMessages/messages/background.messages';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
+import { PopupService } from '../services/popup.service';
+import { PopupController } from './popup.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
+import SeriesEpisode from '../../store/models/series-episode.model';
+import { getSeriesByKey } from '../../store/selectors/series.selector';
+import {
+    seriesEpisodeStartedAction,
+    setTimestampForSeriesEpisodeAction
+} from '../../store/reducers/series-episode.reducer';
+import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { PopupConfig } from '../models/popup-config.model';
 
 @injectable()
 export class VideoController {
 
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-        @inject(CONTENT_TYPES.NotificationService) private readonly notificationService: NotificationService,
+        @inject(CONTENT_TYPES.PopupService) private readonly popupService: PopupService,
+        @inject(CONTENT_TYPES.PopupController) private readonly popupController: PopupController,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
     ) {
         this.messageService.setControllerType(ControllerType.PROVIDOR)
@@ -30,34 +33,40 @@ export class VideoController {
     private readonly timeout = 10000;
 
     private videoStarted$ = new Subject();
-    private onTimeUpdate$ = new Subject();
-    private stopAutoPlay$ = new Subject();
 
     // TODO: remove ugly hack for multiple initializations
     private isActive = false;
 
-    public startVideo(videoElement: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
+    public startVideo(videoElement: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): void {
+        console.log('startin video');
         if (!this.isActive) {
             this.isActive = true;
-            const seriesInfo = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey)
-            videoElement.play().then(() => this.onVideoStarted(videoElement, episodeInfo, seriesInfo));
-            // this.store.dispatch(updateSeriesAction(seriesInfo));
+            videoElement.play().then(() => this.onVideoStarted(videoElement, seriesEpisodeKey));
             this.startErrorTimer(this.timeout);
         }
     }
 
-    private onVideoStarted(video: HTMLVideoElement, episodeInfo: SeriesEpisode, seriesInfo: Series): void {
-        this.initOnTimeUpdateObservable(video);
+    private async onVideoStarted(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
         this.videoStarted$.next();
-        // this.setStartTime(video, episodeInfo);
-        // this.updateSeriesInfo(video, episodeInfo);
-        // this.endTimeListener(video, episodeInfo);
-        this.videoFinishedListener(video);
-        addVideoButtons(episodeInfo);
+        await this.store.dispatch(seriesEpisodeStartedAction({seriesEpisodeKey: seriesEpisodeKey, duration: video.duration}));
+
+        this.store.select(getSeriesEpisodeByKey, seriesEpisodeKey).pipe(
+            first()
+        ).subscribe(episodeData => {
+            const videoTimeUpdate$ = this.getVideoTimeChanges(video);
+
+            this.setStartTime(video, episodeData);
+            this.setActiveTimestamp(episodeData, videoTimeUpdate$);
+            this.popupTimeListener(video, episodeData, videoTimeUpdate$);
+            addVideoButtons(episodeData);
+        })
     }
 
-    private initOnTimeUpdateObservable(video: HTMLVideoElement): void {
-        video.ontimeupdate = () => this.onTimeUpdate$.next();
+    private getVideoTimeChanges(video: HTMLVideoElement): Observable<number> {
+        const onTimeSub$ = new Subject<number>();
+        video.ontimeupdate = () => onTimeSub$.next(video.currentTime);
+
+        return onTimeSub$
     }
 
     private startErrorTimer(timeout: number): void {
@@ -68,115 +77,44 @@ export class VideoController {
         })
     }
 
-    private updateSeriesInfo(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        this.onTimeUpdate$.pipe(
-            throttleTime(1000),
-        ).subscribe(async () => {
-            episodeInfo.timestamp = video.currentTime;
-            await this.store.dispatch(updateSeriesEpisodeAction(episodeInfo));
-        })
-    }
+    private popupTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
+        let popupConfigs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
 
-    private endTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        const seriesInfo$ = this.store.selectBehaviour(getSeriesByKey, episodeInfo.seriesKey).pipe(
-            filter<Series>(Boolean)
-        );
-        const options$ = this.store.selectBehaviour(getOptions);
-        const takeUntil$ = new Subject();
+        videoTimeUpdate$.pipe(
+            throttleTime(1000)
+        ).subscribe(timeStamp => {
+            const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo))
 
-        combineLatest([this.onTimeUpdate$, seriesInfo$, options$]).pipe(
-            throttleTime(1000),
-            takeUntil(takeUntil$)
-        ).subscribe(([timeUpdate, seriesInfo, options]) => {
-            const timeLeft = video.duration - video.currentTime;
-            if (seriesInfo.endTimeConfigured) {
-                if (timeLeft < seriesInfo.scipEndTime) {
-                    this.openEndTimePopup(episodeInfo);
-                    takeUntil$.next();
-                }
-            } else {
-                if (timeLeft < options.timeTillRequestPopup) {
-                    this.openSetEndTimePopup(video, episodeInfo);
-                    takeUntil$.next();
-                }
+            if(configToOpen) {
+                this.popupController.openPopup(configToOpen.pupupKey, video, episodeInfo);
+                popupConfigs = popupConfigs.filter(config => config.pupupKey !== configToOpen.pupupKey);
             }
-        })
+        });
     }
 
-    private videoFinishedListener(video: HTMLVideoElement): void {
-        const hasFinished$ = new Subject();
+    private isTimeToOpenPopup(popupConfig: PopupConfig, currentTime: number, episodeInfo: SeriesEpisode): boolean {
+        if(popupConfig.openFromStart) {
+            return currentTime > popupConfig.timeToOpen;
+        }
 
-        video.onended = () => hasFinished$.next();
+        const timeFromEnd = episodeInfo.duration - currentTime
+        return popupConfig.timeToOpen > timeFromEnd
+    }
 
-        hasFinished$.pipe(
-            takeUntil(this.stopAutoPlay$)
-        ).subscribe(() => this.videoEnded());
+    private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
+        videoTimeUpdate$.pipe(
+            throttleTime(1000),
+        ).subscribe(timestamp => {
+            this.store.dispatch(setTimestampForSeriesEpisodeAction({seriesEpisodeKey: key, timestamp }));
+        })
     }
 
     private setStartTime(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const series = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
-        // if (series?.lastEpisodeWatched?.episode === episodeInfo.episode
-        //     && series?.lastEpisodeWatched?.season === episodeInfo.season
-        //     && series?.lastEpisodeWatched.timestamp) {
-        //     video.currentTime = series.lastEpisodeWatched.timestamp;
-        // } else if (series?.startTimeConfigured) {
-        //     if (series.scipStartTime) {
-        //         video.currentTime = series.scipStartTime;
-        //     }
-        // } else {
-        //     this.openSetStartTimePopup(video, episodeInfo);
-        // }
-    }
-
-    public addFullscreenClass(nodeElement: HTMLElement): void {
-        nodeElement.classList.add(FULL_SCREEN_VIDEO);
-    }
-
-    private openSetStartTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        if(!Boolean(episodeInfo.timestamp)) {
-            // this.notificationService.openSetStartTimePopup(
-            //     () => {
-            //         this.store.dispatch(setStartTimeForSeriesAction({
-            //             key: episodeInfo.seriesKey,
-            //             scipStartTime: video.currentTime
-            //         }))
-            //     },
-            //     () => {
-            //         this.store.dispatch(setStartTimeForSeriesAction({key: episodeInfo.seriesKey, scipStartTime: undefined}))
-            //     })
+        if (Boolean(episodeInfo.timestamp)) {
+            video.currentTime = episodeInfo.timestamp;
+        } else if (series.isStartTimeConfigured && series.scipStartTime) {
+            video.currentTime = series.scipStartTime;
         }
-    }
-
-    private openSetEndTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        // this.notificationService.openSetEndTimePopup(
-        //     async () => {
-        //         await this.store.dispatch(setEndTimeForSeriesAction({
-        //             key: episodeInfo.seriesKey,
-        //             scipEndTime: video.currentTime
-        //         }));
-        //         this.videoEnded();
-        //     },
-        //     async () => {
-        //         await this.store.dispatch(setEndTimeForSeriesAction({
-        //             key: episodeInfo.seriesKey,
-        //             scipEndTime: undefined
-        //         }))
-        //     })
-    }
-
-    private openEndTimePopup(episodeInfo: SeriesEpisode): void {
-        if (episodeInfo.hasNextEpisode) {
-            // this.notificationService.openEndTimePopup(
-            //     () => {
-            //         this.videoEnded();
-            //     },
-            //     () => {
-            //         this.stopAutoPlay$.next();
-            //     })
-        }
-    }
-
-    private videoEnded(): void {
-        this.messageService.sendMessageToBackground(createVideoFinishedMessage());
     }
 }

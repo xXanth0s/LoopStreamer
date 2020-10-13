@@ -3,7 +3,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { fromEvent, Observable, Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { getDomElementSize, isDomElementVisible } from '../ustils/dom.utils';
+import { getDomElementSize, hideElement, isBodyElement, isDomElementVisible } from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
 
@@ -13,7 +13,6 @@ export class RecaptchaService {
     private readonly recaptchaContainerSelector = (): HTMLIFrameElement => document.querySelector('iframe[title="recaptcha challenge"]');
 
     private readonly mutationObserverConfig: MutationObserverInit = { attributes: true, childList: true, subtree: true };
-    private readonly invisibleCssClass = 'ls-invisible';
 
     constructor(@inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
@@ -64,20 +63,16 @@ export class RecaptchaService {
 
     private hideNeighbourElementsWhenParentIsBody(htmlElement: HTMLElement): void {
         const parent = htmlElement.parentElement;
-        if(this.isBodyElement(parent)) {
+        if(isBodyElement(parent)) {
             parent.childNodes.forEach(childElement => {
                 if(childElement !== htmlElement
                     && childElement.nodeType === NodeTypes.ELEMENT_NODE) {
-                    (childElement as HTMLElement).classList.add(this.invisibleCssClass)
+                    hideElement((childElement as HTMLElement));
                 }
             })
         }
         else {
             this.hideNeighbourElementsWhenParentIsBody(parent);
         }
-    }
-
-    private isBodyElement(htmlElement: HTMLElement): boolean {
-        return htmlElement === document.querySelector('body');
     }
 }

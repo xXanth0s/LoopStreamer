@@ -15,6 +15,8 @@ import { PortalService } from '../services/portal.service';
 import { NotificationService } from '../services/notification.service';
 import { TestController } from '../controller/test.controller';
 import { RecaptchaService } from '../services/recaptcha.service';
+import { PopupService } from '../services/popup.service';
+import { PopupController } from '../controller/popup.controller';
 
 const inversifyContentContainer = new Container();
 
@@ -23,18 +25,20 @@ inversifyContentContainer.bind(SHARED_TYPES.MessageService).to(MessageService).i
 inversifyContentContainer.bind(SHARED_TYPES.Store).to(BrowserStoreService).inSingletonScope();
 inversifyContentContainer.bind(SHARED_TYPES.StoreService).to(StoreService).inSingletonScope();
 inversifyContentContainer.bind(SHARED_TYPES.ControllerType).toConstantValue(ControllerType.PROVIDOR);
-//
+
 // Services
 inversifyContentContainer.bind(CONTENT_TYPES.PortalService).to(PortalService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.ProvidorService).to(ProvidorService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.RecaptchaService).to(RecaptchaService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.NotificationService).to(NotificationService).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.PopupService).to(PopupService).inSingletonScope();
 
 // Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.RootController).to(RootContentController).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.VideoController).to(VideoController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.PopupController).to(PopupController).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.TestController).to(TestController).inSingletonScope();
-//
+
 // Portal Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.BurningSeries).to(BurningSeriesController).inSingletonScope();
 

@@ -2,11 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Options from '../models/options.model';
 
 
-const initialOptionsData = {
+const initialOptionsData: Options = {
     episodesToPlay: 0,
     makeFullscreen: false,
     showNotifications: false,
-    timeTillRequestPopup: 180,
+    timeTillSetEndtimePopup: 180,
+    timeForEntimeCountdown: 15,
     prepareVideo: false,
     allowUserShare: false,
     scipIfNoVideo: false,
