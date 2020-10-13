@@ -80,6 +80,7 @@ export class RootBackgroundController {
         }
 
         const window = this.windowService.openWindow(href, this.appWindowConfig);
+        this.windowService.replaceReferrer(window.webContents.session);
 
         this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: window.id, windowType: WindowType.APP }));
         if (isDev) {

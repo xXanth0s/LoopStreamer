@@ -57,9 +57,21 @@ export class WindowService {
     }
 
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
+        const session = window.webContents.session;
         this.hideNewWindows(window);
-        this.setUserAgentForSession(window.webContents.session);
-        this.addAdblockerForSession(window.webContents.session);
+        this.setUserAgentForSession(session);
+        this.addAdblockerForSession(session);
+        this.replaceReferrer(session);
+    }
+
+    public replaceReferrer(session: Session): void {
+        session.webRequest.onBeforeSendHeaders((details, callback) => {
+            const {host} = new URL(details.url);
+
+            details.requestHeaders['Referer'] = host;
+
+            callback({requestHeaders: details.requestHeaders})
+        })
     }
 
     private hideNewWindows(window: BrowserWindow): void {

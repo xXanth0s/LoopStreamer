@@ -38,7 +38,6 @@ export class VideoController {
     private isActive = false;
 
     public startVideo(videoElement: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): void {
-        console.log('startin video');
         if (!this.isActive) {
             this.isActive = true;
             videoElement.play().then(() => this.onVideoStarted(videoElement, seriesEpisodeKey));
