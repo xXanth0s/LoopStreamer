@@ -1,18 +1,22 @@
 import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
-import { fromEvent, Observable, Subject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { getDomElementSize, hideElement, isBodyElement, isDomElementVisible } from '../ustils/dom.utils';
+import { fromEvent, Observable } from 'rxjs';
+import { first, switchMap } from 'rxjs/operators';
+import {
+    checkForMutations,
+    getDomElementSize,
+    hideElement,
+    isBodyElement,
+    isDomElementVisible
+} from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
 
 @injectable()
 export class RecaptchaService {
 
-    private readonly recaptchaContainerSelector = (): HTMLIFrameElement => document.querySelector('iframe[title="recaptcha challenge"]');
-
-    private readonly mutationObserverConfig: MutationObserverInit = { attributes: true, childList: true, subtree: true };
+    private readonly recaptchaContainerSelector = 'iframe[title="recaptcha challenge"]';
 
     constructor(@inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
@@ -29,36 +33,16 @@ export class RecaptchaService {
         })
     }
 
-    private checkForRecaptchaContainer(): Observable<HTMLIFrameElement> {
-        const sub$ = new Subject<HTMLIFrameElement>();
-        const bodyElement = document.querySelector('body');
+    private checkForRecaptchaContainer(): Observable<HTMLElement> {
+        const container = document.querySelector('body');
 
-        const callback = () => {
-            const recaptchaContainer = this.recaptchaContainerSelector();
-            if (recaptchaContainer) {
-                observer.disconnect();
-                sub$.next(recaptchaContainer);
-            }
-        };
-
-        const observer = new MutationObserver(callback);
-        observer.observe(bodyElement, this.mutationObserverConfig);
-
-        return sub$.asObservable();
+        return checkForMutations<HTMLElement>(container, this.recaptchaContainerSelector).pipe(first());
     }
 
     private checkForRecaptchaChallenge(container: HTMLElement): Observable<HTMLElement> {
-        const sub$ = new Subject<HTMLElement>();
-
-        const callback = () => {
-            if(isDomElementVisible(container)) {
-                sub$.next(container);
-            }
-        };
-
-        const observer = new MutationObserver(callback);
-        observer.observe(container, this.mutationObserverConfig);
-        return sub$.asObservable();
+        return checkForMutations<HTMLElement>(container, this.recaptchaContainerSelector).pipe(
+            first(isDomElementVisible)
+        );
     }
 
     private hideNeighbourElementsWhenParentIsBody(htmlElement: HTMLElement): void {
