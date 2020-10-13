@@ -55,6 +55,7 @@ export class WindowController {
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
         this.store.stopPlayer();
         const originalWindow = this.windowService.openWindow(linkToOpen, { visible: false, nodeIntegration: false });
+        this.windowService.hideNewWindows(originalWindow);
         return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             map(data => data[1]),
@@ -63,6 +64,7 @@ export class WindowController {
                 return this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
                     map(isValid => {
                         if (isValid) {
+                            this.windowService.hideNewWindows(window);
                             return window;
                         }
                         this.windowService.closeWindow(window);
@@ -76,27 +78,23 @@ export class WindowController {
     }
 
     private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
-        window.hide();
-        let listening = true;
         const sub$ = new Subject<boolean>();
         const timeout$ = timer(100).pipe(
             mapTo(false)
         );
 
-        const listener = { ...this.requestFilter };
-        window.webContents.session.webRequest.onSendHeaders(listener, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
-            if (resourceType !== 'mainFrame' || !listening) {
+        window.webContents.session.webRequest.onSendHeaders(this.requestFilter, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
+            if (resourceType !== 'mainFrame') {
                 return;
             }
-            listening = false;
             if (window.isDestroyed()) {
                 return;
             }
 
+            window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
             if (!this.isUrlValid(url, allowedPage, validLink)) {
                 sub$.next(false);
             } else {
-                window.show();
                 sub$.next(true);
             }
         });

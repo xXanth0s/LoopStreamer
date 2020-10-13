@@ -53,7 +53,7 @@ export class WindowService {
         const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        window.webContents.openDevTools();
+        // window.webContents.openDevTools();
         this.setUserAgentForSession(window.webContents.session);
         return window;
     }
@@ -70,6 +70,12 @@ export class WindowService {
         if(browserWindow.closable) {
             browserWindow.close()
         }
+    }
+
+    public hideNewWindows(window: BrowserWindow): void {
+        window.webContents.on("new-window", (e, url, frameName, disposition, options) => {
+            options.show = false
+        })
     }
 
     private getConfig(config?: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {

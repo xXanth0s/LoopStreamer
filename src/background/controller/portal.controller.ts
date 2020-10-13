@@ -3,7 +3,6 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { VideoController } from './video.controller';
 import { debounceTime, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
@@ -37,8 +36,7 @@ export class PortalController {
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
                 @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
-                @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController) {
+                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesMetaInfoDto[]> {
@@ -100,10 +98,6 @@ export class PortalController {
             return;
         }
 
-        if(oldWindowId !== undefined) {
-            // const oldWindow = BrowserWindow.fromId(oldWindowId);
-            // oldWindow?.close();
-        }
         this.store.dispatch(setWindowIdForWindowTypeAction({windowId: newPortalWindow.id, windowType: WindowType.PORTAL}))
     }
 }

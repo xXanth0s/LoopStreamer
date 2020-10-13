@@ -21,6 +21,8 @@ export const loopStreamerStatus = (state: StateModel): LoopStreamerStatus => sta
 
 export const getVideoWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.VIDEO]?.windowId;
 
+export const getAppWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.APP]?.windowId;
+
 export const isVideoFullScreen = (state: StateModel): boolean => state.controlState.currentWindowState === 'fullscreen';
 
 // @ts-ignore
