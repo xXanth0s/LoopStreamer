@@ -98,6 +98,7 @@ export class WindowService {
             fullscreen: config.fullscreen,
             show: config.visible,
             frame: true,
+            icon: path.resolve(__dirname, 'assets', 'logo.ico'),
             fullscreenable: false,
             webPreferences: {
                 session: session.defaultSession,
