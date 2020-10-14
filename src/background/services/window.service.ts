@@ -5,6 +5,7 @@ import {
     BrowserWindowConstructorOptions,
     OnBeforeSendHeadersListenerDetails,
     Referrer,
+    session,
     Session
 } from 'electron';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
@@ -45,7 +46,7 @@ export class WindowService {
         const windowConfig = this.getConfig(finalConfig);
         const window = new BrowserWindow(windowConfig);
         window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        this.setUserAgentForSession(window.webContents.session);
+        this.addDefaultHandlingForNewWindow(window);
         this.addAdblockerForSession(window.webContents.session);
         return window;
     }
@@ -59,19 +60,8 @@ export class WindowService {
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
         const session = window.webContents.session;
         this.hideNewWindows(window);
-        this.setUserAgentForSession(session);
+        this.manipulateSession(session);
         this.addAdblockerForSession(session);
-        this.replaceReferrer(session);
-    }
-
-    public replaceReferrer(session: Session): void {
-        session.webRequest.onBeforeSendHeaders((details, callback) => {
-            const {host} = new URL(details.url);
-
-            details.requestHeaders['Referer'] = host;
-
-            callback({requestHeaders: details.requestHeaders})
-        })
     }
 
     private hideNewWindows(window: BrowserWindow): void {
@@ -90,9 +80,13 @@ export class WindowService {
         });
     }
 
-    private setUserAgentForSession(newSession: Session): void {
+    private manipulateSession(newSession: Session): void {
         newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
-            details.requestHeaders['userAgent'] = this.userAgent;
+            const {host} = new URL(details.url);
+
+            details.requestHeaders['Referer'] = host;
+            details.requestHeaders['User-Agent'] = this.userAgent;
+
             callback({cancel: false, requestHeaders: details.requestHeaders});
         })
     }
@@ -106,6 +100,7 @@ export class WindowService {
             frame: true,
             fullscreenable: false,
             webPreferences: {
+                session: session.defaultSession,
                 nodeIntegration: config.nodeIntegration,
                 preload: config.preloadScript ? path.resolve(__dirname, 'content.js') : undefined,
                 webSecurity: true,
