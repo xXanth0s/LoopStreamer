@@ -3,7 +3,6 @@ import { ControlState } from '../models/control-state.model';
 import Portal from '../models/portal.model';
 import Providor from '../models/providor.model';
 import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
-import { VIDEO_STATUS } from '../enums/video-status.enum';
 import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
@@ -13,9 +12,7 @@ const initialControlState: StateModel['controlState'] = {
     activePortal: PORTALS.BS,
     activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
-    isUserOnVideoPage: false,
     loopStreamerStatus: LoopStreamerStatus.PLAYING,
-    videoStatus: VIDEO_STATUS.None,
     controllerWindowState: {
         [WindowType.VIDEO]: null
     }
@@ -94,6 +91,10 @@ function setWindowIdForWindowType(state: ControlState, { windowType, windowId }:
     }
 }
 
+function setActiveEpisode(state: ControlState, activeEpsidoeKey: string) {
+    state.activeEpisode = activeEpsidoeKey;
+}
+
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -107,6 +108,7 @@ export const controlStateSlice = createSlice({
         setCurrentWindowStateAction: (state: ControlState, action: PayloadAction<ControlState['currentWindowState']>) => setCurrentWindowState(state, action.payload),
         setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) => setExpandedSeriesOptionsPage(state, action.payload),
         setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{windowType: WindowType, windowId: number}>) => setWindowIdForWindowType(state, action.payload),
+        setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) => setActiveEpisode(state, action.payload),
     }
 });
 
@@ -118,5 +120,6 @@ export const {
     toggleWindowStateAction,
     setCurrentWindowStateAction,
     setExpandedSeriesOptionsPageAction,
-    setWindowIdForWindowTypeAction
+    setWindowIdForWindowTypeAction,
+    setActiveEpisodeAction
 } = controlStateSlice.actions;

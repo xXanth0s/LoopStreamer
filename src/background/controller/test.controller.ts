@@ -5,13 +5,14 @@ import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
-import { ipcMain } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { createStartEpisodeMessage } from '../../browserMessages/messages/background.messages';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { MessageService } from '../../shared/services/message.service';
 import { RootBackgroundController } from './root-background.controller';
 import {
+    createStartTestRecaptchaMessage,
     createTestNotificationMessage,
     OpenTestPageMessage,
     StartTestEpisodeOverBSMessage
@@ -21,6 +22,8 @@ import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import Website from '../../store/models/website';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowType } from '../../store/enums/window-type.enum';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 
 @injectable()
@@ -42,20 +45,32 @@ export class TestController {
                 this.rootController.startEpisodeHandler(createStartEpisodeMessage('24-S5-E4', PORTALS.BS));
             });
 
+        ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA,
+            (event, message: StartTestEpisodeOverBSMessage): void => {
+                this.startTestPage().subscribe(window => {
+                    this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
+                    this.messageService.sendMessageToPortalTab(createStartTestRecaptchaMessage());
+                })
+            });
+
         ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
             (event, message: OpenTestPageMessage): void => {
-                const testWebsite: Website = {
-                    baseUrl: 'localhost',
-                    urlRegex: 'localhost',
-                };
-
-                this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
-                    waitTillPageLoadFinished()
-                ).subscribe(window => {
-                    window.show();
+                this.startTestPage().subscribe(window => {
                     this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
                     this.messageService.sendMessageToPortalTab(createTestNotificationMessage());
                 })
             });
+    }
+
+    private startTestPage(): Observable<BrowserWindow> {
+        const testWebsite: Website = {
+            baseUrl: 'localhost',
+            urlRegex: 'localhost',
+        };
+
+        return this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
+            waitTillPageLoadFinished(),
+            tap(window => window.show())
+        );
     }
 }

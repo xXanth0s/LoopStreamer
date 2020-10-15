@@ -16,6 +16,7 @@ import { StartVideoMessage } from '../../browserMessages/messages/providor.messa
 import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
 import styles from '../styles/content.scss';
+import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
 
 @injectable()
 export class RootContentController {
@@ -27,6 +28,7 @@ export class RootContentController {
         document.addEventListener('DOMContentLoaded', () => {
             styles.use();
             this.recaptchaService.checkForRecaptcha();
+            addCustomFrame();
         });
     }
 

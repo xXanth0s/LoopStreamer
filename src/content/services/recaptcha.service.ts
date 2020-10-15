@@ -6,7 +6,7 @@ import { first, switchMap } from 'rxjs/operators';
 import {
     checkForMutations,
     getDomElementSize,
-    hideElement,
+    hideNotLsElement,
     isBodyElement,
     isDomElementVisible
 } from '../ustils/dom.utils';
@@ -51,7 +51,7 @@ export class RecaptchaService {
             parent.childNodes.forEach(childElement => {
                 if(childElement !== htmlElement
                     && childElement.nodeType === NodeTypes.ELEMENT_NODE) {
-                    hideElement((childElement as HTMLElement));
+                    hideNotLsElement((childElement as HTMLElement));
                 }
             })
         }

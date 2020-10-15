@@ -1,0 +1,49 @@
+@import "../../../styles/variables";
+
+$button-height: 40px;
+
+
+.window-control-buttons {
+  z-index: $zindex;
+  width: $windowControlButtonsHeight * 3;
+  height: $button-height;
+
+
+  .vertical-felx {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .button {
+    -webkit-app-region: no-drag;
+    width: $windowControlButtonsHeight;
+    height: $button-height;
+
+  }
+
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .button {
+    color: white;
+    background-color: $primary-color;
+
+  }
+
+  .primary-button {
+    &:hover {
+      background-color: darken($primary-color, 5%);
+    }
+  }
+
+  .red-button {
+    &:hover {
+      background-color: darkred;
+    }
+
+  }
+}

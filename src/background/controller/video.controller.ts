@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { debounceTime, map, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from '../../shared/services/message.service';
 import { Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
@@ -36,26 +36,27 @@ export class VideoController {
         const providor = this.store.selectSync(getProvidorForKey, providorKey);
         const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
 
-        return activeWindow$.pipe(
-            takeUntil(this.takeUntil$),
-            takeUntil(this.store.playerHasStopped()),
-            map(async window => {
+        return new Promise<boolean>(resolve => {
+            activeWindow$.pipe(
+                takeUntil(this.takeUntil$),
+                takeUntil(this.store.playerHasStopped()),
+            ).subscribe(async window => {
                 const hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisode.key, providorKey));
                 if(hasVideo) {
                     this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey));
                     window.show();
                 }
 
-                return hasVideo
+                resolve(hasVideo);
             })
-        ).toPromise()
+        })
+
     }
 
     public reset(): void {
         const videoWindowId = this.store.selectSync(getVideoWindowId);
         if (videoWindowId) {
-            const videoWindow = BrowserWindow.fromId(videoWindowId);
-            this.windowService.closeWindow(videoWindow);
+            this.windowService.closeWindow(videoWindowId);
             this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
         }
     }

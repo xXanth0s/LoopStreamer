@@ -85,7 +85,7 @@ export class PortalController {
         return new Promise<R>(resolve => {
             const sub = this.openPortalUrl(portalUrl, portal).subscribe(async (window) => {
                 const result = await this.messageService.sendMessageToPortalTab(message);
-                this.windowService.closeWindow(window);
+                this.windowService.closeWindow(window.id);
                 sub.unsubscribe();
                 resolve(result);
             });

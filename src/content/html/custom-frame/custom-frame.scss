@@ -1,0 +1,15 @@
+@import "../../../styles/variables";
+
+.drag-container {
+  -webkit-app-region: drag;
+
+}
+
+.vertical-felx {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-full-size {
+  flex: 1;
+}

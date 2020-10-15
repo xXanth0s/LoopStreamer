@@ -31,3 +31,11 @@ export const createStartTestEpisodeOverBSMessage = (): Message => ({
 });
 export type StartTestEpisodeOverBSMessage = ReturnType<typeof createStartTestEpisodeOverBSMessage>;
 
+
+export const createStartTestRecaptchaBackgroundMessage = (): Message => ({
+    type: MessageType.TEST_BACKGROUND_START_RECAPTCHA,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+});
+export type StartTestRecaptchaBackgroundMessage = ReturnType<typeof createStartTestRecaptchaBackgroundMessage>;
+

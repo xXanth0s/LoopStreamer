@@ -7,6 +7,9 @@
         <div class="pt-2">
             <button class="btn btn-primary" @click="openTestPage">Open Test Page</button>
         </div>
+        <div class="pt-2">
+            <button class="btn btn-primary" @click="startTestRecaptcha">Start Recaptcha on test page</button>
+        </div>
     </div>
 </template>
 
@@ -20,6 +23,7 @@
     import {
         createOpenTestPageMessage,
         createStartTestEpisodeOverBSMessage,
+        createStartTestRecaptchaBackgroundMessage,
     } from '../../../browserMessages/messages/test.messages';
 
     @Component({
@@ -40,6 +44,10 @@
 
         public openTestPage(): void {
             this.messageService.sendMessageToBackground(createOpenTestPageMessage());
+        }
+
+        public startTestRecaptcha(): void {
+            this.messageService.sendMessageToBackground(createStartTestRecaptchaBackgroundMessage());
         }
     }
 </script>

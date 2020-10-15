@@ -88,10 +88,10 @@ export const createGetSeriesEpisodesForSeasonMessage = (portal: PORTALS, seriesS
 export type GetSeriesEpisodesForSeasonMessage = ReturnType<typeof createGetSeriesEpisodesForSeasonMessage>;
 
 
-export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], portal: PORTALS) : Message<{episodeKey: SeriesEpisode['key'], portal: PORTALS}> => ({
+export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], portal: PORTALS) : Message<{episodeKey: SeriesEpisode['key'], portal: PORTALS}, boolean> => ({
     type: MessageType.BACKGROUND_START_EPISODE,
     destinationController: ControllerType.BACKGROUND,
-    hasReply: false,
+    hasReply: true,
     payload: {
         portal,
         episodeKey
@@ -107,5 +107,41 @@ export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize)
     payload: domElementSize
 });
 export type RecaptchaRecognizedMessage = ReturnType<typeof createRecaptchaRecognizedMessage>;
+
+
+export const createMinimizeWindowMessage = (windowId: number) : Message<number> => ({
+    type: MessageType.BACKGROUND_MINIMIZE_WINDOW,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: windowId
+});
+export type MinimizeWindowMessage = ReturnType<typeof createMinimizeWindowMessage>;
+
+
+export const createToggleWindowFullscreenMessage = (windowId: number) : Message<number> => ({
+    type: MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: windowId
+});
+export type ToggleWindowFullscreenMessage = ReturnType<typeof createToggleWindowFullscreenMessage>;
+
+
+export const createToggleWindowMaximizationMessage = (windowId: number) : Message<number> => ({
+    type: MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: windowId
+});
+export type ToggleWindowMaximizationMessage = ReturnType<typeof createToggleWindowMaximizationMessage>;
+
+
+export const createCloseWindowMessage = (windowId: number) : Message<number> => ({
+    type: MessageType.BACKGROUND_CLOSE_WINDOW,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: windowId
+});
+export type CloseWindowMessage = ReturnType<typeof createCloseWindowMessage>;
 
 

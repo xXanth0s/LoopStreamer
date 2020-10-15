@@ -18,7 +18,6 @@ export class TestController {
             this.executeRecaptchaChallenge();
         });
         ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, (event, message: TestNotificationMessage) => {
-            this.notificationService.openEndTimePopup(22,() => {}, () => {});
         });
     }
 

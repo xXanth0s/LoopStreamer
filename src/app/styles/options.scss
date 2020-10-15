@@ -1,6 +1,8 @@
 @import "elements/index.css";
-@import "../../../styles/variables";
-@import "../../../styles/bootstrap-customized";
+@import "src/styles/variables";
+@import "src/styles/bootstrap-customized";
+@import "src/styles/font-awesome";
+@import "../../shared/html/styles/shared-styles";
 @import '~bootstrap/scss/bootstrap';
 @import '~bootstrap-vue/src/index.scss';
 

@@ -51,14 +51,46 @@ export class WindowService {
         return window;
     }
 
-    public closeWindow(browserWindow: BrowserWindow): void {
+    public closeWindow(windowId?: number): void {
+        if(!windowId) {
+            return;
+        }
+
+        const browserWindow = BrowserWindow.fromId(windowId);
         if(browserWindow?.closable) {
             browserWindow.close()
         }
     }
 
+    public minimizeWindow(windowId: number): void {
+        const browserWindow = BrowserWindow.fromId(windowId);
+        if(browserWindow?.minimizable) {
+            browserWindow.minimize()
+        }
+    }
+
+    public toggleMaximization(windowId: number): void {
+        const browserWindow = BrowserWindow.fromId(windowId);
+        if(browserWindow?.isMaximized()) {
+            browserWindow.unmaximize()
+        } else if(browserWindow?.maximizable) {
+            browserWindow.maximize();
+        }
+    }
+
+    public toggleFullscreen(windowId: number): void {
+        const browserWindow = BrowserWindow.fromId(windowId);
+        if(browserWindow?.isFullScreen()) {
+            browserWindow.setFullScreen(false);
+        } else if(browserWindow?.isFullScreenable()) {
+            browserWindow.setFullScreen(true);
+        }
+
+    }
+
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
         const session = window.webContents.session;
+        window.removeMenu();
         this.hideNewWindows(window);
         this.manipulateSession(session);
         this.addAdblockerForSession(session);
@@ -84,22 +116,25 @@ export class WindowService {
         newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
             const {host} = new URL(details.url);
 
+            // adding host as referer, to bypass ddos protection
             details.requestHeaders['Referer'] = host;
+
+            // set user agent for recaptcha
             details.requestHeaders['User-Agent'] = this.userAgent;
 
             callback({cancel: false, requestHeaders: details.requestHeaders});
         })
     }
 
-    private getConfig(config?: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
+    private getConfig(config: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
         return {
-            width: 1800,
-            height: 1200,
+            width: 1600,
+            height: 900,
             fullscreen: config.fullscreen,
             show: config.visible,
-            frame: true,
+            frame: false,
             icon: path.resolve(__dirname, 'assets', 'logo.ico'),
-            fullscreenable: false,
+            fullscreenable: true,
             webPreferences: {
                 session: session.defaultSession,
                 nodeIntegration: config.nodeIntegration,

@@ -17,6 +17,6 @@ export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
             }
         }),
         components: { ButtonComponent }
-    }).$mount('#ls-video-buttons')
+    }).$mount(`#${containerId}`)
 };
 

@@ -121,7 +121,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import "styles/variables";
+    @import "src/styles/variables";
 
     .btn-bottom {
         position: absolute;

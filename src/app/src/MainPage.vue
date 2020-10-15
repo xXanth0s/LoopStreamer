@@ -1,14 +1,6 @@
 <template>
     <div>
-        <div class="header">
-            <b-nav tabs align="center">
-                <b-nav-item exact exact-active-class="active" :to="routesConst.HOME_PAGE">Home</b-nav-item>
-                <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_PAGE">Meine Serien</b-nav-item>
-                <b-nav-item exact exact-active-class="active" :to="routesConst.SETTINGS_PAGE">Einstellungen</b-nav-item>
-                <b-nav-item exact exact-active-class="active" :to="routesConst.FAQ_PAGE">FAQ</b-nav-item>
-                <b-nav-item v-if="isDev" exact exact-active-class="active" :to="routesConst.TEST_PAGE">Test</b-nav-item>
-            </b-nav>
-        </div>
+        <nav-bar/>
         <div class="container">
             <div class="tab-content">
                 <div class="tab-pane active">
@@ -22,30 +14,20 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { globalRoutes } from '../constants/globalRoutes';
-    import { isDevelopment } from '../../utils/environment.utils';
+    import NavBar from './components/NavBar.vue';
 
-    @Component({})
+    @Component({
+        components: {
+            NavBar,
+        },
+    })
     export default class MainPage extends Vue {
-        private readonly routesConst = globalRoutes;
-        private readonly isDev = isDevelopment()
     }
 
 </script>
 
 <style lang="scss" scoped>
-    @import 'styles/variables';
-
-    .header {
-        top: 0;
-        z-index: 20;
-        width: 100%;
-        position: fixed;
-        background-color: $black-color;
-
-        display: flex;
-        justify-content: center;
-    }
+    @import 'src/styles/variables';
 
     .container {
         margin-top: 70px;

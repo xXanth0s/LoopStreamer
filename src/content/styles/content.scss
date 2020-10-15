@@ -1,6 +1,10 @@
 @import "~izitoast/dist/css/iziToast.min.css";
+@import "../../shared/html/styles/shared-styles";
+@import "../html/custom-frame/custom-frame";
+@import "src/styles/font-awesome";
+
 .ls-container {
-    @import "../../../styles/bootstrap-customized";
+    @import "src/styles/bootstrap-customized";
     @import '~bootstrap/scss/bootstrap';
     @import '~bootstrap-vue/src/index.scss';
 }

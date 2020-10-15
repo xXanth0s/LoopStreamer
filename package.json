@@ -20,6 +20,7 @@
   "dependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
     "@cliqz/adblocker-electron": "^1.18.3",
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "@reduxjs/toolkit": "^1.2.5",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.7.0",
@@ -43,7 +44,6 @@
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1",
     "vue-router": "^3.1.6",
-    "vue-ts-loader": "0.0.3",
     "vuedraggable": "^2.23.2",
     "webextension-polyfill-ts": "^0.14.0",
     "webpack-extension-reloader": "^1.1.4",
@@ -69,6 +69,7 @@
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
+    "file-loader": "^6.1.1",
     "node-sass": "^4.14.1",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",
@@ -78,6 +79,7 @@
     "vue-cli-plugin-electron-builder": "^2.0.0-rc.4",
     "vue-loader": "^15.9.3",
     "vue-template-compiler": "^2.6.12",
+    "vue-ts-loader": "0.0.3",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.11"
   }

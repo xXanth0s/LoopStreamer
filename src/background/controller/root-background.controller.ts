@@ -9,20 +9,28 @@ import { ProvidorService } from '../services/providor.service';
 import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
+    CloseWindowMessage,
     GetAllAvailableSeriesFromPortalMessage,
     GetSeriesEpisodesForSeasonMessage,
     GetSeriesInformationFromPortalMessage,
+    MinimizeWindowMessage,
     OpenNextVideoMessage,
     OpenPreviousVideoMessage,
     RecaptchaRecognizedMessage,
     StartEpisodeMessage,
     StartSeriesMessage,
     ToggleFullscreenModeMessage,
+    ToggleWindowFullscreenMessage,
+    ToggleWindowMaximizationMessage,
     VideoFinishedMessage,
     WindowResizedMessage
 } from '../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
-import { resetControlStateAction, setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
+import {
+    resetControlStateAction,
+    setActiveEpisodeAction,
+    setWindowIdForWindowTypeAction
+} from '../../store/reducers/control-state.reducer';
 import { OpenWindowConfig, WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
@@ -37,7 +45,6 @@ import {
 } from '../../store/selectors/series-episode.selector';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { FRAME_HEIGHT, FRAME_WIDTH } from '../../shared/constants/electron-data';
 import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
@@ -113,8 +120,12 @@ export class RootBackgroundController {
             this.continueSeriesHandler(message);
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): void => {
-            this.startEpisodeHandler(message);
+        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): Promise<boolean>| boolean => {
+            try {
+                return  this.startEpisodeHandler(message);
+            } catch (e) {
+                return false;
+            }
         });
 
         ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
@@ -138,12 +149,32 @@ export class RootBackgroundController {
             (event, message: RecaptchaRecognizedMessage): void => {
                 this.recaptchaRecognizedHandler(event, message);
             });
+
+        ipcMain.handle(MessageType.BACKGROUND_CLOSE_WINDOW,
+            (event, message: CloseWindowMessage): void => {
+                this.closeWindowEventHandler(event, message);
+            });
+
+        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
+            (event, message: ToggleWindowFullscreenMessage): void => {
+                this.toggleWindowFullscreenEventHandler(event, message);
+            });
+
+        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
+            (event, message: ToggleWindowMaximizationMessage): void => {
+                this.toggleWindowMaximizationEventHandler(event, message);
+            });
+
+        ipcMain.handle(MessageType.BACKGROUND_MINIMIZE_WINDOW,
+            (event, message: MinimizeWindowMessage): void => {
+                this.minimizeWindowEventHandler(event, message);
+            });
     }
 
-    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<void> {
+    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
         this.store.stopPlayer();
         const { portal, episodeKey } = message.payload;
-        await this.startEpisode(episodeKey, portal);
+        return this.startEpisode(episodeKey, portal);
     }
 
     private async videoFinishedHandler(): Promise<void> {
@@ -198,8 +229,30 @@ export class RootBackgroundController {
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
-        window.setSize(width + FRAME_WIDTH, height + FRAME_HEIGHT);
+        window.setSize(width, height);
         window.show();
+    }
+
+    private closeWindowEventHandler(event: IpcMainInvokeEvent, message: CloseWindowMessage): void {
+        const windowId = message.payload;
+        this.windowService.closeWindow(windowId);
+    }
+
+    private toggleWindowMaximizationEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowMaximizationMessage): void {
+        const windowId = message.payload;
+        console.log('window fullscreen event handler')
+        this.windowService.toggleMaximization(windowId);
+    }
+
+    private toggleWindowFullscreenEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowFullscreenMessage): void {
+        const windowId = message.payload;
+        console.log('window fullscreen event handler')
+        this.windowService.toggleFullscreen(windowId);
+    }
+
+    private minimizeWindowEventHandler(event: IpcMainInvokeEvent, message: MinimizeWindowMessage): void {
+        const windowId = message.payload;
+        this.windowService.minimizeWindow(windowId);
     }
 
     private resetController(): void {
@@ -209,13 +262,20 @@ export class RootBackgroundController {
     }
 
     private async startEpisode(episodeKey: SeriesEpisode['key'], portal: PORTALS): Promise<boolean> {
+        this.store.dispatch(setActiveEpisodeAction(episodeKey));
         const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
 
+        let result = false;
         if (providorLink.link) {
             const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
-            return this.videoController.startVideo(episodeInfo, providorLink.providor);
+            result = await this.videoController.startVideo(episodeInfo, providorLink.providor);
         }
-        return false;
+
+        if(!result) {
+            this.store.dispatch(setActiveEpisodeAction(null));
+        }
+
+        return result;
     }
 
 }

@@ -67,7 +67,7 @@ export class WindowController {
                             this.windowService.addDefaultHandlingForNewWindow(window);
                             return window;
                         }
-                        this.windowService.closeWindow(window);
+                        this.windowService.closeWindow(window.id);
                         return null;
                     }),
                 );
