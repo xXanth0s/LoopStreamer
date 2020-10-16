@@ -139,7 +139,7 @@ export class RootBackgroundController {
             });
 
         ipcMain.handle(MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
-            async (event, message: SeriesSeasonSelectedInAppMessage): Promise<SeriesEpisode[]> => {
+            async (event, message: SeriesSeasonSelectedInAppMessage): Promise<void> => {
                 console.log(message);
                 return this.getSeriesEpisodeForSeasonHandler(message);
             });
