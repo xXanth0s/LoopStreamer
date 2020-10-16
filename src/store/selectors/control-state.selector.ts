@@ -4,6 +4,7 @@ import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { Windows } from 'webextension-polyfill-ts';
 import Series from '../models/series.model';
 import { WindowType } from '../enums/window-type.enum';
+import { BrowserWindowStateModel } from '../models/browser-window-state.model';
 import WindowState = Windows.WindowState;
 
 export const getControlState = (state: StateModel): ControlState => state.controlState;
@@ -16,12 +17,15 @@ export const isLoopStreamerInactive = (state: StateModel): boolean => {
 };
 
 
-
 export const loopStreamerStatus = (state: StateModel): LoopStreamerStatus => state.controlState.loopStreamerStatus;
 
 export const getVideoWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.VIDEO]?.windowId;
 
 export const getAppWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.APP]?.windowId;
+
+export const getWindowStateForWindowId = (state: StateModel, windowId: BrowserWindowStateModel['windowId']) => {
+    return Object.values(state.controlState.controllerWindowState).find(windowState => windowState.windowId === windowId);
+};
 
 export const isVideoFullScreen = (state: StateModel): boolean => state.controlState.currentWindowState === 'fullscreen';
 
@@ -30,16 +34,16 @@ export const previousWindowState = (state: StateModel): WindowState => state.con
 
 export const isSeriesExpandedOnOptionsPage = (state: StateModel, seriesKey: Series['key']): boolean => {
     return state.controlState.expandedSeriesOptionsPage === seriesKey;
-}
+};
 export const isAnySeriesExpandedOnOptionsPage = (state: StateModel, seriesKeys: Series['key'][]): boolean => {
     return seriesKeys.some(key => key === state.controlState.expandedSeriesOptionsPage);
-}
+};
 
 export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean => {
     const playedEpisodes = state.controlState.playedEpisodes;
     const episodesToPlay = state.options.episodesToPlay;
 
     return episodesToPlay !== 0 && playedEpisodes >= episodesToPlay;
-}
+};
 
 export const getActiveEpisode = (state: StateModel): ControlState['activeEpisode'] => state.controlState.activeEpisode;

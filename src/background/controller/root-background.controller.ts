@@ -46,6 +46,7 @@ import {
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { PORTALS } from '../../store/enums/portals.enum';
+import { addProvidorLinkToEpisodeAction } from '../../store/reducers/series-episode.reducer';
 
 @injectable()
 export class RootBackgroundController {
@@ -215,7 +216,7 @@ export class RootBackgroundController {
     private async getSeriesInformationFromPortalHandler({ payload }: GetSeriesInformationFromPortalMessage): Promise<Series> {
         console.log('getSeriesInformationFromPortalHandler', payload);
         const seriesInfo = await this.portalController.getSeriesInformation(payload);
-        return this.seriesService.addSeries(seriesInfo);
+        return this.seriesService.addSeriesToStore(seriesInfo);
     }
 
     private async getSeriesEpisodeForSeasonHandler(message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> {
@@ -223,7 +224,7 @@ export class RootBackgroundController {
 
         const episodeDtos = await this.portalController.getEpisodesForSeason(seriesSeasonKey, portal);
         console.log(episodeDtos);
-        return this.seriesService.addSeriesEpisodes(episodeDtos);
+        return this.seriesService.addSeriesEpisodesToStore(episodeDtos);
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -267,8 +268,8 @@ export class RootBackgroundController {
 
         let result = false;
         if (providorLink.link) {
-            const episodeInfo = this.seriesService.addProvidorLinkToSeries(episodeKey, providorLink);
-            result = await this.videoController.startVideo(episodeInfo, providorLink.providor);
+            this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
+            result = await this.videoController.startVideo(episodeKey, providorLink.providor);
         }
 
         if(!result) {

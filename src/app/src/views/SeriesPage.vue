@@ -50,8 +50,12 @@
     import Component from 'vue-class-component';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
-    import { removeSeriesAction, resetSeriesAction, updateSeriesAction } from '../../../store/reducers/series.reducer';
-    import { getAllSeries, getAllWatchedSeries } from "../../../store/selectors/series.selector";
+    import {
+        removeSeriesAction,
+        resetSeriesAction,
+        updateOrAddSeriesAction
+    } from '../../../store/reducers/series.reducer';
+    import { getAllWatchedSeries } from '../../../store/selectors/series.selector';
     import { getAllPortals } from '../../../store/selectors/portals.selector';
     import messages from '../../constants/messages';
     import Series from '../../../store/models/series.model';
@@ -92,7 +96,7 @@
         }
 
         public onSaveSeries(series: Series): void {
-            this.store.dispatch(updateSeriesAction(series));
+            this.store.dispatch(updateOrAddSeriesAction(series));
             Notification.success({
                 title: messages.savingTitle,
                 message: messages.savingText,

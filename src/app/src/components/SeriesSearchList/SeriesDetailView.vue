@@ -1,7 +1,7 @@
 <template>
     <b-collapse class="mt-1 mb-2 px-0" v-model="isExpanded">
         <div class="accordion-content full-height">
-            <div v-if="!loadingSeriesData && seriesData" class="full-height flex-container">
+            <div v-if="!isSeriesLoading" class="full-height flex-container">
                 <div class="content-container">
                     <div class="content-description p-3">{{seriesData.description}}</div>
                     <div class="content-series-items mb-3 ml-4">
@@ -10,14 +10,14 @@
                         </div>
                         <div class="mt-1 series-item flex-center white-tile"
                              v-for="season in seasons"
-                             @click="seasonClicked(season)"
-                             :class="{selected: isSeasonSelected(season), disabled: isSeasonLoading}"
+                             @click="seasonClicked(season.key)"
+                             :class="{selected: isSeasonSelected(season.key), disabled: areEpisodesLoading}"
                              v-bind:key="season.key">
-                            <div v-if="season.key !== loadingSeason">
-                                {{season.seasonNumber}}
-                            </div>
-                            <div v-else class="spinner-border tile-spinner" role="status">
+                            <div v-if="isSeasonLoading(season.key)" class="spinner-border tile-spinner" role="status">
                                 <span class="sr-only"></span>
+                            </div>
+                            <div v-else>
+                                {{season.seasonNumber}}
                             </div>
                         </div>
                     </div>
@@ -25,21 +25,13 @@
                         <span class="px-3 mt-1 flex-center white-tile">
                             <b>Episoden:</b>
                         </span>
-                        <div class="mt-1 series-item flex-center white-tile"
-                             v-for="episode in episodes"
-                             @click="episodeClicked(episode)"
-                             :class="{selected: isEpisodeSelected(episode), disabled: isEpisodeLoading}"
-                             v-bind:key="episode.key">
-                            <div v-if="episode.key !== loadingEpisode">
-                                {{episode.episodeNumber}}
-                            </div>
-                            <div v-else class="spinner-border tile-spinner" role="status">
-                                <span class="sr-only"></span>
-                            </div>
-                        </div>
+                        <series-episode-button
+                                v-for="seriesEpisode in episodes" :key="seriesEpisode.key"
+                                :episode-info="seriesEpisode"
+                                :is-blocked="isEpisodeLoading"
+                                @click="episodeClicked(seriesEpisode)"/>
                     </div>
-
-                    <div v-if="loadingEpisodeData" class="flex-center my-3">
+                    <div v-if="areEpisodesLoading" class="flex-center my-3">
                         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
                             <span class="sr-only"></span>
                         </div>
@@ -50,7 +42,7 @@
                     <img :src="seriesData.posterHref">
                 </div>
             </div>
-            <div v-if="loadingSeriesData" class="flex-center full-height">
+            <div v-else class="flex-center full-height">
                 <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
                     <span class="sr-only"></span>
                 </div>
@@ -65,13 +57,15 @@
     import { Prop, Watch } from 'vue-property-decorator';
     import Component from 'vue-class-component';
     import { takeUntil } from 'rxjs/operators';
+    import { merge, Subject } from 'rxjs';
+    import { fromPromise } from 'rxjs/internal-compatibility';
     import Series from '../../../../store/models/series.model';
     import { optionsContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
     import { SeriesSeason } from '../../../../store/models/series-season.model';
-    import { getSeriesSeasonsByKeys } from '../../../../store/selectors/series-season.selector';
+    import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
     import {
         createGetSeriesEpisodesForSeasonMessage,
         createGetSeriesInformationFromPortalMessage,
@@ -80,15 +74,20 @@
     import { PORTALS } from '../../../../store/enums/portals.enum';
     import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
-    import { getActiveEpisode } from '../../../../store/selectors/control-state.selector';
-    import { Subject } from 'rxjs';
-
+    import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
+    import { getSeriesByKey } from '../../../../store/selectors/series.selector';
+    import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
 
     @Component({
         name: 'series-detail-view',
+        components: {
+            SeriesEpisodeButton,
+        },
     })
     export default class SeriesDetailView extends Vue {
 
+        private readonly seriesChanged$ = new Subject();
+        private readonly seasonChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();
 
         @Prop(Object)
@@ -103,31 +102,24 @@
         private messageService: MessageService;
         private store: StoreService;
 
+        private isLoading = true;
         private seriesData: Series = null;
         private seasons: SeriesSeason[] = [];
         private episodes: SeriesEpisode[] = [];
-        private loadingSeriesData = false;
-        private loadingEpisodeData = false;
-        private selectedSeason: SeriesSeason = null;
-        private selectedEpisode: SeriesEpisode['key'] = null;
-        private loadingEpisode: string = null;
-        private loadingSeason: string = null;
+        private selectedSeasonKey: string = null;
+        private isEpisodeLoading = false;
 
-        private get isSeasonLoading(): boolean {
-            return Boolean(this.loadingSeason);
+        private get isSeriesLoading(): boolean {
+            return this.isLoading && !this.seriesData;
         }
 
-        private get isEpisodeLoading(): boolean {
-            return Boolean(this.loadingEpisode);
+        private get areEpisodesLoading(): boolean {
+            return this.isLoading && !this.episodes.length && Boolean(this.selectedSeasonKey);
         }
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
-        }
-
-        public mounted(): void {
-            this.setSelectedEpisode();
         }
 
         public destroyed(): void {
@@ -137,29 +129,35 @@
         @Watch('seriesMetaInfo', { immediate: true })
         public async loadSeriesData(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
             if (seriesMetaInfo) {
-                this.loadingSeriesData = true;
-                this.seriesData = null;
-                this.episodes = [];
+                this.resetData();
+
+                this.fetchSeriesDataFromStore(seriesMetaInfo.key);
+                this.fetchSeasonsFromStore(seriesMetaInfo.key);
+
                 const message = createGetSeriesInformationFromPortalMessage(seriesMetaInfo);
-                this.seriesData = await this.messageService.sendMessageToBackground(message);
-                this.seasons = this.store.selectSync(getSeriesSeasonsByKeys, this.seriesData.seasons);
-                this.loadingSeriesData = false;
+                fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
+                    takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
+                ).subscribe(() => {
+                    this.isLoading = false;
+                });
             }
         }
 
-        public async seasonClicked(season: SeriesSeason): Promise<void> {
-            if (season.key !== this.selectedSeason?.key) {
-                this.loadingEpisodeData = true;
-
-                this.selectedSeason = season;
+        public async seasonClicked(seasonKey: SeriesSeason['key']): Promise<void> {
+            if (seasonKey !== this.selectedSeasonKey) {
+                this.isLoading = true;
+                this.seasonChanged$.next();
+                this.selectedSeasonKey = seasonKey;
                 this.episodes = [];
-                this.loadingSeason = season.key;
 
-                const message = createGetSeriesEpisodesForSeasonMessage(this.selectedProtal, season.key);
-                this.episodes = await this.messageService.sendMessageToBackground(message);
-                this.loadingSeason = null;
+                this.fetchSeriesEpisodesFromStore(seasonKey);
 
-                this.loadingEpisodeData = false;
+                const message = createGetSeriesEpisodesForSeasonMessage(this.selectedProtal, seasonKey);
+                fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
+                    takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
+                ).subscribe(() => {
+                    this.isLoading = null;
+                });
             }
         }
 
@@ -167,25 +165,49 @@
             if (this.isEpisodeLoading) {
                 return;
             }
-            this.loadingEpisode = episode.key;
+            this.isEpisodeLoading = true;
 
             await this.messageService.sendMessageToBackground(createStartEpisodeMessage(episode.key, this.selectedProtal));
 
-            this.loadingEpisode = null;
+            this.isEpisodeLoading = true;
         }
 
-        private setSelectedEpisode(): void {
-            this.store.select(getActiveEpisode).pipe(
-                takeUntil(this.takeUntil$),
-            ).subscribe(activeEpisode => this.selectedEpisode = activeEpisode);
+        private isSeasonSelected(seasonKey: SeriesSeason['key']): boolean {
+            return this.selectedSeasonKey === seasonKey;
         }
 
-        private isSeasonSelected(season: SeriesSeason): boolean {
-            return this.selectedSeason?.key === season.key;
+        private isSeasonLoading(seasonKey: SeriesSeason['key']): boolean {
+            return this.isLoading
+                && this.selectedSeasonKey === seasonKey
+                && !this.episodes.length;
         }
 
-        private isEpisodeSelected(episode: SeriesEpisode): boolean {
-            return this.selectedEpisode === episode.key;
+        private resetData(): void {
+            this.seasonChanged$.next();
+            this.seriesData = null;
+            this.selectedSeasonKey = null;
+            this.isEpisodeLoading = false;
+            this.isLoading = false;
+            this.seasons = [];
+            this.episodes = [];
+        }
+
+        private fetchSeriesDataFromStore(seriesKey: Series['key']): void {
+            this.store.selectBehaviour(getSeriesByKey, seriesKey).pipe(
+                takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
+            ).subscribe(series => this.seriesData = series);
+        }
+
+        private fetchSeasonsFromStore(seriesKey: Series['key']): void {
+            this.store.selectBehaviour(getSeasonsForSeries, seriesKey).pipe(
+                takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
+            ).subscribe(seasons => this.seasons = seasons);
+        }
+
+        private fetchSeriesEpisodesFromStore(seriesSeasonKey: SeriesSeason['key']): void {
+            this.store.selectBehaviour(getSeriesEpisodesForSeason, seriesSeasonKey).pipe(
+                takeUntil(merge(this.seasonChanged$, this.seriesChanged$, this.takeUntil$)),
+            ).subscribe(episodes => this.episodes = episodes);
         }
     }
 </script>

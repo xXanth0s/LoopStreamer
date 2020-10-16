@@ -6,11 +6,13 @@ import { getKeyForSeriesSeason } from '../utils/key.utils';
 
 export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
-export const getSeriesSeasonsByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => keys.map(key => getSeriesSeasonByKey(state, key));
+export const getSeasonsForSeries = (state: StateModel, seriesKey: SeriesSeason['seriesKey']): SeriesSeason[] => {
+    return Object.values(state.seriesSeasons).filter(season => season.seriesKey === seriesKey);
+};
 
 export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): SeriesSeason => {
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
     const seasonKey = getKeyForSeriesSeason(episode.seriesKey, episode.season);
 
-    return getSeriesSeasonByKey(state, seasonKey)
-}
+    return getSeriesSeasonByKey(state, seasonKey);
+};

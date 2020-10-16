@@ -5,6 +5,7 @@ import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { IStoreService } from './store.service.interface';
 import { ActionCreatorWithOptionalPayload } from '@reduxjs/toolkit';
 import { StateModel } from '../../store/models/state.model';
+import { setActiveEpisodeAction } from '../../store/reducers/control-state.reducer';
 
 type SelectorArguments<T, P> = P extends (state: T, ...args: infer A) => any ? A : never;
 
@@ -31,7 +32,7 @@ export class StoreService {
     }
 
     public selectBehaviour<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
-        const subject = new BehaviorSubject<P>(selector(this.store.getState()));
+        const subject = new BehaviorSubject<P>(selector(this.store.getState(), ...args));
         return this.selectHelper(subject, selector, ...args);
     }
 
@@ -58,6 +59,11 @@ export class StoreService {
     }
 
     public stopPlayer(): void {
-        this.playerHasStopped$.next()
+        console.log('player stopped');
+        this.playerHasStopped$.next();
+    }
+
+    public resetControlState(): void {
+        this.dispatch(setActiveEpisodeAction(null));
     }
 }

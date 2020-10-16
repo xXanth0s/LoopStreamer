@@ -14,12 +14,15 @@ import * as path from 'path';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { ElectronBlocker } from '@cliqz/adblocker-electron';
 import fetch from 'cross-fetch';
+import { fromEvent } from 'rxjs';
+import { first } from 'rxjs/operators';
+import { getWindowStateForWindowId } from '../../store/selectors/control-state.selector';
 
 
 export type OpenWindowConfig = {
     nodeIntegration?: boolean;
     visible?: boolean;
-    httpReferrer?:  string| Referrer;
+    httpReferrer?: string | Referrer;
     fullscreen?: boolean;
 
     // load script to website with LoopStreamer functionality,
@@ -92,6 +95,7 @@ export class WindowService {
         const session = window.webContents.session;
         window.removeMenu();
         this.hideNewWindows(window);
+        this.stopPlayerWhenActiveWindowClosed(window);
         this.manipulateSession(session);
         this.addAdblockerForSession(session);
     }
@@ -122,8 +126,20 @@ export class WindowService {
             // set user agent for recaptcha
             details.requestHeaders['User-Agent'] = this.userAgent;
 
-            callback({cancel: false, requestHeaders: details.requestHeaders});
+            callback({ cancel: false, requestHeaders: details.requestHeaders });
         })
+    }
+
+    private stopPlayerWhenActiveWindowClosed(window: BrowserWindow): void {
+        fromEvent(window, 'close').pipe(
+            first()
+        ).subscribe(() => {
+            const windowState = this.store.selectSync(getWindowStateForWindowId, window.id);
+            if (windowState) {
+                this.store.stopPlayer();
+                this.store.resetControlState();
+            }
+        });
     }
 
     private getConfig(config: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {

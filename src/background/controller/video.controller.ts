@@ -18,6 +18,7 @@ import { BrowserWindow } from 'electron';
 import Providor from '../../store/models/providor.model';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
+import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 
 @injectable()
 export class VideoController {
@@ -31,8 +32,10 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesEpisode: SeriesEpisode, providorKey: PROVIDORS): Promise<boolean> {
+    public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorKey: PROVIDORS): Promise<boolean> {
         this.reset();
+
+        const seriesEpisode = this.store.selectSync(getSeriesEpisodeByKey, seriesEpisodeKey);
         const providor = this.store.selectSync(getProvidorForKey, providorKey);
         const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
 
@@ -41,14 +44,14 @@ export class VideoController {
                 takeUntil(this.takeUntil$),
                 takeUntil(this.store.playerHasStopped()),
             ).subscribe(async window => {
-                const hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisode.key, providorKey));
-                if(hasVideo) {
-                    this.store.dispatch(setLastWatchedSeriesAction(seriesEpisode.seriesKey));
+                const hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorKey));
+                if (hasVideo) {
+                    this.store.dispatch(setLastWatchedSeriesAction(seriesEpisodeKey));
                     window.show();
                 }
 
                 resolve(hasVideo);
-            })
+            });
         })
 
     }
@@ -56,8 +59,8 @@ export class VideoController {
     public reset(): void {
         const videoWindowId = this.store.selectSync(getVideoWindowId);
         if (videoWindowId) {
-            this.windowService.closeWindow(videoWindowId);
             this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
+            this.windowService.closeWindow(videoWindowId);
         }
     }
 
