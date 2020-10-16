@@ -7,9 +7,9 @@ import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     GetAllSeriesFromPortalMessage,
+    GetDetailedSeriesInformationMessage,
     GetEpisodesForSeasonMessage,
-    GetProvidorLinkForEpisode,
-    GetSeriesInformationMessage
+    GetProvidorLinkForEpisode
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
@@ -42,9 +42,9 @@ export class RootContentController {
             this.getAllSeriesFromPortalHandler(event, message);
         });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION, (event, message: GetSeriesInformationMessage) => {
+        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION, (event, message: GetDetailedSeriesInformationMessage) => {
             console.log(message);
-            this.getSeriesMetaInformationHandler(event, message);
+            this.getDetailedSeriesInformationHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_EPISODES_FOR_SEASON, (event, message: GetEpisodesForSeasonMessage) => {
@@ -70,7 +70,7 @@ export class RootContentController {
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
-    private async getSeriesMetaInformationHandler(event: IpcRendererEvent, message: GetSeriesInformationMessage): Promise<void> {
+    private async getDetailedSeriesInformationHandler(event: IpcRendererEvent, message: GetDetailedSeriesInformationMessage): Promise<void> {
         const seriesInfo = await this.portalService.getPortalController()?.getSeriesMetaInformation();
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }

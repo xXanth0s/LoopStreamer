@@ -25,9 +25,9 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
     };
 }
 
-export function mapsSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
-    const { title, posterHref, description } = seriesInfo;
 
+export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
+    const { title, posterHref, description, portal, link } = seriesInfo;
     const key = getKeyForSeriesTitle(seriesInfo.title);
 
     return {
@@ -35,6 +35,7 @@ export function mapsSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
         title,
         posterHref,
         description,
+        portalLinks: { [portal]: link },
     };
 }
 

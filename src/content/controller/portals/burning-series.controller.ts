@@ -4,7 +4,6 @@ import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
 import { ProvidorService } from '../../services/providor.service';
 import { simulateEvent } from '../../ustils/simulate-event';
 import Providor from '../../../store/models/providor.model';
-import { SeriesMetaInfoDto } from '../../../dto/series-meta-info.dto';
 import { PORTALS } from '../../../store/enums/portals.enum';
 import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
@@ -47,7 +46,7 @@ export class BurningSeriesController implements IPortalController {
         return null;
     }
 
-    public getAllSeriesInfo(): SeriesMetaInfoDto[] {
+    public getAllSeriesInfo(): SeriesInfoDto[] {
         const links = this.seriesOverviewListLinkSelector();
         const collection = [ ...links ];
         return collection.map((linkInfo: HTMLAnchorElement) => {

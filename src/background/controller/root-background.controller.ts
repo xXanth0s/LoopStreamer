@@ -10,13 +10,13 @@ import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     CloseWindowMessage,
-    GetAllAvailableSeriesFromPortalMessage,
-    GetSeriesEpisodesForSeasonMessage,
-    GetSeriesInformationFromPortalMessage,
     MinimizeWindowMessage,
     OpenNextVideoMessage,
     OpenPreviousVideoMessage,
+    PortalSelectedInAppMessage,
     RecaptchaRecognizedMessage,
+    SeriesSeasonSelectedInAppMessage,
+    SeriesSelectedInAppMessage,
     StartEpisodeMessage,
     StartSeriesMessage,
     ToggleFullscreenModeMessage,
@@ -34,9 +34,7 @@ import {
 import { OpenWindowConfig, WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { SeriesService } from '../../shared/services/series.service';
-import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import {
     getNextEpisode,
@@ -129,19 +127,19 @@ export class RootBackgroundController {
             }
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
+        ipcMain.handle(MessageType.BACKGROUND_PORTAL_SELECTED_IN_APP,
             // async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
-            (event, message: GetAllAvailableSeriesFromPortalMessage) => {
-                return this.getAllVideosFromPortalHandler(message);
+            (event, message: PortalSelectedInAppMessage) => {
+                return this.loadAllVideosFromPortalHandler(message);
             });
 
-        ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_INFORMATION,
-            async (event, message: GetSeriesInformationFromPortalMessage): Promise<Series> => {
-                return this.getSeriesInformationFromPortalHandler(message);
+        ipcMain.handle(MessageType.BACKGROUND_SERIES_SELECTED_IN_APP,
+            async (event, message: SeriesSelectedInAppMessage): Promise<void> => {
+                return this.loadSeriesInformationFromPortalHandler(message);
             });
 
-        ipcMain.handle(MessageType.BACKGROUND_GET_SERIES_EPISODES_FOR_SEASON,
-            async (event, message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> => {
+        ipcMain.handle(MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
+            async (event, message: SeriesSeasonSelectedInAppMessage): Promise<SeriesEpisode[]> => {
                 console.log(message);
                 return this.getSeriesEpisodeForSeasonHandler(message);
             });
@@ -206,24 +204,23 @@ export class RootBackgroundController {
         const seriesEpisode = this.store.selectSync(getSeriesEpisodeByKey, series?.lastEpisodeWatched);
 
         // TO-DO replace hardcoded Vivo with last used Providor
-        this.videoController.startVideo(seriesEpisode, PROVIDORS.Vivo);
+        this.videoController.startVideo(seriesEpisode.key, PROVIDORS.Vivo);
     }
 
-    private async getAllVideosFromPortalHandler({ payload }: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> {
-        return this.portalController.getAllSeriesFromPortal(payload);
+    private async loadAllVideosFromPortalHandler({ payload }: PortalSelectedInAppMessage): Promise<void> {
+        const multipleSeriesMetaInfo = await this.portalController.getAllSeriesFromPortal(payload);
+        this.seriesService.addMultipleSeriesToStore(multipleSeriesMetaInfo);
     }
 
-    private async getSeriesInformationFromPortalHandler({ payload }: GetSeriesInformationFromPortalMessage): Promise<Series> {
-        console.log('getSeriesInformationFromPortalHandler', payload);
-        const seriesInfo = await this.portalController.getSeriesInformation(payload);
-        return this.seriesService.addSeriesToStore(seriesInfo);
+    private async loadSeriesInformationFromPortalHandler({ payload }: SeriesSelectedInAppMessage): Promise<void> {
+        const seriesInfo = await this.portalController.getDetailedSeriesInformation(payload.seriesKey, payload.portal);
+        this.seriesService.addSeriesToStore(seriesInfo);
     }
 
-    private async getSeriesEpisodeForSeasonHandler(message: GetSeriesEpisodesForSeasonMessage): Promise<SeriesEpisode[]> {
+    private async getSeriesEpisodeForSeasonHandler(message: SeriesSeasonSelectedInAppMessage): Promise<void> {
         const { portal, seriesSeasonKey } = message.payload;
 
         const episodeDtos = await this.portalController.getEpisodesForSeason(seriesSeasonKey, portal);
-        console.log(episodeDtos);
         return this.seriesService.addSeriesEpisodesToStore(episodeDtos);
     }
 

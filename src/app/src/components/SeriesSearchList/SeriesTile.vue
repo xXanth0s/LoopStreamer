@@ -23,7 +23,7 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { isSeriesExpandedOnOptionsPage } from '../../../../store/selectors/control-state.selector';
     import SeriesDetailView from './SeriesDetailView.vue';
-    import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
+    import Series from '../../../../store/models/series.model';
 
     @Component({
         name: 'series-tile',
@@ -35,7 +35,7 @@
         private readonly takeUntil$ = new Subject();
 
         @Prop(Object)
-        private series: SeriesMetaViewModel;
+        private series: Series;
 
         private isSelected = false;
         private store: StoreService;
@@ -49,8 +49,8 @@
         }
 
         @Emit()
-        public tileClicked(): SeriesMetaViewModel {
-            return this.series;
+        public tileClicked(): Series['key'] {
+            return this.series.key;
         }
 
         public mounted(): void {

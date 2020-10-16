@@ -17,25 +17,27 @@
                     Bitte Portal auswählen, auf dem nach Serien gesucht werden soll
                 </div>
             </div>
-            <div class="spinner text-center pt-3" v-if="showSpinner">
-                <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-            <div v-if="selectedPortal && !showSpinner">
-                <div class="row">
-                    <div class="col">
-                        <b-form-input v-model="searchText" placeholder="Nach Serie suchen"></b-form-input>
+            <div v-else>
+                <div class="spinner text-center pt-3" v-if="showSpinner">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
+                <div v-else>
+                    <div class="row">
+                        <div class="col">
+                            <b-form-input v-model="searchText" placeholder="Nach Serie suchen"></b-form-input>
+                        </div>
+                    </div>
 
-                <series-list-row
-                        class="px-3"
-                        v-for="seriesChunk in filteredSeries"
-                        :key="seriesChunk[0].title"
-                        :series-list="seriesChunk"
-                        :selected-protal="selectedPortal">
-                </series-list-row>
+                    <series-list-row
+                            class="px-3"
+                            v-for="seriesChunk in filteredSeries"
+                            :key="seriesChunk[0].title"
+                            :series-list="seriesChunk"
+                            :selected-protal="selectedPortal">
+                    </series-list-row>
+                </div>
             </div>
         </div>
     </div>
@@ -45,6 +47,8 @@
     import { Watch } from 'vue-property-decorator';
     import Vue from 'vue';
     import Component from 'vue-class-component';
+    import { takeUntil } from 'rxjs/operators';
+    import { merge, Subject } from 'rxjs';
     import Portal from '../../../store/models/portal.model';
     import { optionsContainer } from '../container/container';
     import { StoreService } from '../../../shared/services/store.service';
@@ -52,12 +56,12 @@
     import { getAllPortals } from '../../../store/selectors/portals.selector';
     import { MessageService } from '../../../shared/services/message.service';
     import { PORTALS } from '../../../store/enums/portals.enum';
-    import { createGetAllAvailableSeriesFromPortalMessage } from '../../../browserMessages/messages/background.messages';
-    import { SeriesMetaInfoDto } from '../../../dto/series-meta-info.dto';
+    import { createPortalSelectedInAppMessage } from '../../../browserMessages/messages/background.messages';
     import SeriesTile from '../components/SeriesSearchList/SeriesTile.vue';
-    import { SeriesMetaViewModel } from '../models/series-meta-view.model';
-    import { getKeyForSeriesTitle } from '../../../store/utils/key.utils';
     import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
+    import { getSeriesForPortal } from '../../../store/selectors/series.selector';
+    import Series from '../../../store/models/series.model';
+    import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
 
     @Component({
         name: 'welcome-page',
@@ -68,15 +72,23 @@
     })
     export default class WelcomePage extends Vue {
         private readonly seriesTilesPerRow = 3;
+        private readonly takeUntil$ = new Subject();
+        private readonly portalChanged$ = new Subject();
 
         private store: StoreService;
         private messageService: MessageService;
+
         private portals: Portal[] = [];
-        private filteredSeries: SeriesMetaInfoDto[][] = [];
+        private filteredSeries: Series[][] = [];
+        private series: Series[];
+
         private selectedPortal: PORTALS = null;
-        private series: SeriesMetaViewModel[];
-        private showSpinner = false;
+        private isLoading = false;
         private searchText = '';
+
+        public get showSpinner(): boolean {
+            return !this.series.length && this.isLoading;
+        }
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
@@ -88,43 +100,43 @@
         }
 
         @Watch('selectedPortal')
-        public async loadSeries(): Promise<void> {
-            const message = createGetAllAvailableSeriesFromPortalMessage(this.selectedPortal);
-            this.showSpinner = true;
-            try {
-                const seriesResult = await this.messageService.sendMessageToBackground(message);
-                // const seriesResult = allSeriesMock as SeriesMetaInfoDto[];
-                this.series = seriesResult.map(metaInfo => ({
-                    ...metaInfo,
-                    key: getKeyForSeriesTitle(metaInfo.title),
-                })).sort((a, b) => a.title.localeCompare(b.title));
+        public async loadSeries(portal: PORTALS): Promise<void> {
+            this.series = [];
+            this.portalChanged$.next();
+            this.loadSeriesFromStoreForPortal(portal);
+            this.isLoading = true;
 
-                this.filteredSeries = this.convertSeriesToChunks(this.series).slice(0, 100);
+            const message = createPortalSelectedInAppMessage(this.selectedPortal);
+            try {
+                await this.messageService.sendMessageToBackground(message);
             } catch (e) {
                 console.error('Error occured, while loading all seires', e);
             } finally {
-                this.showSpinner = false;
+                this.isLoading = false;
             }
         }
 
         @Watch('searchText')
-        public searchChanged(): void {
-            const sortedArrays = this.series.filter(serie => serie.title.toLowerCase().includes(this.searchText.toLowerCase()));
-            this.filteredSeries = this.convertSeriesToChunks(sortedArrays).slice(0, 100);
+        public filterSeries(): void {
+            let filteredSeries: Series[];
+            if (this.searchText) {
+                filteredSeries = this.series.filter(serie => serie.title.toLowerCase().includes(this.searchText.toLowerCase()));
+            } else {
+                filteredSeries = this.series;
+            }
+
+            const sortedArray = sortArrayForKey(filteredSeries, (val: Series) => val.title.toLowerCase());
+
+            this.filteredSeries = convertArrayToChunks(sortedArray, this.seriesTilesPerRow).slice(0, 100);
         }
 
-        private convertSeriesToChunks(series: SeriesMetaViewModel[]): SeriesMetaViewModel[][] {
-            const result = [];
-            series.forEach((value, currentIndex) => {
-                const index = Math.floor(currentIndex / this.seriesTilesPerRow);
-                const previous = result[index] || [];
-                result[index] = [
-                    ...previous,
-                    value,
-                ];
+        private loadSeriesFromStoreForPortal(portal: PORTALS): void {
+            this.store.selectBehaviour(getSeriesForPortal, portal).pipe(
+                takeUntil(merge(this.takeUntil$, this.portalChanged$)),
+            ).subscribe(series => {
+                this.series = series;
+                this.filterSeries();
             });
-
-            return result;
         }
     }
 

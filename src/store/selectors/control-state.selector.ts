@@ -24,7 +24,7 @@ export const getVideoWindowId = (state: StateModel): number => state.controlStat
 export const getAppWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.APP]?.windowId;
 
 export const getWindowStateForWindowId = (state: StateModel, windowId: BrowserWindowStateModel['windowId']) => {
-    return Object.values(state.controlState.controllerWindowState).find(windowState => windowState.windowId === windowId);
+    return Object.values(state.controlState.controllerWindowState).find(windowState => windowState?.windowId === windowId);
 };
 
 export const isVideoFullScreen = (state: StateModel): boolean => state.controlState.currentWindowState === 'fullscreen';

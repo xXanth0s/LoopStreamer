@@ -67,12 +67,11 @@
     import { SeriesSeason } from '../../../../store/models/series-season.model';
     import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
     import {
-        createGetSeriesEpisodesForSeasonMessage,
-        createGetSeriesInformationFromPortalMessage,
+        createSeriesSeasonSelectedInAppMessage,
+        createSeriesSelectedInAppMessage,
         createStartEpisodeMessage,
     } from '../../../../browserMessages/messages/background.messages';
     import { PORTALS } from '../../../../store/enums/portals.enum';
-    import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getSeriesByKey } from '../../../../store/selectors/series.selector';
@@ -90,8 +89,8 @@
         private readonly seasonChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();
 
-        @Prop(Object)
-        private seriesMetaInfo: SeriesMetaViewModel;
+        @Prop(String)
+        private seriesKey: Series['key'];
 
         @Prop(Boolean)
         private isExpanded: boolean;
@@ -110,7 +109,9 @@
         private isEpisodeLoading = false;
 
         private get isSeriesLoading(): boolean {
-            return this.isLoading && !this.seriesData;
+            return this.isLoading
+                && !(Boolean(this.seriesData?.description)
+                    && Boolean(this.seriesData?.posterHref));
         }
 
         private get areEpisodesLoading(): boolean {
@@ -126,15 +127,16 @@
             this.takeUntil$.next();
         }
 
-        @Watch('seriesMetaInfo', { immediate: true })
-        public async loadSeriesData(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
-            if (seriesMetaInfo) {
+        @Watch('seriesKey')
+        public async loadSeriesData(seriesKey: Series['key']): Promise<void> {
+            if (seriesKey) {
                 this.resetData();
+                this.isLoading = true;
 
-                this.fetchSeriesDataFromStore(seriesMetaInfo.key);
-                this.fetchSeasonsFromStore(seriesMetaInfo.key);
+                this.fetchSeriesDataFromStore(seriesKey);
+                this.fetchSeasonsFromStore(seriesKey);
 
-                const message = createGetSeriesInformationFromPortalMessage(seriesMetaInfo);
+                const message = createSeriesSelectedInAppMessage(seriesKey, this.selectedProtal);
                 fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
                     takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
                 ).subscribe(() => {
@@ -152,7 +154,7 @@
 
                 this.fetchSeriesEpisodesFromStore(seasonKey);
 
-                const message = createGetSeriesEpisodesForSeasonMessage(this.selectedProtal, seasonKey);
+                const message = createSeriesSeasonSelectedInAppMessage(seasonKey, this.selectedProtal);
                 fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
                     takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
                 ).subscribe(() => {

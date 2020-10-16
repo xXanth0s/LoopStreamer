@@ -42,15 +42,23 @@ const setEndTimeForSeries = (state: { [key: string]: Series }, key: Series['key'
     return state;
 };
 
-function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): { [key: string]: Series } {
-    return {
-        ...state,
-        [seriesInfo.key]: {
-            ...state[seriesInfo.key],
-            ...seriesInfo,
+function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): void {
+    const { key, portalLinks } = seriesInfo;
 
+    state[key] = {
+        ...state[key],
+        ...seriesInfo,
+        portalLinks: {
+            ...state[key]?.portalLinks,
+            ...portalLinks,
         }
     };
+}
+
+function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos: Series[]): void {
+    for (const series of seriesInfos) {
+        updateOrAddSeries(state, series);
+    }
 }
 
 const seriesSlice = createSlice({
@@ -62,6 +70,7 @@ const seriesSlice = createSlice({
         setEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key'], scipEndTime?: Series['scipStartTime'] }>) => setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
         resetSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => resetSeries(state, action.payload),
         updateOrAddSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series>) => updateOrAddSeries(state, action.payload),
+        updateOrAddMultipleSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series[]>) => updateOrAddMultipleSeries(state, action.payload),
     }
 });
 
@@ -70,7 +79,8 @@ export const {
     resetSeriesAction,
     setStartTimeForSeriesAction,
     setEndTimeForSeriesAction,
-    updateOrAddSeriesAction
+    updateOrAddSeriesAction,
+    updateOrAddMultipleSeriesAction
 } = seriesSlice.actions;
 
 export default seriesSlice;

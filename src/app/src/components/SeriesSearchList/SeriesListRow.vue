@@ -5,12 +5,12 @@
                          v-for="series in seriesList"
                          v-bind:key="series.key"
                          v-bind:series="series"
-                         @tile-clicked="seasonSelected">
+                         @tile-clicked="seriesSelected">
             </series-tile>
         </div>
         <div class="row">
             <series-detail-view
-                    :seriesMetaInfo="openSeries"
+                    :series-key="openSeriesKey"
                     :isExpanded="isAnySeriesSelected"
                     :selected-protal="selectedProtal"
                     class="col">
@@ -30,11 +30,11 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
     import { setExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
-    import { SeriesMetaViewModel } from '../../models/series-meta-view.model';
     import SeriesTile from './SeriesTile.vue';
     import { isAnySeriesExpandedOnOptionsPage } from '../../../../store/selectors/control-state.selector';
     import SeriesDetailView from './SeriesDetailView.vue';
     import { PORTALS } from '../../../../store/enums/portals.enum';
+    import Series from '../../../../store/models/series.model';
 
     @Component({
         name: 'series-list-row',
@@ -47,12 +47,12 @@
         private readonly takeUntil$ = new Subject();
 
         @Prop(Array)
-        private seriesList: SeriesMetaViewModel[];
+        private seriesList: Series[];
 
         @Prop(String)
         private selectedProtal: PORTALS;
 
-        private openSeries: SeriesMetaViewModel = null;
+        private openSeriesKey: Series['key'] = null;
         private isAnySeriesSelected = false;
         private messageService: MessageService;
         private store: StoreService;
@@ -66,23 +66,19 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        public test() {
-            console.log('test');
-        }
-
-        public async seasonSelected(seriesMetaInfo: SeriesMetaViewModel): Promise<void> {
-            this.store.dispatch(setExpandedSeriesOptionsPageAction(seriesMetaInfo.key));
-            this.openSeries = seriesMetaInfo;
+        public async seriesSelected(seriesKey: Series['key']): Promise<void> {
+            this.store.dispatch(setExpandedSeriesOptionsPageAction(seriesKey));
+            this.openSeriesKey = seriesKey;
         }
 
         @Watch('seriesList', { immediate: true })
-        public initializeSeriesList(seriesList: SeriesMetaViewModel[]): void {
+        public initializeSeriesList(seriesList: Series[]): void {
             const keys = seriesList.map(series => series.key);
             this.store.select(isAnySeriesExpandedOnOptionsPage, keys).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isAnySeriesSelected => {
                 if (!isAnySeriesSelected) {
-                    this.openSeries = null;
+                    this.openSeriesKey = null;
                 }
                 this.isAnySeriesSelected = isAnySeriesSelected;
             });

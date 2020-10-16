@@ -3,7 +3,6 @@ import { Message } from './message.interface';
 import { ControllerType } from '../enum/controller.type';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import Series from '../../store/models/series.model';
-import { SeriesMetaInfoDto } from '../../dto/series-meta-info.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 
@@ -58,26 +57,29 @@ export const createContinueSeriesMessage = (seriesKey: Series['key']): Message<S
 export type StartSeriesMessage = ReturnType<typeof createContinueSeriesMessage>;
 
 
-export const createGetAllAvailableSeriesFromPortalMessage = (portal: PORTALS): Message<PORTALS, SeriesMetaInfoDto[]> => ({
-    type: MessageType.BACKGROUND_GET_ALL_SERIES_FROM_PORTAL,
+export const createPortalSelectedInAppMessage = (portal: PORTALS): Message<PORTALS> => ({
+    type: MessageType.BACKGROUND_PORTAL_SELECTED_IN_APP,
     destinationController: ControllerType.BACKGROUND,
     hasReply: true,
     payload: portal
 });
-export type GetAllAvailableSeriesFromPortalMessage = ReturnType<typeof createGetAllAvailableSeriesFromPortalMessage>;
+export type PortalSelectedInAppMessage = ReturnType<typeof createPortalSelectedInAppMessage>;
 
 
-export const createGetSeriesInformationFromPortalMessage = (seriesMetaInfoDto: SeriesMetaInfoDto): Message<SeriesMetaInfoDto, Series> => ({
-    type: MessageType.BACKGROUND_GET_SERIES_INFORMATION,
+export const createSeriesSelectedInAppMessage = (seriesKey: Series['key'], portal: PORTALS): Message<{ seriesKey: Series['key'], portal: PORTALS }> => ({
+    type: MessageType.BACKGROUND_SERIES_SELECTED_IN_APP,
     destinationController: ControllerType.BACKGROUND,
     hasReply: true,
-    payload: seriesMetaInfoDto
+    payload: {
+        seriesKey,
+        portal
+    }
 });
-export type GetSeriesInformationFromPortalMessage = ReturnType<typeof createGetSeriesInformationFromPortalMessage>;
+export type SeriesSelectedInAppMessage = ReturnType<typeof createSeriesSelectedInAppMessage>;
 
 
-export const createGetSeriesEpisodesForSeasonMessage = (portal: PORTALS, seriesSeasonKey: string) : Message<{portal: PORTALS, seriesSeasonKey: string}, SeriesEpisode[]> => ({
-    type: MessageType.BACKGROUND_GET_SERIES_EPISODES_FOR_SEASON,
+export const createSeriesSeasonSelectedInAppMessage = (seriesSeasonKey: string, portal: PORTALS): Message<{ seriesSeasonKey: string, portal: PORTALS }> => ({
+    type: MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
     destinationController: ControllerType.BACKGROUND,
     hasReply: true,
     payload: {
@@ -85,7 +87,7 @@ export const createGetSeriesEpisodesForSeasonMessage = (portal: PORTALS, seriesS
         seriesSeasonKey
     }
 });
-export type GetSeriesEpisodesForSeasonMessage = ReturnType<typeof createGetSeriesEpisodesForSeasonMessage>;
+export type SeriesSeasonSelectedInAppMessage = ReturnType<typeof createSeriesSeasonSelectedInAppMessage>;
 
 
 export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], portal: PORTALS) : Message<{episodeKey: SeriesEpisode['key'], portal: PORTALS}, boolean> => ({

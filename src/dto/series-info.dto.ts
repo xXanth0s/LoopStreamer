@@ -1,8 +1,11 @@
-import { SeriesMetaInfoDto } from './series-meta-info.dto';
+import { PORTALS } from '../store/enums/portals.enum';
 
-export interface SeriesInfoDto extends SeriesMetaInfoDto {
-    posterHref: string;
-    description: string;
-    seasonsLinks: { [key: number]: string };
+export interface SeriesInfoDto {
+    title: string;
+    link: string;
+    portal: PORTALS
+    posterHref?: string;
+    description?: string;
+    seasonsLinks?: { [key: number]: string };
 
 }

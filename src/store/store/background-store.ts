@@ -40,7 +40,7 @@ const backgroundStore = configureStore<StateModel>({
     // enhancers: [
     //     composeEnhancers.apply(BrowserStorageMiddlerware)
     // ]
-    preloadedState
+    // preloadedState
 });
 
 

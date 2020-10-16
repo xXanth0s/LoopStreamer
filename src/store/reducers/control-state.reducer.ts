@@ -13,9 +13,7 @@ const initialControlState: StateModel['controlState'] = {
     activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
     loopStreamerStatus: LoopStreamerStatus.PLAYING,
-    controllerWindowState: {
-        [WindowType.VIDEO]: null
-    }
+    controllerWindowState: {}
 };
 
 const updateControlState = function (state: ControlState, newControlState: Partial<ControlState>): ControlState {
