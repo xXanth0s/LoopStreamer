@@ -3,7 +3,7 @@ import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
-import { getActivePortalTabId } from '../../store/selectors/portals.selector';
+import { getActivePortalWindowId } from '../../store/selectors/portals.selector';
 import { getVideoWindowId } from '../../store/selectors/control-state.selector';
 import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
 
@@ -20,7 +20,7 @@ export class MessageService {
     }
 
     public async sendMessageToPortalTab<T, R>(message: Message<T, R>): Promise<R> {
-        const portalTabId: number = this.storeService.selectSync(getActivePortalTabId);
+        const portalTabId: number = this.storeService.selectSync(getActivePortalWindowId);
         if (portalTabId) {
             return this.sendMessageToBrowserWindow(portalTabId, message);
         }

@@ -8,7 +8,7 @@ export default interface Series {
     lastEpisodeWatched?: SeriesEpisode['key'];
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
-    posterHref: string;
+    posterHref?: string;
     portalLinks: Partial<{
         [key in PORTALS]: string
     }>,

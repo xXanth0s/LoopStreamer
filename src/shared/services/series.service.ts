@@ -3,9 +3,9 @@ import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { updateOrAddMultipleSeriesAction, updateOrAddSeriesAction } from '../../store/reducers/series.reducer';
-import { updateOrAddSeriesSeasonAction } from '../../store/reducers/series-season.reducer';
+import { updateOrAddMutlipleSeriesSeasonAction } from '../../store/reducers/series-season.reducer';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
-import { updateOrAddSeriesEpisodeAction } from '../../store/reducers/series-episode.reducer';
+import { updateOrAddMultipleSeriesEpisodeAction } from '../../store/reducers/series-episode.reducer';
 import {
     mapSeriesEpisodeDtoToSeriesEpisode,
     mapSeriesInfoDtoToSeries,
@@ -30,13 +30,14 @@ export class SeriesService {
 
         if (seriesInfo.seasonsLinks) {
             const seriesSeasons = mapSeriesInfoDtoToSeriesSeasons(seriesInfo);
-            seriesSeasons.forEach(season => this.store.dispatch(updateOrAddSeriesSeasonAction(season)));
+
+            this.store.dispatch(updateOrAddMutlipleSeriesSeasonAction(seriesSeasons));
         }
     }
 
     public addSeriesEpisodesToStore(episodeDtos: SeriesEpisodeDto[]): void {
         const episodes = episodeDtos.map(mapSeriesEpisodeDtoToSeriesEpisode);
 
-        episodes.forEach(episode => this.store.dispatch(updateOrAddSeriesEpisodeAction(episode)));
+        this.store.dispatch(updateOrAddMultipleSeriesEpisodeAction(episodes));
     }
 }

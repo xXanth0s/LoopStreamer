@@ -23,4 +23,4 @@ export const getActivePortal = (state: StateModel): Portal | null => {
     return null;
 };
 
-export const getActivePortalTabId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.PORTAL]?.windowId
+export const getActivePortalWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.PORTAL]?.windowId;

@@ -29,12 +29,19 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
 export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
     const { title, posterHref, description, portal, link } = seriesInfo;
     const key = getKeyForSeriesTitle(seriesInfo.title);
+    if (posterHref || description) {
+        return {
+            key,
+            title,
+            posterHref,
+            description,
+            portalLinks: { [portal]: link },
+        };
+    }
 
     return {
         key,
         title,
-        posterHref,
-        description,
         portalLinks: { [portal]: link },
     };
 }

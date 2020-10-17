@@ -24,6 +24,10 @@ const updateOrAddSeriesEpisode = function (state: StateModel['seriesEpisodes'], 
     };
 };
 
+const updateOrAddMultipleSeriesEpisode = function (state: StateModel['seriesEpisodes'], seriesEpisodes: SeriesEpisode[]): void {
+    seriesEpisodes.forEach(episode => updateOrAddSeriesEpisode(state, episode));
+};
+
 
 function addProvidorLinkToEpisode(state: StateModel['seriesEpisodes'], { payload }: PayloadAction<{ episodeKey: string; providorLink: ProvidorLink }>) {
     const { episodeKey, providorLink } = payload;
@@ -68,6 +72,7 @@ const seriesEpisodesReducer = createSlice({
     initialState,
     reducers: {
         updateOrAddSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode>) => updateOrAddSeriesEpisode(state, action.payload),
+        updateOrAddMultipleSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode[]>) => updateOrAddMultipleSeriesEpisode(state, action.payload),
         addProvidorLinkToEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorLink: ProvidorLink }>) => addProvidorLinkToEpisode(state, action),
         setTimestampForSeriesEpisodeAction: (state: StateModel['seriesEpisodes'],
                                              action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) => setTimestamp(state, action.payload),
@@ -79,6 +84,7 @@ const seriesEpisodesReducer = createSlice({
 
 export const {
     updateOrAddSeriesEpisodeAction,
+    updateOrAddMultipleSeriesEpisodeAction,
     addProvidorLinkToEpisodeAction,
     seriesEpisodeFinishedAction,
     seriesEpisodeStartedAction,

@@ -3,14 +3,14 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { debounceTime, tap } from 'rxjs/operators';
+import { debounceTime, finalize, takeUntil, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
     createGetEpisodesForSeasonMessage,
     createGetProvidorLinkForEpisode
 } from '../../browserMessages/messages/portal.messages';
-import { getActivePortalTabId, getPortalForKey } from '../../store/selectors/portals.selector';
+import { getActivePortalWindowId, getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
 import { Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
@@ -76,9 +76,14 @@ export class PortalController {
     private openPortalUrl(url: string, portalKey: PORTALS): Observable<BrowserWindow> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
         return this.windowController.openLinkForWebsite(portal, url).pipe(
-            waitTillPageLoadFinished(),
+            takeUntil(this.store.playerHasStopped()),
             tap(window => this.setNewPortalWindow(window)),
+            waitTillPageLoadFinished(),
             debounceTime(1000),
+            finalize(() => {
+                const portalWindowId = this.store.selectSync(getActivePortalWindowId);
+                this.windowService.closeWindow(portalWindowId);
+            })
         );
     }
 
@@ -95,7 +100,7 @@ export class PortalController {
     }
 
     private setNewPortalWindow(newPortalWindow: Electron.BrowserWindow): void {
-        const oldWindowId = this.store.selectSync(getActivePortalTabId);
+        const oldWindowId = this.store.selectSync(getActivePortalWindowId);
         if(oldWindowId === newPortalWindow.id) {
             return;
         }

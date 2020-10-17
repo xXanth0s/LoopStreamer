@@ -5,21 +5,22 @@ import { SeriesSeason } from '../models/series-season.model';
 
 const initialState: StateModel['seriesSeasons'] = {};
 
-const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): StateModel['seriesSeasons'] {
+const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): void {
 
     const oldSeasonObject = state[seriesSeason.key];
 
-    return {
-        ...state,
-        [seriesSeason.key]: {
-            ...oldSeasonObject,
-            ...seriesSeason,
-            portalLinks: {
-                ...oldSeasonObject?.portalLinks,
-                ...seriesSeason.portalLinks,
-            }
+    state[seriesSeason.key] = {
+        ...oldSeasonObject,
+        ...seriesSeason,
+        portalLinks: {
+            ...oldSeasonObject?.portalLinks,
+            ...seriesSeason.portalLinks,
         }
     };
+};
+
+const updateOrAddMultipleSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeasons: SeriesSeason[]): void {
+    seriesSeasons.forEach(season => updateOrAddSeriesSeason(state, season));
 };
 
 const seriesSeasonsReducer = createSlice({
@@ -27,11 +28,13 @@ const seriesSeasonsReducer = createSlice({
     initialState,
     reducers: {
         updateOrAddSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason>) => updateOrAddSeriesSeason(state, action.payload),
+        updateOrAddMutlipleSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason[]>) => updateOrAddMultipleSeriesSeason(state, action.payload),
     },
 });
 
 export const {
-    updateOrAddSeriesSeasonAction
+    updateOrAddSeriesSeasonAction,
+    updateOrAddMutlipleSeriesSeasonAction
 } = seriesSeasonsReducer.actions;
 
 
