@@ -62,6 +62,7 @@
     import { getSeriesForPortal } from '../../../store/selectors/series.selector';
     import Series from '../../../store/models/series.model';
     import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
+    import { setExpandedSeriesOptionsPageAction } from '../../../store/reducers/control-state.reducer';
 
     @Component({
         name: 'welcome-page',
@@ -97,6 +98,7 @@
 
         public mounted(): void {
             this.portals = this.store.selectSync(getAllPortals);
+            this.store.dispatch(setExpandedSeriesOptionsPageAction(null));
         }
 
         @Watch('selectedPortal')

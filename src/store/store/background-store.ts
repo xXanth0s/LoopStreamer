@@ -10,15 +10,12 @@ import { controlStateSlice } from '../reducers/control-state.reducer';
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
-import * as fs from 'fs';
-import * as path from 'path';
+import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
 
-const pathToFile = path.resolve(__dirname, 'state.json');
-const jsonData = fs.readFileSync(pathToFile);
-const preloadedState: StateModel = JSON.parse(jsonData.toString());
+const preloadedState = getStorageData();
 
 const backgroundStore = configureStore<StateModel>({
     reducer: {
@@ -34,13 +31,14 @@ const backgroundStore = configureStore<StateModel>({
     // @ts-ignore
     middleware: [
         triggerAlias,
-        forwardToRenderer
+        forwardToRenderer,
+        StorageMiddlerware,
     ],
     devTools: true,
     // enhancers: [
     //     composeEnhancers.apply(BrowserStorageMiddlerware)
     // ]
-    // preloadedState
+    preloadedState
 });
 
 
