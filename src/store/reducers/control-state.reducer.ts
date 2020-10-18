@@ -7,13 +7,15 @@ import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
 import { StateModel } from '../models/state.model';
+import { AsyncInteraction } from '../models/async-interaction.model';
 
 const initialControlState: StateModel['controlState'] = {
     activePortal: PORTALS.BS,
     activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
     loopStreamerStatus: LoopStreamerStatus.PLAYING,
-    controllerWindowState: {}
+    controllerWindowState: {},
+    asyncInteractions: {},
 };
 
 const updateControlState = function (state: ControlState, newControlState: Partial<ControlState>): ControlState {
@@ -93,6 +95,14 @@ function setActiveEpisode(state: ControlState, activeEpsidoeKey: string) {
     state.activeEpisode = activeEpsidoeKey;
 }
 
+function addAsyncInteraction(state: ControlState, asyncInteraction: AsyncInteraction): void {
+    state.asyncInteractions[asyncInteraction.key] = asyncInteraction;
+}
+
+function removeAsyncInteraction(state: ControlState, key: string): void {
+    delete state.asyncInteractions[key];
+}
+
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -105,8 +115,10 @@ export const controlStateSlice = createSlice({
         toggleWindowStateAction: (state: ControlState) => toggleWindowState(state),
         setCurrentWindowStateAction: (state: ControlState, action: PayloadAction<ControlState['currentWindowState']>) => setCurrentWindowState(state, action.payload),
         setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) => setExpandedSeriesOptionsPage(state, action.payload),
-        setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{windowType: WindowType, windowId: number}>) => setWindowIdForWindowType(state, action.payload),
+        setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) => setWindowIdForWindowType(state, action.payload),
         setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) => setActiveEpisode(state, action.payload),
+        addAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction>) => addAsyncInteraction(state, action.payload),
+        removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction['key']>) => removeAsyncInteraction(state, action.payload),
     }
 });
 
@@ -119,5 +131,7 @@ export const {
     setCurrentWindowStateAction,
     setExpandedSeriesOptionsPageAction,
     setWindowIdForWindowTypeAction,
-    setActiveEpisodeAction
+    setActiveEpisodeAction,
+    addAsyncInteractionAction,
+    removeAsyncInteractionAction,
 } = controlStateSlice.actions;

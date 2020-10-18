@@ -5,6 +5,7 @@ import { Windows } from 'webextension-polyfill-ts';
 import Series from '../models/series.model';
 import { WindowType } from '../enums/window-type.enum';
 import { BrowserWindowStateModel } from '../models/browser-window-state.model';
+import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import WindowState = Windows.WindowState;
 
 export const getControlState = (state: StateModel): ControlState => state.controlState;
@@ -47,3 +48,7 @@ export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean 
 };
 
 export const getActiveEpisode = (state: StateModel): ControlState['activeEpisode'] => state.controlState.activeEpisode;
+
+export const hasAsyncInteractionForType = (state: StateModel, type: AsyncInteractionType): boolean => {
+    return Object.values(state.controlState.asyncInteractions).some(interaction => interaction.type === type);
+};

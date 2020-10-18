@@ -1,11 +1,13 @@
 <template>
+
     <button-tile
-            :is-active="episodeInfo.key === activeEpisodeKey"
-            :is-disabled="isAnyEpisodeLoading"
-            :is-loading="episodeInfo.key === activeEpisodeKey && isAnyEpisodeLoading"
+            :is-active="seasonInfo.key === activeSeasonKey"
+            :is-disabled="isSeasonLoading"
+            :is-loading="seasonInfo.key === activeSeasonKey && isSeasonLoading"
             @clicked="clicked">
-        {{episodeInfo.episodeNumber}}
+        {{seasonInfo.seasonNumber}}
     </button-tile>
+
 </template>
 
 <script lang="ts">
@@ -18,26 +20,28 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { getActiveEpisode, hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
+    import { hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
     import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
+    import { SeriesSeason } from '../../../../store/models/series-season.model';
     import ButtonTile from '../ButtonTile.vue';
+    import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
 
     @Component({
-        name: 'series-episode-button',
-        components: {
-            ButtonTile,
-        },
+        name: 'series-season-button',
+        components: { ButtonTile },
     })
-    export default class SeriesEpisodeButton extends Vue {
+    export default class SeriesSeasonButton extends Vue {
 
         private readonly takeUntil$ = new Subject();
 
         @Prop(Object)
-        private episodeInfo: SeriesEpisode;
+        private seasonInfo: SeriesSeason;
+
+        @Prop(String)
+        private activeSeasonKey: string;
 
         private store: StoreService;
-        private isAnyEpisodeLoading = false;
-        private activeEpisodeKey = '';
+        private isSeasonLoading = false;
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
@@ -45,7 +49,6 @@
 
         public mounted(): void {
             this.fetchEpisodeLoadingStateFromStore();
-            this.setSelectedEpisode();
         }
 
         public destroyed(): void {
@@ -54,23 +57,16 @@
 
         @Emit('clicked')
         private clicked(): SeriesEpisode['key'] {
-            if (!this.isAnyEpisodeLoading) {
-                return this.episodeInfo.key;
-            }
-            return null;
+            return this.seasonInfo.key;
         }
-
-        private setSelectedEpisode(): void {
-            this.store.selectBehaviour(getActiveEpisode).pipe(
-                takeUntil(this.takeUntil$),
-            ).subscribe(activeEpisode => this.activeEpisodeKey = activeEpisode);
-        }
-
 
         private fetchEpisodeLoadingStateFromStore(): void {
-            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_EPISODE_INFO).pipe(
+            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_SEASON_EPISODES).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(isLoading => this.isAnyEpisodeLoading = isLoading);
+            ).subscribe(isLoading => {
+                const hasSeasonEpisodes = Boolean(this.store.selectSync(getSeriesEpisodesForSeason, this.seasonInfo.key).length);
+                this.isSeasonLoading = isLoading && !hasSeasonEpisodes;
+            });
         }
     }
 </script>

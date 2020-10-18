@@ -14,7 +14,11 @@ import { getActivePortalWindowId, getPortalForKey } from '../../store/selectors/
 import { WindowService } from '../services/window.service';
 import { Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
-import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
+import {
+    addAsyncInteractionAction,
+    removeAsyncInteractionAction,
+    setWindowIdForWindowTypeAction
+} from '../../store/reducers/control-state.reducer';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
@@ -28,6 +32,8 @@ import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
 import Series from '../../store/models/series.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
+import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
+import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
 
 @injectable()
 export class PortalController {
@@ -41,36 +47,93 @@ export class PortalController {
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
-        return this.openPageAndGetDataForMessage(portal.seriesListUrl, portalKey, createGetAllSeriesFromPortalMessage());
+        let seriesInfos = [];
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_ALL_SERIES, { portalKey });
+        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
+        try {
+            seriesInfos = await this.openPageAndGetDataForMessage(portal.seriesListUrl, portalKey, createGetAllSeriesFromPortalMessage());
+        } catch (e) {
+            console.error('[PortalController -> getAllSeriesFromPortal]', e);
+        } finally {
+            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
+        }
+
+        return seriesInfos;
     }
 
-    public async getDetailedSeriesInformation(seriesKey: Series['key'], portal: PORTALS): Promise<SeriesInfoDto> {
+    public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesInfoDto> {
         const seriesInfo = this.store.selectSync(getSeriesByKey, seriesKey);
-        if (seriesInfo?.portalLinks[portal]) {
-            return this.openPageAndGetDataForMessage(seriesInfo.portalLinks[portal], portal, createGetDetailedSeriesInformationMessage());
+        if (!seriesInfo?.portalLinks[portalKey]) {
+            console.error(`[PortalController -> getDetailedSeriesInformation] tried to load detailed info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`, seriesInfo);
         }
+
+        let detailedSeriesInfo: SeriesInfoDto = null;
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_DETAILED_SERIES, {
+            seriesKey,
+            portalKey
+        });
+        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
+        try {
+            detailedSeriesInfo = await this.openPageAndGetDataForMessage(seriesInfo.portalLinks[portalKey], portalKey, createGetDetailedSeriesInformationMessage());
+        } catch (e) {
+            console.error('[PortalController -> getDetailedSeriesInformation]', e);
+        } finally {
+            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
+        }
+
+        return detailedSeriesInfo;
     }
 
     public async getEpisodesForSeason(seasonKey: string, portalKey: PORTALS): Promise<SeriesEpisodeDto[]> {
         const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey);
-        if (seriesSeason) {
-            return this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portalKey], portalKey, createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
+        if (!seriesSeason?.portalLinks[portalKey]) {
+            console.error(`[PortalController -> getEpisodesForSeason] tried to load episode info for season ${seasonKey} and ${portalKey}, but no valid data found. Data found:`, seriesSeason);
         }
-        return null;
+
+        let seriesEpisodes: SeriesEpisodeDto[] = [];
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_SEASON_EPISODES, {
+            seasonKey,
+            portalKey
+        });
+        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
+        try {
+            seriesEpisodes = await this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portalKey], portalKey, createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
+        } catch (e) {
+            console.error('[PortalController -> getEpisodesForSeason]', e);
+        } finally {
+            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
+        }
+
+        return seriesEpisodes;
     }
 
     public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const providor = this.providorService.getCurrentProvidor()?.key;
         const portalLink = episode?.portalLinks[portalKey][providor];
-        if (portalLink) {
-            const link = await this.openPageAndGetDataForMessage(portalLink, portalKey, createGetProvidorLinkForEpisode(episode, providor));
-            return {
-                providor,
-                link
-            };
+
+        if (!portalLink) {
+            console.error(`[PortalController -> getProvidorLinkForEpisode] tried to load portal links for episode ${episode} and ${portalKey}, but no valid data found.`);
         }
-        return null;
+
+        let link: string = null;
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_EPISODE_INFO, {
+            episodeKey,
+            portalKey
+        });
+        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
+        try {
+            link = await this.openPageAndGetDataForMessage(portalLink, portalKey, createGetProvidorLinkForEpisode(episode, providor));
+        } catch (e) {
+            console.error('[PortalController -> getProvidorLinkForEpisode]', e);
+        } finally {
+            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
+        }
+
+        return {
+            providor,
+            link
+        };
     }
 
     private openPortalUrl(url: string, portalKey: PORTALS): Observable<BrowserWindow> {
@@ -101,10 +164,13 @@ export class PortalController {
 
     private setNewPortalWindow(newPortalWindow: Electron.BrowserWindow): void {
         const oldWindowId = this.store.selectSync(getActivePortalWindowId);
-        if(oldWindowId === newPortalWindow.id) {
+        if (oldWindowId === newPortalWindow.id) {
             return;
         }
 
-        this.store.dispatch(setWindowIdForWindowTypeAction({windowId: newPortalWindow.id, windowType: WindowType.PORTAL}))
+        this.store.dispatch(setWindowIdForWindowTypeAction({
+            windowId: newPortalWindow.id,
+            windowType: WindowType.PORTAL
+        }));
     }
 }

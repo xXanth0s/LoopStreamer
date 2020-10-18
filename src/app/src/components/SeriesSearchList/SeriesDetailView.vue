@@ -1,35 +1,29 @@
 <template>
     <b-collapse class="mt-1 mb-2 px-0" v-model="isExpanded">
         <div class="accordion-content full-height">
-            <div v-if="!isSeriesLoading" class="full-height flex-container">
+            <div v-if="!isSeriesLoading && seriesData" class="full-height flex-container">
                 <div class="content-container">
                     <div class="content-description p-3">{{seriesData.description}}</div>
                     <div class="content-series-items mb-3 ml-4">
                         <div class="px-3 mt-1 flex-center white-tile">
                             <b>Staffeln:</b>
                         </div>
-                        <div class="mt-1 series-item flex-center white-tile"
-                             v-for="season in seasons"
-                             @click="seasonClicked(season.key)"
-                             :class="{selected: isSeasonSelected(season.key), disabled: areEpisodesLoading}"
-                             v-bind:key="season.key">
-                            <div v-if="isSeasonLoading(season.key)" class="spinner-border tile-spinner" role="status">
-                                <span class="sr-only"></span>
-                            </div>
-                            <div v-else>
-                                {{season.seasonNumber}}
-                            </div>
-                        </div>
+                        <series-season-button
+                                v-for="season in seasons"
+                                :key="season.key"
+                                :active-season-key="selectedSeasonKey"
+                                :season-info="season"
+                                @clicked="seasonClicked"/>
                     </div>
                     <div class="content-series-items mb-3 ml-4" v-if="episodes.length">
                         <span class="px-3 mt-1 flex-center white-tile">
                             <b>Episoden:</b>
                         </span>
                         <series-episode-button
-                                v-for="seriesEpisode in episodes" :key="seriesEpisode.key"
+                                v-for="seriesEpisode in episodes"
+                                :key="seriesEpisode.key"
                                 :episode-info="seriesEpisode"
-                                :is-blocked="isEpisodeLoading"
-                                @click="episodeClicked(seriesEpisode)"/>
+                                @clicked="episodeClicked"/>
                     </div>
                     <div v-if="areEpisodesLoading" class="flex-center my-3">
                         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
@@ -58,7 +52,6 @@
     import Component from 'vue-class-component';
     import { takeUntil } from 'rxjs/operators';
     import { merge, Subject } from 'rxjs';
-    import { fromPromise } from 'rxjs/internal-compatibility';
     import Series from '../../../../store/models/series.model';
     import { optionsContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
@@ -76,11 +69,15 @@
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
+    import { hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
+    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
+    import SeriesSeasonButton from './SeasonEpisodeButton.vue';
 
     @Component({
         name: 'series-detail-view',
         components: {
             SeriesEpisodeButton,
+            SeriesSeasonButton,
         },
     })
     export default class SeriesDetailView extends Vue {
@@ -106,7 +103,6 @@
         private seasons: SeriesSeason[] = [];
         private episodes: SeriesEpisode[] = [];
         private selectedSeasonKey: string = null;
-        private isEpisodeLoading = false;
 
         private get isSeriesLoading(): boolean {
             return this.isLoading
@@ -123,31 +119,29 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
+        public mounted(): void {
+            this.fetchLoadingStateFromStore();
+        }
+
         public destroyed(): void {
             this.takeUntil$.next();
         }
 
         @Watch('seriesKey')
-        public async loadSeriesData(seriesKey: Series['key']): Promise<void> {
+        public loadSeriesData(seriesKey: Series['key']): void {
             if (seriesKey) {
                 this.resetData();
-                this.isLoading = true;
 
                 this.fetchSeriesDataFromStore(seriesKey);
                 this.fetchSeasonsFromStore(seriesKey);
 
                 const message = createSeriesSelectedInAppMessage(seriesKey, this.selectedProtal);
-                fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
-                    takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
-                ).subscribe(() => {
-                    this.isLoading = false;
-                });
+                this.messageService.sendMessageToBackground(message);
             }
         }
 
-        public async seasonClicked(seasonKey: SeriesSeason['key']): Promise<void> {
+        public seasonClicked(seasonKey: SeriesSeason['key']): void {
             if (seasonKey !== this.selectedSeasonKey) {
-                this.isLoading = true;
                 this.seasonChanged$.next();
                 this.selectedSeasonKey = seasonKey;
                 this.episodes = [];
@@ -155,43 +149,29 @@
                 this.fetchSeriesEpisodesFromStore(seasonKey);
 
                 const message = createSeriesSeasonSelectedInAppMessage(seasonKey, this.selectedProtal);
-                fromPromise(this.messageService.sendMessageToBackground(message)).pipe(
-                    takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
-                ).subscribe(() => {
-                    this.isLoading = null;
-                });
+
+                this.messageService.sendMessageToBackground(message);
             }
         }
 
-        public async episodeClicked(episode: SeriesEpisode): Promise<void> {
-            if (this.isEpisodeLoading) {
-                return;
+        public episodeClicked(episodeKey: SeriesEpisode['key']): void {
+            if (episodeKey) {
+                this.messageService.sendMessageToBackground(createStartEpisodeMessage(episodeKey, this.selectedProtal));
             }
-            this.isEpisodeLoading = true;
-
-            await this.messageService.sendMessageToBackground(createStartEpisodeMessage(episode.key, this.selectedProtal));
-
-            this.isEpisodeLoading = true;
-        }
-
-        private isSeasonSelected(seasonKey: SeriesSeason['key']): boolean {
-            return this.selectedSeasonKey === seasonKey;
-        }
-
-        private isSeasonLoading(seasonKey: SeriesSeason['key']): boolean {
-            return this.isLoading
-                && this.selectedSeasonKey === seasonKey
-                && !this.episodes.length;
         }
 
         private resetData(): void {
             this.seasonChanged$.next();
             this.seriesData = null;
             this.selectedSeasonKey = null;
-            this.isEpisodeLoading = false;
-            this.isLoading = false;
             this.seasons = [];
             this.episodes = [];
+        }
+
+        private fetchLoadingStateFromStore(): void {
+            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_DETAILED_SERIES).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(isLoading => this.isLoading = isLoading);
         }
 
         private fetchSeriesDataFromStore(seriesKey: Series['key']): void {
@@ -250,10 +230,12 @@
     }
 
     .cover {
+        width: 210px;
         align-items: center;
         display: flex;
 
         img {
+            max-width: 210px;
             height: $accordionHeight;
         }
     }
@@ -283,24 +265,4 @@
         color: black;
         background-color: white;
     }
-
-    .series-item {
-        cursor: pointer;
-
-        &:hover, &.selected {
-            background-color: $primary-color;
-        }
-
-        &.disabled {
-            cursor: not-allowed;
-        }
-
-        min-width: 35px;
-    }
-
-    .tile-spinner {
-        height: 18px;
-        width: 18px;
-    }
-
 </style>

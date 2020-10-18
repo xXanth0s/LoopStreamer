@@ -4,6 +4,7 @@ import Portal from './portal.model';
 import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { BrowserWindowStateModel } from './browser-window-state.model';
 import SeriesEpisode from './series-episode.model';
+import { AsyncInteraction } from './async-interaction.model';
 
 
 export interface ControlState {
@@ -16,5 +17,6 @@ export interface ControlState {
     currentWindowState?: string;
     previousWindowState?: string;
     expandedSeriesOptionsPage?: Series['key'];
-    controllerWindowState: {[key: string]: BrowserWindowStateModel}
+    controllerWindowState: { [key: string]: BrowserWindowStateModel };
+    asyncInteractions: { [key: string]: AsyncInteraction };
 }

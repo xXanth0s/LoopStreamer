@@ -1,13 +1,8 @@
 <template>
 
     <div class="pt-2 px-1 col-4" @click="tileClicked">
-        <div class="card"  :class="{'active-item': isSelected}">
-
-            <div class="card-body">
-                <div class="title text-center">
-                    {{series.title}}
-                </div>
-            </div>
+        <div class="tile center" :class="{'active-item': isSelected}">
+            <span class="title m-1 center">{{series.title}}</span>
         </div>
     </div>
 </template>
@@ -62,18 +57,46 @@
 </script>
 
 <style scoped lang="scss">
-    .card {
+    @import "src/styles/variables";
+
+    $tileColor: #f8f6f6;
+
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .tile {
         cursor: pointer;
         height: 100%;
         background-color: #f8f6f6;
+
+        &:hover {
+            background-color: darken(#f8f6f6, 5%);
+        }
+    }
+
+    .active-item {
+        background-color: $primary-color;
+
+        &:hover {
+            background-color: $primary-color;
+        }
+
+        .title {
+            font-weight: 500;
+        }
     }
 
     .card:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
-    .fat-title {
-        font-size: 1.3em;
-        font-weight: bold;
+    .title {
+        text-align: center;
+        min-height: 4em;
+        font-size: 1em;
+        font-weight: 100;
     }
 </style>

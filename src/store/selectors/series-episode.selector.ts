@@ -4,10 +4,7 @@ import SeriesEpisode from '../models/series-episode.model';
 export const getSeriesEpisodeByKey = (state: StateModel, key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
 
 export const getSeriesEpisodesForSeason = (state: StateModel, seasonKey: SeriesEpisode['seasonKey']): SeriesEpisode[] => {
-    console.log(seasonKey);
-    const test = Object.values(state.seriesEpisodes).filter(episode => episode.seasonKey === seasonKey);
-    console.log(test);
-    return test;
+    return Object.values(state.seriesEpisodes).filter(episode => episode.seasonKey === seasonKey);
 };
 
 export const getNextEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => {
