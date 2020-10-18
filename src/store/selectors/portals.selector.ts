@@ -1,6 +1,5 @@
 import { StateModel } from '../models/state.model';
 import Portal from '../models/portal.model';
-import { WindowType } from '../enums/window-type.enum';
 
 export const getAllPortals = (state: StateModel): Portal[] => Object.values(state.portals);
 
@@ -22,5 +21,3 @@ export const getActivePortal = (state: StateModel): Portal | null => {
     console.error('getCurrentPortal: No currentPortal found');
     return null;
 };
-
-export const getActivePortalWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.PORTAL]?.windowId;

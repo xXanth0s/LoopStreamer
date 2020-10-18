@@ -3,7 +3,6 @@ import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
-import { getActivePortalWindowId } from '../../store/selectors/portals.selector';
 import { getVideoWindowId } from '../../store/selectors/control-state.selector';
 import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
 
@@ -17,14 +16,6 @@ export class MessageService {
 
     public async sendMessageToBackground<T, R>(message: Message<T, R>): Promise<R> {
         return ipcRenderer.invoke(message.type, message);
-    }
-
-    public async sendMessageToPortalTab<T, R>(message: Message<T, R>): Promise<R> {
-        const portalTabId: number = this.storeService.selectSync(getActivePortalWindowId);
-        if (portalTabId) {
-            return this.sendMessageToBrowserWindow(portalTabId, message);
-        }
-        return null;
     }
 
     public async sendMessageToVideoWindow<T, R>(message: Message<T, R>): Promise<R | null> {
@@ -44,7 +35,7 @@ export class MessageService {
         sender.send(this.getReplyChannel(message), args);
     }
 
-    private sendMessageToBrowserWindow<T, R>(browserWindowId: number, message: Message<T, R>): Promise<R> {
+    public sendMessageToBrowserWindow<T, R>(browserWindowId: number, message: Message<T, R>): Promise<R> {
         console.log('sending message to window, ', browserWindowId);
         console.log(message);
         const browserWindow = BrowserWindow.fromId(browserWindowId);

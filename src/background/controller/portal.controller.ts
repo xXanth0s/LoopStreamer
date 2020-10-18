@@ -3,14 +3,14 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { debounceTime, finalize, takeUntil, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, takeUntil } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
     createGetEpisodesForSeasonMessage,
     createGetProvidorLinkForEpisode
 } from '../../browserMessages/messages/portal.messages';
-import { getActivePortalWindowId, getPortalForKey } from '../../store/selectors/portals.selector';
+import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
 import { Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
@@ -28,7 +28,7 @@ import { ProvidorService } from '../services/providor.service';
 import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
 import { WindowController } from './window.controller';
-import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
+import { finalizeWithValue, waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
 import Series from '../../store/models/series.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
@@ -140,37 +140,33 @@ export class PortalController {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
         return this.windowController.openLinkForWebsite(portal, url).pipe(
             takeUntil(this.store.playerHasStopped()),
-            tap(window => this.setNewPortalWindow(window)),
             waitTillPageLoadFinished(),
             debounceTime(1000),
-            finalize(() => {
-                const portalWindowId = this.store.selectSync(getActivePortalWindowId);
-                this.windowService.closeWindow(portalWindowId);
-            })
+            finalizeWithValue((window: BrowserWindow) => this.windowService.closeWindow(window.id)),
         );
     }
 
     private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portalKey: PORTALS, message: Message<T, R>): Promise<R> {
-        return new Promise<R>(resolve => {
-            const sub = this.openPortalUrl(portalUrl, portalKey).subscribe(async (window) => {
-                const result = await this.messageService.sendMessageToPortalTab(message);
+        return new Promise<R>((resolve, reject) => {
+            const sub = this.openPortalUrl(portalUrl, portalKey).pipe(
+                catchError(err => {
+                    reject(err);
+                    return null;
+                }),
+                filter<BrowserWindow>(Boolean)
+            ).subscribe(async (window) => {
+                let result: R;
+
+                try {
+                    result = await this.messageService.sendMessageToBrowserWindow(window.id, message);
+                } catch (e) {
+                    reject(e);
+                }
+
                 this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.PORTAL }));
-                this.windowService.closeWindow(window.id);
                 sub.unsubscribe();
                 resolve(result);
             });
         });
-    }
-
-    private setNewPortalWindow(newPortalWindow: Electron.BrowserWindow): void {
-        const oldWindowId = this.store.selectSync(getActivePortalWindowId);
-        if (oldWindowId === newPortalWindow.id) {
-            return;
-        }
-
-        this.store.dispatch(setWindowIdForWindowTypeAction({
-            windowId: newPortalWindow.id,
-            windowType: WindowType.PORTAL
-        }));
     }
 }

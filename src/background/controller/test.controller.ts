@@ -20,8 +20,6 @@ import {
 import { WindowController } from './window.controller';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import Website from '../../store/models/website';
-import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
-import { WindowType } from '../../store/enums/window-type.enum';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -48,16 +46,14 @@ export class TestController {
         ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA,
             (event, message: StartTestEpisodeOverBSMessage): void => {
                 this.startTestPage().subscribe(window => {
-                    this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
-                    this.messageService.sendMessageToPortalTab(createStartTestRecaptchaMessage());
+                    this.messageService.sendMessageToBrowserWindow(window.id, createStartTestRecaptchaMessage());
                 })
             });
 
         ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
             (event, message: OpenTestPageMessage): void => {
                 this.startTestPage().subscribe(window => {
-                    this.store.dispatch(setWindowIdForWindowTypeAction({windowId: window.id, windowType: WindowType.PORTAL}))
-                    this.messageService.sendMessageToPortalTab(createTestNotificationMessage());
+                    this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
                 })
             });
     }

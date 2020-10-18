@@ -27,35 +27,4 @@ describe('MessageService', () => {
 
     });
 
-    describe('sendMessageToPortalTab', () => {
-        it('should not send message, when no portal tab id exists', () => {
-            const message: Message<null> = {
-                destinationController: ControllerType.PORTAL,
-                sourceController: ControllerType.OPTIONS,
-                type: MessageType.BACKGROUND_PREVIOUS_VIDEO,
-                payload: null
-            };
-
-            storeServiceMock.selectSync.mockReturnValue(null);
-
-            service.sendMessageToPortalTab(message);
-
-            expect(storeServiceMock.selectSync).toHaveBeenCalledWith(getActivePortalTabId);
-        });
-
-        it('should not send message, when no portal tab id exists', () => {
-            const message: Message<null> = {
-                destinationController: ControllerType.PORTAL,
-                sourceController: ControllerType.OPTIONS,
-                type: MessageType.BACKGROUND_PREVIOUS_VIDEO,
-                payload: null
-            };
-
-            storeServiceMock.selectSync.mockReturnValue(null);
-
-            service.sendMessageToPortalTab(message);
-
-            expect(storeServiceMock.selectSync).toHaveBeenCalledWith(getActivePortalTabId);
-        });
-    });
 });
