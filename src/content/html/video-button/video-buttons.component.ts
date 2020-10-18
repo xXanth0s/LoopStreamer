@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import SeriesEpisode from '../../../store/models/series-episode.model';
-import ButtonComponent from './ButtonComponent.vue';
+import VideoButtonComponent from './VideoButtonComponent.vue';
 
 export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
     const containerId = 'ls-video-buttons';
@@ -11,12 +11,12 @@ export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
     document.body.appendChild(buttonContainer);
 
     new Vue({
-        render: h => h(ButtonComponent, {
+        render: h => h(VideoButtonComponent, {
             props: {
                 episodeInfo
             }
         }),
-        components: { ButtonComponent }
+        components: { ButtonComponent: VideoButtonComponent }
     }).$mount(`#${containerId}`)
 };
 

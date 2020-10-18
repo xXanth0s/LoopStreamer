@@ -68,6 +68,7 @@ export class VideoController {
         const window$ = this.windowController.openLinkForWebsite(providor, url);
         return window$.pipe(
             waitTillPageLoadFinished(),
+            tap(window => this.windowService.setOldWindowState(window.id, WindowType.VIDEO)),
             tap(window => this.setNewVideoWindow(window)),
             debounceTime(1000),
         );

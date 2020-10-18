@@ -22,6 +22,8 @@ import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import Website from '../../store/models/website';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
+import { WindowType } from '../../store/enums/window-type.enum';
 
 
 @injectable()
@@ -53,6 +55,10 @@ export class TestController {
         ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
             (event, message: OpenTestPageMessage): void => {
                 this.startTestPage().subscribe(window => {
+                    this.store.dispatch(setWindowIdForWindowTypeAction({
+                        windowId: window.id,
+                        windowType: WindowType.VIDEO
+                    }));
                     this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
                 })
             });

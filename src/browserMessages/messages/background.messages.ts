@@ -13,23 +13,6 @@ export const createVideoFinishedMessage = (): Message<SeriesEpisode> => ({
 });
 export type VideoFinishedMessage = ReturnType<typeof createVideoFinishedMessage>;
 
-
-export const createToggleFullscreenModeMessage = (): Message => ({
-    type: MessageType.BACKGROUND_TOGGLE_FULLSCREEN,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: false,
-});
-export type ToggleFullscreenModeMessage = ReturnType<typeof createToggleFullscreenModeMessage>;
-
-
-export const createWindowResizedMessage = (): Message => ({
-    type: MessageType.BACKGROUND_WINDOW_RESIZED,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: false,
-});
-export type WindowResizedMessage = ReturnType<typeof createWindowResizedMessage>;
-
-
 export const createOpenNextVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
     type: MessageType.BACKGROUND_NEXT_VIDEO,
     destinationController: ControllerType.BACKGROUND,

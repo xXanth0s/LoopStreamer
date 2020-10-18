@@ -13,9 +13,6 @@ export interface ControlState {
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key']
-    hasNextEpisode?: boolean;
-    currentWindowState?: string;
-    previousWindowState?: string;
     expandedSeriesOptionsPage?: Series['key'];
     controllerWindowState: { [key: string]: BrowserWindowStateModel };
     asyncInteractions: { [key: string]: AsyncInteraction };

@@ -8,46 +8,25 @@
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                         <label class="btn btn-primary btn-lg" :disabled="!hasPreviousEpisode || isLoading"
                                @click.stop.prevent="previous" title="Vorherige Episode">
-                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-left"
-                                 v-if="!isStartingPrevious"
-                                 fill="currentColor"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-                            </svg>
-
-                            <div class="spinner-border" v-if="isStartingPrevious" style="width: 1em; height: 1em;"
+                            <div class="spinner-border video-button" v-if="isStartingPrevious"
                                  role="status">
                                 <span class="sr-only"></span>
                             </div>
+                            <i class="fas fa-chevron-left video-button" v-else/>
                         </label>
                         <label class="btn btn-primary btn-lg" @click.stop.prevent="toggleFullscreenMode"
                                :title="fullscreenTitle">
-                            <svg v-if="!isFullscreen" width="1em" height="1em" viewBox="0 0 16 16"
-                                 class="bi bi-arrows-angle-expand" fill="currentColor"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
-                            </svg>
-                            <svg v-if="isFullscreen" width="1em" height="1em" viewBox="0 0 16 16"
-                                 class="bi bi-arrows-angle-contract" fill="currentColor"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
-                            </svg>
+                            <i class="fas fa-compress-alt" v-if="isFullscreen"/>
+                            <i class="fas fa-expand-alt" v-else/>
                         </label>
                         <label class="btn btn-primary btn-lg" :disabled="!hasNextEpisode || isLoading"
                                @click.stop.prevent="next">
-                            <svg width="1em" height="1em" v-if="!isStartingNext" viewBox="0 0 16 16"
-                                 class="bi bi-chevron-right"
-                                 fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-                            </svg>
-                            <div class="spinner-border" v-if="isStartingNext" style="width: 1em; height: 1em;"
+                            <div class="spinner-border video-button" v-if="isStartingNext"
                                  role="status">
                                 <span class="sr-only"></span>
                             </div>
+
+                            <i class="fas fa-chevron-right video-button" v-else/>
                         </label>
                     </div>
                 </div>
@@ -58,6 +37,8 @@
 </template>
 
 <script lang="ts">
+    // eslint-disable-next-line import/no-extraneous-dependencies
+    import { remote } from 'electron';
     import { fromEvent } from 'rxjs';
     import { debounceTime, filter, tap } from 'rxjs/operators';
 
@@ -73,19 +54,19 @@
     import {
         createOpenNextVideoMessage,
         createOpenPreviousVideoMessage,
-        createToggleFullscreenModeMessage,
-        createWindowResizedMessage,
+        createToggleWindowFullscreenMessage,
     } from '../../../browserMessages/messages/background.messages';
-    import { isVideoFullScreen } from '../../../store/selectors/control-state.selector';
+    import { getWindowStateForWindowId } from '../../../store/selectors/control-state.selector';
     import {
         hasSeriesEpisodeNextEpisode,
         hasSeriesEpisodePreviousEpisode
     } from '../../../store/selectors/series-episode.selector';
+    import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';
 
     @Component({
         name: 'ls-video-buttons',
     })
-    export default class ButtonComponent extends Vue {
+    export default class VideoButtonComponent extends Vue {
         private readonly messageService: MessageService = inversifyContentContainer.get(SHARED_TYPES.MessageService);
         private readonly store: StoreService = inversifyContentContainer.get(SHARED_TYPES.StoreService);
 
@@ -102,6 +83,8 @@
         public get isLoading() {
             return this.isStartingNext || this.isStartingPrevious;
         }
+
+        private windowId: number;
 
         private fullscreen = false;
         private isStartingNext = false;
@@ -127,19 +110,19 @@
         }
 
         public toggleFullscreenMode(): void {
-            this.messageService.sendMessageToBackground(createToggleFullscreenModeMessage());
+            this.messageService.sendMessageToBackground(createToggleWindowFullscreenMessage(this.windowId));
         }
-
-        public created(): void {
-            this.initMouseEventListeners();
-            this.initWindowStateListener();
-            this.initKeyboardListener();
-        }
-
         public mounted(): void {
+            this.windowId = remote.getCurrentWindow().id;
+
             setTimeout(() => this.showButtons = false, this.buttonsVisibilityTime);
+
             this.hasPreviousEpisode = this.store.selectSync(hasSeriesEpisodePreviousEpisode, this.episodeInfo.key);
             this.hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, this.episodeInfo.key);
+
+            this.initMouseEventListeners();
+            this.initKeyboardListener();
+            this.fetchFullscreenModeFromStore();
         }
 
         @Watch('fullscreen')
@@ -155,14 +138,6 @@
             ).subscribe(() => this.showButtons = false);
         }
 
-        private initWindowStateListener(): void {
-            this.store.selectBehaviour(isVideoFullScreen)
-                .subscribe(isFullScreen => this.fullscreen = isFullScreen);
-
-            fromEvent(window, 'resize')
-                .subscribe(() => this.messageService.sendMessageToBackground(createWindowResizedMessage()));
-        }
-
         private initKeyboardListener(): void {
             fromEvent<KeyboardEvent>(document.body, 'keyup').pipe(
                 filter(() => this.fullscreen),
@@ -175,6 +150,14 @@
                 filter(event => event.key === 'f'),
             ).subscribe(() => {
                 this.toggleFullscreenMode();
+            });
+        }
+
+        private fetchFullscreenModeFromStore(): void {
+            this.store.select(getWindowStateForWindowId, this.windowId).pipe(
+                filter<BrowserWindowStateModel>(Boolean),
+            ).subscribe(windowState => {
+                this.fullscreen = windowState.windowState === 'fullscreen';
             });
         }
     }

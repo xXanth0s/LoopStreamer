@@ -19,11 +19,9 @@ import {
     SeriesSelectedInAppMessage,
     StartEpisodeMessage,
     StartSeriesMessage,
-    ToggleFullscreenModeMessage,
     ToggleWindowFullscreenMessage,
     ToggleWindowMaximizationMessage,
-    VideoFinishedMessage,
-    WindowResizedMessage
+    VideoFinishedMessage
 } from '../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import {
@@ -96,14 +94,6 @@ export class RootBackgroundController {
     private initializeHandler(): void {
         ipcMain.handle(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
             this.videoFinishedHandler();
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_FULLSCREEN, (event, message: ToggleFullscreenModeMessage) => {
-            this.windowController.toggleWindowState();
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_WINDOW_RESIZED, (event, message: WindowResizedMessage) => {
-            this.windowController.setCurrentWindowState();
         });
 
         ipcMain.handle(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {

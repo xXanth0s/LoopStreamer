@@ -1,8 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
-import { getVideoWindowId } from '../../store/selectors/control-state.selector';
-import { setCurrentWindowStateAction } from '../../store/reducers/control-state.reducer';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portalService';
@@ -29,27 +27,6 @@ export class WindowController {
     public async setCurrentWindowState(): Promise<void> {
         // const activeWindow = await this.getVideoWindow();
         // this.store.dispatch(setCurrentWindowStateAction(activeWindow?.state));
-    }
-
-    public async makeWindowFullscreen(): Promise<void> {
-        const windowId = this.store.selectSync(getVideoWindowId);
-        if (windowId) {
-            this.store.dispatch(setCurrentWindowStateAction('fullscreen'));
-        } else {
-            console.error('WindowController.makeWindowFullscreen: No videoWindowId provided');
-        }
-    }
-
-    public async toggleWindowState(): Promise<void> {
-        // const activeWindow = await this.getVideoWindow();
-        // const isFullscreen = activeWindow.state === 'fullscreen';
-        // const oldWindowState = this.store.selectSync(previousWindowState);
-        //
-        // this.store.dispatch(toggleWindowStateAction());
-        //
-        // const newWindowState: WindowState = isFullscreen ? oldWindowState : 'fullscreen';
-
-        // await chrome.windows.update(activeWindow.id, {state: newWindowState});
     }
 
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {

@@ -8,6 +8,9 @@ import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
 import { StateModel } from '../models/state.model';
 import { AsyncInteraction } from '../models/async-interaction.model';
+import { getWindowStateForWindowIdWithControlstate } from '../selectors/control-state.selector';
+import { Windows } from 'webextension-polyfill-ts';
+import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
     activePortal: PORTALS.BS,
@@ -38,41 +41,30 @@ const setActiveProvidor = function (state: ControlState, activeProvidor: Provido
     };
 };
 
-const resetControlState = (): ControlState => initialControlState;
+const resetControlState = (state: ControlState): ControlState => {
+    return {
+        ...state,
+        asyncInteractions: {},
+        activeEpisode: '',
+        playedEpisodes: 0,
+        activePortal: null,
+        activeProvidor: null,
+        expandedSeriesOptionsPage: null,
+    };
+};
 
 const setLoopStreamerStatus = (state: ControlState, loopStreamerStatus: ControlState['loopStreamerStatus']): ControlState => {
     return {
         ...state,
         loopStreamerStatus
-    }
-};
-
-
-const toggleWindowState = (state: ControlState): ControlState => {
-    return {
-        ...state,
-        previousWindowState: state.currentWindowState,
-        currentWindowState: state.previousWindowState
-    }
-};
-
-const setCurrentWindowState = (state: ControlState, currentWindowState: ControlState['currentWindowState']): ControlState => {
-    let previousWindowState =  'fullscreen';
-    if(currentWindowState === 'fullscreen') {
-        previousWindowState =  state.currentWindowState === 'fullscreen' ? state.previousWindowState : state.currentWindowState;
-    }
-    return {
-        ...state,
-        currentWindowState,
-        previousWindowState
-    }
+    };
 };
 
 function setExpandedSeriesOptionsPage(state: ControlState, expandedSeriesOptionsPage: string): ControlState {
     return {
         ...state,
         expandedSeriesOptionsPage
-    }
+    };
 }
 
 function setWindowIdForWindowType(state: ControlState, { windowType, windowId }: { windowType: WindowType; windowId: number }): ControlState {
@@ -88,7 +80,7 @@ function setWindowIdForWindowType(state: ControlState, { windowType, windowId }:
                 windowId
             }
         }
-    }
+    };
 }
 
 function setActiveEpisode(state: ControlState, activeEpsidoeKey: string) {
@@ -103,22 +95,50 @@ function removeAsyncInteraction(state: ControlState, key: string): void {
     delete state.asyncInteractions[key];
 }
 
+function setWindowState(state: ControlState, payload: { windowId: number; windowState: WindowState }) {
+    const controllerWindowState = getWindowStateForWindowIdWithControlstate(state, payload.windowId);
+    if (controllerWindowState) {
+        controllerWindowState.windowState = payload.windowState;
+    }
+}
+
+function setWindowSize(state: ControlState, payload: { windowId: number; height: number; width: number }) {
+    const { windowId, height, width } = payload;
+    const controllerWindowState = getWindowStateForWindowIdWithControlstate(state, windowId);
+    if (controllerWindowState) {
+        controllerWindowState.height = height;
+        controllerWindowState.width = width;
+    }
+}
+
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
     reducers: {
-        updateControlStateAction: (state: ControlState, action: PayloadAction<Partial<ControlState>>) => updateControlState(state, action.payload),
-        setActivePortalAction: (state: ControlState, action: PayloadAction<Portal['key']>) => setActivePortal(state, action.payload),
-        setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) => setActiveProvidor(state, action.payload),
-        setLoopStreamerStatusAction: (state: ControlState, action: PayloadAction<ControlState['loopStreamerStatus']>) => setLoopStreamerStatus(state, action.payload),
-        resetControlStateAction: () => resetControlState(),
-        toggleWindowStateAction: (state: ControlState) => toggleWindowState(state),
-        setCurrentWindowStateAction: (state: ControlState, action: PayloadAction<ControlState['currentWindowState']>) => setCurrentWindowState(state, action.payload),
-        setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) => setExpandedSeriesOptionsPage(state, action.payload),
-        setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) => setWindowIdForWindowType(state, action.payload),
-        setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) => setActiveEpisode(state, action.payload),
-        addAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction>) => addAsyncInteraction(state, action.payload),
-        removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction['key']>) => removeAsyncInteraction(state, action.payload),
+        updateControlStateAction: (state: ControlState, action: PayloadAction<Partial<ControlState>>) =>
+            updateControlState(state, action.payload),
+        setActivePortalAction: (state: ControlState, action: PayloadAction<Portal['key']>) =>
+            setActivePortal(state, action.payload),
+        setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) =>
+            setActiveProvidor(state, action.payload),
+        setLoopStreamerStatusAction: (state: ControlState, action: PayloadAction<ControlState['loopStreamerStatus']>) =>
+            setLoopStreamerStatus(state, action.payload),
+        resetControlStateAction: (state: ControlState) =>
+            resetControlState(state),
+        setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) =>
+            setExpandedSeriesOptionsPage(state, action.payload),
+        setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) =>
+            setWindowIdForWindowType(state, action.payload),
+        setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) =>
+            setActiveEpisode(state, action.payload),
+        addAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction>) =>
+            addAsyncInteraction(state, action.payload),
+        removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction['key']>) =>
+            removeAsyncInteraction(state, action.payload),
+        setWindowStateAction: (state: ControlState, action: PayloadAction<{ windowId: number, windowState: WindowState }>) =>
+            setWindowState(state, action.payload),
+        setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number, height: number, width: number }>) =>
+            setWindowSize(state, action.payload),
     }
 });
 
@@ -127,11 +147,11 @@ export const {
     setActiveProvidorAction,
     resetControlStateAction,
     setLoopStreamerStatusAction,
-    toggleWindowStateAction,
-    setCurrentWindowStateAction,
     setExpandedSeriesOptionsPageAction,
     setWindowIdForWindowTypeAction,
     setActiveEpisodeAction,
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
+    setWindowStateAction,
+    setWindowSizeAction
 } = controlStateSlice.actions;

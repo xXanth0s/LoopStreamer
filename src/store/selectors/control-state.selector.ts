@@ -1,12 +1,10 @@
 import { StateModel } from '../models/state.model';
 import { ControlState } from '../models/control-state.model';
 import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
-import { Windows } from 'webextension-polyfill-ts';
 import Series from '../models/series.model';
 import { WindowType } from '../enums/window-type.enum';
 import { BrowserWindowStateModel } from '../models/browser-window-state.model';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
-import WindowState = Windows.WindowState;
 
 export const getControlState = (state: StateModel): ControlState => state.controlState;
 
@@ -24,14 +22,17 @@ export const getVideoWindowId = (state: StateModel): number => state.controlStat
 
 export const getAppWindowId = (state: StateModel): number => state.controlState.controllerWindowState[WindowType.APP]?.windowId;
 
-export const getWindowStateForWindowId = (state: StateModel, windowId: BrowserWindowStateModel['windowId']) => {
-    return Object.values(state.controlState.controllerWindowState).find(windowState => windowState?.windowId === windowId);
+export const getWindowStateForWindowType = (state: StateModel, windowType: BrowserWindowStateModel['key']): BrowserWindowStateModel => {
+    return state.controlState.controllerWindowState[windowType];
 };
 
-export const isVideoFullScreen = (state: StateModel): boolean => state.controlState.currentWindowState === 'fullscreen';
+export const getWindowStateForWindowId = (state: StateModel, windowId: BrowserWindowStateModel['windowId']) => {
+    return getWindowStateForWindowIdWithControlstate(state.controlState, windowId);
+};
 
-// @ts-ignore
-export const previousWindowState = (state: StateModel): WindowState => state.controlState.previousWindowState;
+export const getWindowStateForWindowIdWithControlstate = (state: ControlState, windowId: BrowserWindowStateModel['windowId']) => {
+    return Object.values(state.controllerWindowState).find(windowState => windowState?.windowId === windowId);
+};
 
 export const isSeriesExpandedOnOptionsPage = (state: StateModel, seriesKey: Series['key']): boolean => {
     return state.controlState.expandedSeriesOptionsPage === seriesKey;
