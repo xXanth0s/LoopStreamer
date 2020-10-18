@@ -1,78 +1,58 @@
 <template>
-    <div class="col-sm-4">
+    <div v-if="series">
         <div class="card">
-            <transition name="fade" mode="out-in">
-                <div v-if="!hideContent" key="front">
-                    <div class="preview-image">
-                        <img :src="series.posterHref" @click="changeView()" alt="Avatar">
-                    </div>
-                    <div class="card-container-bottom">
-                        {{series.title}}
-                    </div>
-                    <div>
-                        <b-button block variant="primary" class="mt-2 btn-bottom" @click="changeView"><i
-                                class="el-icon-arrow-right"></i></b-button>
-                    </div>
+            <div class="flex-column" key="front" v-if="!hideContent">
+                <div>
+                    <img :src="series.posterHref" @click="changeView()" alt="Avatar">
                 </div>
-                <div v-else key="back">
-                    <span class="heading" v-bind:title="series.title">
-                        {{series.title}}
-                    </span>
-                    <hr>
-                    <div class="px-3">
-                        <b-row class="form-group">
-                            <b-col cols="3">
-                                <label class="card-label">Intro
-                                    <el-tooltip placement="bottom" effect="light">
-                                        <div slot="content">Sekunden die zu Beginn einer<br>Folge übersprungen wird
-                                        </div>
-                                    </el-tooltip>
-                                </label>
-
-                            </b-col>
-                            <b-col cols="8">
-                                <el-input-number class="float-right" size="small" v-model="series.scipStartTime"
-                                                 :min="0"></el-input-number>
-                            </b-col>
-                        </b-row>
-                        <b-row class="form-group">
-                            <b-col cols="3">
-                                <label class="card-label">Outro
-                                    <el-tooltip placement="bottom" effect="light">
-                                        <div slot="content">Sekunden die zu Ende einer<br>Folge übersprungen wird</div>
-                                    </el-tooltip>
-                                </label>
-                            </b-col>
-                            <b-col cols="8">
-                                <el-input-number class="float-right" size="small" v-model="series.scipEndTime"
-                                                 :min="0"></el-input-number>
-                            </b-col>
-                        </b-row>
-                        <b-row>
-                            <b-col>
-                                <b-button block variant="primary" @click="save">Speichern</b-button>
-                            </b-col>
-                        </b-row>
-                        <b-row v-if="showContinueBtn" class="pt-3">
-                            <b-col>
-                                <b-button block variant="primary" @click="continueSeries">
-                                    {{CurrentEpisode}}
-                                    Fortsetzen
-                                </b-button>
-                            </b-col>
-                        </b-row>
-
-                        <b-row class="pt-3">
-                            <b-col>
-                                <b-button block variant="primary" @click="openDeleteModal">Löschen
-                                </b-button>
-                            </b-col>
-                        </b-row>
-                    </div>
-                    <b-button block variant="primary" class="mt-2 btn-bottom" @click="changeView"><i
-                            class="el-icon-arrow-left"></i></b-button>
+                <div class="default-title-text title flex-center flex-grow">
+                    <span class="text">{{series.title}}</span>
                 </div>
-            </transition>
+                <b-button @click="changeView" block class="btn-bottom" variant="primary"><i
+                        class="el-icon-arrow-right"></i></b-button>
+            </div>
+            <div class="flex-column" key="back" v-else>
+                <div class="default-title-text flex-center title underline" v-bind:title="series.title">
+                    <span class="active text px-1">{{series.title}}</span>
+                </div>
+                <div class="px-3 flex-column input-container">
+                    <div class="flex-row mt-3">
+                        <div class="flex-grow">
+                            <label class="card-label">Intro
+                                <i class="far fa-question-circle"
+                                   title="Sekunden die zu Beginn einer Folge übersprungen werden"
+                                   v-b-tooltip.hover/>
+                            </label>
+                        </div>
+                        <div>
+                            <el-input-number :min="0" size="small"
+                                             v-model="scipS"></el-input-number>
+                        </div>
+                    </div>
+                    <div class="flex-row mt-3">
+                        <div class="flex-grow">
+                            <label class="card-label">
+                                Outro
+                                <i class="far fa-question-circle"
+                                   title="Sekunden die zu Ende einer Folge übersprungen werden"
+                                   v-b-tooltip.hover/>
+                            </label>
+                        </div>
+                        <el-input-number :min="0" size="small"
+                                         v-model="scipE"></el-input-number>
+                    </div>
+                    <div class="flex-grow"></div>
+                    <b-button @click="continueSeries" block class="mb-2" v-if="hasNextEpisode" variant="primary">
+                        Fortsetzen
+                    </b-button>
+
+                    <b-button @click="openDeleteModal" block class="mb-3" variant="primary">Löschen
+                    </b-button>
+
+                </div>
+                <b-button @click="changeView" block variant="primary"><i
+                        class="el-icon-arrow-left"></i></b-button>
+            </div>
         </div>
     </div>
 </template>
@@ -81,44 +61,36 @@
     import { MessageBox } from 'element-ui';
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Emit, Prop } from 'vue-property-decorator';
+    import { Prop, Watch } from 'vue-property-decorator';
+    import { Subject } from 'rxjs';
+    import { takeUntil } from 'rxjs/operators';
     import Series from '../../../store/models/series.model';
     import { createContinueSeriesMessage } from '../../../browserMessages/messages/background.messages';
     import { MessageService } from '../../../shared/services/message.service';
     import { optionsContainer } from '../container/container';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
+    import { StoreService } from '../../../shared/services/store.service';
+    import { getSeriesByKey, isSeriesContinuable } from '../../../store/selectors/series.selector';
+    import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../../store/reducers/series.reducer';
 
     @Component({
         name: 'series-panel',
     })
     export default class SeriesPanel extends Vue {
+        private readonly takeUntil$ = new Subject();
 
-        @Prop(Object)
-        private series: Series;
+        @Prop(String)
+        private seriesKey: Series['key'];
 
-        @Prop()
-        private index: number;
+        private series: Series = null;
 
         private messageService: MessageService;
+        private store: StoreService;
 
+        private scipS = 0;
+        private scipE = 0;
+        private hasNextEpisode = false;
         private hideContent = false;
-
-        get showContinueBtn() {
-            // return Boolean(this.series?.lastEpisodeWatched?.portalHref?.length)
-            //     && (this.series?.lastEpisodeWatched?.hasNextEpisode
-            //         || this.series?.lastEpisodeWatched?.timestamp >= 0);
-            return true;
-        }
-
-        get CurrentEpisode() {
-            if (this.series.lastEpisodeWatched) {
-                // if (this.series.lastEpisodeWatched.timestamp === -1) {
-                //     return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode + 1}`;
-                // }
-                // return `S${this.series.lastEpisodeWatched.season} E${this.series.lastEpisodeWatched.episode}`;
-            }
-            return '';
-        }
 
         public openDeleteModal(): void {
             MessageBox.confirm(
@@ -136,7 +108,6 @@
             this.hideContent = !this.hideContent;
         }
 
-        @Emit('remove')
         remove(): Series {
             return this.series;
         }
@@ -145,25 +116,62 @@
             this.messageService.sendMessageToBackground(createContinueSeriesMessage(this.series.key));
         }
 
-        @Emit('save')
-        save(): Series {
-            return this.series;
+        public beforeCreate(): void {
+            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
+            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
         }
 
-        @Emit('reset')
-        reset(): Series {
-            return this.series;
+        public destroyed(): void {
+            this.takeUntil$.next();
         }
 
         public mounted(): void {
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
+            this.loadSeriesFromStore();
+        }
+
+        @Watch('seriesKey')
+        private seriesChanged(seriesKey: string): void {
+            this.takeUntil$.next();
+            this.loadSeriesFromStore();
+        }
+
+        @Watch('scipS')
+        private scipStartTimeChanged(currentValue: number, previousValue: number): void {
+            if (currentValue !== previousValue) {
+                this.store.dispatch(setStartTimeForSeriesAction({ key: this.seriesKey, scipStartTime: currentValue }));
+            }
+        }
+
+        @Watch('scipE')
+        private scipEndTimeChanged(currentValue: number, previousValue: number): void {
+            if (currentValue !== previousValue) {
+                this.store.dispatch(setEndTimeForSeriesAction({ key: this.seriesKey, scipEndTime: currentValue }));
+            }
+        }
+
+        private loadSeriesFromStore(): void {
+            this.store.selectBehaviour(getSeriesByKey, this.seriesKey).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(series => {
+                this.series = series;
+                this.scipE = series.scipEndTime || 0;
+                this.scipS = series.scipStartTime || 0;
+            });
+
+            this.store.selectBehaviour(isSeriesContinuable, this.seriesKey).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(isContinuable => this.hasNextEpisode = isContinuable);
         }
     }
 </script>
 
 <style lang="scss" scoped>
+    @import "src/styles/variables";
 
+    $middleContainerSize: 350px;
     .card {
+        height: 100%;
+
         &:hover {
             box-shadow: 0 8px 8px 1px rgba(0, 0, 0, 0.4);
         }
@@ -171,73 +179,60 @@
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         transition: 0.3s;
         width: 100%;
-        height: 395px;
-        position: relative;
-        margin-bottom: 25px;
-
-        .preview-image {
-            height: 100%;
-        }
-
-        h4 {
-            text-align: center;
-        }
 
         img {
-            /*box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);*/
-            position: relative;
-            height: 100%;
             width: 100%;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
+            height: $middleContainerSize;
+            object-fit: cover;
         }
 
-        .heading {
-            min-height: 48px;
-            width: 100%;
-            text-align: center;
-            border-bottom: 2px;
-            transform: translateY(25%);
-            font-size: 18px;
-
-            h4 {
-                min-height: 38px;
-            }
-        }
-
-        .card-container {
-            position: absolute;
-            padding: 2px 16px;
-            background-color: #ffffff;
-            width: 100%;
-
-        }
-
-        .card-container-bottom {
-            position: absolute;
-            bottom: 33px;
-            padding: 2px 16px;
-            background-color: #ffffff;
-            width: 100%;
-            font-size: 24px;
-            padding-bottom: 8px;
-            text-align: center;
-
-        }
-
-        .btn-bottom {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 40px;
-            border-radius: 0;
-        }
     }
 
     .card-label {
         margin-top: 5px;
         margin-left: 5px;
         font-weight: normal;
+        white-space: nowrap;
+    }
+
+    .flex-column {
+        height: 100%;
+        flex-direction: column;
+        display: flex;
+    }
+
+    .flex-row {
+        display: flex;
+        width: 100%;
+    }
+
+    .flex-grow {
+        flex: 1;
+    }
+
+    .flex-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title {
+        min-height: 3em;
+        text-align: center;
+
+        .text {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+
+    .underline {
+        border-bottom: $border;
+    }
+
+    .input-container {
+        height: $middleContainerSize;
     }
 
 </style>

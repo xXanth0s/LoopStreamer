@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import SeriesEpisode from '../models/series-episode.model';
 import { StateModel } from '../models/state.model';
 import { ProvidorLink } from '../../background/models/providor-link.model';
+import Series from '../models/series.model';
 
 
 const initialState: StateModel['seriesEpisodes'] = {};
@@ -71,14 +72,18 @@ const seriesEpisodesReducer = createSlice({
     name: 'seriesEpisodes',
     initialState,
     reducers: {
-        updateOrAddSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode>) => updateOrAddSeriesEpisode(state, action.payload),
-        updateOrAddMultipleSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode[]>) => updateOrAddMultipleSeriesEpisode(state, action.payload),
-        addProvidorLinkToEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorLink: ProvidorLink }>) => addProvidorLinkToEpisode(state, action),
-        setTimestampForSeriesEpisodeAction: (state: StateModel['seriesEpisodes'],
-                                             action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) => setTimestamp(state, action.payload),
-        seriesEpisodeFinishedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode['key']>) => setSeriesEpisodeFinished(state, action.payload),
-        seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'],
-                                     action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) => setSeriesEpisodeStarted(state, action.payload),
+        updateOrAddSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode>) =>
+            updateOrAddSeriesEpisode(state, action.payload),
+        updateOrAddMultipleSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode[]>) =>
+            updateOrAddMultipleSeriesEpisode(state, action.payload),
+        addProvidorLinkToEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorLink: ProvidorLink }>) =>
+            addProvidorLinkToEpisode(state, action),
+        setTimestampForSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) =>
+            setTimestamp(state, action.payload),
+        seriesEpisodeFinishedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode['key']>) =>
+            setSeriesEpisodeFinished(state, action.payload),
+        seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
+            setSeriesEpisodeStarted(state, action.payload),
     },
 });
 

@@ -28,10 +28,6 @@ body {
   bottom:15px;
 }
 
-.description{
-  margin: 50px;
-
-}
 .card-container {
   color: #333;
   border: 1px solid $borderColor;
@@ -186,4 +182,13 @@ body {
 
 .row [class*='col-'] {
   transition: flex 0.5s ease-in-out, max-width .5s ease-in-out;
+}
+
+.default-title-text {
+  font-size: 1em;
+  font-weight: 100;
+
+  .active {
+    font-weight: 500;
+  }
 }

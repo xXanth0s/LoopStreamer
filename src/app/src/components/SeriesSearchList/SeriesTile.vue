@@ -1,8 +1,8 @@
 <template>
 
     <div class="pt-2 px-1 col-4" @click="tileClicked">
-        <div class="tile center" :class="{'active-item': isSelected}">
-            <span class="title m-1 center">{{series.title}}</span>
+        <div :class="{'active-item': isSelected}" class="tile center default-title-text text-center">
+            <span :class="{'active': isSelected}" class="m-1">{{series.title}}</span>
         </div>
     </div>
 </template>
@@ -72,6 +72,8 @@
         height: 100%;
         background-color: #f8f6f6;
 
+        min-height: 4.5em;
+
         &:hover {
             background-color: darken(#f8f6f6, 5%);
         }
@@ -83,20 +85,10 @@
         &:hover {
             background-color: $primary-color;
         }
-
-        .title {
-            font-weight: 500;
-        }
     }
 
     .card:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 
-    .title {
-        text-align: center;
-        min-height: 4em;
-        font-size: 1em;
-        font-weight: 100;
-    }
 </style>

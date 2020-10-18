@@ -16,3 +16,14 @@ export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: S
 
     return getSeriesSeasonByKey(state, seasonKey);
 };
+
+export const getSeasonWithOffset = (state: StateModel, seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
+    const currentSeason = getSeriesSeasonByKey(state, seasonKey);
+
+    if (!currentSeason) {
+        return null;
+    }
+
+    return getSeasonsForSeries(state, currentSeason.seriesKey)
+        .find(season => season.seasonNumber === currentSeason.seasonNumber + offset);
+};

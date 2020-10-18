@@ -4,7 +4,7 @@ import { globalRoutes } from '../../constants/globalRoutes';
 import WelcomePage from '../views/WelcomePage.vue';
 import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
-import SeriesPage from '../views/SeriesPage.vue';
+import MySeriesPage from '../views/MySeriesPage.vue';
 import TestPage from '../views/TestPage.vue';
 import { isDevelopment } from '../../../utils/environment.utils';
 
@@ -21,7 +21,7 @@ let routes = [
     },
     {
         path: `/${globalRoutes.SERIES_PAGE}`,
-        component: SeriesPage
+        component: MySeriesPage
     },
     {
         path: `/${globalRoutes.FAQ_PAGE}`,

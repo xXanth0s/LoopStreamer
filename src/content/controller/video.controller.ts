@@ -27,7 +27,7 @@ export class VideoController {
         @inject(CONTENT_TYPES.PopupController) private readonly popupController: PopupController,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
     ) {
-        this.messageService.setControllerType(ControllerType.PROVIDOR)
+        this.messageService.setControllerType(ControllerType.PROVIDOR);
     }
 
     private readonly timeout = 10000;
@@ -47,7 +47,12 @@ export class VideoController {
 
     private async onVideoStarted(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
         this.videoStarted$.next();
-        await this.store.dispatch(seriesEpisodeStartedAction({seriesEpisodeKey: seriesEpisodeKey, duration: video.duration}));
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, seriesEpisodeKey);
+        await this.store.dispatch(seriesEpisodeStartedAction({
+            seriesEpisodeKey: seriesEpisodeKey,
+            duration: video.duration,
+            seriesKey: episode.seriesKey,
+        }));
 
         this.store.select(getSeriesEpisodeByKey, seriesEpisodeKey).pipe(
             first()
@@ -58,14 +63,14 @@ export class VideoController {
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
             this.popupTimeListener(video, episodeData, videoTimeUpdate$);
             addVideoButtons(episodeData);
-        })
+        });
     }
 
     private getVideoTimeChanges(video: HTMLVideoElement): Observable<number> {
         const onTimeSub$ = new Subject<number>();
         video.ontimeupdate = () => onTimeSub$.next(video.currentTime);
 
-        return onTimeSub$
+        return onTimeSub$;
     }
 
     private startErrorTimer(timeout: number): void {
@@ -73,7 +78,7 @@ export class VideoController {
             takeUntil(this.videoStarted$)
         ).subscribe(() => {
             console.error('VivoController: Problem with starting the video');
-        })
+        });
     }
 
     private popupTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
@@ -82,9 +87,9 @@ export class VideoController {
         videoTimeUpdate$.pipe(
             throttleTime(1000)
         ).subscribe(timeStamp => {
-            const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo))
+            const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo));
 
-            if(configToOpen) {
+            if (configToOpen) {
                 this.popupController.openPopup(configToOpen.pupupKey, video, episodeInfo);
                 popupConfigs = popupConfigs.filter(config => config.pupupKey !== configToOpen.pupupKey);
             }
@@ -92,20 +97,20 @@ export class VideoController {
     }
 
     private isTimeToOpenPopup(popupConfig: PopupConfig, currentTime: number, episodeInfo: SeriesEpisode): boolean {
-        if(popupConfig.openFromStart) {
+        if (popupConfig.openFromStart) {
             return currentTime > popupConfig.timeToOpen;
         }
 
-        const timeFromEnd = episodeInfo.duration - currentTime
-        return popupConfig.timeToOpen > timeFromEnd
+        const timeFromEnd = episodeInfo.duration - currentTime;
+        return popupConfig.timeToOpen > timeFromEnd;
     }
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
         videoTimeUpdate$.pipe(
             throttleTime(1000),
         ).subscribe(timestamp => {
-            this.store.dispatch(setTimestampForSeriesEpisodeAction({seriesEpisodeKey: key, timestamp }));
-        })
+            this.store.dispatch(setTimestampForSeriesEpisodeAction({ seriesEpisodeKey: key, timestamp }));
+        });
     }
 
     private setStartTime(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
