@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ControlState } from '../models/control-state.model';
 import Portal from '../models/portal.model';
 import Providor from '../models/providor.model';
-import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
@@ -16,7 +15,6 @@ const initialControlState: StateModel['controlState'] = {
     activePortal: PORTALS.BS,
     activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
-    loopStreamerStatus: LoopStreamerStatus.PLAYING,
     controllerWindowState: {},
     asyncInteractions: {},
 };
@@ -50,13 +48,6 @@ const resetControlState = (state: ControlState): ControlState => {
         activePortal: null,
         activeProvidor: null,
         expandedSeriesOptionsPage: null,
-    };
-};
-
-const setLoopStreamerStatus = (state: ControlState, loopStreamerStatus: ControlState['loopStreamerStatus']): ControlState => {
-    return {
-        ...state,
-        loopStreamerStatus
     };
 };
 
@@ -121,8 +112,6 @@ export const controlStateSlice = createSlice({
             setActivePortal(state, action.payload),
         setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) =>
             setActiveProvidor(state, action.payload),
-        setLoopStreamerStatusAction: (state: ControlState, action: PayloadAction<ControlState['loopStreamerStatus']>) =>
-            setLoopStreamerStatus(state, action.payload),
         resetControlStateAction: (state: ControlState) =>
             resetControlState(state),
         setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) =>
@@ -146,7 +135,6 @@ export const {
     updateControlStateAction,
     setActiveProvidorAction,
     resetControlStateAction,
-    setLoopStreamerStatusAction,
     setExpandedSeriesOptionsPageAction,
     setWindowIdForWindowTypeAction,
     setActiveEpisodeAction,

@@ -6,7 +6,7 @@ import { MessageService } from '../../shared/services/message.service';
 import { Observable, Subject } from 'rxjs';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowController } from './window.controller';
-import { getVideoWindowId } from '../../store/selectors/control-state.selector';
+import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
 import { createStartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
@@ -57,7 +57,7 @@ export class VideoController {
     }
 
     public reset(): void {
-        const videoWindowId = this.store.selectSync(getVideoWindowId);
+        const videoWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
         if (videoWindowId) {
             this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
             this.windowService.closeWindow(videoWindowId);

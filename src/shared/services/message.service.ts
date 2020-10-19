@@ -3,8 +3,9 @@ import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
-import { getVideoWindowId } from '../../store/selectors/control-state.selector';
+import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
 import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
+import { WindowType } from '../../store/enums/window-type.enum';
 
 @injectable()
 export class MessageService {
@@ -19,7 +20,7 @@ export class MessageService {
     }
 
     public async sendMessageToVideoWindow<T, R>(message: Message<T, R>): Promise<R | null> {
-        const videoTabId: number = this.storeService.selectSync(getVideoWindowId);
+        const videoTabId: number = this.storeService.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
         if (videoTabId) {
             return this.sendMessageToBrowserWindow(videoTabId, message);
         }
@@ -58,7 +59,6 @@ export class MessageService {
                 })
             }
         })
-
     }
 
     private getReplyChannel<T, R>(message: Message<T, R>): string {

@@ -1,7 +1,6 @@
 import Providor from './providor.model';
 import Series from './series.model';
 import Portal from './portal.model';
-import { LoopStreamerStatus } from '../enums/loop-streamer-status.enum';
 import { BrowserWindowStateModel } from './browser-window-state.model';
 import SeriesEpisode from './series-episode.model';
 import { AsyncInteraction } from './async-interaction.model';
@@ -9,10 +8,9 @@ import { AsyncInteraction } from './async-interaction.model';
 
 export interface ControlState {
     playedEpisodes: number;
-    loopStreamerStatus: LoopStreamerStatus;
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
-    activeEpisode?: SeriesEpisode['key']
+    activeEpisode?: SeriesEpisode['key'];
     expandedSeriesOptionsPage?: Series['key'];
     controllerWindowState: { [key: string]: BrowserWindowStateModel };
     asyncInteractions: { [key: string]: AsyncInteraction };
