@@ -4,28 +4,26 @@ import { mapArrayToObject } from '../utils/selector.utils';
 import { PROVIDORS } from '../enums/providors.enum';
 
 const initialState: {[key: string]: Providor} = {
-    Vivo : {
+    Vivo: {
         key: PROVIDORS.Vivo,
-        names: ['Vivo'],
-        index: 1,
+        names: [ 'Vivo' ],
+        index: 0,
         urlRegex: '^https://vivo',
         baseUrl: 'https://vivo.sx/*',
         controllerName: PROVIDORS.Vivo,
         isUsed: true,
         icon: '/assets/images/providors/vivo.png',
     },
-    // 'OpenLoad': {
-    //     key: "OpenLoad",
-    //     names: ['OpenLoad'],
-    //     index: 0,
-    //     urlRegex: "^https://openload",
-    //     url: "https://openload.co/*",
-    //     controllerName: PROVIDORS.Openload,
-    //     kinoxId: 67,
-    //     isUsed: true,
-    //     icon: "/resources/img/providors/openload.png",
-    //     checkElement: "#videooverlay"
-    // },
+    OpenLoad: {
+        key: PROVIDORS.Openload,
+        names: [ 'OpenLoad' ],
+        index: 1,
+        urlRegex: '^https://openload',
+        baseUrl: 'https://openload.co/*',
+        controllerName: PROVIDORS.Openload,
+        isUsed: true,
+        icon: '/resources/img/providors/openload.png',
+    },
 };
 
 const updateProvidors = (providors: Providor[]): {[key: string]: Providor} => {

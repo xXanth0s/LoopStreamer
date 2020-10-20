@@ -1,34 +1,22 @@
 <template>
-    <div>
-        <div class="row">
-            <h3>Hoster</h3>
-        </div>
-        <hr>
+    <card-tile :title="'Hoster'">
         <div class="row">
             <span>Verwende Drag & Drop um die Hoster zu sortieren</span>
         </div>
         <div class="row">
-            <p class="title">Verwendete Hoster:
-                <el-tooltip placement="bottom" effect="light">
-                    <div slot="content">In der hier angegebenen Reihenfolge wird<br>ein funktionierender Stream für
-                        die<br>geöffnete Serie gesucht
-                    </div>
-                    <i class="el-icon-info"></i>
-                </el-tooltip>
-            </p>
+            <p class="title">Verwendete Hoster:</p>
         </div>
         <div class="row">
             <div class="col">
-                <div class="prov-row drop-area">
-                    <draggable class="dragable" id="used-providors" :list="usedProvidors"
-                               :="{group:{name:'prov', pull:true, put:true }, draggable: '.drag-item'}"
-                               v-on:end="checkMove">
-                        <div v-for="element in usedProvidors" v-bind:key="element.key" class="drag-item">
-                            <div class="drop-item">
-                                <span class="item-name">{{element.key}}</span>
-                                <span class="drop-image-box float-right">
-                                    <img :src="element.icon">
-                                </span>
+                <div class="prov-row drop-area drop-area-not-used">
+                    <draggable :list="usedProvidors"
+                               :options="dragableConfig"
+                               class="dragable">
+                        <div :key="providor.key"
+                             class="drag-item"
+                             v-for="providor in usedProvidors">
+                            <div class="drop-item text-center">
+                                <span class="item-name">{{providor.key}}</span>
                             </div>
                         </div>
                     </draggable>
@@ -36,86 +24,123 @@
             </div>
         </div>
         <div class="row">
-            <p class="title">Nicht zu verwendende Hoster:
-                <el-tooltip placement="bottom" effect="light">
-                    <div slot="content">Diese Hoster werden bei der Suche<br>nach einem passenden Stream ignoriert</div>
-                    <i class="el-icon-info"></i>
-                </el-tooltip>
-            </p>
+            <p class="title">Nicht zu verwendende Hoster:</p>
         </div>
 
         <div class="row">
             <div class="col">
                 <div class="prov-row drop-area drop-area-not-used">
-                    <draggable class="dragable" id="not-used-providors" :list="unusedProvidors"
-                               :options="{group:{name:'prov', pull:true, put:true }, draggable: '.drag-item'}"
-                               v-on:end="checkMove">
-                        <div v-for="element in unusedProvidors" v-bind:key="element.key" class="drag-item">
-                            <div class="drop-item">
-                                <span class="item-name">{{element.key}}</span>
-                                <div v-if="element.icon != ''" class="drop-image-box float-right">
-                                    <img :src="element.icon">
-                                </div>
+                    <draggable :list="unusedProvidors"
+                               :options="dragableConfig"
+                               class="dragable">
+                        <div :key="providor.key"
+                             class="drag-item"
+                             v-for="providor in unusedProvidors">
+                            <div class="drop-item text-center">
+                                <span class="item-name">{{providor.key}}</span>
                             </div>
                         </div>
                     </draggable>
                 </div>
             </div>
         </div>
-        <div class="row col-row" style="align-self: flex-end;">
+        <div class="row col-row" style="">
             <b-button variant="primary" class="btn-bottom" @click="save">Speichern</b-button>
         </div>
-    </div>
+
+        <b-toast id="error-toast" solid>
+            <template #toast-title>
+                Fehler
+            </template>
+            <div class="flex-row">
+                <i class="fas fa-times red mr-3"></i>
+                <span>Mindestens ein Hoster muss verwendet werden</span>
+            </div>
+        </b-toast>
+
+        <b-toast id="success-hoster-toast" solid>
+            <template #toast-title>
+                Hoster Gespeichert
+            </template>
+            <div class="flex-row">
+                <i class="fas fa-check green mr-3"></i>
+                <span>Die Hoster wurden erfolgreich gespeichert</span>
+            </div>
+        </b-toast>
+    </card-tile>
 </template>
 
 <script lang="ts">
     import Draggable from 'vuedraggable';
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Emit, Prop, Watch } from 'vue-property-decorator';
     import Providor from '../../../store/models/providor.model';
+    import { StoreService } from '../../../shared/services/store.service';
+    import { MessageService } from '../../../shared/services/message.service';
+    import { optionsContainer } from '../container/container';
+    import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
+    import { getAllProvidors } from '../../../store/selectors/providors.selector';
+    import { updateProvidorsAction } from '../../../store/reducers/providors.reducer';
+    import CardTile from './CardTile.vue';
 
     @Component({
         name: 'save-providors',
         components: {
+            CardTile,
             Draggable,
         },
     })
     export default class ProvidorsPanel extends Vue {
 
+        private readonly dragableConfig = {
+            group: {
+                name: 'providor',
+                pull: true,
+                put: true,
+            },
+            draggable: '.drag-item',
+        };
+
         private usedProvidors: Providor[] = [];
         private unusedProvidors: Providor[] = [];
 
-        @Prop()
-        providors: Providor[] = [];
+        private store: StoreService;
+        private messageService: MessageService;
 
-        @Watch('providors', { immediate: true })
-        updateProvidors(newVal: Providor[]): void {
-            this.usedProvidors = newVal.filter(providor => providor.isUsed).sort(this.compareProvidorsIndex);
-            this.unusedProvidors = newVal.filter(providor => !providor.isUsed).sort(this.compareProvidorsIndex);
+        public beforeCreate(): void {
+            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        @Emit('save')
-        save(): Providor[] {
-            return [ ...this.unusedProvidors, ...this.usedProvidors ];
+        public created(): void {
+            const providors = this.store.selectSync(getAllProvidors);
+
+            this.usedProvidors = providors.filter(providor => providor.isUsed);
+            this.unusedProvidors = providors.filter(providor => !providor.isUsed);
         }
 
-        public checkMove(): void {
-            for (let i = 0; i < this.usedProvidors.length; i++) {
-                this.usedProvidors[i].index = i;
-                this.usedProvidors[i].isUsed = true;
-            }
-            for (let i = 0; i < this.unusedProvidors.length; i++) {
-                this.unusedProvidors[i].index = i + this.usedProvidors.length;
-                this.unusedProvidors[i].isUsed = false;
+        save(): void {
+            if (!this.usedProvidors.length) {
+                this.$bvToast.show('error-toast');
+            } else {
+                this.updateProvidors();
+                this.store.dispatch(updateProvidorsAction([ ...this.usedProvidors, ...this.unusedProvidors ]));
+                this.$bvToast.show('success-hoster-toast');
             }
         }
 
-        private compareProvidorsIndex(providorA?: Providor, providorB?: Providor): number {
-            if (providorA && providorB) {
-                return providorA.index - providorB.index;
-            }
-            return 0;
+        public updateProvidors(): void {
+            this.usedProvidors = this.usedProvidors.map((providor, index) => ({
+                ...providor,
+                index,
+                isUsed: true,
+            }));
+
+            this.unusedProvidors = this.unusedProvidors.map((providor, index) => ({
+                ...providor,
+                index,
+                isUsed: false,
+            }));
         }
     }
 </script>
@@ -123,6 +148,7 @@
 <style lang="scss" scoped>
     @import "src/styles/variables";
 
+    $dropItemSize: 25px;
     .btn-bottom {
         position: absolute;
         bottom: 24px;
@@ -134,8 +160,7 @@
     }
 
     .drop-area {
-        border: 1px solid $borderColor;
-        border-radius: 1px;
+        border: $border;
         min-height: $dropItemSize;
     }
 
@@ -168,5 +193,19 @@
 
     .dragable {
         min-height: $dropItemSize;
+    }
+
+    .red {
+        color: $red;
+    }
+
+    .green {
+        color: $green;
+    }
+
+    .flex-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 </style>

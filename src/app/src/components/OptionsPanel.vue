@@ -1,150 +1,107 @@
 <template>
-    <div>
-        <div class="row">
-            <h3>Allgemein</h3>
+    <card-tile :title="'Allgemein'">
+        <div class="flex-row">
+            <label>
+                Tote Episoden überspringen:
+                <info-tooltip :text="deadEpisodeTooltipText"/>
+            </label>
+            <toggle-button :labels="false"
+                           :style="toggleButtonColor"
+                           v-model="options.scipIfNoVideo"/>
         </div>
-        <hr>
-        <div class="row col-row">
-            <div class="col-sm-9">
-                <label>Automatisches Vollbild
-                    <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">Sobald LoopStreamer gestartet wird,<br/>wechselt der Browser automatisch<br>in
-                            den Vollbildmodus
-                        </div>
-                        <i class="el-icon-info"></i>
-                    </el-tooltip>
-                </label>
-            </div>
-            <div class="col-sm-3">
-                <el-switch class="float-right"
-                           v-model="options.makeFullscreen"
-                           active-color="#26aaaf"
-                           inactive-color="#d2d1d1">
-                </el-switch>
-            </div>
-        </div>
-        <div class="row col-row">
-            <div class="col-sm-9 col-label">
-                Videos vorbereiten
-                <el-tooltip placement="bottom" effect="light">
-                    <div slot="content">LoopStreamer bereitet im Hintergrund <br> die nächste Folge vor. Dadurch
-                        ist<br/>eine flüssigere Wiedergabe möglich
-                    </div>
-                    <i class="el-icon-info"></i>
-                </el-tooltip>
-
-            </div>
-            <div class="col-sm-3">
-                <el-switch class="float-right"
-                           v-model="options.prepareVideo"
-                           active-color="#26aaaf"
-                           inactive-color="#d2d1d1">
-                </el-switch>
-
-            </div>
-        </div>
-        <div class="row col-row">
-            <div class="col-sm-9 col-label">
-                <label>Tote Episoden überspringen
-                    <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">Falls kein funktionierender Stream<br>existiert, wird automatisch die<br>nächste
-                            Folge wiedergegeben
-                        </div>
-                        <i class="el-icon-info"></i>
-                    </el-tooltip>
-                </label>
-            </div>
-            <div class="col-sm-3">
-                <el-switch class="float-right"
-                           v-model="options.scipIfNoVideo"
-                           active-color="#26aaaf"
-                           inactive-color="#d2d1d1">
-                </el-switch>
-            </div>
-        </div>
-        <div class="row col-row">
-            <div class="col-sm-9 col-label">
-                <label>Portal Adblock
-                    <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">Adblocker für die Streamingportale<br>Falls du die Uploader unterstützen<br>willst,
-                            dann deaktiviere ihn
-                        </div>
-                        <i class="el-icon-info"></i>
-                    </el-tooltip>
-                </label>
-            </div>
-            <div class="col-sm-3">
-                <el-switch class="float-right"
-                           v-model="options.portalAdBlock"
-                           active-color="#26aaaf"
-                           inactive-color="#d2d1d1">
-                </el-switch>
-            </div>
-        </div>
-        <div class="row col-row">
-            <div class="col-sm-6 col-label">
-                <label>Episodenanzahl
-                    <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">So viele Episoden werden ohne<br>Unterbrechung wiedergegeben</div>
-                        <i class="el-icon-info"></i>
-                    </el-tooltip>
-                </label>
-            </div>
-            <div class="col-sm-6">
-                <el-input-number class="float-right" size="small" v-model="options.episodesToPlay"
-                                 :min="0"></el-input-number>
-            </div>
-        </div>
-        <div class="row col-row">
-            <div class="col-sm-6 col-label">
-                <label>Endcountdown
-                    <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">So lange wird die Beachrichtigung<br>für die nächste Episode angezeigt</div>
-                        <i class="el-icon-info"></i>
-                    </el-tooltip>
-                </label>
-            </div>
-            <div class="col-sm-6">
-                <el-input-number class="float-right" size="small" v-model.lazy="options.timeTillRequestPopup"
-                                 :min="0"></el-input-number>
-            </div>
+        <div class="flex-row pt-3">
+                <span>
+                    Episodenanzahl:
+                    <info-tooltip :text="episodeCountTooltipText"/>
+                </span>
+            <minus-plus-input v-model="options.episodesToPlay"></minus-plus-input>
         </div>
         <div class="row col-row">
             <b-button variant="primary" class="btn-bottom" @click="save">Speichern</b-button>
         </div>
 
-    </div>
+        <b-toast id="success-settings-toast" solid>
+            <template #toast-title>
+                Einstellungen Gespeichert
+            </template>
+            <div class="flex-row">
+                <i class="fas fa-check green mr-3"></i>
+                <span>Die allgemeinen Einstellungen wurden erfolgreich gespeichert</span>
+            </div>
+        </b-toast>
+    </card-tile>
 </template>
 
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Emit, Prop } from 'vue-property-decorator';
     import Options from '../../../store/models/options.model';
+    import { optionsContainer } from '../container/container';
+    import { StoreService } from '../../../shared/services/store.service';
+    import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
+    import { MessageService } from '../../../shared/services/message.service';
+    import { getOptions } from '../../../store/selectors/options.selector';
+    import { DEFAULT_COLOR } from '../../../constants/style-variables';
+    import InfoTooltip from './InfoTooltip.vue';
+    import { updateOptionsAction } from '../../../store/reducers/options.reducer';
+    import MinusPlusInput from './MinusPlusInput.vue';
+    import CardTile from './CardTile.vue';
+    import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
 
     @Component({
         name: 'options-panel',
+        components: {
+            CardTile,
+            MinusPlusInput,
+            InfoTooltip,
+        },
     })
     export default class OptionsPanel extends Vue {
-        @Prop(Object)
-        private options?: Options;
 
-        save(): void {
-            this.saveEmit();
+        private readonly toggleButtonColor = DEFAULT_COLOR;
+        private readonly deadEpisodeTooltipText = DEAD_EPISODES_TOOLTIP;
+        private readonly episodeCountTooltipText = EPISODE_COUNT_TOOLTIP;
+
+        private options: Options;
+
+        private store: StoreService;
+        private messageService: MessageService;
+
+        public beforeCreate(): void {
+            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        @Emit('save')
-        public saveEmit(): Options | undefined {
-            return this.options;
+        public created(): void {
+            this.options = {
+                ...this.store.selectSync(getOptions),
+            };
+        }
+
+        private save(): void {
+            this.store.dispatch(updateOptionsAction(this.options));
+            this.$bvToast.show('success-settings-toast');
         }
     }
 </script>
 
 <style lang="scss" scoped>
+    @import "src/styles/variables";
 
     .btn-bottom {
         position: absolute;
         bottom: 24px;
         right: 24px;
+    }
+
+    .flex-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .green {
+        color: $green;
     }
 </style>

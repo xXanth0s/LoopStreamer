@@ -4,14 +4,9 @@ import Options from '../models/options.model';
 
 const initialOptionsData: Options = {
     episodesToPlay: 0,
-    makeFullscreen: false,
-    showNotifications: false,
     timeTillSetEndtimePopup: 180,
     timeForEntimeCountdown: 15,
-    prepareVideo: false,
-    allowUserShare: false,
     scipIfNoVideo: false,
-    portalAdBlock: false
 };
 
 const updateOptions = function (options: Options): Options {

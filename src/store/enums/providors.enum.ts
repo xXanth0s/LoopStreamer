@@ -1,5 +1,6 @@
 export enum PROVIDORS {
     // Openload = "openload",
-    Vivo = "Vivo",
-    None = "none",
+    Vivo = 'Vivo',
+    Openload = 'Openload',
+    None = 'none',
 }

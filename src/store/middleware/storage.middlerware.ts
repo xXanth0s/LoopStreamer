@@ -5,6 +5,7 @@ import { StateModel } from '../models/state.model';
 const store = new ElectronStore();
 const stateKey = 'state';
 
+// store.reset(stateKey)
 export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => ((
     next: Dispatch
 ) => async action => {

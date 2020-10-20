@@ -18,11 +18,13 @@ import {
 } from 'element-ui';
 import BootstrapVue from 'bootstrap-vue';
 import { initBrowserStore } from '../../store/store/browser-store';
+import { ToggleButton } from 'vue-js-toggle-button';
 
 Vue.config.productionTip = false;
 
 initBrowserStore();
 
+Vue.component('ToggleButton', ToggleButton);
 Vue.use(Switch);
 Vue.use(InputNumber);
 Vue.use(Button);
@@ -36,7 +38,7 @@ Vue.use(Menu);
 Vue.use(MenuItem);
 Vue.use(BootstrapVue);
 
-  new Vue({
+new Vue({
     router,
     render: h => h(MainPage)
-  }).$mount('#app');
+}).$mount('#app');
