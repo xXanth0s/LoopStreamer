@@ -11,8 +11,8 @@ import { PORTALS } from '../enums/portals.enum';
 export interface StateModel {
     controlState: ControlState;
     options: Options;
-    portals: Record<PORTALS, Portal>;
-    providors: Record<PROVIDORS, Providor>;
+    portals: Partial<Record<PORTALS, Portal>>;
+    providors: Partial<Record<PROVIDORS, Providor>>;
     series: Record<Series['key'], Series>;
     lastWatchedSeries: Series['key'];
     seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;

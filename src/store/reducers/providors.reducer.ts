@@ -3,7 +3,7 @@ import Providor from '../models/providor.model';
 import { mapArrayToObject } from '../utils/selector.utils';
 import { PROVIDORS } from '../enums/providors.enum';
 
-const initialState: {[key: string]: Providor} = {
+const initialState: Partial<Record<PROVIDORS, Providor>> = {
     Vivo: {
         key: PROVIDORS.Vivo,
         names: [ 'Vivo' ],
@@ -14,7 +14,7 @@ const initialState: {[key: string]: Providor} = {
         isUsed: true,
         icon: '/assets/images/providors/vivo.png',
     },
-    OpenLoad: {
+    Openload: {
         key: PROVIDORS.Openload,
         names: [ 'OpenLoad' ],
         index: 1,
