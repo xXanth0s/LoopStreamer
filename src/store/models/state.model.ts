@@ -5,14 +5,16 @@ import Series from './series.model';
 import { ControlState } from './control-state.model';
 import SeriesEpisode from './series-episode.model';
 import { SeriesSeason } from './series-season.model';
+import { PROVIDORS } from '../enums/providors.enum';
+import { PORTALS } from '../enums/portals.enum';
 
 export interface StateModel {
     controlState: ControlState;
     options: Options;
-    portals: { [key: string]: Portal };
-    providors: { [key: string]: Providor };
-    series: { [key: string]: Series };
+    portals: Record<PORTALS, Portal>;
+    providors: Record<PROVIDORS, Providor>;
+    series: Record<Series['key'], Series>;
     lastWatchedSeries: Series['key'];
-    seriesEpisodes: { [key: string]: SeriesEpisode };
-    seriesSeasons: { [key: string]: SeriesSeason };
+    seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;
+    seriesSeasons: Record<SeriesSeason['key'], SeriesSeason>;
 }

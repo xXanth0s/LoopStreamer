@@ -4,6 +4,7 @@ import Portal from './portal.model';
 import { BrowserWindowStateModel } from './browser-window-state.model';
 import SeriesEpisode from './series-episode.model';
 import { AsyncInteraction } from './async-interaction.model';
+import { WindowType } from '../enums/window-type.enum';
 
 
 export interface ControlState {
@@ -12,6 +13,6 @@ export interface ControlState {
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key'];
     expandedSeriesOptionsPage?: Series['key'];
-    controllerWindowState: { [key: string]: BrowserWindowStateModel };
-    asyncInteractions: { [key: string]: AsyncInteraction };
+    controllerWindowState: Record<WindowType, BrowserWindowStateModel>;
+    asyncInteractions: Record<AsyncInteraction['key'], AsyncInteraction>;
 }

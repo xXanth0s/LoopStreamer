@@ -3,8 +3,6 @@ import { Windows } from 'webextension-polyfill-ts';
 import WindowState = Windows.WindowState;
 
 export class BrowserWindowStateModel {
-    previousWidth?: number;
-    previousHeight?: number;
     width?: number;
     height?: number;
     key: WindowType;
