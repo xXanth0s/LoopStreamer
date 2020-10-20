@@ -43,9 +43,9 @@ export class WindowService {
     }
 
     public addReduxDevTools(): void {
-        BrowserWindow.addDevToolsExtension(
-            path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
-        );
+        // BrowserWindow.addDevToolsExtension(
+        //     path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
+        // );
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
@@ -211,9 +211,11 @@ export class WindowService {
             icon: path.resolve(__dirname, 'assets', 'logo.ico'),
             fullscreenable: true,
             webPreferences: {
+                enableRemoteModule: true,
                 session: session.defaultSession,
-                nodeIntegration: config.nodeIntegration,
-                preload: config.preloadScript ? path.resolve(__dirname, 'content.js') : undefined,
+                // nodeIntegration: config.nodeIntegration,
+                nodeIntegration: true,
+                preload: config.preloadScript ? path.resolve(__dirname, 'preload.js') : undefined,
                 webSecurity: true,
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,

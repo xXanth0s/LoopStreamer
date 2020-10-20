@@ -15,7 +15,6 @@ import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
-import styles from '../styles/content.scss';
 import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
 
 @injectable()
@@ -26,7 +25,7 @@ export class RootContentController {
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
-            styles.use();
+            // styles.use();
             this.recaptchaService.checkForRecaptcha();
             addCustomFrame();
         });

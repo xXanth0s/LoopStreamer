@@ -28,7 +28,7 @@ export class NotificationService {
                 return;
             }
             // @ts-ignore
-            import(/* webpackChunkName: "iziToast" */ 'iziToast').then((iziToast: IziToast) => {
+            import(/* webpackChunkName: "izitoast" */ 'izitoast').then((iziToast: IziToast) => {
                 this._iziToast = iziToast;
                 resolve(this._iziToast);
             });
