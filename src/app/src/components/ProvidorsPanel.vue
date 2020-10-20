@@ -149,6 +149,7 @@
     @import "src/styles/variables";
 
     $dropItemSize: 25px;
+
     .btn-bottom {
         position: absolute;
         bottom: 24px;

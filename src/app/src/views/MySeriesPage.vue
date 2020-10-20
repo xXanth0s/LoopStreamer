@@ -10,7 +10,7 @@
             <div v-if="series.length" class="row">
                 <series-panel :series-key="serie.key"
                               v-bind:key="serie.key"
-                              class="mb-3 col-12 col-md-6 col-lg-4"
+                              class="mb-3 col-12 col-md-4"
                               v-for="serie in series"></series-panel>
             </div>
             <div v-else>

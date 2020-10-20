@@ -1,5 +1,5 @@
 <template>
-    <div class="input-group">
+    <div class="input-group input-group-sm">
         <div class="input-group-prepend">
             <span :class="{disabled: isMinusButtonDisabled}"
                   @click="changeValue(-1)"
@@ -33,7 +33,7 @@
 
         @Emit('input')
         public inputChanged(): number {
-            return this.inputValue;
+            return +this.inputValue;
         }
 
         @Watch('value')
@@ -77,7 +77,7 @@
     }
 
     .number-input {
-        max-width: 50px;
+        max-width: 42px;
         text-align: center;
     }
 </style>

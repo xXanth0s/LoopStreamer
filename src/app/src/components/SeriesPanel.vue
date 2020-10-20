@@ -1,7 +1,7 @@
 <template>
     <div v-if="series">
         <div class="card">
-            <div class="flex-column" key="front" v-if="!hideContent">
+            <div class="flex-column" v-if="!hideContent">
                 <div>
                     <img :src="series.posterHref" @click="changeView()" alt="Avatar">
                 </div>
@@ -11,35 +11,27 @@
                 <b-button @click="changeView" block class="btn-bottom" variant="primary"><i
                         class="el-icon-arrow-right"></i></b-button>
             </div>
-            <div class="flex-column" key="back" v-else>
+            <div class="flex-column" v-else>
                 <div class="default-title-text flex-center title underline" v-bind:title="series.title">
                     <span class="active text px-1">{{series.title}}</span>
                 </div>
-                <div class="px-3 flex-column input-container">
-                    <div class="flex-row mt-3">
-                        <div class="flex-grow">
-                            <label class="card-label">Intro
-                                <i class="far fa-question-circle"
-                                   title="Sekunden die zu Beginn einer Folge übersprungen werden"
-                                   v-b-tooltip.hover/>
-                            </label>
+                <div class="px-3 d-flex flex-column input-container">
+                    <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+                        <div class="d-flex">
+                            <div class="d-flex">Intro:
+                                <info-tooltip :text="scipStartTimeTooltipText" class="pl-1"/>
+                            </div>
                         </div>
                         <div>
-                            <el-input-number :min="0" size="small"
-                                             v-model="scipS"></el-input-number>
+                            <minus-plus-input v-model="scipS"/>
                         </div>
                     </div>
-                    <div class="flex-row mt-3">
-                        <div class="flex-grow">
-                            <label class="card-label">
-                                Outro
-                                <i class="far fa-question-circle"
-                                   title="Sekunden die zu Ende einer Folge übersprungen werden"
-                                   v-b-tooltip.hover/>
-                            </label>
-                        </div>
-                        <el-input-number :min="0" size="small"
-                                         v-model="scipE"></el-input-number>
+                    <div class="d-flex flex-row justify-content-between align-items-center mt-3">
+                            <span class="d-flex">
+                                Outro:
+                                <info-tooltip :text="scipEndTimeTooltipText" class="pl-1"/>
+                            </span>
+                        <minus-plus-input v-model="scipE"/>
                     </div>
                     <div class="flex-grow"></div>
                     <b-button @click="continueSeries" block class="mb-2" v-if="hasNextEpisode" variant="primary">
@@ -72,12 +64,18 @@
     import { StoreService } from '../../../shared/services/store.service';
     import { getSeriesByKey, isSeriesContinuable } from '../../../store/selectors/series.selector';
     import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../../store/reducers/series.reducer';
+    import InfoTooltip from './InfoTooltip.vue';
+    import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../constants/tooltip-texts';
+    import MinusPlusInput from './MinusPlusInput.vue';
 
     @Component({
         name: 'series-panel',
+        components: { MinusPlusInput, InfoTooltip },
     })
     export default class SeriesPanel extends Vue {
         private readonly takeUntil$ = new Subject();
+        private readonly scipStartTimeTooltipText = SERIES_PANEL_SCIP_START_TIME;
+        private readonly scipEndTimeTooltipText = SERIES_PANEL_SCIP_END_TIME;
 
         @Prop(String)
         private seriesKey: Series['key'];
@@ -130,7 +128,7 @@
         }
 
         @Watch('seriesKey')
-        private seriesChanged(seriesKey: string): void {
+        private seriesChanged(): void {
             this.takeUntil$.next();
             this.loadSeriesFromStore();
         }
@@ -161,6 +159,7 @@
             this.store.selectBehaviour(isSeriesContinuable, this.seriesKey).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isContinuable => this.hasNextEpisode = isContinuable);
+
         }
     }
 </script>
@@ -193,17 +192,6 @@
         margin-left: 5px;
         font-weight: normal;
         white-space: nowrap;
-    }
-
-    .flex-column {
-        height: 100%;
-        flex-direction: column;
-        display: flex;
-    }
-
-    .flex-row {
-        display: flex;
-        width: 100%;
     }
 
     .flex-grow {
