@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import {
+    app,
     BeforeSendResponse,
     BrowserWindow,
     BrowserWindowConstructorOptions,
@@ -66,6 +67,9 @@ export class WindowService {
         const browserWindow = BrowserWindow.fromId(windowId);
         if (browserWindow?.closable) {
             browserWindow.close();
+        }
+        if (windowId === 1) {
+            app.quit();
         }
     }
 
@@ -202,6 +206,7 @@ export class WindowService {
     }
 
     private getConfig(config: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
+
         return {
             width: 1600,
             height: 900,

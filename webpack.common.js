@@ -6,7 +6,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
-    content: [
+    preload: [
       path.resolve(__dirname, 'src', 'content', 'main.ts'),
     ],
   },
@@ -72,15 +72,5 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new CopyPlugin([
-      {
-        from: 'assets',
-        to: 'assets',
-      },
-      {
-        from: 'extensions',
-        to: 'extensions',
-      },
-    ]),
   ],
 };

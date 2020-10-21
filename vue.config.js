@@ -1,5 +1,4 @@
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   lintOnSave: false,
@@ -25,6 +24,16 @@ module.exports = {
   },
   configureWebpack: () => ({
     devtool: 'source-map',
+    node: {
+      __dirname: true,
+    },
+    devServer: {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+      },
+    },
   }),
 
   pluginOptions: {
@@ -37,63 +46,10 @@ module.exports = {
         'src/background/**/*.ts',
         'src/browserMessages/**/*.ts',
       ],
-      preload: path.resolve(__dirname, 'src', 'content', 'main.ts'),
-
-      chainWebpackMainProcess: (config) => {
+      preload: {
+        content: path.resolve(__dirname, 'dist_electron', 'content.js'),
+        'vendors~izitoast.bundle': path.resolve(__dirname, 'dist_electron', 'vendors~izitoast.bundle.js'),
       },
-
-      chainWebpackRendererProcess: (config) => {
-        config.merge({
-          module: {
-            rules: [
-              {
-                test: /\.s[ac]ss$/i,
-                use: [
-                  {
-                    loader: 'style-loader',
-                    options: {
-                      esModule: true,
-                      injectType: 'lazyStyleTag',
-                    },
-                  },
-                  'css-loader',
-                  'sass-loader',
-                ],
-              },
-              {
-                test: /\.(svg|eot|woff|woff2|ttf)$/,
-                use: [{
-                  loader: 'file-loader',
-                  options: {
-                    outputPath: 'fonts',
-                    name: '[name].[ext]',
-                    publicPath: 'http://localhost:8080/fonts/',
-                  },
-
-                }],
-              },
-              {
-                test: /\.vue$/,
-                loader: 'vue-loader',
-              },
-              {
-                test: /\.tsx?$/,
-                loader: 'ts-loader',
-                options: {
-                  transpileOnly: true,
-                  appendTsSuffixTo: [
-                    '\\.vue$',
-                  ],
-                  happyPackMode: false,
-                },
-              },
-            ],
-          },
-          plugins: [
-            new VueLoaderPlugin(),
-          ]
-        });
-      }
     },
   },
 };
