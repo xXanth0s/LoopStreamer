@@ -21,6 +21,7 @@ import { getWindowStateForWindowId, getWindowStateForWindowType } from '../../st
 import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/control-state.reducer';
 import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
+import { LoggingService } from '../../shared/services/logging.service';
 import WindowState = Windows.WindowState;
 
 
@@ -40,7 +41,8 @@ export class WindowService {
 
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
-    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
+                @inject(SHARED_TYPES.LoggingService) private readonly logger: LoggingService) {
     }
 
     public addReduxDevTools(): void {
@@ -50,13 +52,18 @@ export class WindowService {
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
-        let finalConfig = { ...DefaultOpenWindowConfig, ...config };
-        const windowConfig = this.getConfig(finalConfig);
-        const window = new BrowserWindow(windowConfig);
-        window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
-        this.addDefaultHandlingForNewWindow(window);
-        this.addAdblockerForSession(window.webContents.session);
-        return window;
+        try {
+            let finalConfig = { ...DefaultOpenWindowConfig, ...config };
+            const windowConfig = this.getConfig(finalConfig);
+            const window = new BrowserWindow(windowConfig);
+            window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
+            this.addDefaultHandlingForNewWindow(window);
+            this.addAdblockerForSession(window.webContents.session);
+            return window;
+        } catch (e) {
+            this.logger.error('[WindowService->openWindow]', e);
+        }
+
     }
 
     public closeWindow(windowId?: number): void {
