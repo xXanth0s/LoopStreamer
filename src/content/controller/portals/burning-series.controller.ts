@@ -47,7 +47,7 @@ export class BurningSeriesController implements IPortalController {
     }
 
     public getAllSeriesInfo(): SeriesInfoDto[] {
-        const links = this.seriesOverviewListLinkSelector();
+        const links = this.seriesOverviewListLinkSelector() || [];
         const collection = [ ...links ];
         return collection.map((linkInfo: HTMLAnchorElement) => {
             const title = linkInfo.text;

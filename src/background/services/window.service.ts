@@ -23,6 +23,7 @@ import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { LoggingService } from '../../shared/services/logging.service';
 import WindowState = Windows.WindowState;
+import { environment } from '../../../environments/environment';
 
 
 export type OpenWindowConfig = {
@@ -40,7 +41,7 @@ export type OpenWindowConfig = {
 export class WindowService {
 
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
-
+    private readonly preloadScript = 'app://./preloadxx.js';
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.LoggingService) private readonly logger: LoggingService) {
     }
@@ -56,9 +57,10 @@ export class WindowService {
             let finalConfig = { ...DefaultOpenWindowConfig, ...config };
             const windowConfig = this.getConfig(finalConfig);
             const window = new BrowserWindow(windowConfig);
-            window.loadURL(href, { httpReferrer: finalConfig.httpReferrer });
+            window.loadURL(href);
             this.addDefaultHandlingForNewWindow(window);
-            this.addAdblockerForSession(window.webContents.session);
+            // this.addAdblockerForSession(window.webContents.session);
+            console.log('window opened')
             return window;
         } catch (e) {
             this.logger.error('[WindowService->openWindow]', e);
@@ -143,10 +145,10 @@ export class WindowService {
 
     private hideNewWindows(window: BrowserWindow): void {
         window.webContents.on('new-window', (e, url, frameName, disposition, options) => {
-            options.show = Boolean(+process.env.SHOW_NEW_WINDOWS);
+            options.show = environment.showNewWindows;
         });
 
-        if (Boolean(+process.env.OPEN_DEV_TOOLS)) {
+        if (environment.openDevTools) {
             window.webContents.openDevTools();
         }
     }

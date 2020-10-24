@@ -2,15 +2,15 @@ import { inversifyContentContainer } from './container/container';
 import { RootContentController } from './controller/root-content.controller';
 import { CONTENT_TYPES } from './container/CONTENT_TYPES';
 import { initBrowserStore } from '../store/store/browser-store';
-import { isDevelopment } from '../utils/environment.utils';
 import { TestController } from './controller/test.controller';
+import { environment } from '../../environments/environment';
 
 initBrowserStore()
 const contentController = inversifyContentContainer.get<RootContentController>(CONTENT_TYPES.RootController);
 
 contentController.init();
 
-if(isDevelopment()) {
+if(environment.isDev) {
     inversifyContentContainer.get<TestController>(CONTENT_TYPES.TestController).initialize();
 }
 

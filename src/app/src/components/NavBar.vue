@@ -14,13 +14,13 @@
 </template>
 
 <script lang="ts">
-    import Vue from 'vue';
-    import Component from 'vue-class-component';
-    import WindowControlButtons from '../../../shared/html/components/WindowControlButtons.vue';
-    import { globalRoutes } from '../../constants/globalRoutes';
-    import { isDevelopment } from '../../../utils/environment.utils';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import WindowControlButtons from '../../../shared/html/components/WindowControlButtons.vue';
+import { globalRoutes } from '../../constants/globalRoutes';
+import { environment } from '../../../../environments/environment';
 
-    @Component({
+@Component({
         name: 'NavBar',
         components: {
             WindowControlButtons,
@@ -28,7 +28,7 @@
     })
     export default class NavBar extends Vue {
         private readonly routesConst = globalRoutes;
-        private readonly isDev = isDevelopment();
+        private readonly isDev = environment.isDev;
     }
 </script>
 

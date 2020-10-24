@@ -1,11 +1,11 @@
 import { injectable } from 'inversify';
 import * as log from 'electron-log';
-import { isDevelopment } from '../../utils/environment.utils';
+import { environment } from '../../../environments/environment';
 
 @injectable()
 export class LoggingService {
 
-    private readonly isDev = isDevelopment();
+    private readonly isDev = environment.isDev;
 
     public error(message, ...args: any[]): void {
         this.execute(message, logType.error, ...args);

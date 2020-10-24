@@ -19,7 +19,6 @@ export function finalizeWithValue<T>(callback: (value: T) => void): MonoTypeOper
         let lastValue: T;
         return source.pipe(
             tap(value => lastValue = value),
-            tap(value => console.log(value)),
             finalize(() => callback(lastValue)),
         );
     });

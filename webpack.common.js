@@ -42,18 +42,6 @@ module.exports = {
         ],
       },
       {
-        test: /\.(svg|eot|woff|woff2|ttf)$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            outputPath: 'fonts',
-            name: '[name].[ext]',
-            publicPath: 'http://localhost:8080/fonts/',
-          },
-
-        }],
-      },
-      {
         test: /\.vue$/,
         loader: 'vue-loader',
       },

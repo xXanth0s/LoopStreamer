@@ -1,9 +1,10 @@
 import { OpenWindowConfig } from '../services/window.service';
+import { environment } from '../../../environments/environment';
 
 export const DefaultOpenWindowConfig: Required<OpenWindowConfig> = {
     fullscreen: false,
     httpReferrer: null,
     nodeIntegration: false,
     preloadScript: true,
-    visible: Boolean(+process.env.SHOW_NEW_WINDOWS)
+    visible: environment.showNewWindows
 }

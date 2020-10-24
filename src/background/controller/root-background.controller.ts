@@ -43,7 +43,7 @@ import { PROVIDORS } from '../../store/enums/providors.enum';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { addProvidorLinkToEpisodeAction } from '../../store/reducers/series-episode.reducer';
-import { isDevelopment } from '../../utils/environment.utils';
+import { environment } from '../../../environments/environment';
 
 @injectable()
 export class RootBackgroundController {
@@ -75,8 +75,8 @@ export class RootBackgroundController {
 
     public openStartPage(): void {
         let href: string;
-        const isDev = isDevelopment();
-        if (isDev) {
+        const { isDev, openAppDevTools } = environment;
+        if(isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
             this.windowService.addReduxDevTools();
         } else {
@@ -87,9 +87,10 @@ export class RootBackgroundController {
         const window = this.windowService.openWindow(href, this.appWindowConfig);
 
         this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: window.id, windowType: WindowType.APP }));
-        if (isDev) {
+
+        if (openAppDevTools) {
+            window.webContents.openDevTools();
         }
-        window.webContents.openDevTools();
     }
 
     private initializeHandler(): void {

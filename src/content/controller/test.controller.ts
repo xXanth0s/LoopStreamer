@@ -19,7 +19,8 @@ export class TestController {
         ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_RECAPTCHA, (event, message: StartTestRecaptchaMessage) => {
             this.executeRecaptchaChallenge();
         });
-        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, (event, message: TestNotificationMessage) => {
+        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION,async (event, message: TestNotificationMessage) => {
+            await this.notificationService.openTestPopup();
             addVideoButtons({ key: '1983-S1-E3' } as SeriesEpisode);
         });
     }

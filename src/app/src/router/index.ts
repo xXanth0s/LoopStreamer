@@ -6,7 +6,7 @@ import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
 import MySeriesPage from '../views/MySeriesPage.vue';
 import TestPage from '../views/TestPage.vue';
-import { isDevelopment } from '../../../utils/environment.utils';
+import { environment } from '../../../../environments/environment';
 
 Vue.use(VueRouter);
 
@@ -33,11 +33,11 @@ let routes = [
     },
     {
         path: '/',
-        redirect: isDevelopment() ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`
+        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`
     },
 ];
 
-if (!isDevelopment()) {
+if (!environment.isDev) {
     routes = routes.filter(route => route.component !== TestPage);
 }
 

@@ -15,11 +15,13 @@ import { WindowService } from '../services/window.service';
 import { SeriesService } from '../../shared/services/series.service';
 import { PortalService } from '../services/portalService';
 import { TestController } from '../controller/test.controller';
+import { LoggingService } from '../../shared/services/logging.service';
 
 const inversifyContainer = new Container();
 
 // shared
 inversifyContainer.bind(SHARED_TYPES.MessageService).to(MessageService).inSingletonScope();
+inversifyContainer.bind(SHARED_TYPES.LoggingService).to(LoggingService).inSingletonScope();
 inversifyContainer.bind(SHARED_TYPES.ControllerType).toConstantValue(ControllerType.BACKGROUND);
 
 // store

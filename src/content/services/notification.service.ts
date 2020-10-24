@@ -23,15 +23,17 @@ export class NotificationService {
     private get iziToast(): Promise<IziToast> {
         return new Promise<IziToast>(resolve => {
 
-            if (this._iziToast) {
-                resolve(this._iziToast);
-                return;
-            }
-            // @ts-ignore
-            import(/* webpackChunkName: "izitoast" */ 'izitoast').then((iziToast: IziToast) => {
-                this._iziToast = iziToast;
-                resolve(this._iziToast);
-            });
+            // if (this._iziToast) {
+            //     resolve(this._iziToast);
+            //     return;
+            // }
+            //
+            // // @ts-ignore
+            // import(/* webpackChunkName: "izitoast" */ 'izitoast').then((iziToast: IziToast) => {
+            //     this._iziToast = iziToast;
+            //     resolve(this._iziToast);
+            // });
+            return {}
         });
     }
 
@@ -119,6 +121,17 @@ export class NotificationService {
                 }, false ]
             ]
         });
+    }
+
+    public async openTestPopup(): Promise<void> {
+        const iziToast = await this.iziToast;
+        debugger
+        iziToast.show({
+            ...this.defaultConfig,
+            timeout: 0,
+            title: 'Test Nachricht',
+            message: 'Dies ist ein Test',
+        })
     }
 
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
