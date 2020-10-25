@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { IziToast, IziToastPosition, IziToastSettings, IziToastTransitionIn, IziToastTransitionOut } from 'izitoast';
+import Toastr from 'toastr2';
 
-@injectable()
 export class NotificationService {
 
     private readonly defaultConfig: IziToastSettings = {
@@ -23,6 +23,7 @@ export class NotificationService {
     private get iziToast(): Promise<IziToast> {
         return new Promise<IziToast>(resolve => {
 
+            resolve({});
             // if (this._iziToast) {
             //     resolve(this._iziToast);
             //     return;
@@ -33,7 +34,6 @@ export class NotificationService {
             //     this._iziToast = iziToast;
             //     resolve(this._iziToast);
             // });
-            return {}
         });
     }
 
@@ -123,15 +123,10 @@ export class NotificationService {
         });
     }
 
-    public async openTestPopup(): Promise<void> {
-        const iziToast = await this.iziToast;
-        debugger
-        iziToast.show({
-            ...this.defaultConfig,
-            timeout: 0,
-            title: 'Test Nachricht',
-            message: 'Dies ist ein Test',
-        })
+    public static async openTestPopup(): Promise<void> {
+
+        const toastr = new Toastr();
+        toastr.info('test')
     }
 
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
