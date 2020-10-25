@@ -22,8 +22,8 @@ import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/
 import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { LoggingService } from '../../shared/services/logging.service';
-import WindowState = Windows.WindowState;
 import { environment } from '../../../environments/environment';
+import WindowState = Windows.WindowState;
 
 
 export type OpenWindowConfig = {
@@ -41,15 +41,15 @@ export type OpenWindowConfig = {
 export class WindowService {
 
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
-    private readonly preloadScript = 'app://./preloadxx.js';
+
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.LoggingService) private readonly logger: LoggingService) {
     }
 
     public addReduxDevTools(): void {
-        // BrowserWindow.addDevToolsExtension(
-        //     path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
-        // );
+        BrowserWindow.addDevToolsExtension(
+            path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
+        );
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
@@ -59,8 +59,7 @@ export class WindowService {
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
             this.addDefaultHandlingForNewWindow(window);
-            // this.addAdblockerForSession(window.webContents.session);
-            console.log('window opened')
+            this.addAdblockerForSession(window.webContents.session);
             return window;
         } catch (e) {
             this.logger.error('[WindowService->openWindow]', e);
@@ -227,8 +226,7 @@ export class WindowService {
             webPreferences: {
                 enableRemoteModule: true,
                 session: session.defaultSession,
-                // nodeIntegration: config.nodeIntegration,
-                nodeIntegration: true,
+                nodeIntegration: config.nodeIntegration,
                 preload: config.preloadScript ? path.resolve(__dirname, 'preload.js') : undefined,
                 webSecurity: true,
                 allowRunningInsecureContent: true,

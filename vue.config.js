@@ -2,63 +2,53 @@ const path = require('path');
 
 const isProd = process.env.NODE_ENV === 'production';
 
-let preload;
-if(isProd) {
-    preload = {
-        preload: path.resolve(__dirname, 'dist_electron', 'preload.js'),
-        'vendors~izitoast.bundle': path.resolve(__dirname, 'dist_electron', 'vendors~izitoast.bundle.js'),
-    };
-}
-
 module.exports = {
-    lintOnSave: false,
-    filenameHashing: false,
-    productionSourceMap: false,
-    outputDir: `${__dirname}/dist_electron`,
-    pages: {
-        index: {
-            // entry for the page
-            entry: 'src/app/src/main.ts',
-            // the source template
-            template: 'src/app/public/index.html',
-            // output as dist/index.html
-            filename: 'index.html',
-            // when using title option,
-            // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-            title: 'LoopStreamer',
-            // chunks to include on this page, by default includes
-            // extracted common chunks and vendor chunks.
-            chunks: ['chunk-vendors', 'chunk-common', 'index'],
-        },
-        background: 'src/background/background.ts',
-
+  lintOnSave: false,
+  filenameHashing: false,
+  outputDir: `${__dirname}/dist_electron`,
+  pages: {
+    index: {
+      // entry for the page
+      entry: 'src/app/src/main.ts',
+      // the source template
+      template: 'src/app/public/index.html',
+      // output as dist/index.html
+      filename: 'index.html',
+      // when using title option,
+      // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
+      title: 'LoopStreamer',
+      // chunks to include on this page, by default includes
+      // extracted common chunks and vendor chunks.
+      chunks: ['chunk-vendors', 'chunk-common', 'index'],
     },
-    configureWebpack: () => ({
-        devtool: 'source-map',
-        node: {
-            __dirname: true,
-        },
-        devServer: {
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-                'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
-            },
-            // writeToDisk: true
-        },
-    }),
+    background: 'src/background/background.ts',
 
-    pluginOptions: {
-        electronBuilder: {
-            nodeIntegration: true,
-            mainProcessFile: 'src/background/background.ts',
-            mainProcessWatch: [
-                'src/shared/**/*.ts',
-                'src/store/**/*.ts',
-                'src/background/**/*.ts',
-                'src/browserMessages/**/*.ts',
-            ],
-            preload,
-        },
+  },
+  configureWebpack: () => ({
+    devtool: 'source-map',
+    node: {
+      __dirname: true,
     },
+    devServer: {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+      },
+    },
+  }),
+
+  pluginOptions: {
+    electronBuilder: {
+      nodeIntegration: true,
+      mainProcessFile: 'src/background/background.ts',
+      mainProcessWatch: [
+        'src/shared/**/*.ts',
+        'src/store/**/*.ts',
+        'src/background/**/*.ts',
+        'src/browserMessages/**/*.ts',
+      ],
+      preload: isProd ? path.resolve(__dirname, 'dist_electron', 'preload.js') : undefined,
+    },
+  },
 };

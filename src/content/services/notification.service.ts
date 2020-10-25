@@ -1,7 +1,13 @@
 import { injectable } from 'inversify';
-import { IziToast, IziToastPosition, IziToastSettings, IziToastTransitionIn, IziToastTransitionOut } from 'izitoast';
-import Toastr from 'toastr2';
+import iziToast, {
+    IziToast,
+    IziToastPosition,
+    IziToastSettings,
+    IziToastTransitionIn,
+    IziToastTransitionOut
+} from '../../../custom_frameworks/izitoast/1.4.0';
 
+@injectable()
 export class NotificationService {
 
     private readonly defaultConfig: IziToastSettings = {
@@ -18,27 +24,7 @@ export class NotificationService {
         timeout: 0,
     };
 
-    private _iziToast: IziToast = null;
-
-    private get iziToast(): Promise<IziToast> {
-        return new Promise<IziToast>(resolve => {
-
-            resolve({});
-            // if (this._iziToast) {
-            //     resolve(this._iziToast);
-            //     return;
-            // }
-            //
-            // // @ts-ignore
-            // import(/* webpackChunkName: "izitoast" */ 'izitoast').then((iziToast: IziToast) => {
-            //     this._iziToast = iziToast;
-            //     resolve(this._iziToast);
-            // });
-        });
-    }
-
-    public async openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void): Promise<void> {
-        const iziToast = await this.iziToast;
+    public openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             title: 'Intro definieren',
@@ -56,8 +42,7 @@ export class NotificationService {
         });
     }
 
-    public async openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, continueFn: () => void): Promise<void> {
-        const iziToast = await this.iziToast;
+    public openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, continueFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
@@ -78,8 +63,7 @@ export class NotificationService {
         });
     }
 
-    public async openEndTimePopup(timeoutSeconds: number, continueFn: () => void, cancel: () => void): Promise<void> {
-        const iziToast = await this.iziToast;
+    public openEndTimePopup(timeoutSeconds: number, continueFn: () => void, cancel: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
@@ -101,8 +85,7 @@ export class NotificationService {
     }
 
 
-    public async openEpisodeLimitReachedPopup(continueFn: () => void, cancel: () => void): Promise<void> {
-        const iziToast = await this.iziToast;
+    public openEpisodeLimitReachedPopup(continueFn: () => void, cancel: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: 0,
@@ -123,10 +106,14 @@ export class NotificationService {
         });
     }
 
-    public static async openTestPopup(): Promise<void> {
-
-        const toastr = new Toastr();
-        toastr.info('test')
+    public openTestPopup(): void {
+        iziToast.show({
+            ...this.defaultConfig,
+            timeout: 0,
+            progressBar: false,
+            title: 'Serie fortsetzen',
+            message: 'Wollen Sie die Serie fortsetzen?'
+        });
     }
 
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {

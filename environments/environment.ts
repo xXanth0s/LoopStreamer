@@ -1,5 +1,5 @@
 export const environment = {
-    isDev: true,
+    isDev: false,
     openAppDevTools: true,
     openDevTools: true,
     showNewWindows: true,
