@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { Observable, Subject, timer } from 'rxjs';
-import { first, takeUntil, throttleTime } from 'rxjs/operators';
+import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
@@ -68,9 +68,11 @@ export class VideoController {
 
     private getVideoTimeChanges(video: HTMLVideoElement): Observable<number> {
         const onTimeSub$ = new Subject<number>();
-        video.ontimeupdate = () => onTimeSub$.next(video.currentTime);
+        video.ontimeupdate = () => onTimeSub$.next(Math.trunc(video.currentTime));
 
-        return onTimeSub$;
+        return onTimeSub$.pipe(
+            distinctUntilChanged(),
+        );
     }
 
     private startErrorTimer(timeout: number): void {
@@ -83,10 +85,7 @@ export class VideoController {
 
     private popupTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
         let popupConfigs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
-
-        videoTimeUpdate$.pipe(
-            throttleTime(1000)
-        ).subscribe(timeStamp => {
+        videoTimeUpdate$.subscribe(timeStamp => {
             const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo));
 
             if (configToOpen) {
@@ -106,9 +105,7 @@ export class VideoController {
     }
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
-        videoTimeUpdate$.pipe(
-            throttleTime(1000),
-        ).subscribe(timestamp => {
+        videoTimeUpdate$.subscribe(timestamp => {
             this.store.dispatch(setTimestampForSeriesEpisodeAction({ seriesEpisodeKey: key, timestamp }));
         });
     }
