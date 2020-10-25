@@ -166,10 +166,12 @@ export class WindowService {
 
     private manipulateSession(newSession: Session): void {
         newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
-            const { host } = new URL(details.url);
+            if (details.requestHeaders['Referer']?.includes('localhost')) {
+                const { host } = new URL(details.url);
 
-            // adding host as referer, to bypass ddos protection
-            details.requestHeaders['Referer'] = host;
+                // adding host as referer, to bypass ddos protection
+                details.requestHeaders['Referer'] = host;
+            }
 
             // set user agent for recaptcha
             details.requestHeaders['User-Agent'] = this.userAgent;

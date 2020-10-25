@@ -51,7 +51,7 @@ export class RootBackgroundController {
     private readonly appWindowConfig: OpenWindowConfig = {
         nodeIntegration: true,
         visible: true,
-        preloadScript: false
+        preloadScript: false,
     };
 
     private isInitialized = false;

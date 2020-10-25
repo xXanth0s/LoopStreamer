@@ -32,7 +32,6 @@ export class WindowController {
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {
         this.store.stopPlayer();
         const originalWindow = this.windowService.openWindow(linkToOpen, { nodeIntegration: false });
-        this.windowService.addDefaultHandlingForNewWindow(originalWindow);
         return fromEvent<WebContensCreatedEvent>(app, 'browser-window-created').pipe(
             takeUntil(this.store.playerHasStopped()),
             map(data => data[1]),
