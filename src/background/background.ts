@@ -4,7 +4,7 @@ import { inversifyContainer } from './container/container';
 import { initStore } from '../store/store/background-store';
 import { app } from 'electron';
 import { TestController } from './controller/test.controller';
-import { environment } from '../../environments/environment';
+import { environment } from '../environments/environment';
 
 
 app.commandLine.appendSwitch ("disable-http-cache");

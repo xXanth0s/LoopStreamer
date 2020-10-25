@@ -36,10 +36,36 @@ module.exports = {
         'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
       },
     },
+    module: {
+      rules: [
+        {
+          test: path.resolve('src/environments/environment.ts'),
+          loader: 'file-replace-loader',
+          options: {
+            condition: isProd,
+            replacement: path.resolve('src/environments/environment.prod.ts'),
+            async: false,
+          },
+        },
+      ],
+    },
   }),
 
   pluginOptions: {
     electronBuilder: {
+
+      chainWebpackMainProcess: (config) => {
+        config.module
+          .rule('file-replace')
+          .test(path.resolve('src/environments/environment.ts'))
+          .use('file')
+          .loader('file-replace-loader')
+          .options({
+            condition: isProd,
+            replacement: path.resolve('src/environments/environment.prod.ts'),
+            async: false,
+          });
+      },
       nodeIntegration: true,
       mainProcessFile: 'src/background/background.ts',
       mainProcessWatch: [
@@ -48,6 +74,7 @@ module.exports = {
         'src/background/**/*.ts',
         'src/browserMessages/**/*.ts',
       ],
+      // Do not preload script with vue CLI to avoid unnecessary reloading
       preload: isProd ? path.resolve(__dirname, 'dist_electron', 'preload.js') : undefined,
     },
   },

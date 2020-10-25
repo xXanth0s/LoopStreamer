@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import * as log from 'electron-log';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @injectable()
 export class LoggingService {

@@ -6,7 +6,7 @@ import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
 import MySeriesPage from '../views/MySeriesPage.vue';
 import TestPage from '../views/TestPage.vue';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 Vue.use(VueRouter);
 

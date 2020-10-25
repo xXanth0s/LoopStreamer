@@ -43,7 +43,7 @@ import { PROVIDORS } from '../../store/enums/providors.enum';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { addProvidorLinkToEpisodeAction } from '../../store/reducers/series-episode.reducer';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @injectable()
 export class RootBackgroundController {
@@ -76,6 +76,7 @@ export class RootBackgroundController {
     public openStartPage(): void {
         let href: string;
         const { isDev, openAppDevTools } = environment;
+        console.log('isDev', isDev);
         if(isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
             // this.windowService.addReduxDevTools();

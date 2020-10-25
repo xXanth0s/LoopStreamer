@@ -22,7 +22,7 @@ import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/
 import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { LoggingService } from '../../shared/services/logging.service';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import WindowState = Windows.WindowState;
 
 
