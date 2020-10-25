@@ -79,7 +79,6 @@ export class RootBackgroundController {
         console.log('isDev', isDev);
         if(isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
-            // this.windowService.addReduxDevTools();
         } else {
             createProtocol('app');
             href = 'app://./index.html';
