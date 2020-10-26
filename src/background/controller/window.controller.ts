@@ -2,8 +2,6 @@ import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { ProvidorService } from '../services/providor.service';
-import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
 import { fromEvent, Observable, race, Subject, timer } from 'rxjs';
 import Website from '../../store/models/website';
@@ -19,14 +17,7 @@ export class WindowController {
     private readonly requestFilter = { urls: [ '*://*/*' ] };
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(BACKGROUND_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
-    }
-
-    public async setCurrentWindowState(): Promise<void> {
-        // const activeWindow = await this.getVideoWindow();
-        // this.store.dispatch(setCurrentWindowStateAction(activeWindow?.state));
     }
 
     public openLinkForWebsite(allowedPage: Website, linkToOpen: string): Observable<BrowserWindow> {

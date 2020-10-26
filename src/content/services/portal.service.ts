@@ -4,14 +4,13 @@ import { StoreService } from '../../shared/services/store.service';
 import Portal from '../../store/models/portal.model';
 import { getActivePortal } from '../../store/selectors/portals.selector';
 import { IPortalController } from '../controller/portals/portal.controller.interface';
-import { CONTENT_TYPES, getContentTypeForPortal } from '../container/CONTENT_TYPES';
+import { getContentTypeForPortal } from '../container/CONTENT_TYPES';
 import { inversifyContentContainer } from '../container/container';
 
 @injectable()
 export class PortalService {
 
-    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(CONTENT_TYPES.BurningSeries) private readonly bsController: IPortalController) {
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
     private _portal: Portal;
