@@ -7,6 +7,7 @@ const BACKGROUND_TYPES = {
     ProvidorService: Symbol.for('ProvidorService'),
     PortalService: Symbol.for('PortalService'),
     WindowService: Symbol.for('WindowService'),
+    SeriesService: Symbol.for('SeriesService'),
 };
 
 export { BACKGROUND_TYPES };

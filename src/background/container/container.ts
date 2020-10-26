@@ -12,7 +12,7 @@ import { ProvidorService } from '../services/providor.service';
 import { WindowController } from '../controller/window.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { WindowService } from '../services/window.service';
-import { SeriesService } from '../../shared/services/series.service';
+import { SeriesService } from '../services/series.service';
 import { PortalService } from '../services/portalService';
 import { TestController } from '../controller/test.controller';
 import { Logger } from '../../shared/services/logger';
@@ -27,12 +27,12 @@ inversifyContainer.bind(SHARED_TYPES.ControllerType).toConstantValue(ControllerT
 // store
 inversifyContainer.bind(SHARED_TYPES.StoreService).to(StoreService).inSingletonScope();
 inversifyContainer.bind(SHARED_TYPES.Store).to(BackgroundStoreService).inSingletonScope();
-inversifyContainer.bind(SHARED_TYPES.SeriesService).to(SeriesService).inSingletonScope();
 
 // services
 inversifyContainer.bind(BACKGROUND_TYPES.ProvidorService).to(ProvidorService).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.PortalService).to(PortalService).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.WindowService).to(WindowService).inSingletonScope();
+inversifyContainer.bind(BACKGROUND_TYPES.SeriesService).to(SeriesService).inSingletonScope();
 
 //controller
 inversifyContainer.bind(BACKGROUND_TYPES.VideoController).to(VideoController).inSingletonScope();

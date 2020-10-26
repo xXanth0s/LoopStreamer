@@ -31,7 +31,7 @@ import {
 import { OpenWindowConfig, WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { SeriesService } from '../../shared/services/series.service';
+import { SeriesService } from '../services/series.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { getPreviousEpisode, getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { WindowType } from '../../store/enums/window-type.enum';
@@ -58,7 +58,7 @@ export class RootBackgroundController {
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(SHARED_TYPES.SeriesService) private readonly seriesService: SeriesService,
+                @inject(BACKGROUND_TYPES.SeriesService) private readonly seriesService: SeriesService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
     }
 

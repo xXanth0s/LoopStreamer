@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
-import { SHARED_TYPES } from '../constants/SHARED_TYPES';
-import { StoreService } from './store.service';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+import { StoreService } from '../../shared/services/store.service';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { updateOrAddMultipleSeriesAction, updateOrAddSeriesAction } from '../../store/reducers/series.reducer';
 import { updateOrAddMutlipleSeriesSeasonAction } from '../../store/reducers/series-season.reducer';
@@ -21,8 +21,8 @@ import {
 } from '../../store/selectors/series-episode.selector';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { getNextSeason, getSeriesSeasonByKey } from '../../store/selectors/series-season.selector';
-import { PortalController } from '../../background/controller/portal.controller';
-import { BACKGROUND_TYPES } from '../../background/container/BACKGROUND_TYPES';
+import { PortalController } from '../controller/portal.controller';
+import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { SeriesSeason } from '../../store/models/series-season.model';
 
 @injectable()
