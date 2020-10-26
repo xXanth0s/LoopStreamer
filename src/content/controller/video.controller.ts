@@ -17,6 +17,7 @@ import {
 } from '../../store/reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { PopupConfig } from '../models/popup-config.model';
+import { Logger } from '../../shared/services/logger';
 
 @injectable()
 export class VideoController {
@@ -85,6 +86,7 @@ export class VideoController {
 
     private popupTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
         let popupConfigs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
+        Logger.info('[VideoController] Popup configs to be opened', popupConfigs);
         videoTimeUpdate$.subscribe(timeStamp => {
             const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo));
 

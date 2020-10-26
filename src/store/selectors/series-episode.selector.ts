@@ -1,5 +1,7 @@
 import { StateModel } from '../models/state.model';
 import SeriesEpisode from '../models/series-episode.model';
+import { SeriesSeason } from '../models/series-season.model';
+import { sortArrayForKey } from '../../utils/array.utils';
 
 export const getSeriesEpisodeByKey = (state: StateModel, key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
 
@@ -23,6 +25,14 @@ export const hasSeriesEpisodePreviousEpisode = (state: StateModel, key: SeriesEp
     return Boolean(getPreviousEpisode(state, key));
 };
 
+export const getFirstEpisodeForSeason = (state: StateModel, key: SeriesSeason['key']): SeriesEpisode => {
+    const seasonEpisodes = getSeriesEpisodesForSeason(state, key);
+    if (!seasonEpisodes.length) {
+        return null;
+    }
+
+    return sortArrayForKey(seasonEpisodes, (episode: SeriesEpisode) => episode.episodeNumber)[0];
+};
 
 const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisode['key'], offset: number): SeriesEpisode => {
     const episode = getSeriesEpisodeByKey(state, episodeKey);

@@ -17,6 +17,10 @@ export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: S
     return getSeriesSeasonByKey(state, seasonKey);
 };
 
+export const getNextSeason = (state: StateModel, seasonKey: SeriesSeason['key']): SeriesSeason => {
+    return getSeasonWithOffset(state, seasonKey, 1);
+};
+
 export const getSeasonWithOffset = (state: StateModel, seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
     const currentSeason = getSeriesSeasonByKey(state, seasonKey);
 

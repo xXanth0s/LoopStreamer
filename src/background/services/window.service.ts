@@ -21,7 +21,7 @@ import { getWindowStateForWindowId, getWindowStateForWindowType } from '../../st
 import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/control-state.reducer';
 import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { LoggingService } from '../../shared/services/logging.service';
+import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
 import WindowState = Windows.WindowState;
 
@@ -42,8 +42,7 @@ export class WindowService {
 
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
-    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(SHARED_TYPES.LoggingService) private readonly logger: LoggingService) {
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
     public addReduxDevTools(): void {
@@ -62,7 +61,7 @@ export class WindowService {
             this.addAdblockerForSession(window.webContents.session);
             return window;
         } catch (e) {
-            this.logger.error('[WindowService->openWindow]', e);
+            Logger.error('[WindowService->openWindow]', e);
         }
 
     }
@@ -216,7 +215,6 @@ export class WindowService {
     }
 
     private getConfig(config: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
-
         return {
             width: 1600,
             height: 900,

@@ -102,6 +102,14 @@ function setWindowSize(state: ControlState, payload: { windowId: number; height:
     }
 }
 
+function raisePlayedEpisodes(state: ControlState) {
+    state.playedEpisodes++;
+}
+
+function resetPlayedEpisodes(state: ControlState) {
+    state.playedEpisodes = 0;
+}
+
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -114,6 +122,10 @@ export const controlStateSlice = createSlice({
             setActiveProvidor(state, action.payload),
         resetControlStateAction: (state: ControlState) =>
             resetControlState(state),
+        raisePlayedEpisodesAction: (state: ControlState) =>
+            raisePlayedEpisodes(state),
+        resetPlayedEpisodesAction: (state: ControlState) =>
+            resetPlayedEpisodes(state),
         setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) =>
             setExpandedSeriesOptionsPage(state, action.payload),
         setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) =>
@@ -133,6 +145,7 @@ export const controlStateSlice = createSlice({
 
 export const {
     updateControlStateAction,
+    setActivePortalAction,
     setActiveProvidorAction,
     resetControlStateAction,
     setExpandedSeriesOptionsPageAction,
@@ -141,5 +154,7 @@ export const {
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
     setWindowStateAction,
-    setWindowSizeAction
+    setWindowSizeAction,
+    raisePlayedEpisodesAction,
+    resetPlayedEpisodesAction
 } = controlStateSlice.actions;

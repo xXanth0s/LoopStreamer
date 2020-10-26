@@ -63,7 +63,7 @@ export class NotificationService {
         });
     }
 
-    public openEndTimePopup(timeoutSeconds: number, continueFn: () => void, cancel: () => void): void {
+    public openEndTimePopup(timeoutSeconds: number, continueFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
@@ -77,7 +77,6 @@ export class NotificationService {
                     this.closeToast(instance, toast);
                 }, false ],
                 [ '<button>Nicht überspringen</button>', (instance, toast) => {
-                    cancel();
                     this.closeToast(instance, toast);
                 }, false ]
             ]
@@ -85,7 +84,7 @@ export class NotificationService {
     }
 
 
-    public openEpisodeLimitReachedPopup(continueFn: () => void, cancel: () => void): void {
+    public openEpisodeLimitReachedPopup(continueFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: 0,
@@ -99,7 +98,6 @@ export class NotificationService {
                     this.closeToast(instance, toast);
                 }, false ],
                 [ '<button>Abbrechen</button>', (instance, toast) => {
-                    cancel();
                     this.closeToast(instance, toast);
                 }, false ]
             ]
@@ -117,6 +115,9 @@ export class NotificationService {
     }
 
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
-        instance.hide({ transitionOut: 'fadeOut' }, htmlElement, 'button');
+        instance.hide({
+            transitionOut: 'fadeOut', onClosed: () => {
+            }
+        }, htmlElement, 'button');
     }
 }

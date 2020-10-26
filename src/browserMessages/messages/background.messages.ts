@@ -6,12 +6,21 @@ import Series from '../../store/models/series.model';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 
-export const createVideoFinishedMessage = (): Message<SeriesEpisode> => ({
+export const createVideoFinishedMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
     type: MessageType.BACKGROUND_VIDEO_FINISHED,
     destinationController: ControllerType.BACKGROUND,
+    payload: episodeKey,
     hasReply: false,
 });
 export type VideoFinishedMessage = ReturnType<typeof createVideoFinishedMessage>;
+
+export const createContinueAutoplayForEpisodeMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
+    type: MessageType.BACKGROUND_CONTINUE_AUTOPLAY,
+    destinationController: ControllerType.BACKGROUND,
+    payload: episodeKey,
+    hasReply: false,
+});
+export type ContinueAutoplayForEpisodeMessage = ReturnType<typeof createContinueAutoplayForEpisodeMessage>;
 
 export const createOpenNextVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
     type: MessageType.BACKGROUND_NEXT_VIDEO,

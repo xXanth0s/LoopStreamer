@@ -3,7 +3,7 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { catchError, debounceTime, filter, takeUntil } from 'rxjs/operators';
+import { catchError, debounceTime, filter, takeUntil, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
@@ -17,6 +17,7 @@ import { PORTALS } from '../../store/enums/portals.enum';
 import {
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
+    setActivePortalAction,
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
@@ -141,6 +142,7 @@ export class PortalController {
         return this.windowController.openLinkForWebsite(portal, url).pipe(
             takeUntil(this.store.playerHasStopped()),
             waitTillPageLoadFinished(),
+            tap(() => this.store.dispatch(setActivePortalAction(portalKey))),
             debounceTime(1000),
             finalizeWithValue((window: BrowserWindow) => this.windowService.closeWindow(window.id)),
         );

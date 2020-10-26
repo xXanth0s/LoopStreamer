@@ -10,6 +10,7 @@ import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     CloseWindowMessage,
+    ContinueAutoplayForEpisodeMessage,
     MinimizeWindowMessage,
     OpenNextVideoMessage,
     OpenPreviousVideoMessage,
@@ -23,9 +24,10 @@ import {
     ToggleWindowMaximizationMessage,
     VideoFinishedMessage
 } from '../../browserMessages/messages/background.messages';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
 import {
+    raisePlayedEpisodesAction,
     resetControlStateAction,
+    resetPlayedEpisodesAction,
     setActiveEpisodeAction,
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
@@ -34,16 +36,16 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { SeriesService } from '../../shared/services/series.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import {
-    getNextEpisode,
-    getPreviousEpisode,
-    getSeriesEpisodeByKey
-} from '../../store/selectors/series-episode.selector';
-import { PROVIDORS } from '../../store/enums/providors.enum';
+import { getPreviousEpisode, getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { PORTALS } from '../../store/enums/portals.enum';
-import { addProvidorLinkToEpisodeAction } from '../../store/reducers/series-episode.reducer';
+import {
+    addProvidorLinkToEpisodeAction,
+    removeProvidorLinkFromEpisodeAction
+} from '../../store/reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';
+import Providor from '../../store/models/providor.model';
+import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
 
 @injectable()
 export class RootBackgroundController {
@@ -76,8 +78,7 @@ export class RootBackgroundController {
     public openStartPage(): void {
         let href: string;
         const { isDev, openAppDevTools } = environment;
-        console.log('isDev', isDev);
-        if(isDev) {
+        if (isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
         } else {
             createProtocol('app');
@@ -93,9 +94,26 @@ export class RootBackgroundController {
         }
     }
 
+    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
+        this.store.stopPlayer();
+        const { portal, episodeKey } = message.payload;
+        this.store.dispatch(resetPlayedEpisodesAction());
+
+        const success = await this.startEpisode(episodeKey, portal);
+        if (success) {
+            this.store.dispatch(raisePlayedEpisodesAction());
+        }
+
+        return success;
+    }
+
     private initializeHandler(): void {
         ipcMain.handle(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
-            this.videoFinishedHandler();
+            this.videoFinishedHandler(message);
+        });
+
+        ipcMain.handle(MessageType.BACKGROUND_CONTINUE_AUTOPLAY, (event, message: ContinueAutoplayForEpisodeMessage) => {
+            this.continueAutoplayHandler(message);
         });
 
         ipcMain.handle(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
@@ -111,9 +129,9 @@ export class RootBackgroundController {
             this.continueSeriesHandler(message);
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): Promise<boolean>| boolean => {
+        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): Promise<boolean> | boolean => {
             try {
-                return  this.startEpisodeHandler(message);
+                return this.startEpisodeHandler(message);
             } catch (e) {
                 return false;
             }
@@ -162,41 +180,51 @@ export class RootBackgroundController {
             });
     }
 
-    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
+    private async videoFinishedHandler({ payload }: VideoFinishedMessage): Promise<void> {
         this.store.stopPlayer();
-        const { portal, episodeKey } = message.payload;
-        return this.startEpisode(episodeKey, portal);
+        const success = await this.startNextEpisode(payload);
+        if (success) {
+            this.store.dispatch(raisePlayedEpisodesAction());
+        }
+
     }
 
-    private async videoFinishedHandler(): Promise<void> {
-            this.store.stopPlayer();
-            // await this.portalController.openNextEpisode();
+    private async continueAutoplayHandler({ payload }: ContinueAutoplayForEpisodeMessage): Promise<void> {
+        this.store.stopPlayer();
+        this.store.dispatch(resetPlayedEpisodesAction());
+        const success = await this.startNextEpisode(payload);
+        if (success) {
+            this.store.dispatch(raisePlayedEpisodesAction());
+        }
     }
 
-    private async previousVideoHandler({payload}: OpenPreviousVideoMessage): Promise<void> {
+    private async previousVideoHandler({ payload }: OpenPreviousVideoMessage): Promise<void> {
         this.store.stopPlayer();
         const previousEpisode = this.store.selectSync(getPreviousEpisode, payload);
-        if(previousEpisode) {
+        if (previousEpisode) {
             await this.startEpisode(previousEpisode.key, PORTALS.BS);
+
         }
     }
 
-    private async nextVideoHandler({payload}: OpenNextVideoMessage): Promise<void> {
+    private async nextVideoHandler({ payload }: OpenNextVideoMessage): Promise<void> {
         this.store.stopPlayer();
-        const nextEpisode = this.store.selectSync(getNextEpisode, payload);
-        if(nextEpisode) {
-            await this.startEpisode(nextEpisode.key, PORTALS.BS);
-        }
+        await this.startNextEpisode(payload);
     }
 
-    private continueSeriesHandler({ payload }: StartSeriesMessage): void {
+    private async continueSeriesHandler({ payload }: StartSeriesMessage): Promise<void> {
         this.resetController();
         this.store.stopPlayer();
-        const series = this.store.selectSync(getSeriesByKey, payload);
-        const seriesEpisode = this.store.selectSync(getSeriesEpisodeByKey, series?.lastEpisodeWatched);
+        const seriesEpisode = await this.seriesService.getContinuableEpisodeForSeries(payload, PORTALS.BS);
+        if (!seriesEpisode) {
+            return;
+        }
 
         // TO-DO replace hardcoded Vivo with last used Providor
-        this.videoController.startVideo(seriesEpisode.key, PROVIDORS.Vivo);
+        const success = this.startEpisode(seriesEpisode.key, PORTALS.BS);
+        if (success) {
+            this.store.dispatch(raisePlayedEpisodesAction());
+        }
     }
 
     private async loadAllVideosFromPortalHandler({ payload }: PortalSelectedInAppMessage): Promise<void> {
@@ -230,13 +258,11 @@ export class RootBackgroundController {
 
     private toggleWindowMaximizationEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowMaximizationMessage): void {
         const windowId = message.payload;
-        console.log('window fullscreen event handler')
         this.windowService.toggleMaximization(windowId);
     }
 
     private toggleWindowFullscreenEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowFullscreenMessage): void {
         const windowId = message.payload;
-        console.log('window fullscreen event handler')
         this.windowService.toggleFullscreen(windowId);
     }
 
@@ -251,21 +277,49 @@ export class RootBackgroundController {
         this.videoController.reset();
     }
 
-    private async startEpisode(episodeKey: SeriesEpisode['key'], portal: PORTALS): Promise<boolean> {
-        this.store.dispatch(setActiveEpisodeAction(episodeKey));
-        const providorLink = await this.portalController.getProvidorLinkForEpisode(episodeKey, portal);
-
-        let result = false;
-        if (providorLink.link) {
-            this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
-            result = await this.videoController.startVideo(episodeKey, providorLink.providor);
+    private async startNextEpisode(episodeKey: SeriesEpisode['key']): Promise<boolean> {
+        const nextEpisode = await this.seriesService.getNextEpisode(episodeKey, PORTALS.BS);
+        if (nextEpisode) {
+            return this.startEpisode(nextEpisode.key, PORTALS.BS);
         }
 
-        if(!result) {
-            this.store.dispatch(setActiveEpisodeAction(null));
+        return false;
+    }
+
+    private async startEpisode(episodeKey: SeriesEpisode['key'], portal: PORTALS): Promise<boolean> {
+        this.store.dispatch(setActiveEpisodeAction(episodeKey));
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+
+        const usedProvidors = this.store.selectSync(getAllUsedProvidors);
+        for (let provider of usedProvidors) {
+            const result = this.startEpisodeForProvidor(episode, portal, provider);
+            if (result) {
+                return true;
+            }
+        }
+
+        this.store.dispatch(setActiveEpisodeAction(null));
+        return false;
+    }
+
+    private async startEpisodeForProvidor(episode: SeriesEpisode, portal: PORTALS, providor: Providor): Promise<boolean> {
+        const episodeKey = episode.key;
+        if (!episode.providorLinks[providor.key]) {
+            const providorLink = await this.portalController.getProvidorLinkForEpisode(episode.key, portal);
+
+            if (providorLink.link) {
+                this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
+            } else {
+                return false;
+            }
+        }
+
+        const result = await this.videoController.startVideo(episodeKey, providor.key);
+
+        if (!result) {
+            this.store.dispatch(removeProvidorLinkFromEpisodeAction({ episodeKey, providorKey: providor.key }));
         }
 
         return result;
     }
-
 }

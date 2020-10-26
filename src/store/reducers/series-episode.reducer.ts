@@ -3,6 +3,7 @@ import SeriesEpisode from '../models/series-episode.model';
 import { StateModel } from '../models/state.model';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import Series from '../models/series.model';
+import Providor from '../models/providor.model';
 
 
 const initialState: StateModel['seriesEpisodes'] = {};
@@ -68,6 +69,12 @@ function setTimestamp(state: StateModel['seriesEpisodes'], { seriesEpisodeKey, t
     state[seriesEpisodeKey].timestamp = timestamp;
 }
 
+function removeProvidorLinkFromEpisode(state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string; providorKey: Providor['key'] }>) {
+    const { providorKey, episodeKey } = action.payload;
+
+    delete state[episodeKey]?.providorLinks[providorKey];
+}
+
 const seriesEpisodesReducer = createSlice({
     name: 'seriesEpisodes',
     initialState,
@@ -78,6 +85,8 @@ const seriesEpisodesReducer = createSlice({
             updateOrAddMultipleSeriesEpisode(state, action.payload),
         addProvidorLinkToEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorLink: ProvidorLink }>) =>
             addProvidorLinkToEpisode(state, action),
+        removeProvidorLinkFromEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorKey: Providor['key'] }>) =>
+            removeProvidorLinkFromEpisode(state, action),
         setTimestampForSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) =>
             setTimestamp(state, action.payload),
         seriesEpisodeFinishedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode['key']>) =>
@@ -91,6 +100,7 @@ export const {
     updateOrAddSeriesEpisodeAction,
     updateOrAddMultipleSeriesEpisodeAction,
     addProvidorLinkToEpisodeAction,
+    removeProvidorLinkFromEpisodeAction,
     seriesEpisodeFinishedAction,
     seriesEpisodeStartedAction,
     setTimestampForSeriesEpisodeAction

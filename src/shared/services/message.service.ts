@@ -6,6 +6,7 @@ import { Message } from '../../browserMessages/messages/message.interface';
 import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
 import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
 import { WindowType } from '../../store/enums/window-type.enum';
+import { Logger } from './logger';
 
 @injectable()
 export class MessageService {
@@ -16,6 +17,7 @@ export class MessageService {
 
 
     public async sendMessageToBackground<T, R>(message: Message<T, R>): Promise<R> {
+        Logger.info('[MessageService->sendMessageToBackground] sending message to Background:', message);
         return ipcRenderer.invoke(message.type, message);
     }
 

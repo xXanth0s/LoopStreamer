@@ -17,7 +17,7 @@ import { TestController } from '../controller/test.controller';
 import { RecaptchaService } from '../services/recaptcha.service';
 import { PopupService } from '../services/popup.service';
 import { PopupController } from '../controller/popup.controller';
-import { LoggingService } from '../../shared/services/logging.service';
+import { Logger } from '../../shared/services/logger';
 
 const inversifyContentContainer = new Container();
 
@@ -25,7 +25,7 @@ const inversifyContentContainer = new Container();
 inversifyContentContainer.bind(SHARED_TYPES.MessageService).to(MessageService).inSingletonScope();
 inversifyContentContainer.bind(SHARED_TYPES.Store).to(BrowserStoreService).inSingletonScope();
 inversifyContentContainer.bind(SHARED_TYPES.StoreService).to(StoreService).inSingletonScope();
-inversifyContentContainer.bind(SHARED_TYPES.LoggingService).to(LoggingService).inSingletonScope();
+inversifyContentContainer.bind(SHARED_TYPES.LoggingService).to(Logger).inSingletonScope();
 inversifyContentContainer.bind(SHARED_TYPES.ControllerType).toConstantValue(ControllerType.PROVIDOR);
 
 // Services

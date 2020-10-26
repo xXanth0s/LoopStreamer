@@ -9,7 +9,11 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../store/reducers/series.reducer';
 import { getOptions } from '../../store/selectors/options.selector';
 import { seriesEpisodeFinishedAction } from '../../store/reducers/series-episode.reducer';
-import { createVideoFinishedMessage } from '../../browserMessages/messages/background.messages';
+import {
+    createContinueAutoplayForEpisodeMessage,
+    createVideoFinishedMessage
+} from '../../browserMessages/messages/background.messages';
+import { Logger } from '../../shared/services/logger';
 
 @injectable()
 export class PopupController {
@@ -22,9 +26,10 @@ export class PopupController {
     }
 
     public openPopup(popupKey: Popup, video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
+        Logger.info('[PopupController->openPopup]', popupKey, episodeInfo);
         switch (popupKey) {
             case Popup.AUTO_PLAY_FINISHED:
-                this.openEpisodeLimitReachedPopup();
+                this.openEpisodeLimitReachedPopup(episodeInfo.key);
                 break;
             case Popup.NEXT_EPISODE_COUNTDOWN:
                 this.openNextEpisodeCountdownPopup(episodeInfo);
@@ -66,16 +71,14 @@ export class PopupController {
                     key: episodeInfo.seriesKey,
                     scipEndTime: timeFromEnd
                 }));
-                this.videoEnded();
+                this.videoEnded(episodeInfo.key);
             },
             async () => {
                 await this.store.dispatch(setEndTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
                     scipEndTime: undefined
                 }));
-            }, () => {
-                this.videoEnded();
-            });
+            }, () => this.videoEnded(episodeInfo.key));
     }
 
     private openNextEpisodeCountdownPopup(episodeInfo: SeriesEpisode): void {
@@ -85,24 +88,20 @@ export class PopupController {
         this.notificationService.openEndTimePopup(
             timeForEntimeCountdown,
             () => {
-                this.videoEnded();
-            },
-            () => {
+                this.videoEnded(episodeInfo.key);
             });
 
     }
 
-    private openEpisodeLimitReachedPopup(): void {
+    private openEpisodeLimitReachedPopup(episodeKey: SeriesEpisode['key']): void {
         this.notificationService.openEpisodeLimitReachedPopup(
             () => {
-                // this.messageService.sendMessageToBackground(createContinueActiveSeries())
-            }, () => {
+                this.messageService.sendMessageToBackground(createContinueAutoplayForEpisodeMessage(episodeKey));
             });
 
     }
 
-    private videoEnded(): void {
-        console.log('video Ended');
-        this.messageService.sendMessageToBackground(createVideoFinishedMessage());
+    private videoEnded(episodeKey: SeriesEpisode['key']): void {
+        this.messageService.sendMessageToBackground(createVideoFinishedMessage(episodeKey));
     }
 }
