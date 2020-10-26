@@ -32,27 +32,33 @@ export class SeriesService {
                 @inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController) {
     }
 
-    public addMultipleSeriesToStore(seriesInfo: SeriesInfoDto[]): void {
-        const series = seriesInfo.map(mapSeriesInfoDtoToSeries);
-
-        this.store.dispatch(updateOrAddMultipleSeriesAction(series));
-    }
-
-    public addSeriesToStore(seriesInfo: SeriesInfoDto): void {
-        const series = mapSeriesInfoDtoToSeries(seriesInfo);
-        this.store.dispatch(updateOrAddSeriesAction(series));
-
-        if (seriesInfo.seasonsLinks) {
-            const seriesSeasons = mapSeriesInfoDtoToSeriesSeasons(seriesInfo);
-
-            this.store.dispatch(updateOrAddMutlipleSeriesSeasonAction(seriesSeasons));
+    public async updateAllSeriesForPortal(portalKey: PORTALS): Promise<boolean> {
+        const multipleSeriesMetaInfo = await this.portalController.getAllSeriesFromPortal(portalKey);
+        if (!multipleSeriesMetaInfo) {
+            this.addMultipleSeriesToStore(multipleSeriesMetaInfo);
+            return true;
         }
+
+        return false;
     }
 
-    public addSeriesEpisodesToStore(episodeDtos: SeriesEpisodeDto[]): void {
-        const episodes = episodeDtos.map(mapSeriesEpisodeDtoToSeriesEpisode);
+    public async updateSeriesForPortal(seriesKey: Series['key'], portal: PORTALS): Promise<boolean> {
+        const seriesInfo = await this.portalController.getDetailedSeriesInformation(seriesKey, portal);
+        if (seriesInfo) {
+            this.addSeriesToStore(seriesInfo);
+        }
 
-        this.store.dispatch(updateOrAddMultipleSeriesEpisodeAction(episodes));
+        return Boolean(seriesInfo);
+    }
+
+    public async updateSeasonForPortal(seasonKey: SeriesSeason['key'], portal: PORTALS): Promise<boolean> {
+        const seasonEpisodes = await this.portalController.getEpisodesForSeason(seasonKey, portal);
+        if (seasonEpisodes && seasonEpisodes.length > 0) {
+            this.addSeriesEpisodesToStore(seasonEpisodes);
+            return true;
+        }
+
+        return false;
     }
 
     public async getContinuableEpisodeForSeries(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesEpisode> {
@@ -122,22 +128,26 @@ export class SeriesService {
         return nextSeason;
     }
 
-    private async updateSeasonForPortal(seasonKey: SeriesSeason['key'], portal: PORTALS): Promise<boolean> {
-        const seasonEpisodes = await this.portalController.getEpisodesForSeason(seasonKey, portal);
-        if (seasonEpisodes && seasonEpisodes.length > 0) {
-            this.addSeriesEpisodesToStore(seasonEpisodes);
-            return true;
-        }
+    private addMultipleSeriesToStore(seriesInfo: SeriesInfoDto[]): void {
+        const series = seriesInfo.map(mapSeriesInfoDtoToSeries);
 
-        return false;
+        this.store.dispatch(updateOrAddMultipleSeriesAction(series));
     }
 
-    private async updateSeriesForPortal(seriesKey: Series['key'], portal: PORTALS): Promise<boolean> {
-        const seriesInfo = await this.portalController.getDetailedSeriesInformation(seriesKey, portal);
-        if (seriesInfo) {
-            this.addSeriesToStore(seriesInfo);
-        }
+    private addSeriesToStore(seriesInfo: SeriesInfoDto): void {
+        const series = mapSeriesInfoDtoToSeries(seriesInfo);
+        this.store.dispatch(updateOrAddSeriesAction(series));
 
-        return Boolean(seriesInfo);
+        if (seriesInfo.seasonsLinks) {
+            const seriesSeasons = mapSeriesInfoDtoToSeriesSeasons(seriesInfo);
+
+            this.store.dispatch(updateOrAddMutlipleSeriesSeasonAction(seriesSeasons));
+        }
+    }
+
+    private addSeriesEpisodesToStore(episodeDtos: SeriesEpisodeDto[]): void {
+        const episodes = episodeDtos.map(mapSeriesEpisodeDtoToSeriesEpisode);
+
+        this.store.dispatch(updateOrAddMultipleSeriesEpisodeAction(episodes));
     }
 }

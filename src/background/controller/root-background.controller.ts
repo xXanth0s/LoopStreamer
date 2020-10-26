@@ -2,11 +2,8 @@ import { inject, injectable } from 'inversify';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { PortalController } from './portal.controller';
 import { VideoController } from './video.controller';
-import { MessageService } from '../../shared/services/message.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
-import { ProvidorService } from '../services/providor.service';
-import { WindowController } from './window.controller';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     CloseWindowMessage,
@@ -60,12 +57,9 @@ export class RootBackgroundController {
 
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController,
-                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
-                @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.SeriesService) private readonly seriesService: SeriesService,
-                @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
-                @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService) {
+                @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
     }
 
     public initialize(): void {
@@ -151,7 +145,7 @@ export class RootBackgroundController {
         ipcMain.handle(MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
             async (event, message: SeriesSeasonSelectedInAppMessage): Promise<void> => {
                 console.log(message);
-                return this.getSeriesEpisodeForSeasonHandler(message);
+                return this.loadSeriesEpisodeForSeasonHandler(message);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
@@ -228,20 +222,19 @@ export class RootBackgroundController {
     }
 
     private async loadAllVideosFromPortalHandler({ payload }: PortalSelectedInAppMessage): Promise<void> {
-        const multipleSeriesMetaInfo = await this.portalController.getAllSeriesFromPortal(payload);
-        this.seriesService.addMultipleSeriesToStore(multipleSeriesMetaInfo);
+        await this.seriesService.updateAllSeriesForPortal(payload);
     }
 
     private async loadSeriesInformationFromPortalHandler({ payload }: SeriesSelectedInAppMessage): Promise<void> {
-        const seriesInfo = await this.portalController.getDetailedSeriesInformation(payload.seriesKey, payload.portal);
-        this.seriesService.addSeriesToStore(seriesInfo);
+        const { portal, seriesKey } = payload;
+
+        await this.seriesService.updateSeriesForPortal(seriesKey, portal);
     }
 
-    private async getSeriesEpisodeForSeasonHandler(message: SeriesSeasonSelectedInAppMessage): Promise<void> {
+    private async loadSeriesEpisodeForSeasonHandler(message: SeriesSeasonSelectedInAppMessage): Promise<void> {
         const { portal, seriesSeasonKey } = message.payload;
 
-        const episodeDtos = await this.portalController.getEpisodesForSeason(seriesSeasonKey, portal);
-        return this.seriesService.addSeriesEpisodesToStore(episodeDtos);
+        await this.seriesService.updateSeasonForPortal(seriesSeasonKey, portal);
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
