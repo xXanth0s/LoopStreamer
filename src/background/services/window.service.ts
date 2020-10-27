@@ -23,7 +23,7 @@ import { WindowType } from '../../store/enums/window-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
-import { DEFAULT_SESSION_NAME } from '../../constants/electron-variables';
+import { DEFAULT_SESSION_NAME, DEFAULT_TITLE } from '../../constants/electron-variables';
 import WindowState = Windows.WindowState;
 
 @injectable()
@@ -204,6 +204,7 @@ export class WindowService {
             width: 1600,
             height: 900,
             fullscreen: config.fullscreen,
+            title: DEFAULT_TITLE,
             show: config.visible,
             frame: false,
             icon: path.resolve(__dirname, 'assets', 'logo.ico'),

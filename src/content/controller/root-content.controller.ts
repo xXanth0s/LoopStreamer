@@ -17,6 +17,7 @@ import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
 import styles from '../styles/content.scss';
 import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
+import { DEFAULT_TITLE } from '../../constants/electron-variables';
 
 @injectable()
 export class RootContentController {
@@ -29,6 +30,7 @@ export class RootContentController {
             styles.use();
             this.recaptchaService.checkForRecaptcha();
             addCustomFrame();
+            window.document.title = DEFAULT_TITLE;
         });
     }
 
