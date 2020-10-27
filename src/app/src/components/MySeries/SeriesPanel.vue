@@ -3,7 +3,7 @@
         <div class="card">
             <div class="flex-column" v-if="!showSettings">
                 <div>
-                    <i @click="toggleSettings" class="fas fa-cog setting-icon icon"></i>
+                    <i @click="toggleSettings" class="fas fa-cog spin-icon absolute top-0 right-0 mt-2 mr-2 icon"></i>
                     <img :src="series.posterHref" alt="Avatar">
                 </div>
                 <div class="default-title-text title flex-center flex-grow">
@@ -262,10 +262,7 @@
         width: 1.5em;
     }
 
-    .setting-icon {
-        position: absolute;
-        right: 10px;
-        top: 10px;
+    .spin-icon {
         transition: transform 1.2s ease-in-out;
 
         &:hover {

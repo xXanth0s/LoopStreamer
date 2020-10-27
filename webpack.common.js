@@ -2,7 +2,6 @@
 const path = require('path');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -39,6 +38,7 @@ module.exports = {
           },
           'css-loader',
           'sass-loader',
+          'postcss-loader',
         ],
       },
       {
