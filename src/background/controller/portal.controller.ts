@@ -3,7 +3,7 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { catchError, debounceTime, filter, takeUntil, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, first, takeUntil, tap } from 'rxjs/operators';
 import {
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
@@ -12,7 +12,7 @@ import {
 } from '../../browserMessages/messages/portal.messages';
 import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
-import { Observable } from 'rxjs';
+import { fromEvent, Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
 import {
     addAsyncInteractionAction,
@@ -155,7 +155,7 @@ export class PortalController {
                     reject(err);
                     return null;
                 }),
-                filter<BrowserWindow>(Boolean)
+                filter<BrowserWindow>(Boolean),
             ).subscribe(async (window) => {
                 let result: R;
 
@@ -165,9 +165,15 @@ export class PortalController {
                     reject(e);
                 }
 
+                resolve(result);
+
                 this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.PORTAL }));
                 sub.unsubscribe();
-                resolve(result);
+
+                // return null, when window gets closed, so outer function gets notified about it
+                fromEvent(window, 'close').pipe(
+                    first()
+                ).subscribe(() => resolve(null));
             });
         });
     }
