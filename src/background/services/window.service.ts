@@ -5,7 +5,6 @@ import {
     BrowserWindow,
     BrowserWindowConstructorOptions,
     OnBeforeSendHeadersListenerDetails,
-    Referrer,
     session,
     Session
 } from 'electron';
@@ -23,19 +22,9 @@ import { Windows } from 'webextension-polyfill-ts';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
+import { OpenWindowConfig } from '../data/types/open-window-config.type';
+import { DEFAULT_SESSION_NAME } from '../../constants/electron-variables';
 import WindowState = Windows.WindowState;
-
-
-export type OpenWindowConfig = {
-    nodeIntegration?: boolean;
-    visible?: boolean;
-    httpReferrer?: string | Referrer;
-    fullscreen?: boolean;
-
-    // load script to website with LoopStreamer functionality,
-    // @default: true
-    preloadScript?: boolean
-}
 
 @injectable()
 export class WindowService {
@@ -45,20 +34,17 @@ export class WindowService {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
-    public addReduxDevTools(): void {
-        BrowserWindow.addDevToolsExtension(
-            path.join(__dirname, 'extensions', 'redux-dev-tools', process.env.REDUX_DEV_TOOLS_VERSION)
-        );
-    }
-
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
         try {
-            let finalConfig = { ...DefaultOpenWindowConfig, ...config };
+            let finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
             const windowConfig = this.getConfig(finalConfig);
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
             this.addDefaultHandlingForNewWindow(window);
-            this.addAdblockerForSession(window.webContents.session);
+            if (finalConfig.manipulateSession) {
+                this.addDefaultHandlingForSession(window.webContents.session);
+            }
+
             return window;
         } catch (e) {
             Logger.error('[WindowService->openWindow]', e);
@@ -103,17 +89,16 @@ export class WindowService {
         } else if (browserWindow?.isFullScreenable()) {
             browserWindow.setFullScreen(true);
         }
-
     }
 
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
-        const session = window.webContents.session;
         window.removeMenu();
-
         this.hideNewWindows(window);
         this.stopPlayerWhenActiveWindowClosed(window);
         this.listenToWindowSizeChanges(window);
+    }
 
+    private addDefaultHandlingForSession(session: Session): void {
         this.manipulateSession(session);
         this.addAdblockerForSession(session);
     }
@@ -232,7 +217,7 @@ export class WindowService {
                 allowRunningInsecureContent: true,
                 experimentalFeatures: true,
                 contextIsolation: !config.nodeIntegration,
-                partition: 'persist:',
+                partition: DEFAULT_SESSION_NAME,
             },
         };
     }

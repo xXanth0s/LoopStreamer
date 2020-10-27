@@ -7,8 +7,6 @@ import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
 import { BrowserWindow, ipcMain } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
-import { createStartEpisodeMessage } from '../../browserMessages/messages/background.messages';
-import { PORTALS } from '../../store/enums/portals.enum';
 import { MessageService } from '../../shared/services/message.service';
 import { RootBackgroundController } from './root-background.controller';
 import {
@@ -42,7 +40,7 @@ export class TestController {
     public initializeHandler(): void {
         ipcMain.handle(MessageType.TEST_BACKGROUND_START_TEST_EPISODE_OVER_BS,
             (event, message: StartTestEpisodeOverBSMessage): void => {
-                this.rootController.startEpisodeHandler(createStartEpisodeMessage('24-S5-E4', PORTALS.BS));
+                // this.rootController.startEpisodeHandler(createStartEpisodeMessage('24-S5-E4', PORTALS.BS));
             });
 
         ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA,

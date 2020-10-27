@@ -28,7 +28,7 @@ import {
     setActiveEpisodeAction,
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
-import { OpenWindowConfig, WindowService } from '../services/window.service';
+import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { SeriesService } from '../services/series.service';
@@ -43,6 +43,7 @@ import {
 import { environment } from '../../environments/environment';
 import Providor from '../../store/models/providor.model';
 import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
+import { OpenWindowConfig } from '../data/types/open-window-config.type';
 
 @injectable()
 export class RootBackgroundController {
@@ -51,9 +52,8 @@ export class RootBackgroundController {
         nodeIntegration: true,
         visible: true,
         preloadScript: false,
+        manipulateSession: true,
     };
-
-    private isInitialized = false;
 
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController,
@@ -62,14 +62,7 @@ export class RootBackgroundController {
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
     }
 
-    public initialize(): void {
-        if (!this.isInitialized) {
-            this.initializeHandler();
-            this.isInitialized = true;
-        }
-    }
-
-    public openStartPage(): void {
+    public openApp(): void {
         let href: string;
         const { isDev, openAppDevTools } = environment;
         if (isDev) {
@@ -88,20 +81,7 @@ export class RootBackgroundController {
         }
     }
 
-    public async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
-        this.store.stopPlayer();
-        const { portal, episodeKey } = message.payload;
-        this.store.dispatch(resetPlayedEpisodesAction());
-
-        const success = await this.startEpisode(episodeKey, portal);
-        if (success) {
-            this.store.dispatch(raisePlayedEpisodesAction());
-        }
-
-        return success;
-    }
-
-    private initializeHandler(): void {
+    public initializeHandler(): void {
         ipcMain.handle(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
             this.videoFinishedHandler(message);
         });
@@ -172,6 +152,19 @@ export class RootBackgroundController {
             (event, message: MinimizeWindowMessage): void => {
                 this.minimizeWindowEventHandler(event, message);
             });
+    }
+
+    private async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
+        this.store.stopPlayer();
+        const { portal, episodeKey } = message.payload;
+        this.store.dispatch(resetPlayedEpisodesAction());
+
+        const success = await this.startEpisode(episodeKey, portal);
+        if (success) {
+            this.store.dispatch(raisePlayedEpisodesAction());
+        }
+
+        return success;
     }
 
     private async videoFinishedHandler({ payload }: VideoFinishedMessage): Promise<void> {

@@ -11,9 +11,9 @@ app.commandLine.appendSwitch ("disable-http-cache");
 async function initialize(): Promise<void> {
    await initStore();
    const rootController = inversifyContainer.get<RootBackgroundController>(BACKGROUND_TYPES.RootController);
-   rootController.initialize();
-   rootController.openStartPage();
-   if(environment.isDev) {
+   rootController.initializeHandler();
+   rootController.openApp();
+   if (environment.isDev) {
       const testController = inversifyContainer.get<TestController>(BACKGROUND_TYPES.TestController);
       testController.initializeHandler();
    }
