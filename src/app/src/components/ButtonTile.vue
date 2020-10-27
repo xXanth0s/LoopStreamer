@@ -1,6 +1,6 @@
 <template>
-    <div class="mt-1 series-item flex-center white-tile "
-         :class="{selected: isActive, disabled: isDisabled}"
+    <div :class="[{selected: isActive, disabled: isDisabled}, progressClass]"
+         class="mt-1 series-item flex-center white-tile"
          @click="clicked">
         <div v-if="isLoading"
              class="spinner-border tile-spinner"
@@ -29,11 +29,18 @@
         @Prop({ default: false })
         private isDisabled: boolean;
 
+        @Prop({ default: 0 })
+        private progress: number;
+
         @Prop({ default: false })
         private isLoading: boolean;
 
         @Emit('clicked')
         public clicked(): void {
+        }
+
+        get progressClass(): string {
+            return this.isActive ? '' : `progress-${this.progress}`;
         }
     }
 </script>
@@ -55,11 +62,17 @@
         background-color: white;
     }
 
+    @for $i from 0 through 100 {
+        .progress-#{$i} {
+            background: -webkit-linear-gradient(left, $light-blue-color $i * 1%, white $i * 1%);
+        }
+    }
+
     .series-item {
         cursor: pointer;
 
         &:hover, &.selected {
-            background-color: $primary-color;
+            background: -webkit-linear-gradient(left, $primary-color 100%, white 100%);
         }
 
         &.disabled {

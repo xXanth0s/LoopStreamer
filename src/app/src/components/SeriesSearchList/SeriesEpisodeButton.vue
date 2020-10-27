@@ -2,6 +2,7 @@
     <button-tile
             :is-active="episodeInfo.key === activeEpisodeKey"
             :is-disabled="isAnyEpisodeLoading"
+            :progress="progress"
             :is-loading="episodeInfo.key === activeEpisodeKey && isAnyEpisodeLoading"
             @clicked="clicked">
         {{episodeInfo.episodeNumber}}
@@ -39,6 +40,19 @@
         private isAnyEpisodeLoading = false;
         private activeEpisodeKey = '';
 
+        public get progress(): number {
+            if (this.episodeInfo.isFinished) {
+                return 100;
+            }
+
+            const { timestamp, duration } = this.episodeInfo;
+            if (timestamp) {
+                return Math.trunc((timestamp / duration) * 100);
+            }
+
+            return 0;
+        }
+
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
         }
@@ -65,7 +79,6 @@
                 takeUntil(this.takeUntil$),
             ).subscribe(activeEpisode => this.activeEpisodeKey = activeEpisode);
         }
-
 
         private fetchEpisodeLoadingStateFromStore(): void {
             this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_EPISODE_INFO).pipe(
