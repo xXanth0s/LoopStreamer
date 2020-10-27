@@ -3,13 +3,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { fromEvent, Observable } from 'rxjs';
 import { first, switchMap } from 'rxjs/operators';
-import {
-    checkForMutations,
-    getDomElementSize,
-    hideNotLsElement,
-    isBodyElement,
-    isDomElementVisible
-} from '../ustils/dom.utils';
+import { checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement } from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
 
@@ -25,7 +19,9 @@ export class RecaptchaService {
         this.checkForRecaptchaContainer().pipe(
             switchMap(container => this.checkForRecaptchaChallenge(container))
         ).subscribe(recaptchaElement => {
-            this.hideNeighbourElementsWhenParentIsBody(recaptchaElement)
+            this.hideNeighbourElementsWhenParentIsBody(recaptchaElement);
+
+            recaptchaElement.scrollIntoView();
             fromEvent(window, 'resize').subscribe(() => recaptchaElement.scrollIntoView());
 
             const size = getDomElementSize(recaptchaElement);
@@ -41,7 +37,6 @@ export class RecaptchaService {
 
     private checkForRecaptchaChallenge(container: HTMLElement): Observable<HTMLElement> {
         return checkForMutations<HTMLElement>(container, this.recaptchaContainerSelector).pipe(
-            first(isDomElementVisible)
         );
     }
 
