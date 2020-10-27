@@ -47,14 +47,15 @@ const resetControlState = (state: ControlState): ControlState => {
         playedEpisodes: 0,
         activePortal: null,
         activeProvidor: null,
-        expandedSeriesOptionsPage: null,
+        expandedSeriesApp: null,
     };
 };
 
-function setExpandedSeriesOptionsPage(state: ControlState, expandedSeriesOptionsPage: string): ControlState {
+function toggleExpandedSeriesOptionsPage(state: ControlState, seriesToToggle: string): ControlState {
+    const isAlreadySelected = state.expandedSeriesApp === seriesToToggle;
     return {
         ...state,
-        expandedSeriesOptionsPage
+        expandedSeriesApp: isAlreadySelected ? null : seriesToToggle
     };
 }
 
@@ -126,8 +127,8 @@ export const controlStateSlice = createSlice({
             raisePlayedEpisodes(state),
         resetPlayedEpisodesAction: (state: ControlState) =>
             resetPlayedEpisodes(state),
-        setExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesOptionsPage']>) =>
-            setExpandedSeriesOptionsPage(state, action.payload),
+        toggleExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesApp']>) =>
+            toggleExpandedSeriesOptionsPage(state, action.payload),
         setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) =>
             setWindowIdForWindowType(state, action.payload),
         setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) =>
@@ -148,7 +149,7 @@ export const {
     setActivePortalAction,
     setActiveProvidorAction,
     resetControlStateAction,
-    setExpandedSeriesOptionsPageAction,
+    toggleExpandedSeriesOptionsPageAction,
     setWindowIdForWindowTypeAction,
     setActiveEpisodeAction,
     addAsyncInteractionAction,

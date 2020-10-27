@@ -6,6 +6,7 @@ export default interface Series {
     title: string;
     description?: string;
     lastEpisodeWatched?: SeriesEpisode['key'];
+    lastUsedPortal?: PORTALS;
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
     posterHref?: string;

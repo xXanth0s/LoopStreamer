@@ -31,6 +31,7 @@
 
     .container {
         margin-top: 70px;
+        min-width: 800px;
         width: $containerWidth;
         background-color: $containerBackground;
         min-height: 760px;

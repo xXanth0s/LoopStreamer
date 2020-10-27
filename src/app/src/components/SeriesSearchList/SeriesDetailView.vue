@@ -135,7 +135,7 @@
                 this.fetchSeriesDataFromStore(seriesKey);
                 this.fetchSeasonsFromStore(seriesKey);
 
-                const message = createSeriesSelectedInAppMessage(seriesKey, this.selectedProtal);
+                const message = createSeriesSelectedInAppMessage(seriesKey, this.getPortal());
                 this.messageService.sendMessageToBackground(message);
             }
         }
@@ -148,7 +148,7 @@
 
                 this.fetchSeriesEpisodesFromStore(seasonKey);
 
-                const message = createSeriesSeasonSelectedInAppMessage(seasonKey, this.selectedProtal);
+                const message = createSeriesSeasonSelectedInAppMessage(seasonKey, this.getPortal());
 
                 this.messageService.sendMessageToBackground(message);
             }
@@ -156,7 +156,7 @@
 
         public episodeClicked(episodeKey: SeriesEpisode['key']): void {
             if (episodeKey) {
-                this.messageService.sendMessageToBackground(createStartEpisodeMessage(episodeKey, this.selectedProtal));
+                this.messageService.sendMessageToBackground(createStartEpisodeMessage(episodeKey, this.getPortal()));
             }
         }
 
@@ -190,6 +190,10 @@
             this.store.selectBehaviour(getSeriesEpisodesForSeason, seriesSeasonKey).pipe(
                 takeUntil(merge(this.seasonChanged$, this.seriesChanged$, this.takeUntil$)),
             ).subscribe(episodes => this.episodes = episodes);
+        }
+
+        private getPortal(): PORTALS {
+            return this.selectedProtal || this.seriesData.lastUsedPortal;
         }
     }
 </script>

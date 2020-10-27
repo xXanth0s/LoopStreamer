@@ -16,7 +16,7 @@
     import { optionsContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { isSeriesExpandedOnOptionsPage } from '../../../../store/selectors/control-state.selector';
+    import { isSeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
     import SeriesDetailView from './SeriesDetailView.vue';
     import Series from '../../../../store/models/series.model';
 
@@ -49,7 +49,7 @@
         }
 
         public mounted(): void {
-            this.store.selectBehaviour(isSeriesExpandedOnOptionsPage, this.series.key).pipe(
+            this.store.selectBehaviour(isSeriesExpandedOnApp, this.series.key).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isSelected => this.isSelected = isSelected);
         }

@@ -3,6 +3,8 @@ import Series from '../models/series.model';
 import { StateModel } from '../models/state.model';
 import { seriesEpisodeStartedAction } from './series-episode.reducer';
 import SeriesEpisode from '../models/series-episode.model';
+import { PORTALS } from '../enums/portals.enum';
+import { Logger } from '../../shared/services/logger';
 
 const initialState: StateModel['series'] = {};
 
@@ -73,6 +75,15 @@ function seriesStarted(state: StateModel['series'], actionData: { seriesKey: Ser
     state[seriesKey].lastEpisodeWatched = seriesEpisodeKey;
 }
 
+function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, portal }: { seriesKey: Series['key']; portal: PORTALS }): void {
+    if (!state[seriesKey]) {
+        Logger.error(`[SeriesReducer->setLastUsedPortalForSeries] tried to update series ${seriesKey} but no series found`);
+        return;
+    }
+
+    state[seriesKey].lastUsedPortal = portal;
+}
+
 const seriesSlice = createSlice({
     name: 'series',
     initialState,
@@ -89,6 +100,8 @@ const seriesSlice = createSlice({
             updateOrAddSeries(state, action.payload),
         updateOrAddMultipleSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series[]>) =>
             updateOrAddMultipleSeries(state, action.payload),
+        setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], portal: PORTALS }>) =>
+            setLastUsedPortalForSeries(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(seriesEpisodeStartedAction, (state: StateModel['series'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
             seriesStarted(state, action.payload));
@@ -101,7 +114,8 @@ export const {
     setStartTimeForSeriesAction,
     setEndTimeForSeriesAction,
     updateOrAddSeriesAction,
-    updateOrAddMultipleSeriesAction
+    updateOrAddMultipleSeriesAction,
+    setLastUsedPortalForSeriesAction
 } = seriesSlice.actions;
 
 export default seriesSlice;

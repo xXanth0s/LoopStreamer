@@ -1,18 +1,15 @@
 <template>
-    <div>
+    <div class="mb-2">
         <div class="row">
-            <series-tile class="col-4"
-                         v-for="series in seriesList"
-                         v-bind:key="series.key"
-                         v-bind:series="series"
-                         @tile-clicked="seriesSelected">
-            </series-tile>
+            <series-panel :series-key="serie.key"
+                          class="mb-1 col-4"
+                          v-bind:key="serie.key"
+                          v-for="serie in seriesList"></series-panel>
         </div>
         <div class="row">
             <series-detail-view
-                    :series-key="openSeriesKey"
                     :isExpanded="isAnySeriesSelected"
-                    :selected-protal="selectedProtal"
+                    :series-key="openSeriesKey"
                     class="col">
             </series-detail-view>
         </div>
@@ -29,28 +26,23 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
-    import { toggleExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
-    import SeriesTile from './SeriesTile.vue';
-    import { isAnySeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
-    import SeriesDetailView from './SeriesDetailView.vue';
-    import { PORTALS } from '../../../../store/enums/portals.enum';
+    import { getExpandedSeries } from '../../../../store/selectors/control-state.selector';
     import Series from '../../../../store/models/series.model';
+    import SeriesPanel from './SeriesPanel.vue';
+    import SeriesDetailView from '../SeriesSearchList/SeriesDetailView.vue';
 
     @Component({
-        name: 'series-list-row',
+        name: 'my-series-row',
         components: {
-            SeriesTile,
             SeriesDetailView,
+            SeriesPanel,
         },
     })
-    export default class SeriesListRow extends Vue {
+    export default class MySeriesRow extends Vue {
         private readonly takeUntil$ = new Subject();
 
         @Prop(Array)
         private seriesList: Series[];
-
-        @Prop(String)
-        private selectedProtal: PORTALS;
 
         private openSeriesKey: Series['key'] = null;
         private isAnySeriesSelected = false;
@@ -66,21 +58,18 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        public async seriesSelected(seriesKey: Series['key']): Promise<void> {
-            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(seriesKey));
-            this.openSeriesKey = seriesKey;
-        }
-
         @Watch('seriesList', { immediate: true })
         public initializeSeriesList(seriesList: Series[]): void {
             const keys = seriesList.map(series => series.key);
-            this.store.select(isAnySeriesExpandedOnApp, keys).pipe(
+            this.store.select(getExpandedSeries).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(isAnySeriesSelected => {
-                if (!isAnySeriesSelected) {
+            ).subscribe(expandedSeries => {
+                this.isAnySeriesSelected = keys.some(key => key === expandedSeries);
+                if (!this.isAnySeriesSelected) {
                     this.openSeriesKey = null;
+                } else {
+                    this.openSeriesKey = expandedSeries;
                 }
-                this.isAnySeriesSelected = isAnySeriesSelected;
             });
         }
     }

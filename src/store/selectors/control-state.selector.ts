@@ -21,11 +21,13 @@ export const getWindowStateForWindowIdWithControlstate = (state: ControlState, w
     return Object.values(state.controllerWindowState).find(windowState => windowState?.windowId === windowId);
 };
 
-export const isSeriesExpandedOnOptionsPage = (state: StateModel, seriesKey: Series['key']): boolean => {
-    return state.controlState.expandedSeriesOptionsPage === seriesKey;
+export const getExpandedSeries = (state: StateModel): Series['key'] => state.controlState.expandedSeriesApp;
+
+export const isSeriesExpandedOnApp = (state: StateModel, seriesKey: Series['key']): boolean => {
+    return state.controlState.expandedSeriesApp === seriesKey;
 };
-export const isAnySeriesExpandedOnOptionsPage = (state: StateModel, seriesKeys: Series['key'][]): boolean => {
-    return seriesKeys.some(key => key === state.controlState.expandedSeriesOptionsPage);
+export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['key'][]): boolean => {
+    return seriesKeys.some(key => key === state.controlState.expandedSeriesApp);
 };
 
 export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean => {

@@ -22,5 +22,4 @@ export function sortArrayForKey<T>(array: Array<T>, getValue: (T) => any): T[] {
         }
         return 0;
     });
-
 }

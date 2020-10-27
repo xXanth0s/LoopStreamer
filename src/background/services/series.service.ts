@@ -34,7 +34,7 @@ export class SeriesService {
 
     public async updateAllSeriesForPortal(portalKey: PORTALS): Promise<boolean> {
         const multipleSeriesMetaInfo = await this.portalController.getAllSeriesFromPortal(portalKey);
-        if (!multipleSeriesMetaInfo) {
+        if (multipleSeriesMetaInfo) {
             this.addMultipleSeriesToStore(multipleSeriesMetaInfo);
             return true;
         }

@@ -62,16 +62,16 @@
     import { getSeriesForPortal } from '../../../store/selectors/series.selector';
     import Series from '../../../store/models/series.model';
     import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
-    import { setExpandedSeriesOptionsPageAction } from '../../../store/reducers/control-state.reducer';
+    import { toggleExpandedSeriesOptionsPageAction } from '../../../store/reducers/control-state.reducer';
 
     @Component({
-        name: 'welcome-page',
+        name: 'series-overview',
         components: {
             SeriesTile,
             SeriesListRow,
         },
     })
-    export default class WelcomePage extends Vue {
+    export default class SeriesOverview extends Vue {
         private readonly seriesTilesPerRow = 3;
         private readonly takeUntil$ = new Subject();
         private readonly portalChanged$ = new Subject();
@@ -98,7 +98,7 @@
 
         public mounted(): void {
             this.portals = this.store.selectSync(getAllPortals);
-            this.store.dispatch(setExpandedSeriesOptionsPageAction(null));
+            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(null));
         }
 
         @Watch('selectedPortal')

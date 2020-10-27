@@ -36,20 +36,21 @@
             return +this.inputValue;
         }
 
-        @Watch('value')
-        private setValue(newValue: number): void {
+        @Watch('value', { immediate: true })
+        public setValue(newValue: number): void {
             this.lastValidatedValue = newValue;
 
             this.inputValue = newValue;
         }
 
         private validateValue(): void {
-            if (Number.isNaN(this.inputValue) || this.inputValue < 0) {
+            const value = +this.inputValue;
+            if (Number.isNaN(value) || value < 0) {
                 this.inputValue = this.lastValidatedValue;
                 return;
             }
 
-            this.lastValidatedValue = this.inputValue;
+            this.setValue(value);
             this.inputChanged();
         }
 

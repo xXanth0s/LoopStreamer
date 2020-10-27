@@ -12,7 +12,7 @@ export interface ControlState {
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key'];
-    expandedSeriesOptionsPage?: Series['key'];
+    expandedSeriesApp?: Series['key'];
     controllerWindowState: Partial<Record<WindowType, BrowserWindowStateModel>>;
     asyncInteractions: Record<AsyncInteraction['key'], AsyncInteraction>;
 }

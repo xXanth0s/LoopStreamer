@@ -7,11 +7,11 @@
                 <span>Ebenso können die Zeiten für das Intro und Outro neu definiert werden.</span>
             </div>
 
-            <div v-if="series.length" class="row">
-                <series-panel :series-key="serie.key"
-                              v-bind:key="serie.key"
-                              class="mb-3 col-12 col-md-4"
-                              v-for="serie in series"></series-panel>
+            <div v-if="series">
+                <my-series-row :key="seriesChunk[0].title"
+                               :series-list="seriesChunk"
+                               v-for="seriesChunk in series">
+                </my-series-row>
             </div>
             <div v-else>
 
@@ -34,19 +34,24 @@
     import { takeUntil } from 'rxjs/operators';
     import { getAllWatchedSeries } from '../../../store/selectors/series.selector';
     import Series from '../../../store/models/series.model';
-    import SeriesPanel from '../components/SeriesPanel.vue';
+    import SeriesPanel from '../components/MySeries/SeriesPanel.vue';
     import { StoreService } from '../../../shared/services/store.service';
     import { optionsContainer } from '../container/container';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
+    import { convertArrayToChunks } from '../../../utils/array.utils';
+    import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
+    import MySeriesRow from '../components/MySeries/MySeriesRow.vue';
 
     @Component({
         components: {
+            MySeriesRow,
+            SeriesListRow,
             SeriesPanel,
         },
     })
     export default class MySeriesPage extends Vue {
         private store: StoreService;
-        private series: Series[] = [];
+        private series: Series[][] = [];
 
         private readonly takeUntil$ = new Subject();
 
@@ -57,7 +62,9 @@
         public mounted(): void {
             this.store.selectBehaviour(getAllWatchedSeries).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(series => this.series = series);
+            ).subscribe(series => {
+                this.series = convertArrayToChunks(series, 3);
+            });
         }
 
         public destroyed(): void {

@@ -44,6 +44,7 @@ import { environment } from '../../environments/environment';
 import Providor from '../../store/models/providor.model';
 import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
+import { setLastUsedPortalForSeriesAction } from '../../store/reducers/series.reducer';
 
 @injectable()
 export class RootBackgroundController {
@@ -304,6 +305,8 @@ export class RootBackgroundController {
 
         if (!result) {
             this.store.dispatch(removeProvidorLinkFromEpisodeAction({ episodeKey, providorKey: providor.key }));
+        } else {
+            this.store.dispatch(setLastUsedPortalForSeriesAction({ seriesKey: episode.seriesKey, portal }));
         }
 
         return result;

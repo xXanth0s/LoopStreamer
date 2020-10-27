@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { globalRoutes } from '../../constants/globalRoutes';
-import WelcomePage from '../views/WelcomePage.vue';
+import SeriesOverview from '../views/SeriesOverview.vue';
 import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
 import MySeriesPage from '../views/MySeriesPage.vue';
@@ -13,7 +13,7 @@ Vue.use(VueRouter);
 let routes = [
     {
         path: `/${globalRoutes.HOME_PAGE}`,
-        component: WelcomePage
+        component: SeriesOverview
     },
     {
         path: `/${globalRoutes.SETTINGS_PAGE}`,

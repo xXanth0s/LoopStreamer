@@ -1,19 +1,20 @@
 <template>
     <div v-if="series">
         <div class="card">
-            <div class="flex-column" v-if="!hideContent">
+            <div class="flex-column" v-if="!showSettings">
                 <div>
-                    <img :src="series.posterHref" @click="changeView()" alt="Avatar">
+                    <i @click="toggleSettings" class="fas fa-cog setting-icon icon"></i>
+                    <img :src="series.posterHref" alt="Avatar">
                 </div>
                 <div class="default-title-text title flex-center flex-grow">
                     <span class="text">{{series.title}}</span>
                 </div>
-                <b-button @click="changeView" block class="btn-bottom" variant="primary"><i
-                        class="el-icon-arrow-right"></i></b-button>
             </div>
             <div class="flex-column" v-else>
-                <div class="default-title-text flex-center title underline" v-bind:title="series.title">
+                <div class="default-title-text flex-row title underline px-2" v-bind:title="series.title">
+                    <i @click="toggleSettings" class="el-icon-arrow-left icon"></i>
                     <span class="active text px-1">{{series.title}}</span>
+                    <div class="icon-spacer"></div>
                 </div>
                 <div class="px-3 d-flex flex-column input-container">
                     <div class="d-flex flex-row justify-content-between align-items-center mt-3">
@@ -33,19 +34,29 @@
                             </span>
                         <minus-plus-input v-model="scipE"/>
                     </div>
+
                     <div class="flex-grow"></div>
-                    <b-button @click="continueSeries" block class="mb-2" v-if="hasNextEpisode" variant="primary">
-                        Fortsetzen
+
+                    <b-button @click="openDeleteModal" block class="mb-2" variant="outline-primary">Löschen
                     </b-button>
 
-                    <b-button @click="openDeleteModal" block class="mb-3" variant="primary">Löschen
+                    <b-button @click="saveSettings" block class="mb-3" variant="primary">Speichern
                     </b-button>
-
                 </div>
-                <b-button @click="changeView" block variant="primary"><i
-                        class="el-icon-arrow-left"></i></b-button>
             </div>
+            <b-button @click="toggleSeries" block class="btn-bottom" variant="primary"><i
+                    :class="{'transform-arrow': isActive}" class="el-icon-arrow-right expand-button"></i></b-button>
         </div>
+
+        <b-toast id="success-save-toast" solid>
+            <template #toast-title>
+                Einstellungen Gespeichert
+            </template>
+            <div class="flex-row">
+                <i class="fas fa-check green mr-3"></i>
+                <span>Die Zeiten für die Serie {{series.title}} wurden aktualisiert</span>
+            </div>
+        </b-toast>
     </div>
 </template>
 
@@ -56,17 +67,19 @@
     import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
-    import Series from '../../../store/models/series.model';
-    import { createContinueSeriesMessage } from '../../../browserMessages/messages/background.messages';
-    import { MessageService } from '../../../shared/services/message.service';
-    import { optionsContainer } from '../container/container';
-    import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
-    import { StoreService } from '../../../shared/services/store.service';
-    import { getSeriesByKey, isSeriesContinuable } from '../../../store/selectors/series.selector';
-    import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../../store/reducers/series.reducer';
-    import InfoTooltip from './InfoTooltip.vue';
-    import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../constants/tooltip-texts';
-    import MinusPlusInput from './MinusPlusInput.vue';
+    import Series from '../../../../store/models/series.model';
+    import { createContinueSeriesMessage } from '../../../../browserMessages/messages/background.messages';
+    import { MessageService } from '../../../../shared/services/message.service';
+    import { optionsContainer } from '../../container/container';
+    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
+    import { StoreService } from '../../../../shared/services/store.service';
+    import { getSeriesByKey, isSeriesContinuable } from '../../../../store/selectors/series.selector';
+    import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../../../store/reducers/series.reducer';
+    import InfoTooltip from '../InfoTooltip.vue';
+    import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../../constants/tooltip-texts';
+    import MinusPlusInput from '../MinusPlusInput.vue';
+    import { toggleExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
+    import { isSeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
 
     @Component({
         name: 'series-panel',
@@ -85,10 +98,12 @@
         private messageService: MessageService;
         private store: StoreService;
 
+        private isActive: boolean;
+
         private scipS = 0;
         private scipE = 0;
         private hasNextEpisode = false;
-        private hideContent = false;
+        private showSettings = false;
 
         public openDeleteModal(): void {
             MessageBox.confirm(
@@ -102,8 +117,8 @@
             });
         }
 
-        changeView() {
-            this.hideContent = !this.hideContent;
+        toggleSettings() {
+            this.showSettings = !this.showSettings;
         }
 
         remove(): Series {
@@ -125,26 +140,24 @@
 
         public mounted(): void {
             this.loadSeriesFromStore();
+            this.loadIsActiveStateFromStore();
+        }
+
+        public toggleSeries(): void {
+            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(this.seriesKey));
+        }
+
+        public saveSettings(): void {
+            this.store.dispatch(setStartTimeForSeriesAction({ key: this.seriesKey, scipStartTime: this.scipS }));
+            this.store.dispatch(setEndTimeForSeriesAction({ key: this.seriesKey, scipEndTime: this.scipE }));
+
+            this.$bvToast.show('success-save-toast');
         }
 
         @Watch('seriesKey')
         private seriesChanged(): void {
             this.takeUntil$.next();
             this.loadSeriesFromStore();
-        }
-
-        @Watch('scipS')
-        private scipStartTimeChanged(currentValue: number, previousValue: number): void {
-            if (currentValue !== previousValue) {
-                this.store.dispatch(setStartTimeForSeriesAction({ key: this.seriesKey, scipStartTime: currentValue }));
-            }
-        }
-
-        @Watch('scipE')
-        private scipEndTimeChanged(currentValue: number, previousValue: number): void {
-            if (currentValue !== previousValue) {
-                this.store.dispatch(setEndTimeForSeriesAction({ key: this.seriesKey, scipEndTime: currentValue }));
-            }
         }
 
         private loadSeriesFromStore(): void {
@@ -159,7 +172,15 @@
             this.store.selectBehaviour(isSeriesContinuable, this.seriesKey).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isContinuable => this.hasNextEpisode = isContinuable);
+        }
 
+        private loadIsActiveStateFromStore(): void {
+            this.store.selectBehaviour(isSeriesExpandedOnApp, this.seriesKey).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(isActive => {
+                this.isActive = isActive;
+                this.$forceUpdate();
+            });
         }
     }
 </script>
@@ -221,6 +242,42 @@
 
     .input-container {
         height: $middleContainerSize;
+    }
+
+    .transform-arrow {
+        transform: rotate(90deg);
+    }
+
+    .icon {
+        cursor: pointer;
+        color: $primary-color;
+        font-size: 1.5em;
+    }
+
+    .expand-button {
+        transition: all 0.2s;
+    }
+
+    .icon-spacer {
+        width: 1.5em;
+    }
+
+    .setting-icon {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        transition: transform 1.2s ease-in-out;
+
+        &:hover {
+            transform: rotate(180deg);
+        }
+    }
+
+    .flex-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
 </style>
