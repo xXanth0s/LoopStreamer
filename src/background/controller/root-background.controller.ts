@@ -45,6 +45,8 @@ import Providor from '../../store/models/providor.model';
 import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { setLastUsedPortalForSeriesAction } from '../../store/reducers/series.reducer';
+import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
+import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 
 @injectable()
 export class RootBackgroundController {
@@ -54,6 +56,8 @@ export class RootBackgroundController {
         visible: true,
         preloadScript: false,
         manipulateSession: true,
+        width: environment.openAppDevTools ? DefaultOpenWindowConfig.width : APP_WIDTH,
+        height: environment.openAppDevTools ? DefaultOpenWindowConfig.height : APP_HEIGHT,
     };
 
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,

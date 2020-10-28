@@ -6,5 +6,8 @@ export type OpenWindowConfig = {
     httpReferrer?: string | Referrer;
     fullscreen?: boolean;
     manipulateSession?: boolean;
-    preloadScript?: boolean
+    preloadScript?: boolean;
+    width?: number;
+    height?: number;
+    resizable?: boolean
 }

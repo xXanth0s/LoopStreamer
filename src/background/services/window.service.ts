@@ -213,14 +213,15 @@ export class WindowService {
 
     private getConfig(config: Required<OpenWindowConfig>): BrowserWindowConstructorOptions {
         return {
-            width: 1600,
-            height: 900,
+            width: config.width,
+            height: config.height,
             fullscreen: config.fullscreen,
             title: DEFAULT_TITLE,
             show: config.visible,
             frame: false,
             icon: path.resolve(__dirname, 'assets', 'logo.ico'),
             fullscreenable: true,
+            resizable: config.resizable,
             webPreferences: {
                 enableRemoteModule: true,
                 session: session.defaultSession,

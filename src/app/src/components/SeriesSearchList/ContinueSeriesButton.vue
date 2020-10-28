@@ -51,7 +51,7 @@
         private isLoading = false;
 
         public get buttonText(): string {
-            return `S${getSeriesEpisodeTitle(this.seriesEpisode)} Fortsetzen`;
+            return `${getSeriesEpisodeTitle(this.seriesEpisode)} Fortsetzen`;
         }
 
         public get progress(): number {

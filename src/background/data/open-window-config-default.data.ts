@@ -8,4 +8,7 @@ export const DefaultOpenWindowConfig: Required<OpenWindowConfig> = {
     preloadScript: true,
     visible: environment.showNewWindows,
     manipulateSession: false,
+    width: 1600,
+    height: 900,
+    resizable: true,
 }

@@ -73,6 +73,7 @@ module.exports = {
         'src/store/**/*.ts',
         'src/background/**/*.ts',
         'src/browserMessages/**/*.ts',
+        'src/environments/*.ts',
       ],
       // Do not preload script with vue CLI to avoid unnecessary reloading
       preload: isProd ? path.resolve(__dirname, 'dist_electron', 'preload.js') : undefined,
