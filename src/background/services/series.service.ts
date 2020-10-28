@@ -13,7 +13,7 @@ import {
 } from '../../store/utils/series.utils';
 import Series from '../../store/models/series.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import { getLastWatchedEpisode } from '../../store/selectors/series.selector';
+import { getLastUsedEpisodeForSeries, getLastWatchedEpisode } from '../../store/selectors/series.selector';
 import {
     getFirstEpisodeForSeason,
     getNextEpisode,
@@ -61,9 +61,10 @@ export class SeriesService {
         return false;
     }
 
-    public async getContinuableEpisodeForSeries(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesEpisode> {
+    public async getContinuableEpisodeForSeries(seriesKey: Series['key'], portalKey?: PORTALS): Promise<SeriesEpisode> {
         const lastWatchedEpisode = this.store.selectSync(getLastWatchedEpisode, seriesKey);
-        if (!lastWatchedEpisode) {
+        const finalPortal = portalKey || this.store.selectSync(getLastUsedEpisodeForSeries, seriesKey);
+        if (!lastWatchedEpisode || !finalPortal) {
             return null;
         }
 
@@ -71,12 +72,16 @@ export class SeriesService {
             return lastWatchedEpisode;
         }
 
-        return this.getNextEpisode(lastWatchedEpisode.key, portalKey);
+        return this.getNextEpisode(lastWatchedEpisode.key, finalPortal);
     }
 
-    public async getNextEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS): Promise<SeriesEpisode> {
+    public async getNextEpisode(episodeKey: SeriesEpisode['key'], portalKey?: PORTALS): Promise<SeriesEpisode> {
         const lastEpisode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         if (!lastEpisode) {
+            return null;
+        }
+        const finalPortal = portalKey || this.store.selectSync(getLastUsedEpisodeForSeries, lastEpisode.seriesKey);
+        if (!finalPortal) {
             return null;
         }
 
@@ -85,20 +90,25 @@ export class SeriesService {
             return nextEpisode;
         }
 
-        return this.getFirstEpisodeForNextSeason(lastEpisode.seasonKey, portalKey);
+        return this.getFirstEpisodeForNextSeason(lastEpisode.seasonKey, finalPortal);
     }
 
-    private async getNextEpisodeForSameSeason({ key, seasonKey }: SeriesEpisode, portalKey: PORTALS): Promise<SeriesEpisode> {
+    private async getNextEpisodeForSameSeason({ key, seasonKey, seriesKey }: SeriesEpisode, portalKey?: PORTALS): Promise<SeriesEpisode> {
         const nextEpisode = this.store.selectSync(getNextEpisode, key);
         if (nextEpisode) {
             return nextEpisode;
         }
 
-        await this.updateSeasonForPortal(seasonKey, portalKey);
+        const finalPortal = portalKey || this.store.selectSync(getLastUsedEpisodeForSeries, seriesKey);
+        if (!finalPortal) {
+            return null;
+        }
+
+        await this.updateSeasonForPortal(seasonKey, finalPortal);
         return this.store.selectSync(getNextEpisode, key);
     }
 
-    private async getFirstEpisodeForNextSeason(seasonKey: SeriesSeason['key'], portalKey: PORTALS): Promise<SeriesEpisode> {
+    private async getFirstEpisodeForNextSeason(seasonKey: SeriesSeason['key'], portalKey?: PORTALS): Promise<SeriesEpisode> {
         let nextSeason = await this.getNextSeason(seasonKey, portalKey);
         if (!nextSeason) {
             return null;
@@ -109,15 +119,27 @@ export class SeriesService {
             return firstEpisode;
         }
 
-        await this.updateSeasonForPortal(nextSeason.key, portalKey);
+        const season = this.store.selectSync(getSeriesSeasonByKey, seasonKey);
+        const finalPortal = portalKey || this.store.selectSync(getLastUsedEpisodeForSeries, season.seriesKey);
+        if (!finalPortal) {
+            return null;
+        }
+
+        await this.updateSeasonForPortal(nextSeason.key, finalPortal);
         return this.store.selectSync(getFirstEpisodeForSeason, nextSeason.key);
     }
 
-    private async getNextSeason(seasonKey: SeriesSeason['key'], portal: PORTALS): Promise<SeriesSeason> {
+    private async getNextSeason(seasonKey: SeriesSeason['key'], portalKey?: PORTALS): Promise<SeriesSeason> {
         let nextSeason = this.store.selectSync(getNextSeason, seasonKey);
         if (!nextSeason) {
             const currentSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey);
-            const isSeriesUpdateSuccessful = this.updateSeriesForPortal(currentSeason?.seriesKey, portal);
+
+            const finalPortal = portalKey || this.store.selectSync(getLastUsedEpisodeForSeries, currentSeason.seriesKey);
+            if (!finalPortal) {
+                return null;
+            }
+
+            const isSeriesUpdateSuccessful = this.updateSeriesForPortal(currentSeason?.seriesKey, finalPortal);
             if (!isSeriesUpdateSuccessful) {
                 return null;
             }

@@ -1,5 +1,6 @@
 export enum ControllerType {
     BACKGROUND = 'BACKGROUND',
+    BACKGROUND_DATA = 'BACKGROUND_DATA',
     PORTAL = 'PORTAL',
     PROVIDOR = 'PROVIDOR',
     OPTIONS = 'OPTIONS',

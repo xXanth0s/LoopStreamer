@@ -2,9 +2,11 @@
     <b-collapse class="mt-1 mb-2 px-0" v-model="isExpanded">
         <div class="accordion-content full-height">
             <div v-if="!isSeriesLoading && seriesData" class="full-height flex-container">
-                <div class="content-container">
-                    <div class="content-description p-3">{{seriesData.description}}</div>
-                    <div class="content-series-items mb-3 ml-4">
+                <div class="content-container container">
+                    <div class="content-description py-3">{{seriesData.description}}</div>
+                    <continue-series-button :series-episode-key="episodeToContinue.key" class="my-3"
+                                            v-if="episodeToContinue"/>
+                    <div class="content-series-items mb-3">
                         <div class="px-3 mt-1 flex-center white-tile">
                             <b>Staffeln:</b>
                         </div>
@@ -15,7 +17,7 @@
                                 :season-info="season"
                                 @clicked="seasonClicked"/>
                     </div>
-                    <div class="content-series-items mb-3 ml-4" v-if="episodes.length">
+                    <div class="content-series-items mb-3" v-if="episodes.length">
                         <span class="px-3 mt-1 flex-center white-tile">
                             <b>Episoden:</b>
                         </span>
@@ -67,17 +69,19 @@
     import { PORTALS } from '../../../../store/enums/portals.enum';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
-    import { getSeriesByKey } from '../../../../store/selectors/series.selector';
+    import { getLastWatchedEpisode, getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
-    import { hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
-    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
+    import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
+    import { createGetContinuableEpisodeMessage } from '../../../../browserMessages/messages/background-data.messages';
+    import ContinueSeriesButton from './ContinueSeriesButton.vue';
 
     @Component({
         name: 'series-detail-view',
         components: {
             SeriesEpisodeButton,
             SeriesSeasonButton,
+            ContinueSeriesButton
         },
     })
     export default class SeriesDetailView extends Vue {
@@ -103,6 +107,7 @@
         private seasons: SeriesSeason[] = [];
         private episodes: SeriesEpisode[] = [];
         private selectedSeasonKey: string = null;
+        private episodeToContinue: SeriesEpisode = null;
 
         private get isSeriesLoading(): boolean {
             return this.isLoading
@@ -119,12 +124,18 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        public mounted(): void {
-            this.fetchLoadingStateFromStore();
-        }
-
         public destroyed(): void {
             this.takeUntil$.next();
+        }
+
+        @Watch('isExpanded', { immediate: true })
+        public expandationChanged(isExpanded: boolean): void {
+            console.log('isExpanded');
+            if (isExpanded) {
+                this.fetchLoadingStateFromStore();
+            } else {
+                this.takeUntil$.next();
+            }
         }
 
         @Watch('seriesKey')
@@ -132,6 +143,7 @@
             if (seriesKey) {
                 this.resetData();
 
+                this.continousFetchEpisodeToContinue();
                 this.fetchSeriesDataFromStore(seriesKey);
                 this.fetchSeasonsFromStore(seriesKey);
 
@@ -168,8 +180,22 @@
             this.episodes = [];
         }
 
+        private async continousFetchEpisodeToContinue(): Promise<void> {
+            await this.fetchEpisodeToContinue();
+            this.store.selectBehaviour(getLastWatchedEpisode, this.seriesKey).pipe(
+                takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
+            ).subscribe(() => this.fetchEpisodeToContinue());
+        }
+
+        private async fetchEpisodeToContinue(): Promise<void> {
+            const message = createGetContinuableEpisodeMessage(this.seriesKey);
+            this.episodeToContinue = await this.messageService.sendMessageToBackground(message);
+            this.$forceUpdate();
+            console.log('episodeToContinue', this.episodeToContinue);
+        }
+
         private fetchLoadingStateFromStore(): void {
-            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_DETAILED_SERIES).pipe(
+            this.store.selectBehaviour(isPreparingVideo).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isLoading => this.isLoading = isLoading);
         }

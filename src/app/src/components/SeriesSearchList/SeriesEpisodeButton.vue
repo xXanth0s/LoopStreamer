@@ -22,6 +22,7 @@
     import { getActiveEpisode, hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
     import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
     import ButtonTile from '../ButtonTile.vue';
+    import { getProgressForEpisode } from '../../../../store/utils/series.utils';
 
     @Component({
         name: 'series-episode-button',
@@ -41,16 +42,7 @@
         private activeEpisodeKey = '';
 
         public get progress(): number {
-            if (this.episodeInfo.isFinished) {
-                return 100;
-            }
-
-            const { timestamp, duration } = this.episodeInfo;
-            if (timestamp) {
-                return Math.trunc((timestamp / duration) * 100);
-            }
-
-            return 0;
+            return getProgressForEpisode(this.episodeInfo);
         }
 
         public beforeCreate(): void {

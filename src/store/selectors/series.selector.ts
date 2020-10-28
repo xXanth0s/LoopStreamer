@@ -11,6 +11,8 @@ export const getAllWatchedSeries = (state: StateModel): Series[] => Object.value
 
 export const getSeriesByKey = (state: StateModel, seriesKey: Series['key']): Series => state.series[seriesKey];
 
+export const getLastUsedEpisodeForSeries = (state: StateModel, seriesKey: Series['key']): PORTALS => getSeriesByKey(state, seriesKey)?.lastUsedPortal;
+
 export const getSeriesForPortal = (state: StateModel, portal: PORTALS): Series[] => {
     return Object.values(state.series).filter(series => {
         return Object.keys(series.portalLinks).some(availablePortal => availablePortal === portal);

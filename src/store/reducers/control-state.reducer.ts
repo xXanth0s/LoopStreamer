@@ -49,7 +49,6 @@ const resetControlState = (state: ControlState): ControlState => {
         playedEpisodes: 0,
         activePortal: null,
         activeProvidor: null,
-        expandedSeriesApp: null,
     };
 };
 

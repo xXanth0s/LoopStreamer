@@ -42,3 +42,8 @@ export const getActiveEpisode = (state: StateModel): ControlState['activeEpisode
 export const hasAsyncInteractionForType = (state: StateModel, type: AsyncInteractionType): boolean => {
     return Object.values(state.controlState.asyncInteractions).some(interaction => interaction.type === type);
 };
+
+export const isPreparingVideo = (state: StateModel): boolean => {
+    return hasAsyncInteractionForType(state, AsyncInteractionType.PORTAL_GET_EPISODE_INFO)
+        || hasAsyncInteractionForType(state, AsyncInteractionType.VIDEO_OPEN_VIDEO);
+};

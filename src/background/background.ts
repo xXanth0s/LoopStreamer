@@ -5,13 +5,17 @@ import { initStore } from '../store/store/background-store';
 import { app } from 'electron';
 import { TestController } from './controller/test.controller';
 import { environment } from '../environments/environment';
+import { BackgroundDataController } from './controller/background-data.controller';
 
 
 app.commandLine.appendSwitch ("disable-http-cache");
 async function initialize(): Promise<void> {
    await initStore();
    const rootController = inversifyContainer.get<RootBackgroundController>(BACKGROUND_TYPES.RootController);
+   const dataController = inversifyContainer.get<BackgroundDataController>(BACKGROUND_TYPES.BackgroundDataController);
+
    rootController.initializeHandler();
+   dataController.initializeHandler();
    rootController.openApp();
    if (environment.isDev) {
       const testController = inversifyContainer.get<TestController>(BACKGROUND_TYPES.TestController);

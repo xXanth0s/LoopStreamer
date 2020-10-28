@@ -60,3 +60,29 @@ export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): Seri
         };
     });
 }
+
+export function getProgressForEpisode(seriesEpisode: SeriesEpisode): number {
+    if (seriesEpisode.isFinished) {
+        return 100;
+    }
+
+    const { timestamp, duration } = seriesEpisode;
+    if (timestamp) {
+        return Math.trunc((timestamp / duration) * 100);
+    }
+
+    return 0;
+}
+
+export function getSeriesEpisodeTitle(seriesEpisode: SeriesEpisode): string {
+    return `S${addLeadingZero(seriesEpisode.season)}E${addLeadingZero(seriesEpisode.episodeNumber)}`;
+}
+
+function addLeadingZero(digit: number): string {
+    const stringDigit = `${digit}`;
+    if (stringDigit.length === 1) {
+        return `0${digit}`;
+    }
+
+    return stringDigit;
+}
