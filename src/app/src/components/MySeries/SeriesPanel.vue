@@ -11,10 +11,10 @@
                 </div>
             </div>
             <div class="flex-column" v-else>
-                <div class="default-title-text flex-row title underline px-2" v-bind:title="series.title">
-                    <i @click="toggleSettings" class="el-icon-arrow-left icon"></i>
+                <div class="default-title-text flex-row title underline-box px-2" v-bind:title="series.title">
+                    <i @click="toggleSettings" class="fas fa-chevron-left icon"></i>
                     <span class="active text px-1">{{series.title}}</span>
-                    <div class="icon-spacer"></div>
+                    <i @click="openDeleteModal()" class="fas fa-times icon red-icon"></i>
                 </div>
                 <div class="px-3 d-flex flex-column input-container">
                     <div class="d-flex flex-row justify-content-between align-items-center mt-3">
@@ -57,16 +57,28 @@
                 <span>Die Zeiten für die Serie {{series.title}} wurden aktualisiert</span>
             </div>
         </b-toast>
+
+        <b-modal hide-footer v-model="showDeleteModal">
+            <template #modal-title>
+                {{series.title}} löschen
+            </template>
+            <div class="d-block text-center">
+                <span>Wollen Sie die Serie {{series.title}} wirklich löschen?</span>
+            </div>
+            <div class="flex-row mt-3">
+                <b-button @click="closeDeleteModal" variant="primary">Schließen</b-button>
+                <b-button @click="remove" variant="outline-primary">Löschen</b-button>
+            </div>
+        </b-modal>
     </div>
 </template>
 
 <script lang="ts">
-    import { MessageBox } from 'element-ui';
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
-    import { takeUntil } from 'rxjs/operators';
+    import { filter, takeUntil } from 'rxjs/operators';
     import Series from '../../../../store/models/series.model';
     import { createContinueSeriesMessage } from '../../../../browserMessages/messages/background.messages';
     import { MessageService } from '../../../../shared/services/message.service';
@@ -80,6 +92,7 @@
     import MinusPlusInput from '../MinusPlusInput.vue';
     import { toggleExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
     import { isSeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
+    import { deleteSeriesAction } from '../../../../store/actions/shared.actions';
 
     @Component({
         name: 'series-panel',
@@ -99,30 +112,28 @@
         private store: StoreService;
 
         private isActive: boolean;
+        private showDeleteModal = false;
 
         private scipS = 0;
         private scipE = 0;
         private hasNextEpisode = false;
         private showSettings = false;
 
-        public openDeleteModal(): void {
-            MessageBox.confirm(
-                `Möchten Sie ${this.series.title} wirklich löschen?`,
-                'Löschen', {
-                    confirmButtonText: 'Bestätigen',
-                    cancelButtonText: 'Abbrechen',
-                    type: 'warning',
-                }).then(() => {
-                this.remove();
-            });
+        private openDeleteModal(): void {
+            this.showDeleteModal = true;
+        }
+
+        private closeDeleteModal(): void {
+            this.showDeleteModal = false;
+        }
+
+        private remove(): void {
+            this.closeDeleteModal();
+            this.store.dispatch(deleteSeriesAction(this.seriesKey));
         }
 
         toggleSettings() {
             this.showSettings = !this.showSettings;
-        }
-
-        remove(): Series {
-            return this.series;
         }
 
         continueSeries() {
@@ -163,7 +174,8 @@
         private loadSeriesFromStore(): void {
             this.store.selectBehaviour(getSeriesByKey, this.seriesKey).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(series => {
+                filter(Boolean),
+            ).subscribe((series: Series) => {
                 this.series = series;
                 this.scipE = series.scipEndTime || 0;
                 this.scipS = series.scipStartTime || 0;
@@ -236,7 +248,7 @@
         }
     }
 
-    .underline {
+    .underline-box {
         border-bottom: $border;
     }
 
@@ -258,8 +270,10 @@
         transition: all 0.2s;
     }
 
-    .icon-spacer {
-        width: 1.5em;
+    .red-icon {
+        &:hover {
+            color: $red;
+        }
     }
 
     .spin-icon {

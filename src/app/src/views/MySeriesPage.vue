@@ -8,7 +8,7 @@
             </div>
 
             <div v-if="series">
-                <my-series-row :key="seriesChunk[0].title"
+                <my-series-row :key="getKeyForChunk(seriesChunk)"
                                :series-list="seriesChunk"
                                v-for="seriesChunk in series">
                 </my-series-row>
@@ -69,6 +69,10 @@
 
         public destroyed(): void {
             this.takeUntil$.next();
+        }
+
+        public getKeyForChunk(seriesChunk: Series[]): string {
+            return `${seriesChunk[0]?.key || ''}-${seriesChunk[1]?.key || ''}-${seriesChunk[2]?.key || ''}`;
         }
     }
 </script>

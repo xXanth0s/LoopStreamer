@@ -5,6 +5,8 @@ import { seriesEpisodeStartedAction } from './series-episode.reducer';
 import SeriesEpisode from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { Logger } from '../../shared/services/logger';
+import { deleteSeriesAction } from '../actions/shared.actions';
+import { filterObject } from '../utils/selector.utils';
 
 const initialState: StateModel['series'] = {};
 
@@ -84,6 +86,10 @@ function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, po
     state[seriesKey].lastUsedPortal = portal;
 }
 
+function deleteSeries(state: StateModel['series'], seriesKey: string): StateModel['series'] {
+    return filterObject(state, series => series.key !== seriesKey);
+}
+
 const seriesSlice = createSlice({
     name: 'series',
     initialState,
@@ -105,6 +111,8 @@ const seriesSlice = createSlice({
     }, extraReducers: (builder) => {
         builder.addCase(seriesEpisodeStartedAction, (state: StateModel['series'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
             seriesStarted(state, action.payload));
+        builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
+            deleteSeries(state, action.payload));
     },
 });
 
@@ -115,7 +123,7 @@ export const {
     setEndTimeForSeriesAction,
     updateOrAddSeriesAction,
     updateOrAddMultipleSeriesAction,
-    setLastUsedPortalForSeriesAction
+    setLastUsedPortalForSeriesAction,
 } = seriesSlice.actions;
 
 export default seriesSlice;

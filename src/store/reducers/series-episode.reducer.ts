@@ -4,6 +4,8 @@ import { StateModel } from '../models/state.model';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import Series from '../models/series.model';
 import Providor from '../models/providor.model';
+import { filterObject } from '../utils/selector.utils';
+import { deleteSeriesAction } from '../actions/shared.actions';
 
 
 const initialState: StateModel['seriesEpisodes'] = {};
@@ -75,6 +77,10 @@ function removeProvidorLinkFromEpisode(state: StateModel['seriesEpisodes'], acti
     delete state[episodeKey]?.providorLinks[providorKey];
 }
 
+function deleteAllEpisodesFromSeries(state: StateModel['seriesEpisodes'], seriesKey: string): StateModel['seriesEpisodes'] {
+    return filterObject(state, episode => episode.seriesKey !== seriesKey);
+}
+
 const seriesEpisodesReducer = createSlice({
     name: 'seriesEpisodes',
     initialState,
@@ -93,6 +99,9 @@ const seriesEpisodesReducer = createSlice({
             setSeriesEpisodeFinished(state, action.payload),
         seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
             setSeriesEpisodeStarted(state, action.payload),
+    }, extraReducers: (builder) => {
+        builder.addCase(deleteSeriesAction, (state: StateModel['seriesEpisodes'], action: PayloadAction<Series['key']>) =>
+            deleteAllEpisodesFromSeries(state, action.payload));
     },
 });
 

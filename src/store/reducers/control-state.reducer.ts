@@ -9,6 +9,8 @@ import { StateModel } from '../models/state.model';
 import { AsyncInteraction } from '../models/async-interaction.model';
 import { getWindowStateForWindowIdWithControlstate } from '../selectors/control-state.selector';
 import { Windows } from 'webextension-polyfill-ts';
+import Series from '../models/series.model';
+import { deleteSeriesAction } from '../actions/shared.actions';
 import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
@@ -75,7 +77,7 @@ function setWindowIdForWindowType(state: ControlState, { windowType, windowId }:
     };
 }
 
-function setActiveEpisode(state: ControlState, activeEpsidoeKey: string) {
+function setActiveEpisode(state: ControlState, activeEpsidoeKey: string): void {
     state.activeEpisode = activeEpsidoeKey;
 }
 
@@ -87,14 +89,14 @@ function removeAsyncInteraction(state: ControlState, key: string): void {
     delete state.asyncInteractions[key];
 }
 
-function setWindowState(state: ControlState, payload: { windowId: number; windowState: WindowState }) {
+function setWindowState(state: ControlState, payload: { windowId: number; windowState: WindowState }): void {
     const controllerWindowState = getWindowStateForWindowIdWithControlstate(state, payload.windowId);
     if (controllerWindowState) {
         controllerWindowState.windowState = payload.windowState;
     }
 }
 
-function setWindowSize(state: ControlState, payload: { windowId: number; height: number; width: number }) {
+function setWindowSize(state: ControlState, payload: { windowId: number; height: number; width: number }): void {
     const { windowId, height, width } = payload;
     const controllerWindowState = getWindowStateForWindowIdWithControlstate(state, windowId);
     if (controllerWindowState) {
@@ -103,12 +105,18 @@ function setWindowSize(state: ControlState, payload: { windowId: number; height:
     }
 }
 
-function raisePlayedEpisodes(state: ControlState) {
+function raisePlayedEpisodes(state: ControlState): void {
     state.playedEpisodes++;
 }
 
-function resetPlayedEpisodes(state: ControlState) {
+function resetPlayedEpisodes(state: ControlState): void {
     state.playedEpisodes = 0;
+}
+
+function resetDataForDeletedSeries(state: StateModel['controlState'], seriesKey: string): void {
+    if (state.expandedSeriesApp === seriesKey) {
+        state.expandedSeriesApp = null;
+    }
 }
 
 export const controlStateSlice = createSlice({
@@ -141,6 +149,9 @@ export const controlStateSlice = createSlice({
             setWindowState(state, action.payload),
         setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number, height: number, width: number }>) =>
             setWindowSize(state, action.payload),
+    }, extraReducers: (builder) => {
+        builder.addCase(deleteSeriesAction, (state: StateModel['controlState'], action: PayloadAction<Series['key']>) =>
+            resetDataForDeletedSeries(state, action.payload));
     }
 });
 
