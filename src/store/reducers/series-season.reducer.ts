@@ -38,7 +38,7 @@ const seriesSeasonsReducer = createSlice({
         updateOrAddMutlipleSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason[]>) => updateOrAddMultipleSeriesSeason(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['seriesSeasons'], action: PayloadAction<Series['key']>) =>
-            deleteAllSeasonsForSeries(state, action.payload));
+            deleteAllSeasonsForSeries(state, action.payload))
     }
 });
 

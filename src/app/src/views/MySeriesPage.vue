@@ -8,9 +8,9 @@
             </div>
 
             <div v-if="series">
-                <my-series-row :key="getKeyForChunk(seriesChunk)"
+                <my-series-row :key="index"
                                :series-list="seriesChunk"
-                               v-for="seriesChunk in series">
+                               v-for="(seriesChunk, index) in series">
                 </my-series-row>
             </div>
             <div v-else>

@@ -101,7 +101,7 @@ const seriesEpisodesReducer = createSlice({
             setSeriesEpisodeStarted(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['seriesEpisodes'], action: PayloadAction<Series['key']>) =>
-            deleteAllEpisodesFromSeries(state, action.payload));
+            deleteAllEpisodesFromSeries(state, action.payload))
     },
 });
 

@@ -114,9 +114,7 @@ function resetPlayedEpisodes(state: ControlState): void {
 }
 
 function resetDataForDeletedSeries(state: StateModel['controlState'], seriesKey: string): void {
-    if (state.expandedSeriesApp === seriesKey) {
-        state.expandedSeriesApp = null;
-    }
+    state.expandedSeriesApp = null;
 }
 
 export const controlStateSlice = createSlice({
@@ -151,7 +149,7 @@ export const controlStateSlice = createSlice({
             setWindowSize(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['controlState'], action: PayloadAction<Series['key']>) =>
-            resetDataForDeletedSeries(state, action.payload));
+            resetDataForDeletedSeries(state, action.payload))
     }
 });
 
