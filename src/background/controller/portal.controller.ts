@@ -144,7 +144,7 @@ export class PortalController {
             waitTillPageLoadFinished(),
             tap(() => this.store.dispatch(setActivePortalAction(portalKey))),
             debounceTime(1000),
-            finalizeWithValue((window: BrowserWindow) => this.windowService.closeWindow(window.id)),
+            finalizeWithValue((window: BrowserWindow) => this.windowService.closeWindow(window.id, true)),
         );
     }
 

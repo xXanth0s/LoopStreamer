@@ -58,7 +58,12 @@ export class TestController {
                         windowType: WindowType.VIDEO
                     }));
                     this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
-                })
+                });
+            });
+
+        ipcMain.handle(MessageType.TEST_BACKGROUND_SHOW_ALL_WINDOWS,
+            (event, message: OpenTestPageMessage): void => {
+                BrowserWindow.getAllWindows().forEach(window => window.show());
             });
     }
 

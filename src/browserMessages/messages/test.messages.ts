@@ -39,3 +39,11 @@ export const createStartTestRecaptchaBackgroundMessage = (): Message => ({
 });
 export type StartTestRecaptchaBackgroundMessage = ReturnType<typeof createStartTestRecaptchaBackgroundMessage>;
 
+
+export const createShowAllWindowsMessage = (): Message => ({
+    type: MessageType.TEST_BACKGROUND_SHOW_ALL_WINDOWS,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+});
+export type ShowAllWindowsMessage = ReturnType<typeof createShowAllWindowsMessage>;
+

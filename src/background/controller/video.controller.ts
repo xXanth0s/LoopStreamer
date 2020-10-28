@@ -60,7 +60,7 @@ export class VideoController {
         const videoWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
         if (videoWindowId) {
             this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
-            this.windowService.closeWindow(videoWindowId);
+            this.windowService.closeWindow(videoWindowId, true);
         }
     }
 

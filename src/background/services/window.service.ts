@@ -52,15 +52,27 @@ export class WindowService {
 
     }
 
-    public closeWindow(windowId?: number): void {
+    public closeWindow(windowId?: number, closeParentWindows = false): void {
         if (!windowId) {
             return;
         }
 
+        const appWindowState = this.store.selectSync(getWindowStateForWindowType, WindowType.APP);
         const browserWindow = BrowserWindow.fromId(windowId);
+        if (!browserWindow) {
+            return;
+        }
+
+        const parentWindowId = browserWindow.getParentWindow()?.id;
+
         if (browserWindow?.closable) {
             browserWindow.close();
         }
+
+        if (closeParentWindows && parentWindowId && parentWindowId !== appWindowState.windowId) {
+            this.closeWindow(parentWindowId, closeParentWindows);
+        }
+
         if (windowId === 1) {
             app.quit();
         }

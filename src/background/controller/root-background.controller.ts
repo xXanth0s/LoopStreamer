@@ -240,7 +240,7 @@ export class RootBackgroundController {
 
     private closeWindowEventHandler(event: IpcMainInvokeEvent, message: CloseWindowMessage): void {
         const windowId = message.payload;
-        this.windowService.closeWindow(windowId);
+        this.windowService.closeWindow(windowId, true);
     }
 
     private toggleWindowMaximizationEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowMaximizationMessage): void {

@@ -10,6 +10,9 @@
         <div class="pt-2">
             <button class="btn btn-primary" @click="startTestRecaptcha">Start Recaptcha on test page</button>
         </div>
+        <div class="pt-2">
+            <button @click="showAllWindows" class="btn btn-primary">Show all windows</button>
+        </div>
     </div>
 </template>
 
@@ -22,6 +25,7 @@
     import { MessageService } from '../../../shared/services/message.service';
     import {
         createOpenTestPageMessage,
+        createShowAllWindowsMessage,
         createStartTestEpisodeOverBSMessage,
         createStartTestRecaptchaBackgroundMessage,
     } from '../../../browserMessages/messages/test.messages';
@@ -48,6 +52,10 @@
 
         public startTestRecaptcha(): void {
             this.messageService.sendMessageToBackground(createStartTestRecaptchaBackgroundMessage());
+        }
+
+        public showAllWindows(): void {
+            this.messageService.sendMessageToBackground(createShowAllWindowsMessage());
         }
     }
 </script>
