@@ -54,6 +54,7 @@ export class NotificationService {
             timeout: timeoutSeconds * 1000,
             title: 'Outro definieren',
             message: 'Die zu überspringenden Zeit setzen',
+            close: true,
             onClosed: closedFn,
             buttons: [
                 [ '<button>Jetzt setzen</button>', (instance, toast) => {

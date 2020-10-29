@@ -1,7 +1,13 @@
 <template>
     <b-collapse class="mt-1 mb-2 px-0" v-model="isExpanded">
         <div class="accordion-content full-height">
-            <div v-if="!isSeriesLoading && seriesData" class="full-height flex-container">
+            <div class="flex-center full-height" v-if="isSeriesLoading">
+                <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="sr-only"></span>
+                </div>
+                <span>Serie wird geladen...</span>
+            </div>
+            <div class="full-height flex-container" v-else>
                 <div class="content-container container">
                     <div class="content-description py-3">{{seriesData.description}}</div>
                     <continue-series-button :series-episode-key="episodeToContinue.key" class="my-3"
@@ -37,12 +43,6 @@
                 <div class="cover float-right mx-3">
                     <img :src="seriesData.posterHref">
                 </div>
-            </div>
-            <div v-else class="flex-center full-height">
-                <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-                    <span class="sr-only"></span>
-                </div>
-                <span>Serie wird geladen...</span>
             </div>
         </div>
     </b-collapse>
@@ -97,12 +97,12 @@
         private isExpanded: boolean;
 
         @Prop(String)
-        private selectedProtal: PORTALS;
+        private selectedPortal: PORTALS;
 
         private messageService: MessageService;
         private store: StoreService;
 
-        private isLoading = true;
+        private isLoading = false;
         private seriesData: Series = null;
         private seasons: SeriesSeason[] = [];
         private episodes: SeriesEpisode[] = [];
@@ -110,9 +110,7 @@
         private episodeToContinue: SeriesEpisode = null;
 
         private get isSeriesLoading(): boolean {
-            return this.isLoading
-                && !(Boolean(this.seriesData?.description)
-                    && Boolean(this.seriesData?.posterHref));
+            return this.seasons.length === 0;
         }
 
         private get areEpisodesLoading(): boolean {
@@ -140,6 +138,7 @@
         @Watch('seriesKey')
         public loadSeriesData(seriesKey: Series['key']): void {
             if (seriesKey) {
+                this.seriesChanged$.next();
                 this.resetData();
 
                 this.continousFetchEpisodeToContinue();
@@ -190,7 +189,6 @@
             const message = createGetContinuableEpisodeMessage(this.seriesKey);
             this.episodeToContinue = await this.messageService.sendMessageToBackground(message);
             this.$forceUpdate();
-            console.log('episodeToContinue', this.episodeToContinue);
         }
 
         private fetchLoadingStateFromStore(): void {
@@ -200,25 +198,34 @@
         }
 
         private fetchSeriesDataFromStore(seriesKey: Series['key']): void {
+            const takeUntil$ = merge(this.seriesChanged$, this.takeUntil$);
             this.store.selectBehaviour(getSeriesByKey, seriesKey).pipe(
-                takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
-            ).subscribe(series => this.seriesData = series);
+                takeUntil(takeUntil$),
+            ).subscribe(series => {
+                this.seriesData = series;
+            });
         }
 
         private fetchSeasonsFromStore(seriesKey: Series['key']): void {
+            const takeUntil$ = merge(this.seriesChanged$, this.takeUntil$);
             this.store.selectBehaviour(getSeasonsForSeries, seriesKey).pipe(
-                takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
-            ).subscribe(seasons => this.seasons = seasons);
+                takeUntil(takeUntil$),
+            ).subscribe(seasons => {
+                this.seasons = seasons;
+            });
         }
 
         private fetchSeriesEpisodesFromStore(seriesSeasonKey: SeriesSeason['key']): void {
+            const takeUntil$ = merge(this.seasonChanged$, this.seriesChanged$, this.takeUntil$);
             this.store.selectBehaviour(getSeriesEpisodesForSeason, seriesSeasonKey).pipe(
-                takeUntil(merge(this.seasonChanged$, this.seriesChanged$, this.takeUntil$)),
-            ).subscribe(episodes => this.episodes = episodes);
+                takeUntil(takeUntil$),
+            ).subscribe(episodes => {
+                this.episodes = episodes;
+            });
         }
 
         private getPortal(): PORTALS {
-            return this.selectedProtal || this.seriesData.lastUsedPortal;
+            return this.selectedPortal || this.seriesData.lastUsedPortal;
         }
     }
 </script>

@@ -270,7 +270,7 @@ export class RootBackgroundController {
     }
 
     private async startNextEpisode(episodeKey: SeriesEpisode['key']): Promise<boolean> {
-        const nextEpisode = await this.seriesService.getNextEpisode(episodeKey, PORTALS.BS);
+        const nextEpisode = await this.seriesService.getNextEpisode(episodeKey);
         if (nextEpisode) {
             return this.startEpisode(nextEpisode.key, PORTALS.BS);
         }
