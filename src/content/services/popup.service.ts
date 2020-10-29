@@ -5,12 +5,10 @@ import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesByKey, isEndTimeConfiguredForSeries } from '../../store/selectors/series.selector';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { Popup } from '../enum/popup.enum';
-import { getOptions } from '../../store/selectors/options.selector';
+import { getPopupEndTimeForSeriesEpisode } from '../../store/utils/series.utils';
 
 @injectable()
 export class PopupService {
-
-    private readonly endTimeBuffer = 5;
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
@@ -41,13 +39,14 @@ export class PopupService {
 
     private getConfigForSetEndTimePopup(episodeInfo: SeriesEpisode): PopupConfig {
         const series = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
-        const { timeTillSetEndtimePopup } = this.store.selectSync(getOptions);
         const mustBeOpened = series && !series.isEndTimeConfigured;
+
+        const timeToOpen = this.getEndTimeForConfiguredSeries(series.key);
 
         return {
             pupupKey: Popup.SET_ENDTIME,
             openFromStart: false,
-            timeToOpen: timeTillSetEndtimePopup,
+            timeToOpen,
             mustBeOpened,
         };
     }
@@ -66,13 +65,8 @@ export class PopupService {
     }
 
     private getEndTimeForConfiguredSeries(seriesKey: string): number {
-        const { timeForEndtimeCountdown } = this.store.selectSync(getOptions);
-        const { isEndTimeConfigured, scipEndTime } = this.store.selectSync(getSeriesByKey, seriesKey);
+        const series = this.store.selectSync(getSeriesByKey, seriesKey);
 
-        if (!isEndTimeConfigured || scipEndTime < timeForEndtimeCountdown - this.endTimeBuffer) {
-            return timeForEndtimeCountdown;
-        }
-
-        return scipEndTime + timeForEndtimeCountdown - this.endTimeBuffer;
+        return getPopupEndTimeForSeriesEpisode(series);
     }
 }

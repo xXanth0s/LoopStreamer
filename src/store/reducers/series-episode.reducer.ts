@@ -6,6 +6,7 @@ import Series from '../models/series.model';
 import Providor from '../models/providor.model';
 import { filterObject } from '../utils/selector.utils';
 import { deleteSeriesAction } from '../actions/shared.actions';
+import { setTimestampForSeriesEpisode } from '../thunk/series-episode.thunk';
 
 
 const initialState: StateModel['seriesEpisodes'] = {};
@@ -62,13 +63,22 @@ function setSeriesEpisodeStarted(state: StateModel['seriesEpisodes'],
     episode.duration = duration;
 }
 
-function setTimestamp(state: StateModel['seriesEpisodes'], { seriesEpisodeKey, timestamp }: { seriesEpisodeKey: SeriesEpisode['key']; timestamp: number }) {
-    if (!state[seriesEpisodeKey]) {
+function setTimestamp(state: StateModel['seriesEpisodes'],
+                      { seriesEpisodeKey, timestamp, isFinished }: { seriesEpisodeKey: SeriesEpisode['key']; timestamp: number, isFinished: boolean }): StateModel['seriesEpisodes'] {
+    const seriesEpisode = state[seriesEpisodeKey];
+    if (!seriesEpisode) {
         console.error(`[SeriesEpisodeReducer -> setTimestamp]: series for key ${seriesEpisodeKey} not found`);
-        return;
+        return state;
     }
 
-    state[seriesEpisodeKey].timestamp = timestamp;
+    return {
+        ...state,
+        [seriesEpisodeKey]: {
+            ...seriesEpisode,
+            timestamp,
+            isFinished
+        }
+    };
 }
 
 function removeProvidorLinkFromEpisode(state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string; providorKey: Providor['key'] }>) {
@@ -93,15 +103,16 @@ const seriesEpisodesReducer = createSlice({
             addProvidorLinkToEpisode(state, action),
         removeProvidorLinkFromEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string, providorKey: Providor['key'] }>) =>
             removeProvidorLinkFromEpisode(state, action),
-        setTimestampForSeriesEpisodeAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) =>
-            setTimestamp(state, action.payload),
         seriesEpisodeFinishedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<SeriesEpisode['key']>) =>
             setSeriesEpisodeFinished(state, action.payload),
         seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
             setSeriesEpisodeStarted(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['seriesEpisodes'], action: PayloadAction<Series['key']>) =>
-            deleteAllEpisodesFromSeries(state, action.payload))
+            deleteAllEpisodesFromSeries(state, action.payload));
+        builder.addCase(setTimestampForSeriesEpisode.fulfilled, (state: StateModel['seriesEpisodes'],
+                                                                 action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], isFinished: boolean, timestamp: number }>) =>
+            setTimestamp(state, action.payload));
     },
 });
 
@@ -112,7 +123,6 @@ export const {
     removeProvidorLinkFromEpisodeAction,
     seriesEpisodeFinishedAction,
     seriesEpisodeStartedAction,
-    setTimestampForSeriesEpisodeAction
 } = seriesEpisodesReducer.actions;
 
 

@@ -4,6 +4,7 @@ import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } f
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
+import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
 
 export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
     const { seriesTitle, epdisodeNumber, seasonNumber, portalLinks, portal, providorLinks } = seriesEpisodeDto;
@@ -85,4 +86,18 @@ function addLeadingZero(digit: number): string {
     }
 
     return stringDigit;
+}
+
+export function getPopupEndTimeForSeriesEpisode(series: Series) {
+    const { isEndTimeConfigured, scipEndTime } = series;
+
+    if (!isEndTimeConfigured) {
+        return TIME_FOR_SET_ENDTIME_POPUP;
+    }
+
+    if (scipEndTime < TIME_FOR_NEXT_EPISODE_POPUP - END_TIME_BUFFER) {
+        return TIME_FOR_NEXT_EPISODE_POPUP;
+    }
+
+    return scipEndTime + TIME_FOR_NEXT_EPISODE_POPUP - END_TIME_BUFFER;
 }

@@ -10,11 +10,9 @@ import { PopupController } from './popup.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
-import {
-    seriesEpisodeStartedAction,
-    setTimestampForSeriesEpisodeAction
-} from '../../store/reducers/series-episode.reducer';
+import { seriesEpisodeStartedAction } from '../../store/reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { setTimestampForSeriesEpisode } from '../../store/thunk/series-episode.thunk';
 
 @injectable()
 export class VideoController {
@@ -82,7 +80,7 @@ export class VideoController {
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
         videoTimeUpdate$.subscribe(timestamp => {
-            this.store.dispatch(setTimestampForSeriesEpisodeAction({ seriesEpisodeKey: key, timestamp }));
+            this.store.dispatch(setTimestampForSeriesEpisode({ seriesEpisodeKey: key, timestamp }));
         });
     }
 

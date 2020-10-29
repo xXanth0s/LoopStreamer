@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import lastWatchedSeriesSlice from '../reducers/lastWatchedSeries.reducer';
 import seriesSlice from '../reducers/series.reducer';
 import portalsSlice from '../reducers/portals.reducer';
@@ -11,6 +11,7 @@ import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redu
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
+import { environment } from '../../environments/environment';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
@@ -30,11 +31,12 @@ const backgroundStore = configureStore<StateModel>({
     },
     // @ts-ignore
     middleware: [
+        ...getDefaultMiddleware({ serializableCheck: false, immutableCheck: false }),
         triggerAlias,
         forwardToRenderer,
         StorageMiddlerware,
     ],
-    devTools: true,
+    devTools: environment.isDev,
     // enhancers: [
     //     composeEnhancers.apply(BrowserStorageMiddlerware)
     // ]

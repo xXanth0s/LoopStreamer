@@ -8,7 +8,6 @@ import { Popup } from '../enum/popup.enum';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../store/reducers/series.reducer';
 import { getOptions } from '../../store/selectors/options.selector';
-import { seriesEpisodeFinishedAction } from '../../store/reducers/series-episode.reducer';
 import {
     createContinueAutoplayForEpisodeMessage,
     createVideoFinishedMessage
@@ -95,7 +94,6 @@ export class PopupController {
     }
 
     private openSetEndTimePopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        this.store.dispatch(seriesEpisodeFinishedAction(episodeInfo.key));
         const popupCountdown = this.getTimeForSetEndtimeCountdon(video);
 
         this.notificationService.openSetEndTimePopup(
@@ -127,7 +125,6 @@ export class PopupController {
             return;
         }
 
-        this.store.dispatch(seriesEpisodeFinishedAction(episodeInfo.key));
 
         const popupCountdown = this.getTimeTillForNextEpisodeCountdown(video);
 

@@ -1,5 +1,5 @@
 import { StateModel } from '../models/state.model';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { controlStateSlice } from '../reducers/control-state.reducer';
 import { optionsSlice } from '../reducers/options.reducer';
 import { providorsReducer } from '../reducers/providors.reducer';
@@ -7,11 +7,9 @@ import lastWatchedSeriesSlice from '../reducers/lastWatchedSeries.reducer';
 import seriesSlice from '../reducers/series.reducer';
 import portalsSlice from '../reducers/portals.reducer';
 import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer, } from 'electron-redux';
-import path from 'path';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
-
-const __dirname = path.resolve();
+import { environment } from '../../environments/environment';
 
 const initialState = getInitialStateRenderer();
 
@@ -27,10 +25,12 @@ const browserStore = configureStore<StateModel>({
         seriesEpisodes: seriesEpisodesReducer.reducer,
     },
     preloadedState: initialState,
+    // @ts-ignore
     middleware: [
+        ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
         forwardToMainWithParams(),
     ],
-    devTools: true,
+    devTools: environment.isDev,
 });
 
 export const initBrowserStore = () => {

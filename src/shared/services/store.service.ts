@@ -3,9 +3,10 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, finalize } from 'rxjs/operators';
 import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { IStoreService } from './store.service.interface';
-import { ActionCreatorWithOptionalPayload } from '@reduxjs/toolkit';
+import { ActionCreatorWithOptionalPayload, AsyncThunkAction } from '@reduxjs/toolkit';
 import { StateModel } from '../../store/models/state.model';
 import { setActiveEpisodeAction } from '../../store/reducers/control-state.reducer';
+import { thunkConfig } from '../../store/types/thunk-config.type';
 
 type SelectorArguments<T, P> = P extends (state: T, ...args: infer A) => any ? A : never;
 
@@ -36,7 +37,7 @@ export class StoreService {
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public dispatch(action: ReturnType<ActionCreatorWithOptionalPayload<any>>): void | Promise<void> {
+    public dispatch(action: ReturnType<ActionCreatorWithOptionalPayload<any>> | AsyncThunkAction<any, any, thunkConfig>): void | Promise<void> {
         return this.store.dispatch(action);
     }
 
