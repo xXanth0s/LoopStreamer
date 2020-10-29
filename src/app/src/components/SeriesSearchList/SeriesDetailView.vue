@@ -81,7 +81,7 @@
         components: {
             SeriesEpisodeButton,
             SeriesSeasonButton,
-            ContinueSeriesButton
+            ContinueSeriesButton,
         },
     })
     export default class SeriesDetailView extends Vue {

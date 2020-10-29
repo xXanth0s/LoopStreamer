@@ -18,14 +18,15 @@ import { PopupService } from '../services/popup.service';
 import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { createHasNextEpisodeMessage } from '../../browserMessages/messages/background-data.messages';
-import { filter, first } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 
 @injectable()
 export class PopupController {
 
     private hasNextEpisode = true;
     private videoOnTimeUpdate$: Observable<number>;
+    private popupFinallyClosed$ = new Subject<Popup>();
 
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
@@ -52,10 +53,24 @@ export class PopupController {
 
     private openPupupAtTime(config: PopupConfig, video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const videoDuration = video.duration;
+        let isOpen = false;
+
+        const takeUntil$ = this.popupFinallyClosed$.pipe(
+            filter(key => key === config.pupupKey),
+        );
+
         this.videoOnTimeUpdate$.pipe(
-            filter(timeStamp => this.isTimeToOpenPopup(config, timeStamp, videoDuration)),
-            first()
-        ).subscribe(() => this.openPopup(config, video, episodeInfo));
+            takeUntil(takeUntil$),
+        ).subscribe(timestamp => {
+            const shouldOpen = this.isTimeToOpenPopup(config, timestamp, videoDuration);
+            if (!shouldOpen && isOpen) {
+                this.notificationService.closeAllPopups();
+                isOpen = false;
+            } else if (shouldOpen && !isOpen) {
+                setTimeout(() => this.openPopup(config, video, episodeInfo));
+                isOpen = true;
+            }
+        });
     }
 
     private openPopup(config: PopupConfig, video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
@@ -84,12 +99,16 @@ export class PopupController {
                     key: episodeInfo.seriesKey,
                     scipStartTime: video.currentTime
                 }));
+                this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
             },
             () => {
                 this.store.dispatch(setStartTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
                     scipStartTime: undefined
                 }));
+                this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
+            }, () => {
+                this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
             });
     }
 
@@ -105,13 +124,18 @@ export class PopupController {
                     scipEndTime: timeFromEnd
                 }));
                 this.videoEnded(episodeInfo.key);
+                this.popupFinallyClosed$.next(Popup.SET_ENDTIME);
             },
             async () => {
                 await this.store.dispatch(setEndTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
                     scipEndTime: undefined
                 }));
-            }, () => this.openNextEpisodeCountdownPopupOnEndOfVideo(video, episodeInfo));
+                this.popupFinallyClosed$.next(Popup.SET_ENDTIME);
+            }, () => {
+                this.openNextEpisodeCountdownPopupOnEndOfVideo(video, episodeInfo);
+                this.popupFinallyClosed$.next(Popup.SET_ENDTIME);
+            });
     }
 
     private openNextEpisodeCountdownPopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
@@ -163,7 +187,6 @@ export class PopupController {
 
     private openNextEpisodeCountdownPopupOnEndOfVideo(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const timeToOpen = this.getTimeTillForNextEpisodeCountdown(video);
-
         const config: PopupConfig = {
             pupupKey: Popup.NEXT_EPISODE_COUNTDOWN,
             openFromStart: false,

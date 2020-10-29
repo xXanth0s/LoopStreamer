@@ -25,11 +25,16 @@ export class NotificationService {
         timeout: 0,
     };
 
-    public openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void): void {
+    public closeAllPopups(): void {
+        iziToast.destroy();
+    }
+
+    public openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void, onClosedFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             title: 'Intro definieren',
             message: 'Die zu überspringenden Zeit setzen',
+            onClosed: onClosedFn,
             buttons: [
                 [ '<button>Jetzt setzen</button>', (instance, toast) => {
                     setStartTime();
