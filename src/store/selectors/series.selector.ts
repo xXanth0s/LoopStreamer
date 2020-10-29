@@ -48,3 +48,8 @@ export const isSeriesContinuable = (state: StateModel, seriesKey: Series['key'])
 
     return Boolean(nextSeason);
 };
+
+export const isEndTimeConfiguredForSeries = (state: StateModel, seriesKey: Series['key']): boolean => {
+    const series = getSeriesByKey(state, seriesKey);
+    return Boolean(series?.isEndTimeConfigured);
+};

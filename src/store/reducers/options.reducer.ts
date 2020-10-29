@@ -5,7 +5,7 @@ import Options from '../models/options.model';
 const initialOptionsData: Options = {
     episodesToPlay: 0,
     timeTillSetEndtimePopup: 180,
-    timeForEntimeCountdown: 15,
+    timeForEndtimeCountdown: 15,
     scipIfNoVideo: false,
 };
 

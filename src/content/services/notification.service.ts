@@ -15,7 +15,8 @@ export class NotificationService {
         transitionOut: 'fadeOutRight' as IziToastTransitionOut,
         position: 'topRight' as IziToastPosition,
         layout: 2,
-        resetOnHover: true,
+        resetOnHover: false,
+        pauseOnHover: false,
         message: 'Loopstreamer',
         theme: 'dark',
         color: 'grey',
@@ -42,14 +43,13 @@ export class NotificationService {
         });
     }
 
-    public openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, continueFn: () => void): void {
+    public openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, closedFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
-            resetOnHover: false,
             title: 'Outro definieren',
             message: 'Die zu überspringenden Zeit setzen',
-            onClosed: continueFn,
+            onClosed: closedFn,
             buttons: [
                 [ '<button>Jetzt setzen</button>', (instance, toast) => {
                     setEndTime();
@@ -68,6 +68,7 @@ export class NotificationService {
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
             progressBar: true,
+            close: false,
             title: 'Video Beendet',
             message: 'Nächste Episode',
             onClosed: continueFn,
@@ -76,7 +77,7 @@ export class NotificationService {
                     continueFn();
                     this.closeToast(instance, toast);
                 }, false ],
-                [ '<button>Nicht überspringen</button>', (instance, toast) => {
+                [ '<button>Abbrechen</button>', (instance, toast) => {
                     this.closeToast(instance, toast);
                 }, false ]
             ]
@@ -91,7 +92,7 @@ export class NotificationService {
             progressBar: false,
             title: 'Serie fortsetzen',
             message: 'Wollen Sie die Serie fortsetzen?',
-            onClosed: continueFn,
+            close: false,
             buttons: [
                 [ '<button>Fortsetzen</button>', (instance, toast) => {
                     continueFn();
@@ -101,6 +102,16 @@ export class NotificationService {
                     this.closeToast(instance, toast);
                 }, false ]
             ]
+        });
+    }
+
+    public openVideoIsPreparingPopup(): void {
+        iziToast.show({
+            ...this.defaultConfig,
+            timeout: 0,
+            progressBar: false,
+            title: 'Video wird vorbereitet',
+            message: 'Das nächste Video wird Vorbereitet.'
         });
     }
 

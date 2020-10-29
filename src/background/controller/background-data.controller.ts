@@ -8,7 +8,10 @@ import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { WindowService } from '../services/window.service';
 import { ipcMain } from 'electron';
 import { SeriesService } from '../services/series.service';
-import { GetContinuableEpisodeMessage } from '../../browserMessages/messages/background-data.messages';
+import {
+    GetContinuableEpisodeMessage,
+    HasNextEpisodeMessage
+} from '../../browserMessages/messages/background-data.messages';
 
 @injectable()
 export class BackgroundDataController {
@@ -23,6 +26,10 @@ export class BackgroundDataController {
     public initializeHandler(): void {
         ipcMain.handle(MessageType.BACKGROUND_DATA_GET_CONTINUABLE_EPISODE, (event, message: GetContinuableEpisodeMessage) => {
             return this.seriesService.getContinuableEpisodeForSeries(message.payload);
+        });
+        ipcMain.handle(MessageType.BACKGROUND_DATA_GET_HAS_NEXT_EPISODE, async (event, message: HasNextEpisodeMessage) => {
+            const nextEpisode = await this.seriesService.getNextEpisode(message.payload);
+            return Boolean(nextEpisode);
         });
     }
 }

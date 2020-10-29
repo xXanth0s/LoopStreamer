@@ -130,7 +130,6 @@
 
         @Watch('isExpanded', { immediate: true })
         public expandationChanged(isExpanded: boolean): void {
-            console.log('isExpanded');
             if (isExpanded) {
                 this.fetchLoadingStateFromStore();
             } else {

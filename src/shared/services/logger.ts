@@ -5,6 +5,9 @@ import { environment } from '../../environments/environment';
 @injectable()
 export class Logger {
 
+    public static log(message, ...args: any[]): void {
+        this.execute(message, logType.log, ...args);
+    }
 
     public static error(message, ...args: any[]): void {
         this.execute(message, logType.error, ...args);
@@ -33,6 +36,13 @@ export class Logger {
 
     private static execute(message: string, type: logType, ...args: any[]): void {
         switch (type) {
+            case logType.log:
+                if (environment.isDev) {
+                    console.log(message, ...args);
+                } else {
+                    log.log(message, ...args);
+                }
+                break;
             case logType.warn:
                 if (environment.isDev) {
                     console.warn(message, ...args);
@@ -88,6 +98,7 @@ export class Logger {
 enum logType {
     error,
     warn,
+    log,
     info,
     verbose,
     debug,

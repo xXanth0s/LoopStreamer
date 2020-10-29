@@ -62,6 +62,8 @@
         hasSeriesEpisodePreviousEpisode
     } from '../../../store/selectors/series-episode.selector';
     import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';
+    import { PopupController } from '../../controller/popup.controller';
+    import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
 
     @Component({
         name: 'ls-video-buttons',
@@ -69,6 +71,7 @@
     export default class VideoButtonComponent extends Vue {
         private readonly messageService: MessageService = inversifyContentContainer.get(SHARED_TYPES.MessageService);
         private readonly store: StoreService = inversifyContentContainer.get(SHARED_TYPES.StoreService);
+        private readonly popupController: PopupController = inversifyContentContainer.get(CONTENT_TYPES.PopupController);
 
         private readonly closeFullscreenTitle = 'Vollbildmodus beenden';
         private readonly openFullscreenTitle = 'Vollbild';
@@ -102,11 +105,13 @@
         public previous(): void {
             this.isStartingPrevious = true;
             this.messageService.sendMessageToBackground(createOpenPreviousVideoMessage(this.episodeInfo.key));
+            this.popupController.openVideoIsPreparingPopup();
         }
 
         public next(): void {
             this.isStartingNext = true;
             this.messageService.sendMessageToBackground(createOpenNextVideoMessage(this.episodeInfo.key));
+            this.popupController.openVideoIsPreparingPopup();
         }
 
         public toggleFullscreenMode(): void {

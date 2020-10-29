@@ -2,12 +2,10 @@ import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { PopupConfig } from '../models/popup-config.model';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
+import { getSeriesByKey, isEndTimeConfiguredForSeries } from '../../store/selectors/series.selector';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { Popup } from '../enum/popup.enum';
 import { getOptions } from '../../store/selectors/options.selector';
-import { isMaximumPlayedEpisodesLimitReached } from '../../store/selectors/control-state.selector';
-import { hasSeriesEpisodeNextEpisode } from '../../store/selectors/series-episode.selector';
 
 @injectable()
 export class PopupService {
@@ -20,9 +18,8 @@ export class PopupService {
     public getPopupConfigsForEpisode(episodeInfo: SeriesEpisode): PopupConfig[] {
         const configs = [
             this.getConfigForSetStartTimePopup(episodeInfo),
-            this.getAutoPlayFinishedConfig(episodeInfo),
             this.getNextEpisodeCountdownConfig(episodeInfo),
-            this.getConfigForSetEndTimeConfig(episodeInfo),
+            this.getConfigForSetEndTimePopup(episodeInfo),
         ]
         return configs.filter(config => config.mustBeOpened);
     }
@@ -39,62 +36,43 @@ export class PopupService {
             openFromStart: true,
             timeToOpen: 0,
             mustBeOpened
-        }
+        };
     }
 
-    private getConfigForSetEndTimeConfig(episodeInfo: SeriesEpisode): PopupConfig {
-        const { isEndTimeConfigured } = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
-        const { timeTillSetEndtimePopup } = this.store.selectSync(getOptions)
-        const mustBeOpened = !isEndTimeConfigured
+    private getConfigForSetEndTimePopup(episodeInfo: SeriesEpisode): PopupConfig {
+        const series = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
+        const { timeTillSetEndtimePopup } = this.store.selectSync(getOptions);
+        const mustBeOpened = series && !series.isEndTimeConfigured;
 
         return {
             pupupKey: Popup.SET_ENDTIME,
             openFromStart: false,
             timeToOpen: timeTillSetEndtimePopup,
-            mustBeOpened
-        }
+            mustBeOpened,
+        };
     }
 
     private getNextEpisodeCountdownConfig(episodeInfo: SeriesEpisode): PopupConfig {
-        const isLastAutoPlayEpisode = this.store.selectSync(isMaximumPlayedEpisodesLimitReached);
-        const hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, episodeInfo.key);
-        const { isEndTimeConfigured } = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
+        const isEndTimeConfigured = this.store.selectSync(isEndTimeConfiguredForSeries, episodeInfo.seriesKey);
 
-        const mustBeOpened = !isLastAutoPlayEpisode && isEndTimeConfigured && hasNextEpisode;
         const timeToOpen = this.getEndTimeForConfiguredSeries(episodeInfo.seriesKey);
 
         return {
             pupupKey: Popup.NEXT_EPISODE_COUNTDOWN,
             openFromStart: false,
             timeToOpen,
-            mustBeOpened
-        }
-    }
-
-    private getAutoPlayFinishedConfig(episodeInfo: SeriesEpisode): PopupConfig {
-        const isLastAutoPlayEpisode = this.store.selectSync(isMaximumPlayedEpisodesLimitReached);
-        const hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, episodeInfo.key)
-        const timeToOpen = this.getEndTimeForConfiguredSeries(episodeInfo.seriesKey);
-
-        const mustBeOpened = isLastAutoPlayEpisode && hasNextEpisode;
-
-        return {
-            pupupKey: Popup.AUTO_PLAY_FINISHED,
-            openFromStart: false,
-            timeToOpen,
-            mustBeOpened
+            mustBeOpened: isEndTimeConfigured
         }
     }
 
     private getEndTimeForConfiguredSeries(seriesKey: string): number {
-        const { timeForEntimeCountdown } = this.store.selectSync(getOptions)
+        const { timeForEndtimeCountdown } = this.store.selectSync(getOptions);
         const { isEndTimeConfigured, scipEndTime } = this.store.selectSync(getSeriesByKey, seriesKey);
 
-        if (!isEndTimeConfigured || scipEndTime < timeForEntimeCountdown - this.endTimeBuffer) {
-            return timeForEntimeCountdown;
+        if (!isEndTimeConfigured || scipEndTime < timeForEndtimeCountdown - this.endTimeBuffer) {
+            return timeForEndtimeCountdown;
         }
 
-        return scipEndTime + timeForEntimeCountdown - this.endTimeBuffer;
+        return scipEndTime + timeForEndtimeCountdown - this.endTimeBuffer;
     }
-
 }

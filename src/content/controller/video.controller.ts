@@ -6,7 +6,6 @@ import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
-import { PopupService } from '../services/popup.service';
 import { PopupController } from './popup.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import SeriesEpisode from '../../store/models/series-episode.model';
@@ -16,15 +15,12 @@ import {
     setTimestampForSeriesEpisodeAction
 } from '../../store/reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
-import { PopupConfig } from '../models/popup-config.model';
-import { Logger } from '../../shared/services/logger';
 
 @injectable()
 export class VideoController {
 
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-        @inject(CONTENT_TYPES.PopupService) private readonly popupService: PopupService,
         @inject(CONTENT_TYPES.PopupController) private readonly popupController: PopupController,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
     ) {
@@ -61,8 +57,8 @@ export class VideoController {
             const videoTimeUpdate$ = this.getVideoTimeChanges(video);
 
             this.setStartTime(video, episodeData);
+            this.popupController.openPopupsForVideo(video, seriesEpisodeKey, videoTimeUpdate$);
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
-            this.popupTimeListener(video, episodeData, videoTimeUpdate$);
             addVideoButtons(episodeData);
         });
     }
@@ -82,28 +78,6 @@ export class VideoController {
         ).subscribe(() => {
             console.error('VivoController: Problem with starting the video');
         });
-    }
-
-    private popupTimeListener(video: HTMLVideoElement, episodeInfo: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
-        let popupConfigs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
-        Logger.info('[VideoController] Popup configs to be opened', popupConfigs);
-        videoTimeUpdate$.subscribe(timeStamp => {
-            const configToOpen = popupConfigs.find(config => this.isTimeToOpenPopup(config, timeStamp, episodeInfo));
-
-            if (configToOpen) {
-                this.popupController.openPopup(configToOpen.pupupKey, video, episodeInfo);
-                popupConfigs = popupConfigs.filter(config => config.pupupKey !== configToOpen.pupupKey);
-            }
-        });
-    }
-
-    private isTimeToOpenPopup(popupConfig: PopupConfig, currentTime: number, episodeInfo: SeriesEpisode): boolean {
-        if (popupConfig.openFromStart) {
-            return currentTime > popupConfig.timeToOpen;
-        }
-
-        const timeFromEnd = episodeInfo.duration - currentTime;
-        return popupConfig.timeToOpen > timeFromEnd;
     }
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {

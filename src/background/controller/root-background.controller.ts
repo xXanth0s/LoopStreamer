@@ -239,6 +239,7 @@ export class RootBackgroundController {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
         window.setSize(width, height);
+        window.webContents.closeDevTools();
         window.show();
     }
 
