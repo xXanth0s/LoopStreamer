@@ -1,6 +1,5 @@
 import { StateModel } from '../models/state.model';
 import { ControlState } from '../models/control-state.model';
-import Series from '../models/series.model';
 import { WindowType } from '../enums/window-type.enum';
 import { BrowserWindowStateModel } from '../models/browser-window-state.model';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
@@ -19,15 +18,6 @@ export const getWindowStateForWindowId = (state: StateModel, windowId: BrowserWi
 
 export const getWindowStateForWindowIdWithControlstate = (state: ControlState, windowId: BrowserWindowStateModel['windowId']) => {
     return Object.values(state.controllerWindowState).find(windowState => windowState?.windowId === windowId);
-};
-
-export const getExpandedSeries = (state: StateModel): Series['key'] => state.controlState.expandedSeriesApp;
-
-export const isSeriesExpandedOnApp = (state: StateModel, seriesKey: Series['key']): boolean => {
-    return state.controlState.expandedSeriesApp === seriesKey;
-};
-export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['key'][]): boolean => {
-    return seriesKeys.some(key => key === state.controlState.expandedSeriesApp);
 };
 
 export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean => {

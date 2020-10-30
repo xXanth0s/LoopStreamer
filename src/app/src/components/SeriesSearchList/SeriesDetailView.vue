@@ -96,9 +96,6 @@
         @Prop(Boolean)
         private isExpanded: boolean;
 
-        @Prop(String)
-        private selectedPortal: PORTALS;
-
         private messageService: MessageService;
         private store: StoreService;
 
@@ -225,7 +222,7 @@
         }
 
         private getPortal(): PORTALS {
-            return this.selectedPortal || this.seriesData.lastUsedPortal;
+            return PORTALS.BS;
         }
     }
 </script>

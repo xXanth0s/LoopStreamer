@@ -90,9 +90,9 @@
     import InfoTooltip from '../InfoTooltip.vue';
     import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../../constants/tooltip-texts';
     import MinusPlusInput from '../MinusPlusInput.vue';
-    import { toggleExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
-    import { isSeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
     import { deleteSeriesAction } from '../../../../store/actions/shared.actions';
+    import { toggleSelectedSeriesForAppAction } from '../../../../store/reducers/app-control-state.reducer';
+    import { isSeriesExpandedOnApp } from '../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'series-panel',
@@ -155,7 +155,7 @@
         }
 
         public toggleSeries(): void {
-            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(this.seriesKey));
+            this.store.dispatch(toggleSelectedSeriesForAppAction(this.seriesKey));
         }
 
         public saveSettings(): void {

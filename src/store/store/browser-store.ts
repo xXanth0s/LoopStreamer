@@ -10,12 +10,14 @@ import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer,
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';
+import { appControlStateSlice } from '../reducers/app-control-state.reducer';
 
 const initialState = getInitialStateRenderer();
 
 const browserStore = configureStore<StateModel>({
     reducer: {
         controlState: controlStateSlice.reducer,
+        appControlState: appControlStateSlice.reducer,
         options: optionsSlice.reducer,
         providors: providorsReducer.reducer,
         lastWatchedSeries: lastWatchedSeriesSlice.reducer,

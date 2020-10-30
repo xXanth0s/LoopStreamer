@@ -9,8 +9,6 @@ import { StateModel } from '../models/state.model';
 import { AsyncInteraction } from '../models/async-interaction.model';
 import { getWindowStateForWindowIdWithControlstate } from '../selectors/control-state.selector';
 import { Windows } from 'webextension-polyfill-ts';
-import Series from '../models/series.model';
-import { deleteSeriesAction } from '../actions/shared.actions';
 import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
@@ -51,14 +49,6 @@ const resetControlState = (state: ControlState): ControlState => {
         activeProvidor: null,
     };
 };
-
-function toggleExpandedSeriesOptionsPage(state: ControlState, seriesToToggle: string): ControlState {
-    const isAlreadySelected = state.expandedSeriesApp === seriesToToggle;
-    return {
-        ...state,
-        expandedSeriesApp: isAlreadySelected ? null : seriesToToggle
-    };
-}
 
 function setWindowIdForWindowType(state: ControlState, { windowType, windowId }: { windowType: WindowType; windowId: number }): ControlState {
     const oldValue = state.controllerWindowState ? state.controllerWindowState[windowType] : {};
@@ -112,10 +102,6 @@ function resetPlayedEpisodes(state: ControlState): void {
     state.playedEpisodes = 0;
 }
 
-function resetDataForDeletedSeries(state: StateModel['controlState'], seriesKey: string): void {
-    state.expandedSeriesApp = null;
-}
-
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -132,8 +118,6 @@ export const controlStateSlice = createSlice({
             raisePlayedEpisodes(state),
         resetPlayedEpisodesAction: (state: ControlState) =>
             resetPlayedEpisodes(state),
-        toggleExpandedSeriesOptionsPageAction: (state: ControlState, action: PayloadAction<ControlState['expandedSeriesApp']>) =>
-            toggleExpandedSeriesOptionsPage(state, action.payload),
         setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType, windowId: number }>) =>
             setWindowIdForWindowType(state, action.payload),
         setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) =>
@@ -146,9 +130,6 @@ export const controlStateSlice = createSlice({
             setWindowState(state, action.payload),
         setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number, height: number, width: number }>) =>
             setWindowSize(state, action.payload),
-    }, extraReducers: (builder) => {
-        builder.addCase(deleteSeriesAction, (state: StateModel['controlState'], action: PayloadAction<Series['key']>) =>
-            resetDataForDeletedSeries(state, action.payload))
     }
 });
 
@@ -157,7 +138,6 @@ export const {
     setActivePortalAction,
     setActiveProvidorAction,
     resetControlStateAction,
-    toggleExpandedSeriesOptionsPageAction,
     setWindowIdForWindowTypeAction,
     setActiveEpisodeAction,
     addAsyncInteractionAction,

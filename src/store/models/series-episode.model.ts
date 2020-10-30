@@ -1,7 +1,7 @@
 import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
 
-export default interface  SeriesEpisode {
+export default interface SeriesEpisode {
     key: string;
     seriesKey: string;
     seasonKey: string;

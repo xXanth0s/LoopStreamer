@@ -12,7 +12,6 @@
             <series-detail-view
                     :series-key="openSeriesKey"
                     :isExpanded="isAnySeriesSelected"
-                    :selected-protal="selectedProtal"
                     class="col">
             </series-detail-view>
         </div>
@@ -29,12 +28,11 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
-    import { toggleExpandedSeriesOptionsPageAction } from '../../../../store/reducers/control-state.reducer';
     import SeriesTile from './SeriesTile.vue';
-    import { isAnySeriesExpandedOnApp } from '../../../../store/selectors/control-state.selector';
     import SeriesDetailView from './SeriesDetailView.vue';
-    import { PORTALS } from '../../../../store/enums/portals.enum';
     import Series from '../../../../store/models/series.model';
+    import { toggleSelectedSeriesForAppAction } from '../../../../store/reducers/app-control-state.reducer';
+    import { isAnySeriesExpandedOnApp } from '../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'series-list-row',
@@ -48,9 +46,6 @@
 
         @Prop(Array)
         private seriesList: Series[];
-
-        @Prop(String)
-        private selectedProtal: PORTALS;
 
         private openSeriesKey: Series['key'] = null;
         private isAnySeriesSelected = false;
@@ -67,7 +62,7 @@
         }
 
         public async seriesSelected(seriesKey: Series['key']): Promise<void> {
-            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(seriesKey));
+            this.store.dispatch(toggleSelectedSeriesForAppAction(seriesKey));
             this.openSeriesKey = seriesKey;
         }
 

@@ -11,10 +11,8 @@ export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => (
 ) => async action => {
     const returnValue = next(action);
 
-    const state = {
-        ...getState(),
-    };
-    delete state.controlState;
+    const state = removeControlStates(getState());
+
     try {
         store.set(stateKey, state);
     } catch (e) {
@@ -27,4 +25,12 @@ export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => (
 
 export function getStorageData(): StateModel {
     return store.get(stateKey) as StateModel;
+}
+
+function removeControlStates(state: StateModel): StateModel {
+    return {
+        ...state,
+        controlState: null,
+        appControlState: null
+    };
 }

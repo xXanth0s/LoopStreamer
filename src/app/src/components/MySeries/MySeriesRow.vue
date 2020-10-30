@@ -26,10 +26,10 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
-    import { getExpandedSeries } from '../../../../store/selectors/control-state.selector';
     import Series from '../../../../store/models/series.model';
     import SeriesPanel from './SeriesPanel.vue';
     import SeriesDetailView from '../SeriesSearchList/SeriesDetailView.vue';
+    import { getExpandedSeries } from '../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'my-series-row',

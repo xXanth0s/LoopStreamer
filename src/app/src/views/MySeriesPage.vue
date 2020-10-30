@@ -41,6 +41,7 @@
     import { convertArrayToChunks } from '../../../utils/array.utils';
     import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
     import MySeriesRow from '../components/MySeries/MySeriesRow.vue';
+    import { toggleSelectedSeriesForAppAction } from '../../../store/reducers/app-control-state.reducer';
 
     @Component({
         components: {
@@ -65,6 +66,8 @@
             ).subscribe(series => {
                 this.series = convertArrayToChunks(series, 3);
             });
+
+            this.store.dispatch(toggleSelectedSeriesForAppAction(null));
         }
 
         public destroyed(): void {

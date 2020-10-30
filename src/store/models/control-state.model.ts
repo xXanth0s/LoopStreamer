@@ -1,5 +1,4 @@
 import Providor from './providor.model';
-import Series from './series.model';
 import Portal from './portal.model';
 import { BrowserWindowStateModel } from './browser-window-state.model';
 import SeriesEpisode from './series-episode.model';
@@ -12,7 +11,6 @@ export interface ControlState {
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key'];
-    expandedSeriesApp?: Series['key'];
     controllerWindowState: Partial<Record<WindowType, BrowserWindowStateModel>>;
     asyncInteractions: Record<AsyncInteraction['key'], AsyncInteraction>;
 }

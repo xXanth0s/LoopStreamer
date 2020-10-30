@@ -34,8 +34,7 @@
                             class="px-3"
                             v-for="seriesChunk in filteredSeries"
                             :key="seriesChunk[0].title"
-                            :series-list="seriesChunk"
-                            :selected-protal="selectedPortal">
+                            :series-list="seriesChunk">
                     </series-list-row>
                 </div>
             </div>
@@ -62,7 +61,10 @@
     import { getSeriesForPortal } from '../../../store/selectors/series.selector';
     import Series from '../../../store/models/series.model';
     import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
-    import { toggleExpandedSeriesOptionsPageAction } from '../../../store/reducers/control-state.reducer';
+    import {
+        setActivePortalForAppAction,
+        toggleSelectedSeriesForAppAction
+    } from '../../../store/reducers/app-control-state.reducer';
 
     @Component({
         name: 'series-overview',
@@ -98,13 +100,13 @@
 
         public mounted(): void {
             this.portals = this.store.selectSync(getAllPortals);
-            this.store.dispatch(toggleExpandedSeriesOptionsPageAction(null));
+            this.store.dispatch(toggleSelectedSeriesForAppAction(null));
         }
 
         @Watch('selectedPortal')
         public async loadSeries(portal: PORTALS): Promise<void> {
+            this.store.dispatch(setActivePortalForAppAction(portal));
             this.series = [];
-            this.portalChanged$.next();
             this.loadSeriesFromStoreForPortal(portal);
             this.isLoading = true;
 
@@ -133,6 +135,7 @@
         }
 
         private loadSeriesFromStoreForPortal(portal: PORTALS): void {
+            this.portalChanged$.next();
             this.store.selectBehaviour(getSeriesForPortal, portal).pipe(
                 takeUntil(merge(this.takeUntil$, this.portalChanged$)),
             ).subscribe(series => {

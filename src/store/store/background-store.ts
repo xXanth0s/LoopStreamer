@@ -12,6 +12,7 @@ import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 import { environment } from '../../environments/environment';
+import { appControlStateSlice } from '../reducers/app-control-state.reducer';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
@@ -21,6 +22,7 @@ const preloadedState = getStorageData();
 const backgroundStore = configureStore<StateModel>({
     reducer: {
         controlState: controlStateSlice.reducer,
+        appControlState: appControlStateSlice.reducer,
         options: optionsSlice.reducer,
         providors: providorsReducer.reducer,
         lastWatchedSeries: lastWatchedSeriesSlice.reducer,

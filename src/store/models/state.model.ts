@@ -7,9 +7,11 @@ import SeriesEpisode from './series-episode.model';
 import { SeriesSeason } from './series-season.model';
 import { PROVIDORS } from '../enums/providors.enum';
 import { PORTALS } from '../enums/portals.enum';
+import AppControlStateModel from './app-control-state.model';
 
 export interface StateModel {
     controlState: ControlState;
+    appControlState: AppControlStateModel;
     options: Options;
     portals: Partial<Record<PORTALS, Portal>>;
     providors: Partial<Record<PROVIDORS, Providor>>;
