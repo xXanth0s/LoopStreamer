@@ -6,6 +6,7 @@ import { optionsSlice } from '../reducers/options.reducer';
 import { StateModel } from '../models/state.model';
 import { providorsReducer } from '../reducers/providors.reducer';
 import { controlStateSlice } from '../reducers/control-state.reducer';
+import createSagaMiddleware from 'redux-saga';
 // @ts-ignore
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
@@ -13,11 +14,13 @@ import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 import { environment } from '../../environments/environment';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
+import { watcherSaga } from '../saga/watcher.saga';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
 
 const preloadedState = getStorageData();
+const sagaMiddleware = createSagaMiddleware();
 
 const backgroundStore = configureStore<StateModel>({
     reducer: {
@@ -37,6 +40,7 @@ const backgroundStore = configureStore<StateModel>({
         triggerAlias,
         forwardToRenderer,
         StorageMiddlerware,
+        sagaMiddleware
     ],
     devTools: environment.isDev,
     // enhancers: [
@@ -45,6 +49,7 @@ const backgroundStore = configureStore<StateModel>({
     preloadedState
 });
 
+sagaMiddleware.run(watcherSaga);
 
 export const initStore = async function(): Promise<void> {
     replayActionMain(backgroundStore);

@@ -63,7 +63,6 @@
     import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
     import {
         createSeriesSeasonSelectedInAppMessage,
-        createSeriesSelectedInAppMessage,
         createStartEpisodeMessage,
     } from '../../../../browserMessages/messages/background.messages';
     import { PORTALS } from '../../../../store/enums/portals.enum';
@@ -141,9 +140,6 @@
                 this.continousFetchEpisodeToContinue();
                 this.fetchSeriesDataFromStore(seriesKey);
                 this.fetchSeasonsFromStore(seriesKey);
-
-                const message = createSeriesSelectedInAppMessage(seriesKey, this.getPortal());
-                this.messageService.sendMessageToBackground(message);
             }
         }
 

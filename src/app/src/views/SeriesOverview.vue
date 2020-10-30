@@ -53,9 +53,7 @@
     import { StoreService } from '../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
     import { getAllPortals } from '../../../store/selectors/portals.selector';
-    import { MessageService } from '../../../shared/services/message.service';
     import { PORTALS } from '../../../store/enums/portals.enum';
-    import { createPortalSelectedInAppMessage } from '../../../browserMessages/messages/background.messages';
     import SeriesTile from '../components/SeriesSearchList/SeriesTile.vue';
     import SeriesListRow from '../components/SeriesSearchList/SeriesListRow.vue';
     import { getSeriesForPortal } from '../../../store/selectors/series.selector';
@@ -79,23 +77,20 @@
         private readonly portalChanged$ = new Subject();
 
         private store: StoreService;
-        private messageService: MessageService;
 
         private portals: Portal[] = [];
         private filteredSeries: Series[][] = [];
         private series: Series[];
 
         private selectedPortal: PORTALS = null;
-        private isLoading = false;
         private searchText = '';
 
         public get showSpinner(): boolean {
-            return !this.series.length && this.isLoading;
+            return !this.series.length && this.selectedPortal === null;
         }
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         public mounted(): void {
@@ -106,18 +101,7 @@
         @Watch('selectedPortal')
         public async loadSeries(portal: PORTALS): Promise<void> {
             this.store.dispatch(setActivePortalForAppAction(portal));
-            this.series = [];
             this.loadSeriesFromStoreForPortal(portal);
-            this.isLoading = true;
-
-            const message = createPortalSelectedInAppMessage(this.selectedPortal);
-            try {
-                await this.messageService.sendMessageToBackground(message);
-            } catch (e) {
-                console.error('Error occured, while loading all seires', e);
-            } finally {
-                this.isLoading = false;
-            }
         }
 
         @Watch('searchText')
@@ -135,6 +119,7 @@
         }
 
         private loadSeriesFromStoreForPortal(portal: PORTALS): void {
+            this.series = [];
             this.portalChanged$.next();
             this.store.selectBehaviour(getSeriesForPortal, portal).pipe(
                 takeUntil(merge(this.takeUntil$, this.portalChanged$)),

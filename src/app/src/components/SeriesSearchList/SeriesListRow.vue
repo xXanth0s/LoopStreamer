@@ -27,7 +27,6 @@
     import { optionsContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { MessageService } from '../../../../shared/services/message.service';
     import SeriesTile from './SeriesTile.vue';
     import SeriesDetailView from './SeriesDetailView.vue';
     import Series from '../../../../store/models/series.model';
@@ -49,7 +48,6 @@
 
         private openSeriesKey: Series['key'] = null;
         private isAnySeriesSelected = false;
-        private messageService: MessageService;
         private store: StoreService;
 
         public destroyed(): void {
@@ -58,7 +56,6 @@
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         public async seriesSelected(seriesKey: Series['key']): Promise<void> {

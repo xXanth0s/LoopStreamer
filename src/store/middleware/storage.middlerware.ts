@@ -28,9 +28,12 @@ export function getStorageData(): StateModel {
 }
 
 function removeControlStates(state: StateModel): StateModel {
-    return {
+    const copy = {
         ...state,
-        controlState: null,
-        appControlState: null
     };
+
+    delete copy.controlState;
+    delete copy.appControlState;
+
+    return copy;
 }
