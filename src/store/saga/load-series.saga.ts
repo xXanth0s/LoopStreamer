@@ -22,3 +22,6 @@ export function* loadDetailedSeriesInformation(action: ReturnType<typeof toggleS
 
     yield seriesService.updateSeriesForPortal(action.payload, activePortal);
 }
+
+
+

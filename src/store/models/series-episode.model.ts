@@ -1,10 +1,11 @@
 import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
+import Series from './series.model';
 
 export default interface SeriesEpisode {
     key: string;
     seriesKey: string;
-    seasonKey: string;
+    seasonKey: Series['key'];
     season: number;
     episodeNumber: number;
     duration?: number;

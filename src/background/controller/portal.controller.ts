@@ -65,7 +65,7 @@ export class PortalController {
     public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesInfoDto> {
         const seriesInfo = this.store.selectSync(getSeriesByKey, seriesKey);
         if (!seriesInfo?.portalLinks[portalKey]) {
-            console.error(`[PortalController -> getDetailedSeriesInformation] tried to load detailed info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`, seriesInfo);
+            console.error(`[PortalController->getDetailedSeriesInformation] tried to load detailed info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`, seriesInfo);
         }
 
         let detailedSeriesInfo: SeriesInfoDto = null;
@@ -77,7 +77,7 @@ export class PortalController {
         try {
             detailedSeriesInfo = await this.openPageAndGetDataForMessage(seriesInfo.portalLinks[portalKey], portalKey, createGetDetailedSeriesInformationMessage());
         } catch (e) {
-            console.error('[PortalController -> getDetailedSeriesInformation]', e);
+            console.error('[PortalController->getDetailedSeriesInformation]', e);
         } finally {
             this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
         }
