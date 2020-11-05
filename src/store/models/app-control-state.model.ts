@@ -4,6 +4,6 @@ import { PORTALS } from '../enums/portals.enum';
 
 export default interface AppControlStateModel {
     activePortal?: PORTALS;
-    selectedSeries?: Series['key'];
+    selectedSeriesKey?: Series['key'];
     selectedSeason?: SeriesSeason['key'];
 }

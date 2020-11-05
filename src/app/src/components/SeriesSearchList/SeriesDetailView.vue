@@ -61,10 +61,6 @@
     import { MessageService } from '../../../../shared/services/message.service';
     import { SeriesSeason } from '../../../../store/models/series-season.model';
     import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
-    import {
-        createSeriesSeasonSelectedInAppMessage,
-        createStartEpisodeMessage,
-    } from '../../../../browserMessages/messages/background.messages';
     import { PORTALS } from '../../../../store/enums/portals.enum';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
@@ -74,6 +70,8 @@
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import { createGetContinuableEpisodeMessage } from '../../../../browserMessages/messages/background-data.messages';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
+    import { startEpisodeAction } from '../../../../store/actions/shared.actions';
+    import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
 
     @Component({
         name: 'series-detail-view',
@@ -137,7 +135,7 @@
                 this.seriesChanged$.next();
                 this.resetData();
 
-                this.continousFetchEpisodeToContinue();
+                this.fetchEpisodeToContinueFromStore();
                 this.fetchSeriesDataFromStore(seriesKey);
                 this.fetchSeasonsFromStore(seriesKey);
             }
@@ -151,15 +149,13 @@
 
                 this.fetchSeriesEpisodesFromStore(seasonKey);
 
-                const message = createSeriesSeasonSelectedInAppMessage(seasonKey, this.getPortal());
-
-                this.messageService.sendMessageToBackground(message);
+                this.store.dispatch(setSelectedSeasonForAppAction(seasonKey));
             }
         }
 
         public episodeClicked(episodeKey: SeriesEpisode['key']): void {
             if (episodeKey) {
-                this.messageService.sendMessageToBackground(createStartEpisodeMessage(episodeKey, this.getPortal()));
+                this.store.dispatch(startEpisodeAction(episodeKey));
             }
         }
 
@@ -171,7 +167,7 @@
             this.episodes = [];
         }
 
-        private async continousFetchEpisodeToContinue(): Promise<void> {
+        private async fetchEpisodeToContinueFromStore(): Promise<void> {
             await this.fetchEpisodeToContinue();
             this.store.selectBehaviour(getLastWatchedEpisode, this.seriesKey).pipe(
                 takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
@@ -181,7 +177,6 @@
         private async fetchEpisodeToContinue(): Promise<void> {
             const message = createGetContinuableEpisodeMessage(this.seriesKey);
             this.episodeToContinue = await this.messageService.sendMessageToBackground(message);
-            this.$forceUpdate();
         }
 
         private fetchLoadingStateFromStore(): void {

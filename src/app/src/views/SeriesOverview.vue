@@ -60,8 +60,8 @@
     import Series from '../../../store/models/series.model';
     import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
     import {
-        setActivePortalForAppAction,
-        toggleSelectedSeriesForAppAction
+        resetAppControlStateAction,
+        setActivePortalForAppAction
     } from '../../../store/reducers/app-control-state.reducer';
 
     @Component({
@@ -95,7 +95,7 @@
 
         public mounted(): void {
             this.portals = this.store.selectSync(getAllPortals);
-            this.store.dispatch(toggleSelectedSeriesForAppAction(null));
+            this.store.dispatch(resetAppControlStateAction());
         }
 
         @Watch('selectedPortal')

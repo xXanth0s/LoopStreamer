@@ -14,12 +14,20 @@ function setActivePortal(state: AppControlStateModel, payload: PORTALS): void {
 }
 
 function toggleSelectedSeries(state: AppControlStateModel, seriesKey: Series['key']) {
-    const isDifferent = state.selectedSeries !== seriesKey;
-    state.selectedSeries = isDifferent ? seriesKey : null;
+    const isDifferent = state.selectedSeriesKey !== seriesKey;
+    state.selectedSeriesKey = isDifferent ? seriesKey : null;
 }
 
 function setSelectedSeason(state: AppControlStateModel, seasonKey: SeriesSeason['key']) {
     state.selectedSeason = seasonKey;
+}
+
+function reset(): AppControlStateModel {
+    return {
+        selectedSeason: null,
+        activePortal: null,
+        selectedSeriesKey: null,
+    };
 }
 
 export const appControlStateSlice = createSlice({
@@ -32,6 +40,8 @@ export const appControlStateSlice = createSlice({
             toggleSelectedSeries(state, action.payload),
         setSelectedSeasonForAppAction: (state: AppControlStateModel, action: PayloadAction<SeriesSeason['key']>) =>
             setSelectedSeason(state, action.payload),
+        resetAppControlStateAction: (state: AppControlStateModel) =>
+            reset(),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['controlState']) =>
             toggleSelectedSeries(state, null));
@@ -42,4 +52,5 @@ export const {
     setActivePortalForAppAction,
     toggleSelectedSeriesForAppAction,
     setSelectedSeasonForAppAction,
+    resetAppControlStateAction,
 } = appControlStateSlice.actions;

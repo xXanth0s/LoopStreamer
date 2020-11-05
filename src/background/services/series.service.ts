@@ -32,16 +32,6 @@ export class SeriesService {
                 @inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController) {
     }
 
-    public async updateAllSeriesForPortal(portalKey: PORTALS): Promise<boolean> {
-        const multipleSeriesMetaInfo = await this.portalController.getAllSeriesFromPortal(portalKey);
-        if (multipleSeriesMetaInfo) {
-            this.addMultipleSeriesToStore(multipleSeriesMetaInfo);
-            return true;
-        }
-
-        return false;
-    }
-
     public async updateSeriesForPortal(seriesKey: Series['key'], portal: PORTALS): Promise<boolean> {
         const seriesInfo = await this.portalController.getDetailedSeriesInformation(seriesKey, portal);
         if (seriesInfo) {

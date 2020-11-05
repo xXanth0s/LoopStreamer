@@ -3,7 +3,6 @@ import { Message } from './message.interface';
 import { ControllerType } from '../enum/controller.type';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import Series from '../../store/models/series.model';
-import { PORTALS } from '../../store/enums/portals.enum';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 
 export const createVideoFinishedMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
@@ -47,51 +46,6 @@ export const createContinueSeriesMessage = (seriesKey: Series['key']): Message<S
     hasReply: false,
 });
 export type StartSeriesMessage = ReturnType<typeof createContinueSeriesMessage>;
-
-
-export const createPortalSelectedInAppMessage = (portal: PORTALS): Message<PORTALS> => ({
-    type: MessageType.BACKGROUND_PORTAL_SELECTED_IN_APP,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: true,
-    payload: portal
-});
-export type PortalSelectedInAppMessage = ReturnType<typeof createPortalSelectedInAppMessage>;
-
-
-export const createSeriesSelectedInAppMessage = (seriesKey: Series['key'], portal: PORTALS): Message<{ seriesKey: Series['key'], portal: PORTALS }> => ({
-    type: MessageType.BACKGROUND_SERIES_SELECTED_IN_APP,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: true,
-    payload: {
-        seriesKey,
-        portal
-    }
-});
-export type SeriesSelectedInAppMessage = ReturnType<typeof createSeriesSelectedInAppMessage>;
-
-
-export const createSeriesSeasonSelectedInAppMessage = (seriesSeasonKey: string, portal: PORTALS): Message<{ seriesSeasonKey: string, portal: PORTALS }> => ({
-    type: MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: true,
-    payload: {
-        portal,
-        seriesSeasonKey
-    }
-});
-export type SeriesSeasonSelectedInAppMessage = ReturnType<typeof createSeriesSeasonSelectedInAppMessage>;
-
-
-export const createStartEpisodeMessage = (episodeKey: SeriesEpisode['key'], portal: PORTALS) : Message<{episodeKey: SeriesEpisode['key'], portal: PORTALS}, boolean> => ({
-    type: MessageType.BACKGROUND_START_EPISODE,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: true,
-    payload: {
-        portal,
-        episodeKey
-    }
-});
-export type StartEpisodeMessage = ReturnType<typeof createStartEpisodeMessage>;
 
 
 export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize) : Message<DomElementSize> => ({

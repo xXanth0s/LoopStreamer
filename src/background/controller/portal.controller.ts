@@ -35,6 +35,7 @@ import Series from '../../store/models/series.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
 import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
+import { PROVIDORS } from '../../store/enums/providors.enum';
 
 @injectable()
 export class PortalController {
@@ -51,6 +52,7 @@ export class PortalController {
         let seriesInfos = [];
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_ALL_SERIES, { portalKey });
         this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
+
         try {
             seriesInfos = await this.openPageAndGetDataForMessage(portal.seriesListUrl, portalKey, createGetAllSeriesFromPortalMessage());
         } catch (e) {
@@ -58,7 +60,6 @@ export class PortalController {
         } finally {
             this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
         }
-
         return seriesInfos;
     }
 
@@ -108,9 +109,8 @@ export class PortalController {
         return seriesEpisodes;
     }
 
-    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS): Promise<ProvidorLink> {
+    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
-        const providor = this.providorService.getCurrentProvidor()?.key;
         const portalLink = episode?.portalLinks[portalKey][providor];
 
         if (!portalLink) {

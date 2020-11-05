@@ -16,16 +16,14 @@ import {
 } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
-import { PROVIDORS } from '../../store/enums/providors.enum';
 import { getProvidorForKey } from '../../store/selectors/providors.selector';
 import { BrowserWindow } from 'electron';
-import Providor from '../../store/models/providor.model';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
 import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
 import { Logger } from '../../shared/services/logger';
+import { ProvidorLink } from '../models/providor-link.model';
 
 @injectable()
 export class VideoController {
@@ -39,12 +37,10 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorKey: PROVIDORS): Promise<boolean> {
+    public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorLink: ProvidorLink): Promise<boolean> {
         this.reset();
 
-        const seriesEpisode = this.store.selectSync(getSeriesEpisodeByKey, seriesEpisodeKey);
-        const providor = this.store.selectSync(getProvidorForKey, providorKey);
-        const activeWindow$ = this.openVideoUrl(seriesEpisode.providorLinks[providorKey], providor);
+        const activeWindow$ = this.openVideoUrl(providorLink);
 
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.VIDEO_OPEN_VIDEO, { seriesEpisode: seriesEpisodeKey });
         this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
@@ -56,7 +52,7 @@ export class VideoController {
             ).subscribe(async window => {
                 let hasVideo = false;
                 try {
-                    hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorKey));
+                    hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorLink.providor));
                 } catch (e) {
                     Logger.error('[VideoController->startVideo] Exception occured', e);
                 } finally {
@@ -82,8 +78,9 @@ export class VideoController {
         }
     }
 
-    private openVideoUrl(url: string, providor: Providor): Observable<BrowserWindow> {
-        const window$ = this.windowController.openLinkForWebsite(providor, url);
+    private openVideoUrl({ link, providor }: ProvidorLink): Observable<BrowserWindow> {
+        const website = this.store.selectSync(getProvidorForKey, providor);
+        const window$ = this.windowController.openLinkForWebsite(website, link);
         return window$.pipe(
             waitTillPageLoadFinished(),
             tap(window => this.windowService.setOldWindowState(window.id, WindowType.VIDEO)),

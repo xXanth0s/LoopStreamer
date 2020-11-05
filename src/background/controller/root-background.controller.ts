@@ -11,11 +11,7 @@ import {
     MinimizeWindowMessage,
     OpenNextVideoMessage,
     OpenPreviousVideoMessage,
-    PortalSelectedInAppMessage,
     RecaptchaRecognizedMessage,
-    SeriesSeasonSelectedInAppMessage,
-    SeriesSelectedInAppMessage,
-    StartEpisodeMessage,
     StartSeriesMessage,
     ToggleWindowFullscreenMessage,
     ToggleWindowMaximizationMessage,
@@ -36,15 +32,10 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import { getPreviousEpisode, getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { PORTALS } from '../../store/enums/portals.enum';
-import {
-    addProvidorLinkToEpisodeAction,
-    removeProvidorLinkFromEpisodeAction
-} from '../../store/reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';
 import Providor from '../../store/models/providor.model';
 import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
-import { setLastUsedPortalForSeriesAction } from '../../store/reducers/series.reducer';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 
@@ -108,31 +99,6 @@ export class RootBackgroundController {
             this.continueSeriesHandler(message);
         });
 
-        ipcMain.handle(MessageType.BACKGROUND_START_EPISODE, (event, message: StartEpisodeMessage): Promise<boolean> | boolean => {
-            try {
-                return this.startEpisodeHandler(message);
-            } catch (e) {
-                return false;
-            }
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_PORTAL_SELECTED_IN_APP,
-            // async (event, message: GetAllAvailableSeriesFromPortalMessage): Promise<SeriesMetaInfoDto[]> => {
-            (event, message: PortalSelectedInAppMessage) => {
-                return this.loadAllVideosFromPortalHandler(message);
-            });
-
-        ipcMain.handle(MessageType.BACKGROUND_SERIES_SELECTED_IN_APP,
-            async (event, message: SeriesSelectedInAppMessage): Promise<void> => {
-                return this.loadSeriesInformationFromPortalHandler(message);
-            });
-
-        ipcMain.handle(MessageType.BACKGROUND_SERIES_SEASON_SELECTED_IN_APP,
-            async (event, message: SeriesSeasonSelectedInAppMessage): Promise<void> => {
-                console.log(message);
-                return this.loadSeriesEpisodeForSeasonHandler(message);
-            });
-
         ipcMain.handle(MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
             (event, message: RecaptchaRecognizedMessage): void => {
                 this.recaptchaRecognizedHandler(event, message);
@@ -157,19 +123,6 @@ export class RootBackgroundController {
             (event, message: MinimizeWindowMessage): void => {
                 this.minimizeWindowEventHandler(event, message);
             });
-    }
-
-    private async startEpisodeHandler(message: StartEpisodeMessage): Promise<boolean> {
-        this.store.stopPlayer();
-        const { portal, episodeKey } = message.payload;
-        this.store.dispatch(resetPlayedEpisodesAction());
-
-        const success = await this.startEpisode(episodeKey, portal);
-        if (success) {
-            this.store.dispatch(raisePlayedEpisodesAction());
-        }
-
-        return success;
     }
 
     private async videoFinishedHandler({ payload }: VideoFinishedMessage): Promise<void> {
@@ -217,22 +170,6 @@ export class RootBackgroundController {
         if (success) {
             this.store.dispatch(raisePlayedEpisodesAction());
         }
-    }
-
-    private async loadAllVideosFromPortalHandler({ payload }: PortalSelectedInAppMessage): Promise<void> {
-        await this.seriesService.updateAllSeriesForPortal(payload);
-    }
-
-    private async loadSeriesInformationFromPortalHandler({ payload }: SeriesSelectedInAppMessage): Promise<void> {
-        const { portal, seriesKey } = payload;
-
-        await this.seriesService.updateSeriesForPortal(seriesKey, portal);
-    }
-
-    private async loadSeriesEpisodeForSeasonHandler(message: SeriesSeasonSelectedInAppMessage): Promise<void> {
-        const { portal, seriesSeasonKey } = message.payload;
-
-        await this.seriesService.updateSeasonForPortal(seriesSeasonKey, portal);
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -295,25 +232,26 @@ export class RootBackgroundController {
     }
 
     private async startEpisodeForProvidor(episode: SeriesEpisode, portal: PORTALS, providor: Providor): Promise<boolean> {
-        const episodeKey = episode.key;
-        if (!episode.providorLinks[providor.key]) {
-            const providorLink = await this.portalController.getProvidorLinkForEpisode(episode.key, portal);
+        // const episodeKey = episode.key;
+        // if (!episode.providorLinks[providor.key]) {
+        //     // const providorLink = await this.portalController.getProvidorLinkForEpisode(episode.key, portal);
+        //     //
+        //     // if (providorLink.link) {
+        //         this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
+        //     } else {
+        //         return false;
+        //     }
+        // }
 
-            if (providorLink.link) {
-                this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
-            } else {
-                return false;
-            }
-        }
-
-        const result = await this.videoController.startVideo(episodeKey, providor.key);
-
-        if (!result) {
-            this.store.dispatch(removeProvidorLinkFromEpisodeAction({ episodeKey, providorKey: providor.key }));
-        } else {
-            this.store.dispatch(setLastUsedPortalForSeriesAction({ seriesKey: episode.seriesKey, portal }));
-        }
-
-        return result;
+        // const result = await this.videoController.startVideo(episodeKey, providor.key);
+        //
+        // if (!result) {
+        //     this.store.dispatch(removeProvidorLinkFromEpisodeAction({ episodeKey, providorKey: providor.key }));
+        // } else {
+        //     this.store.dispatch(setLastUsedPortalForSeriesAction({ seriesKey: episode.seriesKey, portal }));
+        // }
+        //
+        // return result;
+        return false;
     }
 }
