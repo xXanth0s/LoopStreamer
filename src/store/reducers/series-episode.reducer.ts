@@ -57,14 +57,22 @@ function setSeriesEpisodeFinished(state: StateModel['seriesEpisodes'], payload: 
 }
 
 function setSeriesEpisodeStarted(state: StateModel['seriesEpisodes'],
-                                 {seriesEpisodeKey, duration}: { seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }): void {
+                                 { seriesEpisodeKey, duration }: { seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }): StateModel['seriesEpisodes'] {
     const episode = state[seriesEpisodeKey];
     if (!episode) {
         console.error(`[SeriesEpisodeReducer->setSeriesEpisodeStarted]: no episode found for key: ${seriesEpisodeKey}`);
-        return;
+        return state;
     }
 
-    episode.duration = duration;
+    return {
+        ...state,
+        [seriesEpisodeKey]: {
+            ...episode,
+            hasNextEpisode: false,
+            hasPreviousEpisode: false,
+            duration
+        }
+    };
 }
 
 function setTimestamp(state: StateModel['seriesEpisodes'],
@@ -86,13 +94,35 @@ function setTimestamp(state: StateModel['seriesEpisodes'],
 }
 
 function removeProvidorLinkFromEpisode(state: StateModel['seriesEpisodes'], action: PayloadAction<{ episodeKey: string; providorKey: Providor['key'] }>) {
-    const {providorKey, episodeKey} = action.payload;
+    const { providorKey, episodeKey } = action.payload;
 
     delete state[episodeKey]?.providorLinks[providorKey];
 }
 
 function deleteAllEpisodesFromSeries(state: StateModel['seriesEpisodes'], seriesKey: string): StateModel['seriesEpisodes'] {
     return filterObject(state, episode => episode.seriesKey !== seriesKey);
+}
+
+function setNextEpisodeState(state: StateModel['seriesEpisodes'],
+                             { seriesEpisodeKey, hasNextEpisode }: { seriesEpisodeKey: SeriesEpisode['key'], hasNextEpisode: boolean }) {
+    const episode = state[seriesEpisodeKey];
+    if (!episode) {
+        console.error(`[SeriesEpisodeReducer->setNextEpisodeState]: no episode found for key: ${seriesEpisodeKey}`);
+        return;
+    }
+
+    episode.hasNextEpisode = hasNextEpisode;
+}
+
+function setPreviousEpisodeState(state: StateModel['seriesEpisodes'],
+                                 { seriesEpisodeKey, hasPreviousEpisode }: { seriesEpisodeKey: SeriesEpisode['key'], hasPreviousEpisode: boolean }) {
+    const episode = state[seriesEpisodeKey];
+    if (!episode) {
+        console.error(`[SeriesEpisodeReducer->setPreviousEpisodeState]: no episode found for key: ${seriesEpisodeKey}`);
+        return;
+    }
+
+    episode.hasPreviousEpisode = hasPreviousEpisode;
 }
 
 const seriesEpisodesReducer = createSlice({
@@ -109,10 +139,14 @@ const seriesEpisodesReducer = createSlice({
             removeProvidorLinkFromEpisode(state, action),
         setSeriesEpisodeFinishedStateAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], isFinished: boolean }>) =>
             setSeriesEpisodeFinished(state, action.payload),
-        seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
+        seriesEpisodeStartedAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
             setSeriesEpisodeStarted(state, action.payload),
         setSeriesEpisodeTimeStampAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], timestamp: number }>) =>
-            setTimestamp(state, action.payload)
+            setTimestamp(state, action.payload),
+        setSeriesEpisodeNextEpisodeStateAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], hasNextEpisode: boolean }>) =>
+            setNextEpisodeState(state, action.payload),
+        setSeriesEpisodePreviousEpisodeStateAction: (state: StateModel['seriesEpisodes'], action: PayloadAction<{ seriesEpisodeKey: SeriesEpisode['key'], hasPreviousEpisode: boolean }>) =>
+            setPreviousEpisodeState(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['seriesEpisodes'], action: PayloadAction<Series['key']>) =>
             deleteAllEpisodesFromSeries(state, action.payload));
@@ -127,6 +161,8 @@ export const {
     setSeriesEpisodeFinishedStateAction,
     seriesEpisodeStartedAction,
     setSeriesEpisodeTimeStampAction,
+    setSeriesEpisodePreviousEpisodeStateAction,
+    setSeriesEpisodeNextEpisodeStateAction
 } = seriesEpisodesReducer.actions;
 
 

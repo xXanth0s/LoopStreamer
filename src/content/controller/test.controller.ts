@@ -5,7 +5,6 @@ import { StartTestRecaptchaMessage, TestNotificationMessage } from '../../browse
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { NotificationService } from '../services/notification.service';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
-import SeriesEpisode from '../../store/models/series-episode.model';
 
 @injectable()
 export class TestController {
@@ -21,7 +20,7 @@ export class TestController {
         });
         ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, (event, message: TestNotificationMessage) => {
             this.notificationService.openTestPopup();
-            addVideoButtons({ key: '1983-S1-E3' } as SeriesEpisode);
+            addVideoButtons('1983-S1-E3');
         });
     }
 

@@ -2,11 +2,12 @@
     <div class="ls-container">
         <div class="ls-video-buttons"
              @mouseover="isMouseOnButton = true"
-             @mouseleave="isMouseOnButton = false">
+             @mouseleave="isMouseOnButton = false"
+             v-if="episodeInfo">
             <transition name="fade">
                 <div v-if="showButtons">
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                        <label class="btn btn-primary btn-lg" :disabled="!hasPreviousEpisode || isLoading"
+                        <label :disabled="!episodeInfo.hasPreviousEpisode || isLoading" class="btn btn-primary btn-lg"
                                @click.stop.prevent="previous" title="Vorherige Episode">
                             <div class="spinner-border video-button" v-if="isStartingPrevious"
                                  role="status">
@@ -19,7 +20,7 @@
                             <i class="fas fa-compress-alt" v-if="isFullscreen"/>
                             <i class="fas fa-expand-alt" v-else/>
                         </label>
-                        <label class="btn btn-primary btn-lg" :disabled="!hasNextEpisode || isLoading"
+                        <label :disabled="!episodeInfo.hasNextEpisode || isLoading" class="btn btn-primary btn-lg"
                                @click.stop.prevent="next">
                             <div class="spinner-border video-button" v-if="isStartingNext"
                                  role="status">
@@ -57,6 +58,7 @@
     import { PopupController } from '../../controller/popup.controller';
     import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
     import { startNextEpisodeAction, startPreviousEpisodeAction } from '../../../store/actions/shared.actions';
+    import { getSeriesEpisodeByKey } from '../../../store/selectors/series-episode.selector';
 
     @Component({
         name: 'ls-video-buttons',
@@ -69,8 +71,8 @@
         private readonly closeFullscreenTitle = 'Vollbildmodus beenden';
         private readonly openFullscreenTitle = 'Vollbild';
 
-        @Prop(Object)
-        private episodeInfo: SeriesEpisode;
+        @Prop(String)
+        private episodeKey: SeriesEpisode['key'];
 
         public get isFullscreen() {
             return this.fullscreen;
@@ -79,6 +81,8 @@
         public get isLoading() {
             return this.isStartingNext || this.isStartingPrevious;
         }
+
+        private episodeInfo: SeriesEpisode = null;
 
         private windowId: number;
 
@@ -90,20 +94,18 @@
         public fullscreenTitle = this.openFullscreenTitle;
 
         private isMouseOnButton = false;
-        private hasPreviousEpisode = true;
-        private hasNextEpisode = true;
 
         private readonly buttonsVisibilityTime = 1500;
 
         public previous(): void {
             this.isStartingPrevious = true;
-            this.store.dispatch(startPreviousEpisodeAction(this.episodeInfo.key));
+            this.store.dispatch(startPreviousEpisodeAction(this.episodeKey));
             this.popupController.openVideoIsPreparingPopup();
         }
 
         public next(): void {
             this.isStartingNext = true;
-            this.store.dispatch(startNextEpisodeAction({ episodeKey: this.episodeInfo.key, userAction: true }));
+            this.store.dispatch(startNextEpisodeAction({ episodeKey: this.episodeKey, userAction: true }));
             this.popupController.openVideoIsPreparingPopup();
         }
 
@@ -116,12 +118,10 @@
 
             setTimeout(() => this.showButtons = false, this.buttonsVisibilityTime);
 
-            // this.hasPreviousEpisode = this.store.selectSync(hasSeriesEpisodePreviousEpisode, this.episodeInfo.key);
-            // this.hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, this.episodeInfo.key);
-
             this.initMouseEventListeners();
             this.initKeyboardListener();
             this.fetchFullscreenModeFromStore();
+            this.fetchEpisodeInfoFromStore();
         }
 
         @Watch('fullscreen')
@@ -158,6 +158,11 @@
             ).subscribe(windowState => {
                 this.fullscreen = windowState.windowState === 'fullscreen';
             });
+        }
+
+        private fetchEpisodeInfoFromStore(): void {
+            this.store.selectBehaviour(getSeriesEpisodeByKey, this.episodeKey)
+                .subscribe(episodeInfo => this.episodeInfo = episodeInfo);
         }
     }
 </script>

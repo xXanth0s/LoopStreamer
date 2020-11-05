@@ -67,7 +67,7 @@ function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos
     }
 }
 
-function seriesStarted(state: StateModel['series'], actionData: { seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key']; duration: SeriesEpisode['duration'] }): void {
+function setLastWatchedEpisode(state: StateModel['series'], actionData: { seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }): void {
     const { seriesEpisodeKey, seriesKey } = actionData;
     if (!state[seriesKey]) {
         console.error(`[SeriesReducer->seriesStarted] tried to update series ${seriesKey} but no series found`);
@@ -108,9 +108,11 @@ const seriesSlice = createSlice({
             updateOrAddMultipleSeries(state, action.payload),
         setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], portal: PORTALS }>) =>
             setLastUsedPortalForSeries(state, action.payload),
+        setLastWatchedEpisodeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }>) =>
+            setLastWatchedEpisode(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(seriesEpisodeStartedAction, (state: StateModel['series'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
-            seriesStarted(state, action.payload));
+            setLastWatchedEpisode(state, action.payload));
         builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
             deleteSeries(state, action.payload));
     },
@@ -124,6 +126,7 @@ export const {
     updateOrAddSeriesAction,
     updateOrAddMultipleSeriesAction,
     setLastUsedPortalForSeriesAction,
+    setLastWatchedEpisodeAction
 } = seriesSlice.actions;
 
 export default seriesSlice;

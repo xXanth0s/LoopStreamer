@@ -9,6 +9,8 @@ export default interface SeriesEpisode {
     season: number;
     episodeNumber: number;
     duration?: number;
+    hasNextEpisode?: boolean;
+    hasPreviousEpisode?: boolean;
     portalLinks: Partial<{
         [key in PORTALS]: {
             [key in PROVIDORS]: string

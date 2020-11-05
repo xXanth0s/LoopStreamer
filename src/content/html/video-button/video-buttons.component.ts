@@ -2,7 +2,7 @@ import Vue from 'vue';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import VideoButtonComponent from './VideoButtonComponent.vue';
 
-export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
+export const addVideoButtons = function (episodeKey: SeriesEpisode['key']): void {
     const containerId = 'ls-video-buttons';
     const buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('id', containerId);
@@ -13,7 +13,7 @@ export const addVideoButtons = function(episodeInfo: SeriesEpisode): void {
     new Vue({
         render: h => h(VideoButtonComponent, {
             props: {
-                episodeInfo
+                episodeKey
             }
         }),
         components: { ButtonComponent: VideoButtonComponent }

@@ -48,7 +48,6 @@ export class VideoController {
         await this.store.dispatch(seriesEpisodeStartedAction({
             seriesEpisodeKey: seriesEpisodeKey,
             duration: video.duration,
-            seriesKey: episode.seriesKey,
         }));
 
         this.store.select(getSeriesEpisodeByKey, seriesEpisodeKey).pipe(
@@ -59,7 +58,7 @@ export class VideoController {
             this.setStartTime(video, episodeData);
             this.popupController.openPopupsForVideo(video, seriesEpisodeKey, videoTimeUpdate$);
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
-            addVideoButtons(episodeData);
+            addVideoButtons(episodeData.key);
         });
     }
 
