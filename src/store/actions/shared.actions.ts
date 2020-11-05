@@ -4,4 +4,8 @@ export const deleteSeriesAction = createAction<string>('series/deleteSeries');
 
 export const startEpisodeAction = createAction<string>('app/startEpisode');
 
+export const startNextEpisodeAction = createAction<{ episodeKey: string, userAction: boolean }>('app/startNextEpisode');
+
+export const startPreviousEpisodeAction = createAction<string>('app/startPreviousEpisode');
+
 

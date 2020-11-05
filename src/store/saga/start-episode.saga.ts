@@ -11,16 +11,29 @@ import { PROVIDORS } from '../enums/providors.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { getSeriesByKey } from '../selectors/series.selector';
 import { setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
+import { raisePlayedEpisodesAction } from '../reducers/control-state.reducer';
+import { stopPlayer } from '../utils/stop-player.util';
 
 
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
+    stopPlayer();
     const episodeKey = action.payload;
+
+    const episodeStartSuccessful: boolean = yield startEpisode(episodeKey);
+
+    if (episodeStartSuccessful) {
+        yield put(raisePlayedEpisodesAction());
+    }
+}
+
+export function* startEpisode(episodeKey: SeriesEpisode['key']) {
     const videoController = getVideoController();
     const usedProvidors = [];
     const state: StateModel = yield select();
     const episode = getSeriesEpisodeByKey(state, episodeKey);
     const series = getSeriesByKey(state, episode.seriesKey);
 
+    debugger
     let portal = state.appControlState.activePortal;
     if (!portal) {
 
@@ -35,12 +48,14 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
         if (isVideoStartSuccessful) {
             yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
             yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal }));
-            break;
+            return true;
         }
 
         usedProvidors.push(providorLink.providor);
         providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
     }
+
+    return false;
 }
 
 function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[]) {
@@ -53,7 +68,12 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
 
     for (const provider of providors) {
         if (seriesEpisode.providorLinks[provider.key]) {
-            return seriesEpisode.providorLinks[provider.key];
+            const result: ProvidorLink = {
+                link: seriesEpisode.providorLinks[provider.key],
+                providor: provider.key
+            };
+
+            return result;
         }
 
         const link: ProvidorLink = yield call([ portalController, portalController.getProvidorLinkForEpisode ], episodeKey, portalKey, provider.key);

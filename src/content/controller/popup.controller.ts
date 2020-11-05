@@ -8,10 +8,7 @@ import { Popup } from '../enum/popup.enum';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../store/reducers/series.reducer';
 import { getOptions } from '../../store/selectors/options.selector';
-import {
-    createContinueAutoplayForEpisodeMessage,
-    createVideoFinishedMessage
-} from '../../browserMessages/messages/background.messages';
+import { createContinueAutoplayForEpisodeMessage } from '../../browserMessages/messages/background.messages';
 import { Logger } from '../../shared/services/logger';
 import { isMaximumPlayedEpisodesLimitReached } from '../../store/selectors/control-state.selector';
 import { PopupService } from '../services/popup.service';
@@ -20,6 +17,7 @@ import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.sele
 import { createHasNextEpisodeMessage } from '../../browserMessages/messages/background-data.messages';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
+import { startNextEpisodeAction } from '../../store/actions/shared.actions';
 
 @injectable()
 export class PopupController {
@@ -180,7 +178,7 @@ export class PopupController {
         if (isPlayedEpisodeLimitReached) {
             this.openEpisodeLimitReachedPopup(episodeKey);
         } else {
-            this.messageService.sendMessageToBackground(createVideoFinishedMessage(episodeKey));
+            this.store.dispatch(startNextEpisodeAction({ episodeKey, userAction: false }));
             this.openVideoIsPreparingPopup();
         }
     }

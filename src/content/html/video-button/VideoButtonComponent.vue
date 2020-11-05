@@ -52,18 +52,15 @@
     import { inversifyContentContainer } from '../../container/container';
     import SeriesEpisode from '../../../store/models/series-episode.model';
     import {
-        createOpenNextVideoMessage,
         createOpenPreviousVideoMessage,
         createToggleWindowFullscreenMessage,
     } from '../../../browserMessages/messages/background.messages';
     import { getWindowStateForWindowId } from '../../../store/selectors/control-state.selector';
-    import {
-        hasSeriesEpisodeNextEpisode,
-        hasSeriesEpisodePreviousEpisode
-    } from '../../../store/selectors/series-episode.selector';
+    import { hasSeriesEpisodePreviousEpisode } from '../../../store/selectors/series-episode.selector';
     import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';
     import { PopupController } from '../../controller/popup.controller';
     import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
+    import { startNextEpisodeAction } from '../../../store/actions/shared.actions';
 
     @Component({
         name: 'ls-video-buttons',
@@ -98,7 +95,7 @@
 
         private isMouseOnButton = false;
         private hasPreviousEpisode = false;
-        private hasNextEpisode = false;
+        private hasNextEpisode = true;
 
         private readonly buttonsVisibilityTime = 1500;
 
@@ -110,20 +107,21 @@
 
         public next(): void {
             this.isStartingNext = true;
-            this.messageService.sendMessageToBackground(createOpenNextVideoMessage(this.episodeInfo.key));
+            this.store.dispatch(startNextEpisodeAction({ episodeKey: this.episodeInfo.key, userAction: true }));
             this.popupController.openVideoIsPreparingPopup();
         }
 
         public toggleFullscreenMode(): void {
             this.messageService.sendMessageToBackground(createToggleWindowFullscreenMessage(this.windowId));
         }
+
         public mounted(): void {
             this.windowId = remote.getCurrentWindow().id;
 
             setTimeout(() => this.showButtons = false, this.buttonsVisibilityTime);
 
             this.hasPreviousEpisode = this.store.selectSync(hasSeriesEpisodePreviousEpisode, this.episodeInfo.key);
-            this.hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, this.episodeInfo.key);
+            // this.hasNextEpisode = this.store.selectSync(hasSeriesEpisodeNextEpisode, this.episodeInfo.key);
 
             this.initMouseEventListeners();
             this.initKeyboardListener();

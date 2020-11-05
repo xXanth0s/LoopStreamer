@@ -53,3 +53,8 @@ export const isEndTimeConfiguredForSeries = (state: StateModel, seriesKey: Serie
     const series = getSeriesByKey(state, seriesKey);
     return Boolean(series?.isEndTimeConfigured);
 };
+
+export const getSeriesForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): Series => {
+    const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
+    return getSeriesByKey(state, episode?.seriesKey);
+};

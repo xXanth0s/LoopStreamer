@@ -9,13 +9,11 @@ import {
     CloseWindowMessage,
     ContinueAutoplayForEpisodeMessage,
     MinimizeWindowMessage,
-    OpenNextVideoMessage,
     OpenPreviousVideoMessage,
     RecaptchaRecognizedMessage,
     StartSeriesMessage,
     ToggleWindowFullscreenMessage,
-    ToggleWindowMaximizationMessage,
-    VideoFinishedMessage
+    ToggleWindowMaximizationMessage
 } from '../../browserMessages/messages/background.messages';
 import {
     raisePlayedEpisodesAction,
@@ -78,16 +76,8 @@ export class RootBackgroundController {
     }
 
     public initializeHandler(): void {
-        ipcMain.handle(MessageType.BACKGROUND_VIDEO_FINISHED, (event, message: VideoFinishedMessage) => {
-            this.videoFinishedHandler(message);
-        });
-
         ipcMain.handle(MessageType.BACKGROUND_CONTINUE_AUTOPLAY, (event, message: ContinueAutoplayForEpisodeMessage) => {
             this.continueAutoplayHandler(message);
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_NEXT_VIDEO, (event, message: OpenNextVideoMessage) => {
-            this.nextVideoHandler(message);
         });
 
         ipcMain.handle(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
@@ -125,15 +115,6 @@ export class RootBackgroundController {
             });
     }
 
-    private async videoFinishedHandler({ payload }: VideoFinishedMessage): Promise<void> {
-        this.store.stopPlayer();
-        const success = await this.startNextEpisode(payload);
-        if (success) {
-            this.store.dispatch(raisePlayedEpisodesAction());
-        }
-
-    }
-
     private async continueAutoplayHandler({ payload }: ContinueAutoplayForEpisodeMessage): Promise<void> {
         this.store.stopPlayer();
         this.store.dispatch(resetPlayedEpisodesAction());
@@ -150,11 +131,6 @@ export class RootBackgroundController {
             await this.startEpisode(previousEpisode.key, PORTALS.BS);
 
         }
-    }
-
-    private async nextVideoHandler({ payload }: OpenNextVideoMessage): Promise<void> {
-        this.store.stopPlayer();
-        await this.startNextEpisode(payload);
     }
 
     private async continueSeriesHandler({ payload }: StartSeriesMessage): Promise<void> {

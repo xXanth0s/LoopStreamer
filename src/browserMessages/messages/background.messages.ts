@@ -5,14 +5,6 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import Series from '../../store/models/series.model';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 
-export const createVideoFinishedMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
-    type: MessageType.BACKGROUND_VIDEO_FINISHED,
-    destinationController: ControllerType.BACKGROUND,
-    payload: episodeKey,
-    hasReply: false,
-});
-export type VideoFinishedMessage = ReturnType<typeof createVideoFinishedMessage>;
-
 export const createContinueAutoplayForEpisodeMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
     type: MessageType.BACKGROUND_CONTINUE_AUTOPLAY,
     destinationController: ControllerType.BACKGROUND,
@@ -20,15 +12,6 @@ export const createContinueAutoplayForEpisodeMessage = (episodeKey: SeriesEpisod
     hasReply: false,
 });
 export type ContinueAutoplayForEpisodeMessage = ReturnType<typeof createContinueAutoplayForEpisodeMessage>;
-
-export const createOpenNextVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
-    type: MessageType.BACKGROUND_NEXT_VIDEO,
-    destinationController: ControllerType.BACKGROUND,
-    payload: activeEpisodeKey,
-    hasReply: false,
-});
-export type OpenNextVideoMessage = ReturnType<typeof createOpenNextVideoMessage>;
-
 
 export const createOpenPreviousVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
     type: MessageType.BACKGROUND_PREVIOUS_VIDEO,
