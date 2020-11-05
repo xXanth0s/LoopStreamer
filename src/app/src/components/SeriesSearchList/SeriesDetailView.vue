@@ -58,17 +58,14 @@
     import { optionsContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { MessageService } from '../../../../shared/services/message.service';
     import { SeriesSeason } from '../../../../store/models/series-season.model';
     import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
-    import { PORTALS } from '../../../../store/enums/portals.enum';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getLastWatchedEpisode, getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
     import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
-    import { createGetContinuableEpisodeMessage } from '../../../../browserMessages/messages/background-data.messages';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
     import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
@@ -93,7 +90,6 @@
         @Prop(Boolean)
         private isExpanded: boolean;
 
-        private messageService: MessageService;
         private store: StoreService;
 
         private isLoading = false;
@@ -113,7 +109,6 @@
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         public destroyed(): void {
@@ -168,15 +163,9 @@
         }
 
         private async fetchEpisodeToContinueFromStore(): Promise<void> {
-            await this.fetchEpisodeToContinue();
             this.store.selectBehaviour(getLastWatchedEpisode, this.seriesKey).pipe(
                 takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
-            ).subscribe(() => this.fetchEpisodeToContinue());
-        }
-
-        private async fetchEpisodeToContinue(): Promise<void> {
-            const message = createGetContinuableEpisodeMessage(this.seriesKey);
-            this.episodeToContinue = await this.messageService.sendMessageToBackground(message);
+            ).subscribe(episode => this.episodeToContinue = episode);
         }
 
         private fetchLoadingStateFromStore(): void {
@@ -210,10 +199,6 @@
             ).subscribe(episodes => {
                 this.episodes = episodes;
             });
-        }
-
-        private getPortal(): PORTALS {
-            return PORTALS.BS;
         }
     }
 </script>
