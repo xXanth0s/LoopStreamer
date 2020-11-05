@@ -34,7 +34,17 @@ export const getFirstEpisodeForSeason = (state: StateModel, key: SeriesSeason['k
     return sortArrayForKey(seasonEpisodes, (episode: SeriesEpisode) => episode.episodeNumber)[0];
 };
 
-const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisode['key'], offset: number): SeriesEpisode => {
+export const getLastEpisodeForSeason = (state: StateModel, key: SeriesSeason['key']): SeriesEpisode => {
+    const seasonEpisodes = getSeriesEpisodesForSeason(state, key);
+    if (!seasonEpisodes.length) {
+        return null;
+    }
+
+    const sortedArray = sortArrayForKey(seasonEpisodes, (episode: SeriesEpisode) => episode.episodeNumber);
+    return sortedArray[sortedArray.length - 1];
+};
+
+export const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisode['key'], offset: number): SeriesEpisode => {
     const episode = getSeriesEpisodeByKey(state, episodeKey);
 
     if (!episode) {
