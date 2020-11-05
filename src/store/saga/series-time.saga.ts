@@ -9,7 +9,7 @@ import { put, select } from 'redux-saga/effects';
 import { getNeighbourEpisode } from './shared-sagas/neighbour-episode.saga';
 import { setLastWatchedEpisodeAction } from '../reducers/series.reducer';
 
-export function* setEpisodeEndedState(action: ReturnType<typeof setSeriesEpisodeTimeStampAction>) {
+export function* setEpisodeEndedStateSaga(action: ReturnType<typeof setSeriesEpisodeTimeStampAction>) {
     const { seriesEpisodeKey, timestamp } = action.payload;
     const state = yield select();
     const seriesEpisode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
@@ -20,20 +20,17 @@ export function* setEpisodeEndedState(action: ReturnType<typeof setSeriesEpisode
     const timeWhenSeriesIsFinished = getPopupEndTimeForSeriesEpisode(series);
 
     const isFinished = timeLeft <= timeWhenSeriesIsFinished;
-
-    if (seriesEpisode.isFinished !== isFinished) {
-        yield put(setSeriesEpisodeFinishedStateAction({
-            seriesEpisodeKey,
-            isFinished,
-        }));
-    }
-
-    if (!isFinished && series.lastEpisodeWatched === seriesEpisodeKey) {
-        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: seriesEpisodeKey }));
+    if (seriesEpisode.isFinished === isFinished) {
         return;
     }
 
-    if (!isFinished) {
+    yield put(setSeriesEpisodeFinishedStateAction({
+        seriesEpisodeKey,
+        isFinished,
+    }));
+
+    if (!isFinished && series.lastEpisodeWatched !== seriesEpisodeKey) {
+        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: seriesEpisodeKey }));
         return;
     }
 

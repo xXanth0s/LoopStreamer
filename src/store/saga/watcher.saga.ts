@@ -6,7 +6,7 @@ import {
 import { loadSeriesInformationSaga } from './load-series.saga';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
-import { setEpisodeEndedState } from './series-time.saga';
+import { setEpisodeEndedStateSaga } from './series-time.saga';
 import { startEpisodeAction, startNextEpisodeAction, startPreviousEpisodeAction } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
 import { loadAllSeriesForPortal } from './load-all-series.saga';
@@ -21,7 +21,7 @@ export function* watcherSaga() {
     yield takeEvery(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 
     // episode state controlling
-    yield takeLatest(setSeriesEpisodeTimeStampAction.type, setEpisodeEndedState);
+    yield takeLatest(setSeriesEpisodeTimeStampAction.type, setEpisodeEndedStateSaga);
     yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
 
     // controll actions from app

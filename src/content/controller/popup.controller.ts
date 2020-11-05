@@ -14,7 +14,6 @@ import { isMaximumPlayedEpisodesLimitReached } from '../../store/selectors/contr
 import { PopupService } from '../services/popup.service';
 import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
-import { createHasNextEpisodeMessage } from '../../browserMessages/messages/background-data.messages';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { startNextEpisodeAction } from '../../store/actions/shared.actions';
@@ -22,7 +21,6 @@ import { startNextEpisodeAction } from '../../store/actions/shared.actions';
 @injectable()
 export class PopupController {
 
-    private hasNextEpisode = true;
     private videoOnTimeUpdate$: Observable<number>;
     private popupFinallyClosed$ = new Subject<Popup>();
 
@@ -39,8 +37,6 @@ export class PopupController {
         const configs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
 
         configs.forEach(config => this.openPupupAtTime(config, video, episodeInfo));
-
-        this.checkIfNextEpisodeIsAvailable(episodeKey);
 
         Logger.log('[PopupController->openPopupsForVideo] Popup configs to be opened', configs);
     }
@@ -79,7 +75,7 @@ export class PopupController {
                 this.openEpisodeLimitReachedPopup(episodeInfo.key);
                 break;
             case Popup.NEXT_EPISODE_COUNTDOWN:
-                this.openNextEpisodeCountdownPopup(video, episodeInfo);
+                this.openNextEpisodeCountdownPopup(video, episodeInfo.key);
                 break;
             case Popup.SET_ENDTIME:
                 this.openSetEndTimePopup(video, episodeInfo);
@@ -136,14 +132,15 @@ export class PopupController {
             });
     }
 
-    private openNextEpisodeCountdownPopup(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
-        if (!this.hasNextEpisode) {
+    private openNextEpisodeCountdownPopup(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): void {
+        const episodeInfo = this.store.selectSync(getSeriesEpisodeByKey, seriesEpisodeKey);
+        if (!episodeInfo.hasNextEpisode) {
             return;
         }
 
         const isEpisodeLimitReached = this.store.selectSync(isMaximumPlayedEpisodesLimitReached);
         if (isEpisodeLimitReached) {
-            this.openEpisodeLimitReachedPopup(episodeInfo.key);
+            this.openEpisodeLimitReachedPopup(seriesEpisodeKey);
             return;
         }
 
@@ -153,12 +150,13 @@ export class PopupController {
         this.notificationService.openEndTimePopup(
             popupCountdown,
             () => {
-                this.videoEnded(episodeInfo.key);
+                this.videoEnded(seriesEpisodeKey);
             });
     }
 
     private openEpisodeLimitReachedPopup(episodeKey: SeriesEpisode['key']): void {
-        if (!this.hasNextEpisode) {
+        const episodeInfo = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+        if (!episodeInfo.hasNextEpisode) {
             return;
         }
 
@@ -170,7 +168,8 @@ export class PopupController {
     }
 
     private videoEnded(episodeKey: SeriesEpisode['key']): void {
-        if (!this.hasNextEpisode) {
+        const episodeInfo = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+        if (!episodeInfo.hasNextEpisode) {
             return;
         }
 
@@ -202,10 +201,6 @@ export class PopupController {
 
         const timeFromEnd = videoDuration - currentTime;
         return popupConfig.timeToOpen >= timeFromEnd;
-    }
-
-    private async checkIfNextEpisodeIsAvailable(seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
-        this.hasNextEpisode = await this.messageService.sendMessageToBackground(createHasNextEpisodeMessage(seriesEpisodeKey));
     }
 
     private getTimeTillForNextEpisodeCountdown(video: HTMLVideoElement): number {
