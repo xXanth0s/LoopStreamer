@@ -1,6 +1,6 @@
 export type EnvironmentType = {
-    isDev: Boolean;
-    openAppDevTools: Boolean;
-    openDevTools: Boolean;
-    showNewWindows: Boolean;
+    isDev: boolean;
+    openAppDevTools: boolean;
+    openDevTools: boolean;
+    showNewWindows: boolean;
 };
