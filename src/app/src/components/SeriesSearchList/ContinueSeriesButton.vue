@@ -1,5 +1,5 @@
 <template>
-    <div v-if="seriesEpisode">
+    <div v-if="seriesEpisode && !seriesEpisode.isFinished">
         <b-button @click="continueEpisode" block class="float-right mb-2" variant="primary">
             <span v-if="isLoading">
                 <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;">
@@ -92,7 +92,6 @@
                 takeUntil(merge(this.takeUntil$, this.episodeChanged$)),
             ).subscribe(seriesEpisode => {
                 this.seriesEpisode = seriesEpisode;
-                console.log(this.seriesEpisode);
                 this.$forceUpdate();
             });
         }

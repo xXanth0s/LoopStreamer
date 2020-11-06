@@ -76,7 +76,7 @@ export function getProgressForEpisode(seriesEpisode: SeriesEpisode): number {
 }
 
 export function getSeriesEpisodeTitle(seriesEpisode: SeriesEpisode): string {
-    return `S${addLeadingZero(seriesEpisode.season)}E${addLeadingZero(seriesEpisode.episodeNumber)}`;
+    return `S${addLeadingZero(seriesEpisode.season)} E${addLeadingZero(seriesEpisode.episodeNumber)}`;
 }
 
 function addLeadingZero(digit: number): string {
