@@ -11,7 +11,11 @@ import { PROVIDORS } from '../enums/providors.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
-import { raisePlayedEpisodesAction, resetPlayedEpisodesAction } from '../reducers/control-state.reducer';
+import {
+    raisePlayedEpisodesAction,
+    resetPlayedEpisodesAction,
+    setActiveEpisodeAction
+} from '../reducers/control-state.reducer';
 import { stopPlayer } from '../utils/stop-player.util';
 
 
@@ -34,24 +38,26 @@ export function* startEpisode(episodeKey: SeriesEpisode['key']) {
     const state: StateModel = yield select();
     const series = getSeriesForEpisode(state, episodeKey);
 
+    yield put(setActiveEpisodeAction(episodeKey));
+
     const portal = state.appControlState.activePortal ? state.appControlState.activePortal : series.lastUsedPortal;
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
 
-    let success = false;
     while (providorLink !== null) {
-        success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
+        const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
         if (success) {
             yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
             yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal }));
-            break;
+            return true;
         }
 
         usedProvidors.push(providorLink.providor);
         providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
     }
 
-    return success;
+    yield put(setActiveEpisodeAction(null));
+    return false;
 }
 
 function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[]) {

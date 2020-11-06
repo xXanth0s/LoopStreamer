@@ -19,8 +19,7 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { getActiveEpisode, hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
-    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
+    import { getActiveEpisode, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import ButtonTile from '../ButtonTile.vue';
     import { getProgressForEpisode } from '../../../../store/utils/series.utils';
 
@@ -73,9 +72,11 @@
         }
 
         private fetchEpisodeLoadingStateFromStore(): void {
-            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_EPISODE_INFO).pipe(
+            this.store.selectBehaviour(isPreparingVideo).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(isLoading => this.isAnyEpisodeLoading = isLoading);
+            ).subscribe(isLoading => {
+                this.isAnyEpisodeLoading = isLoading;
+            });
         }
     }
 </script>
