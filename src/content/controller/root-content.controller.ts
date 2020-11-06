@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { PortalService } from '../services/portal.service';
-import { ProvidorService } from '../services/providor.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
@@ -18,12 +17,12 @@ import { RecaptchaService } from '../services/recaptcha.service';
 import styles from '../styles/content.scss';
 import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
 import { DEFAULT_TITLE } from '../../constants/electron-variables';
+import { getProvidorController } from '../container/content-container.utils';
 
 @injectable()
 export class RootContentController {
 
     constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalService,
-                @inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
@@ -84,7 +83,7 @@ export class RootContentController {
 
     private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoMessage): void {
         const { providor, episodeKey } = message.payload;
-        const result = Boolean(this.providorService.getProvidorController(providor)?.startVideo(episodeKey));
+        const result = Boolean(getProvidorController(providor)?.startVideo(episodeKey));
         this.messageService.replyToSender(message, event.sender, result);
     }
 }

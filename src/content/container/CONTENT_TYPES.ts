@@ -1,6 +1,3 @@
-import { PORTALS } from '../../store/enums/portals.enum';
-import { PROVIDORS } from '../../store/enums/providors.enum';
-
 const CONTENT_TYPES = {
     RootController: Symbol.for('RootContentController'),
     VideoController: Symbol.for('VideoController'),
@@ -9,6 +6,7 @@ const CONTENT_TYPES = {
 
     // Services
     NotificationService: Symbol.for('NotificationService'),
+    PortalService: Symbol.for('PortalService'),
     RecaptchaService: Symbol.for('RecaptchaService'),
     PopupService: Symbol.for('PopupService'),
 
@@ -24,14 +22,3 @@ const CONTENT_TYPES = {
 export { CONTENT_TYPES };
 
 
-export const getContentTypeForPortal = (portal: PORTALS): symbol => {
-    switch (portal) {
-        case PORTALS.BS: return CONTENT_TYPES.BurningSeries;
-    }
-};
-
-export const getContentTypeForProvidor = (providor: PROVIDORS): symbol => {
-    switch (providor) {
-        case PROVIDORS.Vivo: return CONTENT_TYPES.Vivo;
-    }
-};

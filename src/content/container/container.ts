@@ -10,7 +10,6 @@ import { VivoController } from '../controller/providors/vivo.controller';
 import { CONTENT_TYPES } from './CONTENT_TYPES';
 import { VideoController } from '../controller/video.controller';
 import { RootContentController } from '../controller/root-content.controller';
-import { ProvidorService } from '../services/providor.service';
 import { PortalService } from '../services/portal.service';
 import { NotificationService } from '../services/notification.service';
 import { TestController } from '../controller/test.controller';
@@ -30,7 +29,6 @@ inversifyContentContainer.bind(SHARED_TYPES.ControllerType).toConstantValue(Cont
 
 // Services
 inversifyContentContainer.bind(CONTENT_TYPES.PortalService).to(PortalService).inSingletonScope();
-inversifyContentContainer.bind(CONTENT_TYPES.ProvidorService).to(ProvidorService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.RecaptchaService).to(RecaptchaService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.NotificationService).to(NotificationService).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.PopupService).to(PopupService).inSingletonScope();

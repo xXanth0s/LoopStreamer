@@ -4,8 +4,8 @@ import { StoreService } from '../../shared/services/store.service';
 import Portal from '../../store/models/portal.model';
 import { getActivePortal } from '../../store/selectors/portals.selector';
 import { IPortalController } from '../controller/portals/portal.controller.interface';
-import { getContentTypeForPortal } from '../container/CONTENT_TYPES';
 import { inversifyContentContainer } from '../container/container';
+import { getContentTypeForPortal } from '../container/content-container.utils';
 
 @injectable()
 export class PortalService {

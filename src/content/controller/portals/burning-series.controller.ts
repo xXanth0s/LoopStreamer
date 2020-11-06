@@ -1,7 +1,5 @@
 import { IPortalController } from './portal.controller.interface';
 import { inject, injectable } from 'inversify';
-import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
-import { ProvidorService } from '../../services/providor.service';
 import { simulateEvent } from '../../ustils/simulate-event';
 import Providor from '../../../store/models/providor.model';
 import { PORTALS } from '../../../store/enums/portals.enum';
@@ -9,7 +7,7 @@ import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
-import { getAllUsedProvidors } from '../../../store/selectors/providors.selector';
+import { getAllUsedProvidors, getProvidorForName } from '../../../store/selectors/providors.selector';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 
@@ -28,8 +26,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seriesContainer")?.querySelectorAll("a");
     private readonly seriesDescriptionSelector = (): string => document.querySelector("#sp_left > p")?.textContent || '';
 
-    constructor(@inject(CONTENT_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
     isVideoOpenWithProvidor(): Providor | null {
@@ -40,7 +37,7 @@ export class BurningSeriesController implements IPortalController {
         const activeProvidorElement = this.activeProvidorSelector() as HTMLElement;
         if (activeProvidorElement) {
             const providorName = activeProvidorElement.textContent.trim();
-            return this.providorService.getProvidorForName(providorName);
+            return this.store.selectSync(getProvidorForName, providorName);
         }
 
         return null;
