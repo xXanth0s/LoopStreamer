@@ -1,35 +1,7 @@
 import { MessageType } from '../enum/message-type.enum';
 import { Message } from './message.interface';
 import { ControllerType } from '../enum/controller.type';
-import SeriesEpisode from '../../store/models/series-episode.model';
-import Series from '../../store/models/series.model';
 import { DomElementSize } from '../../dto/dom-element-size.model';
-
-export const createContinueAutoplayForEpisodeMessage = (episodeKey: SeriesEpisode['key']): Message<SeriesEpisode['key']> => ({
-    type: MessageType.BACKGROUND_CONTINUE_AUTOPLAY,
-    destinationController: ControllerType.BACKGROUND,
-    payload: episodeKey,
-    hasReply: false,
-});
-export type ContinueAutoplayForEpisodeMessage = ReturnType<typeof createContinueAutoplayForEpisodeMessage>;
-
-export const createOpenPreviousVideoMessage = (activeEpisodeKey: Series['key']): Message<Series['key']> => ({
-    type: MessageType.BACKGROUND_PREVIOUS_VIDEO,
-    destinationController: ControllerType.BACKGROUND,
-    payload: activeEpisodeKey,
-    hasReply: false,
-});
-export type OpenPreviousVideoMessage = ReturnType<typeof createOpenPreviousVideoMessage>;
-
-
-export const createContinueSeriesMessage = (seriesKey: Series['key']): Message<Series['key']> => ({
-    type: MessageType.BACKGROUND_CONTINUE_SERIES,
-    destinationController: ControllerType.BACKGROUND,
-    payload: seriesKey,
-    hasReply: false,
-});
-export type StartSeriesMessage = ReturnType<typeof createContinueSeriesMessage>;
-
 
 export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize) : Message<DomElementSize> => ({
     type: MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,

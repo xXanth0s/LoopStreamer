@@ -25,7 +25,6 @@ import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getSeriesSeasonByKey } from '../../store/selectors/series-season.selector';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
-import { ProvidorService } from '../services/providor.service';
 import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
 import { WindowController } from './window.controller';
@@ -43,7 +42,6 @@ export class PortalController {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
-                @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 

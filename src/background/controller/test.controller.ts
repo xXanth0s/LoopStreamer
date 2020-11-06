@@ -2,8 +2,6 @@ import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { ProvidorService } from '../services/providor.service';
-import { PortalService } from '../services/portalService';
 import { WindowService } from '../services/window.service';
 import { BrowserWindow, ipcMain } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
@@ -29,8 +27,6 @@ export class TestController {
 
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(BACKGROUND_TYPES.ProvidorService) private readonly providorService: ProvidorService,
-                @inject(BACKGROUND_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.RootController) private readonly rootController: RootBackgroundController,
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,

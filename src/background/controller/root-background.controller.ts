@@ -7,32 +7,17 @@ import { StoreService } from '../../shared/services/store.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     CloseWindowMessage,
-    ContinueAutoplayForEpisodeMessage,
     MinimizeWindowMessage,
-    OpenPreviousVideoMessage,
     RecaptchaRecognizedMessage,
-    StartSeriesMessage,
     ToggleWindowFullscreenMessage,
     ToggleWindowMaximizationMessage
 } from '../../browserMessages/messages/background.messages';
-import {
-    raisePlayedEpisodesAction,
-    resetControlStateAction,
-    resetPlayedEpisodesAction,
-    setActiveEpisodeAction,
-    setWindowIdForWindowTypeAction
-} from '../../store/reducers/control-state.reducer';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { SeriesService } from '../services/series.service';
-import SeriesEpisode from '../../store/models/series-episode.model';
-import { getPreviousEpisode, getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { PORTALS } from '../../store/enums/portals.enum';
 import { environment } from '../../environments/environment';
-import Providor from '../../store/models/providor.model';
-import { getAllUsedProvidors } from '../../store/selectors/providors.selector';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
@@ -52,7 +37,6 @@ export class RootBackgroundController {
     constructor(@inject(BACKGROUND_TYPES.PortalController) private readonly portalController: PortalController,
                 @inject(BACKGROUND_TYPES.VideoController) private readonly videoController: VideoController,
                 @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
-                @inject(BACKGROUND_TYPES.SeriesService) private readonly seriesService: SeriesService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
     }
 
@@ -76,19 +60,6 @@ export class RootBackgroundController {
     }
 
     public initializeHandler(): void {
-        ipcMain.handle(MessageType.BACKGROUND_CONTINUE_AUTOPLAY, (event, message: ContinueAutoplayForEpisodeMessage) => {
-            this.continueAutoplayHandler(message);
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_PREVIOUS_VIDEO, (event, message: OpenPreviousVideoMessage) => {
-            this.previousVideoHandler(message);
-        });
-
-        ipcMain.handle(MessageType.BACKGROUND_CONTINUE_SERIES, (event, message: StartSeriesMessage) => {
-            console.log('in continue series handler');
-            this.continueSeriesHandler(message);
-        });
-
         ipcMain.handle(MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
             (event, message: RecaptchaRecognizedMessage): void => {
                 this.recaptchaRecognizedHandler(event, message);
@@ -113,39 +84,6 @@ export class RootBackgroundController {
             (event, message: MinimizeWindowMessage): void => {
                 this.minimizeWindowEventHandler(event, message);
             });
-    }
-
-    private async continueAutoplayHandler({ payload }: ContinueAutoplayForEpisodeMessage): Promise<void> {
-        this.store.stopPlayer();
-        this.store.dispatch(resetPlayedEpisodesAction());
-        const success = await this.startNextEpisode(payload);
-        if (success) {
-            this.store.dispatch(raisePlayedEpisodesAction());
-        }
-    }
-
-    private async previousVideoHandler({ payload }: OpenPreviousVideoMessage): Promise<void> {
-        this.store.stopPlayer();
-        const previousEpisode = this.store.selectSync(getPreviousEpisode, payload);
-        if (previousEpisode) {
-            await this.startEpisode(previousEpisode.key, PORTALS.BS);
-
-        }
-    }
-
-    private async continueSeriesHandler({ payload }: StartSeriesMessage): Promise<void> {
-        this.resetController();
-        this.store.stopPlayer();
-        const seriesEpisode = await this.seriesService.getContinuableEpisodeForSeries(payload, PORTALS.BS);
-        if (!seriesEpisode) {
-            return;
-        }
-
-        // TO-DO replace hardcoded Vivo with last used Providor
-        const success = this.startEpisode(seriesEpisode.key, PORTALS.BS);
-        if (success) {
-            this.store.dispatch(raisePlayedEpisodesAction());
-        }
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -174,60 +112,5 @@ export class RootBackgroundController {
     private minimizeWindowEventHandler(event: IpcMainInvokeEvent, message: MinimizeWindowMessage): void {
         const windowId = message.payload;
         this.windowService.minimizeWindow(windowId);
-    }
-
-    private resetController(): void {
-        this.store.dispatch(resetControlStateAction());
-        this.store.stopPlayer();
-        this.videoController.reset();
-    }
-
-    private async startNextEpisode(episodeKey: SeriesEpisode['key']): Promise<boolean> {
-        const nextEpisode = await this.seriesService.getNextEpisode(episodeKey);
-        if (nextEpisode) {
-            return this.startEpisode(nextEpisode.key, PORTALS.BS);
-        }
-
-        return false;
-    }
-
-    private async startEpisode(episodeKey: SeriesEpisode['key'], portal: PORTALS): Promise<boolean> {
-        this.store.dispatch(setActiveEpisodeAction(episodeKey));
-        const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
-
-        const usedProvidors = this.store.selectSync(getAllUsedProvidors);
-        for (let provider of usedProvidors) {
-            const result = this.startEpisodeForProvidor(episode, portal, provider);
-            if (result) {
-                return true;
-            }
-        }
-
-        this.store.dispatch(setActiveEpisodeAction(null));
-        return false;
-    }
-
-    private async startEpisodeForProvidor(episode: SeriesEpisode, portal: PORTALS, providor: Providor): Promise<boolean> {
-        // const episodeKey = episode.key;
-        // if (!episode.providorLinks[providor.key]) {
-        //     // const providorLink = await this.portalController.getProvidorLinkForEpisode(episode.key, portal);
-        //     //
-        //     // if (providorLink.link) {
-        //         this.store.dispatch(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
-        //     } else {
-        //         return false;
-        //     }
-        // }
-
-        // const result = await this.videoController.startVideo(episodeKey, providor.key);
-        //
-        // if (!result) {
-        //     this.store.dispatch(removeProvidorLinkFromEpisodeAction({ episodeKey, providorKey: providor.key }));
-        // } else {
-        //     this.store.dispatch(setLastUsedPortalForSeriesAction({ seriesKey: episode.seriesKey, portal }));
-        // }
-        //
-        // return result;
-        return false;
     }
 }

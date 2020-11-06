@@ -27,11 +27,11 @@
     import { MessageService } from '../../../../shared/services/message.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { createContinueSeriesMessage } from '../../../../browserMessages/messages/background.messages';
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../store/utils/series.utils';
     import { StoreService } from '../../../../shared/services/store.service';
     import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import { getSeriesEpisodeByKey } from '../../../../store/selectors/series-episode.selector';
+    import { startEpisodeAction } from '../../../../store/actions/shared.actions';
 
     @Component({
         name: 'continue-series-button',
@@ -72,7 +72,7 @@
         }
 
         public continueEpisode(): void {
-            this.messageService.sendMessageToBackground(createContinueSeriesMessage(this.seriesEpisode.seriesKey));
+            this.store.dispatch(startEpisodeAction(this.seriesEpisode.key));
         }
 
         @Watch('seriesEpisodeKey', { immediate: true })

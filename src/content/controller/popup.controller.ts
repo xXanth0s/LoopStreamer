@@ -8,7 +8,6 @@ import { Popup } from '../enum/popup.enum';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../store/reducers/series.reducer';
 import { getOptions } from '../../store/selectors/options.selector';
-import { createContinueAutoplayForEpisodeMessage } from '../../browserMessages/messages/background.messages';
 import { Logger } from '../../shared/services/logger';
 import { isMaximumPlayedEpisodesLimitReached } from '../../store/selectors/control-state.selector';
 import { PopupService } from '../services/popup.service';
@@ -162,7 +161,8 @@ export class PopupController {
 
         this.notificationService.openEpisodeLimitReachedPopup(
             () => {
-                this.messageService.sendMessageToBackground(createContinueAutoplayForEpisodeMessage(episodeKey));
+                // TO-DO: Add functionality
+                // this.messageService.sendMessageToBackground(createContinueAutoplayForEpisodeMessage(episodeKey));
                 this.openVideoIsPreparingPopup();
             });
     }

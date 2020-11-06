@@ -80,7 +80,6 @@
     import { Subject } from 'rxjs';
     import { filter, takeUntil } from 'rxjs/operators';
     import Series from '../../../../store/models/series.model';
-    import { createContinueSeriesMessage } from '../../../../browserMessages/messages/background.messages';
     import { MessageService } from '../../../../shared/services/message.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
@@ -134,10 +133,6 @@
 
         toggleSettings() {
             this.showSettings = !this.showSettings;
-        }
-
-        continueSeries() {
-            this.messageService.sendMessageToBackground(createContinueSeriesMessage(this.series.key));
         }
 
         public beforeCreate(): void {

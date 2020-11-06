@@ -9,8 +9,6 @@ const CONTENT_TYPES = {
 
     // Services
     NotificationService: Symbol.for('NotificationService'),
-    PortalService: Symbol.for('PortalService'),
-    ProvidorService: Symbol.for('ProvidorService'),
     RecaptchaService: Symbol.for('RecaptchaService'),
     PopupService: Symbol.for('PopupService'),
 
