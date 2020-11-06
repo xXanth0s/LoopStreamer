@@ -15,7 +15,7 @@ import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
-import { startNextEpisodeAction } from '../../store/actions/shared.actions';
+import { continueAutoplayAction, startNextEpisodeAction } from '../../store/actions/shared.actions';
 
 @injectable()
 export class PopupController {
@@ -161,8 +161,7 @@ export class PopupController {
 
         this.notificationService.openEpisodeLimitReachedPopup(
             () => {
-                // TO-DO: Add functionality
-                // this.messageService.sendMessageToBackground(createContinueAutoplayForEpisodeMessage(episodeKey));
+                this.store.dispatch(continueAutoplayAction(episodeKey));
                 this.openVideoIsPreparingPopup();
             });
     }

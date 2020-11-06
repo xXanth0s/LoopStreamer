@@ -7,13 +7,19 @@ import { loadSeriesInformationSaga } from './load-series.saga';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { setEpisodeEndedStateSaga } from './series-time.saga';
-import { startEpisodeAction, startNextEpisodeAction, startPreviousEpisodeAction } from '../actions/shared.actions';
+import {
+    continueAutoplayAction,
+    startEpisodeAction,
+    startNextEpisodeAction,
+    startPreviousEpisodeAction
+} from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
 import { loadAllSeriesForPortal } from './load-all-series.saga';
 import { loadSeasonInformationSaga } from './load-season.saga';
 import { startNextEpisode } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
+import { continueAutoplaySaga } from './continue-autoplay.saga';
 
 export function* watcherSaga() {
     yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortal);
@@ -24,8 +30,11 @@ export function* watcherSaga() {
     yield takeLatest(setSeriesEpisodeTimeStampAction.type, setEpisodeEndedStateSaga);
     yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
 
-    // controll actions from app
+    // control actions from app
     yield takeEvery(startEpisodeAction.type, startEpisodeSaga);
-    yield takeEvery(startNextEpisodeAction.type, startNextEpisode);
-    yield takeEvery(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
+
+    // control actions from video
+    yield takeLatest(startNextEpisodeAction.type, startNextEpisode);
+    yield takeLatest(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
+    yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
 }

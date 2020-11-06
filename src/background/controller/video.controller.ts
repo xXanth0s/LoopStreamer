@@ -38,15 +38,13 @@ export class VideoController {
     private readonly takeUntil$ = new Subject();
 
     public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorLink: ProvidorLink): Promise<boolean> {
-        this.reset();
-
-        const activeWindow$ = this.openVideoUrl(providorLink);
+        const oldWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
 
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.VIDEO_OPEN_VIDEO, { seriesEpisode: seriesEpisodeKey });
         this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
 
         return new Promise<boolean>(resolve => {
-            activeWindow$.pipe(
+            this.openVideoUrl(providorLink).pipe(
                 takeUntil(this.takeUntil$),
                 takeUntil(this.store.playerHasStopped()),
             ).subscribe(async window => {
@@ -59,6 +57,8 @@ export class VideoController {
                     this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
                 }
 
+                this.windowService.closeWindow(oldWindowId, true);
+
                 if (hasVideo) {
                     this.store.dispatch(setLastWatchedSeriesAction(seriesEpisodeKey));
                     window.show();
@@ -66,16 +66,7 @@ export class VideoController {
 
                 resolve(hasVideo);
             });
-        })
-
-    }
-
-    public reset(): void {
-        const videoWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
-        if (videoWindowId) {
-            this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.VIDEO }));
-            this.windowService.closeWindow(videoWindowId, true);
-        }
+        });
     }
 
     private openVideoUrl({ link, providor }: ProvidorLink): Observable<BrowserWindow> {

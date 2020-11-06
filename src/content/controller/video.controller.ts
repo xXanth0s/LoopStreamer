@@ -44,7 +44,6 @@ export class VideoController {
 
     private async onVideoStarted(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
         this.videoStarted$.next();
-        const episode = this.store.selectSync(getSeriesEpisodeByKey, seriesEpisodeKey);
         await this.store.dispatch(seriesEpisodeStartedAction({
             seriesEpisodeKey: seriesEpisodeKey,
             duration: video.duration,
@@ -87,7 +86,7 @@ export class VideoController {
 
     private setStartTime(video: HTMLVideoElement, episodeInfo: SeriesEpisode): void {
         const series = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
-        if (Boolean(episodeInfo.timestamp)) {
+        if (Boolean(episodeInfo.timestamp) && !episodeInfo.isFinished) {
             video.currentTime = episodeInfo.timestamp;
         } else if (series.isStartTimeConfigured && series.scipStartTime) {
             video.currentTime = series.scipStartTime;

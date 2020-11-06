@@ -9,15 +9,17 @@ import { getAllUsedProvidors } from '../selectors/providors.selector';
 import { addProvidorLinkToEpisodeAction } from '../reducers/series-episode.reducer';
 import { PROVIDORS } from '../enums/providors.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
-import { getSeriesByKey } from '../selectors/series.selector';
+import { getSeriesForEpisode } from '../selectors/series.selector';
 import { setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
-import { raisePlayedEpisodesAction } from '../reducers/control-state.reducer';
+import { raisePlayedEpisodesAction, resetPlayedEpisodesAction } from '../reducers/control-state.reducer';
 import { stopPlayer } from '../utils/stop-player.util';
 
 
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
     stopPlayer();
     const episodeKey = action.payload;
+
+    yield put(resetPlayedEpisodesAction());
 
     const episodeStartSuccessful: boolean = yield startEpisode(episodeKey);
 
@@ -30,32 +32,26 @@ export function* startEpisode(episodeKey: SeriesEpisode['key']) {
     const videoController = getVideoController();
     const usedProvidors = [];
     const state: StateModel = yield select();
-    const episode = getSeriesEpisodeByKey(state, episodeKey);
-    const series = getSeriesByKey(state, episode.seriesKey);
+    const series = getSeriesForEpisode(state, episodeKey);
 
-    debugger
-    let portal = state.appControlState.activePortal;
-    if (!portal) {
-
-        portal = series.lastUsedPortal;
-    }
+    const portal = state.appControlState.activePortal ? state.appControlState.activePortal : series.lastUsedPortal;
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
 
+    let success = false;
     while (providorLink !== null) {
-
-        const isVideoStartSuccessful: boolean = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
-        if (isVideoStartSuccessful) {
+        success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
+        if (success) {
             yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
             yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal }));
-            return true;
+            break;
         }
 
         usedProvidors.push(providorLink.providor);
         providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
     }
 
-    return false;
+    return success;
 }
 
 function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[]) {
