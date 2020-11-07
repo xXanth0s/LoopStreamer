@@ -99,7 +99,7 @@ export class PortalController {
         try {
             seriesEpisodes = await this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portalKey], portalKey, createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
         } catch (e) {
-            console.error('[PortalController -> getEpisodesForSeason]', e);
+            console.error('[PortalController->getEpisodesForSeason]', e);
         } finally {
             this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
         }
@@ -112,7 +112,8 @@ export class PortalController {
         const portalLink = episode?.portalLinks[portalKey][providor];
 
         if (!portalLink) {
-            console.error(`[PortalController -> getProvidorLinkForEpisode] tried to load portal links for episode ${episode} and ${portalKey}, but no valid data found.`);
+            console.error(`[PortalController->getProvidorLinkForEpisode] tried to load portal links for episode ${episode} and ${portalKey}, but no valid data found.`);
+            return null;
         }
 
         let link: string = null;

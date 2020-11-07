@@ -33,7 +33,6 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
 }
 
 export function* startEpisode(episodeKey: SeriesEpisode['key']) {
-    const videoController = getVideoController();
     const usedProvidors = [];
     const state: StateModel = yield select();
     const series = getSeriesForEpisode(state, episodeKey);
@@ -44,20 +43,28 @@ export function* startEpisode(episodeKey: SeriesEpisode['key']) {
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
 
-    while (providorLink !== null) {
-        const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
-        if (success) {
-            yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
-            yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal }));
-            return true;
-        }
-
+    while (providorLink && !(yield startVideo(episodeKey, providorLink, portal))) {
         usedProvidors.push(providorLink.providor);
-        providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
+        providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, usedProvidors);
     }
+
+    // TODO show error message
 
     yield put(setActiveEpisodeAction(null));
     return false;
+}
+
+function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLink, linkSourcePortal: PORTALS) {
+    const videoController = getVideoController();
+    const series = getSeriesForEpisode(yield select(), episodeKey);
+    const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
+    if (success) {
+        yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
+        yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal: linkSourcePortal }));
+        return true;
+    }
+
+    return success;
 }
 
 function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[]) {
