@@ -1,7 +1,8 @@
 <template>
     <button-tile
             :is-active="episodeInfo.key === activeEpisodeKey"
-            :is-disabled="isAnyEpisodeLoading"
+            :is-disabled="isDisabled || isAnyEpisodeLoading"
+            :title="title"
             :progress="progress"
             :is-loading="episodeInfo.key === activeEpisodeKey && isAnyEpisodeLoading"
             @clicked="clicked">
@@ -22,6 +23,8 @@
     import { getActiveEpisode, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import ButtonTile from '../ButtonTile.vue';
     import { getProgressForEpisode } from '../../../../store/utils/series.utils';
+    import { PORTALS } from '../../../../store/enums/portals.enum';
+    import { getActivePortalOnApp } from '../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'series-episode-button',
@@ -39,13 +42,27 @@
         private store: StoreService;
         private isAnyEpisodeLoading = false;
         private activeEpisodeKey = '';
+        private activePortal: PORTALS;
 
         public get progress(): number {
             return getProgressForEpisode(this.episodeInfo);
         }
 
+        public get isDisabled(): boolean {
+            return Object.keys(this.episodeInfo?.portalLinks[this.activePortal]).length === 0;
+        }
+
+        public get title(): string {
+            if (this.isDisabled) {
+                return 'Es wurden keine verfügbaren Streams für diese Episode gefunden';
+            }
+
+            return '';
+        }
+
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.activePortal = this.store.selectSync(getActivePortalOnApp);
         }
 
         public mounted(): void {

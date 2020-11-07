@@ -1,6 +1,7 @@
 <template>
     <div :class="[{selected: isActive, disabled: isDisabled}, progressClass]"
          class="mt-1 series-item flex-center white-tile"
+         :title="title"
          @click="clicked">
         <div v-if="isLoading"
              class="spinner-border tile-spinner"
@@ -34,6 +35,9 @@
 
         @Prop({ default: false })
         private isLoading: boolean;
+
+        @Prop({ default: '' })
+        private title: string;
 
         @Emit('clicked')
         public clicked(): void {
