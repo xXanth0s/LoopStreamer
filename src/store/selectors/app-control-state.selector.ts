@@ -1,6 +1,8 @@
 import { StateModel } from '../models/state.model';
 import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
+import SeriesEpisode from '../models/series-episode.model';
+import { getSeriesForEpisode } from './series.selector';
 
 export const getExpandedSeries = (state: StateModel): Series['key'] => state.appControlState.selectedSeriesKey;
 
@@ -12,4 +14,6 @@ export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['
     return seriesKeys.some(key => key === state.appControlState.selectedSeriesKey);
 };
 
-export const getActivePortalOnApp = (state: StateModel): PORTALS => state.appControlState.activePortal;
+export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => {
+    return state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
+};

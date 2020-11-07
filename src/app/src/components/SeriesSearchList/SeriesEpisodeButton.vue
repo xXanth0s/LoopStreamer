@@ -24,7 +24,7 @@
     import ButtonTile from '../ButtonTile.vue';
     import { getProgressForEpisode } from '../../../../store/utils/series.utils';
     import { PORTALS } from '../../../../store/enums/portals.enum';
-    import { getActivePortalOnApp } from '../../../../store/selectors/app-control-state.selector';
+    import { getActivePortalOnAppOrSeries } from '../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'series-episode-button',
@@ -49,7 +49,11 @@
         }
 
         public get isDisabled(): boolean {
-            return Object.keys(this.episodeInfo?.portalLinks[this.activePortal]).length === 0;
+            if (this.activePortal) {
+                return Object.keys(this.episodeInfo?.portalLinks[this.activePortal]).length === 0;
+            }
+
+            return false;
         }
 
         public get title(): string {
@@ -62,12 +66,13 @@
 
         public beforeCreate(): void {
             this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.activePortal = this.store.selectSync(getActivePortalOnApp);
         }
 
         public mounted(): void {
             this.fetchEpisodeLoadingStateFromStore();
             this.setSelectedEpisode();
+
+            this.activePortal = this.store.selectSync(getActivePortalOnAppOrSeries, this.episodeInfo.key);
         }
 
         public destroyed(): void {
