@@ -18,13 +18,52 @@ export class BurningSeriesController implements IPortalController {
 
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
-    private readonly videoUrlSelector = () => document.querySelector('section > div.hoster-player > a');
-    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seasons").querySelectorAll("a")
+
+    public async getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
+        // return timer(100000).pipe(
+        //     mapTo('')
+        // ).toPromise();
+        if (this.getActiveProvidor()?.controllerName === providor) {
+            const link = this.getVideoUrl();
+            if (link) {
+                return link;
+            }
+
+            if (this.isVideoOpenWithProvidor()) {
+                const playButtonElement = this.videoContainerSelector() as HTMLElement;
+                simulateEvent(playButtonElement,
+                    'click',
+                    { pointerX: playButtonElement.clientTop, pointerY: playButtonElement.clientLeft }
+                );
+                return new Promise((resolve) => {
+                    const videoContainer = this.videoContainerSelector();
+
+                    const config = { attributes: false, childList: true, subtree: true };
+
+                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
+                        const link = this.getVideoUrl();
+                        if (link) {
+                            resolve(link);
+                            observer.disconnect();
+                        }
+                    };
+
+                    const observer = new MutationObserver(callback);
+                    observer.observe(videoContainer, config);
+                });
+            }
+        } else {
+            return '';
+        }
+    }
+
+    private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
+    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
     private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLTableRowElement> => document.querySelector('.episodes').querySelectorAll('tr');
-    private readonly seriesTitleSelector = () => document.querySelector("#sp_left > h2")?.textContent?.trim().split('\n')[0];
-    private readonly seriesImageSelector = (): string => (document.querySelector("#sp_right > img") as HTMLImageElement)?.src;
-    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector("#seriesContainer")?.querySelectorAll("a");
-    private readonly seriesDescriptionSelector = (): string => document.querySelector("#sp_left > p")?.textContent || '';
+    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
+    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
+    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
+    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
@@ -115,41 +154,9 @@ export class BurningSeriesController implements IPortalController {
         return result;
     }
 
-    public async getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
-        // return timer(100000).pipe(
-        //     mapTo('')
-        // ).toPromise();
-        if (this.getActiveProvidor()?.controllerName === providor) {
-            const link = this.videoUrlSelector() as HTMLLinkElement;
-            if (link) {
-                return link.href;
-            }
+    private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
 
-            if (this.isVideoOpenWithProvidor()) {
-                const playButtonElement = this.videoContainerSelector() as HTMLElement;
-                simulateEvent(playButtonElement,
-                    'click',
-                    { pointerX: playButtonElement.clientTop, pointerY: playButtonElement.clientLeft }
-                );
-                return new Promise((resolve) => {
-                    const videoContainer = this.videoContainerSelector();
-
-                    const config = { attributes: false, childList: true, subtree: true };
-
-                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
-                        const link = this.videoUrlSelector() as HTMLLinkElement;
-                        if (link) {
-                            resolve(link.href);
-                            observer.disconnect();
-                        }
-                    };
-
-                    const observer = new MutationObserver(callback);
-                    observer.observe(videoContainer, config);
-                });
-            }
-        } else {
-            return '';
-        }
+    private getVideoUrl(): string {
+        return this.videoUrlSelector()?.href || this.videoIframeSelector()?.src;
     }
 }

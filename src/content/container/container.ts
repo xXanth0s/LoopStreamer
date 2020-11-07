@@ -17,6 +17,7 @@ import { RecaptchaService } from '../services/recaptcha.service';
 import { PopupService } from '../services/popup.service';
 import { PopupController } from '../controller/popup.controller';
 import { Logger } from '../../shared/services/logger';
+import { MIXDropController } from '../controller/providors/mixdrop.controller';
 
 const inversifyContentContainer = new Container();
 
@@ -44,5 +45,6 @@ inversifyContentContainer.bind(CONTENT_TYPES.BurningSeries).to(BurningSeriesCont
 
 // Providor Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.Vivo).to(VivoController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.MIXDrop).to(MIXDropController).inSingletonScope();
 
 export { inversifyContentContainer };

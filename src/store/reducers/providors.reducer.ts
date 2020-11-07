@@ -24,6 +24,16 @@ const initialState: Partial<Record<PROVIDORS, Providor>> = {
         isUsed: true,
         icon: '/resources/img/providors/openload.png',
     },
+    MIXdrop: {
+        key: PROVIDORS.MIXdrop,
+        names: [ 'MIXdrop', 'mixdrop' ],
+        index: 2,
+        urlRegex: '^https://mixdrop.co/',
+        baseUrl: 'https://mixdrop.co/*',
+        controllerName: PROVIDORS.MIXdrop,
+        isUsed: true,
+        icon: '/resources/img/providors/openload.png',
+    },
 };
 
 const updateProvidors = (providors: Providor[]): {[key: string]: Providor} => {

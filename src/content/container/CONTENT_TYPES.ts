@@ -15,6 +15,7 @@ const CONTENT_TYPES = {
 
     // Providors
     Vivo: Symbol.for('Vivo'),
+    MIXDrop: Symbol.for('MIXDrop'),
 
 
 };
