@@ -11,6 +11,7 @@ export interface ControlState {
     activePortal?: Portal['key'];
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key'];
-    controllerWindowState: Partial<Record<WindowType, BrowserWindowStateModel>>;
     asyncInteractions: Record<AsyncInteraction['key'], AsyncInteraction>;
+    controllerWindowState: Partial<Record<WindowType, BrowserWindowStateModel>>;
+    isVideoPictureInPicture?: boolean
 }

@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
-import { Observable, Subject, timer } from 'rxjs';
-import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subject, timer } from 'rxjs';
+import { distinctUntilChanged, first, skip, startWith, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
@@ -15,6 +15,9 @@ import {
     setSeriesEpisodeTimeStampAction
 } from '../../store/reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
+import { isVideoPictureInPicture } from '../../store/selectors/app-control-state.selector';
+import { setPictureInPictureAction } from '../../store/reducers/control-state.reducer';
+import { isPictureInPicture } from '../ustils/dom.utils';
 
 @injectable()
 export class VideoController {
@@ -57,6 +60,7 @@ export class VideoController {
             this.setStartTime(video, episodeData);
             this.popupController.openPopupsForVideo(video, seriesEpisodeKey, videoTimeUpdate$);
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
+            this.setPictureInPictureState(video);
             addVideoButtons(episodeData.key);
         });
     }
@@ -91,5 +95,34 @@ export class VideoController {
         } else if (series.isStartTimeConfigured && series.scipStartTime) {
             video.currentTime = series.scipStartTime;
         }
+    }
+
+    private setPictureInPictureState(video: HTMLVideoElement): void {
+        let isProgrammatically = false;
+        this.store.select(isVideoPictureInPicture).pipe(
+            skip(1)
+        ).subscribe(isPictureInPictureValue => {
+            isProgrammatically = true;
+            if (isPictureInPictureValue) {
+                // @ts-ignore
+                video.requestPictureInPicture();
+            } else if (isPictureInPicture()) {
+                // @ts-ignore
+                document.exitPictureInPicture();
+            }
+        });
+
+        merge(
+            fromEvent(video, 'enterpictureinpicture'),
+            fromEvent(video, 'leavepictureinpicture'),
+        ).pipe(
+            startWith(null)
+        ).subscribe(() => {
+            if (!isProgrammatically) {
+                this.store.dispatch(setPictureInPictureAction(isPictureInPicture()));
+            }
+
+            isProgrammatically = false;
+        });
     }
 }

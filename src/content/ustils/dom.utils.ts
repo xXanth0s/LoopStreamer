@@ -62,3 +62,8 @@ export function checkForMutations<T extends Element>(container: Node, selector: 
         finalize(() => observer.disconnect())
     );
 }
+
+export function isPictureInPicture(): boolean {
+    // @ts-ignore
+    return Boolean(document.pictureInPictureElement);
+}

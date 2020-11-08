@@ -15,6 +15,10 @@
                             </div>
                             <i class="fas fa-chevron-left video-button" v-else/>
                         </label>
+                        <label @click.stop.prevent="togglePictureInPicture" class="btn btn-primary btn-lg">
+                            <i class="far fa-clone" v-if="isPictureInPicture"></i>
+                            <i class="fas fa-clone" v-else></i>
+                        </label>
                         <label class="btn btn-primary btn-lg" @click.stop.prevent="toggleFullscreenMode"
                                :title="fullscreenTitle">
                             <i class="fas fa-compress-alt" v-if="isFullscreen"/>
@@ -59,6 +63,8 @@
     import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
     import { startNextEpisodeAction, startPreviousEpisodeAction } from '../../../store/actions/shared.actions';
     import { getSeriesEpisodeByKey } from '../../../store/selectors/series-episode.selector';
+    import { setPictureInPictureAction } from '../../../store/reducers/control-state.reducer';
+    import { isVideoPictureInPicture } from '../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'ls-video-buttons',
@@ -87,6 +93,7 @@
         private windowId: number;
 
         private fullscreen = false;
+        private isPictureInPicture = false;
         private isStartingNext = false;
         private isStartingPrevious = false;
 
@@ -122,6 +129,7 @@
             this.initKeyboardListener();
             this.fetchFullscreenModeFromStore();
             this.fetchEpisodeInfoFromStore();
+            this.fetchPictureInPictureStateFromStore();
         }
 
         @Watch('fullscreen')
@@ -163,6 +171,15 @@
         private fetchEpisodeInfoFromStore(): void {
             this.store.selectBehaviour(getSeriesEpisodeByKey, this.episodeKey)
                 .subscribe(episodeInfo => this.episodeInfo = episodeInfo);
+        }
+
+        private fetchPictureInPictureStateFromStore(): void {
+            this.store.selectBehaviour(isVideoPictureInPicture)
+                .subscribe(isPictrueInPicture => this.isPictureInPicture = isPictrueInPicture);
+        }
+
+        private togglePictureInPicture(): void {
+            this.store.dispatch(setPictureInPictureAction(!this.isPictureInPicture));
         }
     }
 </script>
