@@ -1,9 +1,10 @@
 import { Dispatch, Middleware, MiddlewareAPI } from 'redux';
 import ElectronStore from 'electron-store';
 import { StateModel } from '../models/state.model';
+import { environment } from '../../environments/environment';
 
 const store = new ElectronStore();
-const stateKey = 'state';
+const stateKey = environment.isDev ? 'state-dev' : 'state';
 
 // store.reset(stateKey)
 export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => ((
