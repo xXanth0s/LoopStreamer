@@ -27,11 +27,6 @@ export class StoreService {
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public selectCopy<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
-        const subject = new Subject<P>();
-        return this.selectHelper(subject, selector, ...args);
-    }
-
     public selectBehaviour<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
         const subject = new BehaviorSubject<P>(selector(this.store.getState(), ...args));
         return this.selectHelper(subject, selector, ...args);
