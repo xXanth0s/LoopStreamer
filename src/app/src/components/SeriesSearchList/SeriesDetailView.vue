@@ -52,7 +52,7 @@
     import Vue from 'vue';
     import { Prop, Watch } from 'vue-property-decorator';
     import Component from 'vue-class-component';
-    import { takeUntil } from 'rxjs/operators';
+    import { debounceTime, takeUntil } from 'rxjs/operators';
     import { merge, Subject } from 'rxjs';
     import Series from '../../../../store/models/series.model';
     import { optionsContainer } from '../../container/container';
@@ -64,11 +64,12 @@
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getLastWatchedEpisode, getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
-    import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
+    import { hasAsyncInteractionForType, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
     import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
+    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
 
     @Component({
         name: 'series-detail-view',
@@ -93,6 +94,7 @@
         private store: StoreService;
 
         private isLoading = false;
+        private isSeasonLoading = false;
         private seriesData: Series = null;
         private seasons: SeriesSeason[] = [];
         private episodes: SeriesEpisode[] = [];
@@ -104,7 +106,7 @@
         }
 
         private get areEpisodesLoading(): boolean {
-            return this.isLoading && !this.episodes.length && Boolean(this.selectedSeasonKey);
+            return this.isSeasonLoading && !this.episodes.length && Boolean(this.selectedSeasonKey);
         }
 
         public beforeCreate(): void {
@@ -119,6 +121,7 @@
         public expandationChanged(isExpanded: boolean): void {
             if (isExpanded) {
                 this.fetchLoadingStateFromStore();
+                this.fetchSeasonLoadingStateFromStore();
             } else {
                 this.takeUntil$.next();
             }
@@ -168,6 +171,13 @@
             ).subscribe(episode => this.episodeToContinue = episode);
         }
 
+        private fetchSeasonLoadingStateFromStore(): void {
+            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_SEASON_EPISODES).pipe(
+                takeUntil(this.takeUntil$),
+                debounceTime(100),
+            ).subscribe(isLoading => this.isSeasonLoading = isLoading);
+        }
+
         private fetchLoadingStateFromStore(): void {
             this.store.selectBehaviour(isPreparingVideo).pipe(
                 takeUntil(this.takeUntil$),
@@ -200,6 +210,7 @@
                 this.episodes = episodes;
             });
         }
+
     }
 </script>
 
