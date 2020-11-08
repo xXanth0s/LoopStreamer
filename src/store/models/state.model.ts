@@ -16,7 +16,6 @@ export interface StateModel {
     portals: Partial<Record<PORTALS, Portal>>;
     providors: Partial<Record<PROVIDORS, Providor>>;
     series: Record<Series['key'], Series>;
-    lastWatchedSeries: Series['key'];
     seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;
     seriesSeasons: Record<SeriesSeason['key'], SeriesSeason>;
 }

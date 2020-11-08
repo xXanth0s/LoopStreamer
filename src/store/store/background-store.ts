@@ -1,5 +1,4 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import lastWatchedSeriesSlice from '../reducers/lastWatchedSeries.reducer';
 import seriesSlice from '../reducers/series.reducer';
 import portalsSlice from '../reducers/portals.reducer';
 import { optionsSlice } from '../reducers/options.reducer';
@@ -28,7 +27,6 @@ const backgroundStore = configureStore<StateModel>({
         appControlState: appControlStateSlice.reducer,
         options: optionsSlice.reducer,
         providors: providorsReducer.reducer,
-        lastWatchedSeries: lastWatchedSeriesSlice.reducer,
         series: seriesSlice.reducer,
         portals: portalsSlice.reducer,
         seriesSeasons: seriesSeasonsReducer.reducer,

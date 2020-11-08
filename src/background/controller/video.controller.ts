@@ -8,7 +8,6 @@ import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowController } from './window.controller';
 import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
 import { createStartVideoMessage } from '../../browserMessages/messages/providor.messages';
-import { setLastWatchedSeriesAction } from '../../store/reducers/lastWatchedSeries.reducer';
 import {
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
@@ -60,7 +59,6 @@ export class VideoController {
                 this.windowService.closeWindow(oldWindowId, true);
 
                 if (hasVideo) {
-                    this.store.dispatch(setLastWatchedSeriesAction(seriesEpisodeKey));
                     window.show();
                 }
 
