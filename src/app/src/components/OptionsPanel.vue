@@ -20,15 +20,11 @@
             <b-button variant="primary" class="btn-bottom" @click="save">Speichern</b-button>
         </div>
 
-        <b-toast id="success-settings-toast" solid>
-            <template #toast-title>
-                Einstellungen Gespeichert
-            </template>
-            <div class="flex-row">
-                <i class="fas fa-check green mr-3"></i>
-                <span>Die allgemeinen Einstellungen wurden erfolgreich gespeichert</span>
-            </div>
-        </b-toast>
+        <toast :context="context.SUCCESS"
+               :selector="successToastSelector"
+               title="Einstellungen Gespeichert">
+            Die allgemeinen Einstellungen wurden erfolgreich gespeichert
+        </toast>
     </card-tile>
 </template>
 
@@ -47,6 +43,8 @@
     import MinusPlusInput from './MinusPlusInput.vue';
     import CardTile from './CardTile.vue';
     import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
+    import { Context } from '../enums/context.enum';
+    import Toast from './Toast.vue';
 
     @Component({
         name: 'options-panel',
@@ -54,13 +52,16 @@
             CardTile,
             MinusPlusInput,
             InfoTooltip,
+            Toast,
         },
     })
     export default class OptionsPanel extends Vue {
 
+        private readonly context = Context;
         private readonly toggleButtonColor = DEFAULT_COLOR;
         private readonly deadEpisodeTooltipText = DEAD_EPISODES_TOOLTIP;
         private readonly episodeCountTooltipText = EPISODE_COUNT_TOOLTIP;
+        private readonly successToastSelector = 'success-settings-toast';
 
         private options: Options;
 
@@ -80,7 +81,7 @@
 
         private save(): void {
             this.store.dispatch(updateOptionsAction(this.options));
-            this.$bvToast.show('success-settings-toast');
+            this.$bvToast.show(this.successToastSelector);
         }
     }
 </script>

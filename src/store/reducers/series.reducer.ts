@@ -20,7 +20,6 @@ const resetSeries = (state: { [key: string]: Series }, key: Series['key']): { [k
     state[key] = {
         ...series,
         isEndTimeConfigured: false,
-        lastEpisodeWatched: undefined,
         isStartTimeConfigured: false,
         scipEndTime: 0,
         scipStartTime: 0

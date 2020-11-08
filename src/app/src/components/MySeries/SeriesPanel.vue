@@ -37,7 +37,7 @@
 
                     <div class="flex-grow"></div>
 
-                    <b-button @click="openDeleteModal" block class="mb-2" variant="outline-primary">Löschen
+                    <b-button @click="openResetModal" block class="mb-2" variant="outline-primary">Zeiten zurücksetzen
                     </b-button>
 
                     <b-button @click="saveSettings" block class="mb-3" variant="primary">Speichern
@@ -48,28 +48,29 @@
                     :class="{'transform-arrow': isActive}" class="el-icon-arrow-right expand-button"></i></b-button>
         </div>
 
-        <b-toast id="success-save-toast" solid>
-            <template #toast-title>
-                Einstellungen Gespeichert
-            </template>
-            <div class="flex-row">
-                <i class="fas fa-check green mr-3"></i>
-                <span>Die Zeiten für die Serie {{series.title}} wurden aktualisiert</span>
-            </div>
-        </b-toast>
+        <toast :context="context.SUCCESS"
+               :selector="saveSuccessToastSelector"
+               title="Einstellungen Gespeichert">
+            Die Zeiten für die Serie {{series.title}} wurden aktualisiert
+        </toast>
 
-        <b-modal hide-footer v-model="showDeleteModal">
-            <template #modal-title>
-                {{series.title}} löschen
-            </template>
-            <div class="d-block text-center">
-                <span>Wollen Sie die Serie {{series.title}} wirklich löschen?</span>
-            </div>
-            <div class="flex-row mt-3">
-                <b-button @click="closeDeleteModal" variant="primary">Schließen</b-button>
-                <b-button @click="remove" variant="outline-primary">Löschen</b-button>
-            </div>
-        </b-modal>
+        <toast :context="context.SUCCESS"
+               :selector="resetSuccessToastSelector"
+               title="Zeiten zurückgesetzt">
+            Die Zeiten für die Serie {{series.title}} wurden erfolgreich zurückgesetzt
+        </toast>
+
+        <series-delete-modal
+                :title="series.title"
+                @approved="remove"
+                v-model="showDeleteModal"/>
+
+        <series-reset-modal
+                :title="series.title"
+                @approved="reset"
+                v-model="showResetModal"/>
+
+
     </div>
 </template>
 
@@ -85,22 +86,40 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../shared/services/store.service';
     import { getSeriesByKey, isSeriesContinuable } from '../../../../store/selectors/series.selector';
-    import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../../../store/reducers/series.reducer';
+    import {
+        resetSeriesAction,
+        setEndTimeForSeriesAction,
+        setStartTimeForSeriesAction
+    } from '../../../../store/reducers/series.reducer';
     import InfoTooltip from '../InfoTooltip.vue';
     import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../../constants/tooltip-texts';
     import MinusPlusInput from '../MinusPlusInput.vue';
     import { deleteSeriesAction } from '../../../../store/actions/shared.actions';
     import { toggleSelectedSeriesForAppAction } from '../../../../store/reducers/app-control-state.reducer';
     import { isSeriesExpandedOnApp } from '../../../../store/selectors/app-control-state.selector';
+    import Toast from '../Toast.vue';
+    import { Context } from '../../enums/context.enum';
+    import SeriesDeleteModal from './SeriesDeleteModal.vue';
+    import SeriesResetModal from './SeriesResetModal.vue';
 
     @Component({
         name: 'series-panel',
-        components: { MinusPlusInput, InfoTooltip },
+        components: {
+            SeriesDeleteModal,
+            SeriesResetModal,
+            Toast,
+            MinusPlusInput,
+            InfoTooltip,
+        },
     })
     export default class SeriesPanel extends Vue {
+
+        private readonly context = Context;
         private readonly takeUntil$ = new Subject();
         private readonly scipStartTimeTooltipText = SERIES_PANEL_SCIP_START_TIME;
         private readonly scipEndTimeTooltipText = SERIES_PANEL_SCIP_END_TIME;
+        private readonly saveSuccessToastSelector = 'save-success-save-toast';
+        private readonly resetSuccessToastSelector = 'reset-success-save-toast';
 
         @Prop(String)
         private seriesKey: Series['key'];
@@ -112,24 +131,12 @@
 
         private isActive: boolean;
         private showDeleteModal = false;
+        private showResetModal = false;
 
         private scipS = 0;
         private scipE = 0;
         private hasNextEpisode = false;
         private showSettings = false;
-
-        private openDeleteModal(): void {
-            this.showDeleteModal = true;
-        }
-
-        private closeDeleteModal(): void {
-            this.showDeleteModal = false;
-        }
-
-        private remove(): void {
-            this.closeDeleteModal();
-            this.store.dispatch(deleteSeriesAction(this.seriesKey));
-        }
 
         toggleSettings() {
             this.showSettings = !this.showSettings;
@@ -149,15 +156,43 @@
             this.loadIsActiveStateFromStore();
         }
 
-        public toggleSeries(): void {
-            this.store.dispatch(toggleSelectedSeriesForAppAction(this.seriesKey));
-        }
-
         public saveSettings(): void {
             this.store.dispatch(setStartTimeForSeriesAction({ key: this.seriesKey, scipStartTime: this.scipS }));
             this.store.dispatch(setEndTimeForSeriesAction({ key: this.seriesKey, scipEndTime: this.scipE }));
 
-            this.$bvToast.show('success-save-toast');
+            this.$bvToast.show(this.saveSuccessToastSelector);
+        }
+
+        public toggleSeries(): void {
+            this.store.dispatch(toggleSelectedSeriesForAppAction(this.seriesKey));
+        }
+
+        private openDeleteModal(): void {
+            this.showDeleteModal = true;
+        }
+
+        private closeDeleteModal(): void {
+            this.showDeleteModal = false;
+        }
+
+        private remove(): void {
+            this.closeDeleteModal();
+            this.store.dispatch(deleteSeriesAction(this.seriesKey));
+        }
+
+        private openResetModal(): void {
+            this.showResetModal = true;
+        }
+
+        private closeResetModal(): void {
+            this.showResetModal = false;
+        }
+
+        private reset(): void {
+            this.closeResetModal();
+            this.store.dispatch(resetSeriesAction(this.series.key));
+
+            this.$bvToast.show(this.resetSuccessToastSelector);
         }
 
         @Watch('seriesKey')

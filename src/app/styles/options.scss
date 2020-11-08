@@ -2,6 +2,7 @@
 @import "src/styles/variables";
 @import "src/styles/bootstrap-customized";
 @import "src/styles/font-awesome";
+@import "src/styles/global";
 @import "src/styles/tailwind";
 @import "../../shared/html/styles/shared-styles";
 @import '~bootstrap/scss/bootstrap';
@@ -92,7 +93,7 @@ body {
 }
 
 .cd-faq-group, .cd-faq-items {
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 .cd-faq-group{
