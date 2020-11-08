@@ -21,6 +21,7 @@ import { environment } from '../../environments/environment';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
+import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
 
 @injectable()
 export class RootBackgroundController {
@@ -84,6 +85,11 @@ export class RootBackgroundController {
             (event, message: MinimizeWindowMessage): void => {
                 this.minimizeWindowEventHandler(event, message);
             });
+
+        ipcMain.handle(MessageType.BACKGROUND_START_VIDEO_IN_VIDEO,
+            (event): void => {
+                this.startVideoInVideo(event);
+            });
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -112,5 +118,10 @@ export class RootBackgroundController {
     private minimizeWindowEventHandler(event: IpcMainInvokeEvent, message: MinimizeWindowMessage): void {
         const windowId = message.payload;
         this.windowService.minimizeWindow(windowId);
+    }
+
+    private startVideoInVideo(event: Electron.IpcMainInvokeEvent): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        window.webContents.executeJavaScript(`document.querySelector('.${VIDEO_IN_VIDEO_CSS_CLASS}').requestPictureInPicture()`, true);
     }
 }

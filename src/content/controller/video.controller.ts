@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { fromEvent, merge, Observable, Subject, timer } from 'rxjs';
-import { distinctUntilChanged, first, skip, startWith, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
@@ -17,7 +17,8 @@ import {
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { isVideoPictureInPicture } from '../../store/selectors/app-control-state.selector';
 import { setPictureInPictureAction } from '../../store/reducers/control-state.reducer';
-import { isPictureInPicture } from '../ustils/dom.utils';
+import { addClassForVideoInVideoClass, isPictureInPicture } from '../ustils/dom.utils';
+import { createStartVideoInVideoMessage } from '../../browserMessages/messages/background.messages';
 
 @injectable()
 export class VideoController {
@@ -98,14 +99,13 @@ export class VideoController {
     }
 
     private setPictureInPictureState(video: HTMLVideoElement): void {
+        addClassForVideoInVideoClass(video);
         let isProgrammatically = false;
-        this.store.select(isVideoPictureInPicture).pipe(
-            skip(1)
-        ).subscribe(isPictureInPictureValue => {
+
+        this.store.selectBehaviour(isVideoPictureInPicture).subscribe(isPictureInPictureValue => {
             isProgrammatically = true;
             if (isPictureInPictureValue) {
-                // @ts-ignore
-                video.requestPictureInPicture();
+                this.messageService.sendMessageToBackground(createStartVideoInVideoMessage());
             } else if (isPictureInPicture()) {
                 // @ts-ignore
                 document.exitPictureInPicture();
@@ -115,8 +115,6 @@ export class VideoController {
         merge(
             fromEvent(video, 'enterpictureinpicture'),
             fromEvent(video, 'leavepictureinpicture'),
-        ).pipe(
-            startWith(null)
         ).subscribe(() => {
             if (!isProgrammatically) {
                 this.store.dispatch(setPictureInPictureAction(isPictureInPicture()));

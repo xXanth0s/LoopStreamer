@@ -1,5 +1,10 @@
 import { DomElementSize } from '../../dto/dom-element-size.model';
-import { FULL_SCREEN_VIDEO_CSS_CLASS, HIDE_ELMENT_CSS_CLASS, LS_CONTENT_CONTAINER } from '../constants/class-names';
+import {
+    FULL_SCREEN_VIDEO_CSS_CLASS,
+    HIDE_ELMENT_CSS_CLASS,
+    LS_CONTENT_CONTAINER,
+    VIDEO_IN_VIDEO_CSS_CLASS
+} from '../constants/class-names';
 import { Observable, Subject } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
@@ -31,13 +36,17 @@ function getNumberFromPixelString(pixelString: string): number {
 }
 
 export function hideNotLsElement(htmlElement: HTMLElement): void {
-    if(!htmlElement.classList.contains(LS_CONTENT_CONTAINER)) {
-        htmlElement.classList.add(HIDE_ELMENT_CSS_CLASS)
+    if (!htmlElement.classList.contains(LS_CONTENT_CONTAINER)) {
+        htmlElement.classList.add(HIDE_ELMENT_CSS_CLASS);
     }
 }
 
 export function addFullscreenClass(nodeElement: HTMLElement): void {
     nodeElement.classList.add(FULL_SCREEN_VIDEO_CSS_CLASS);
+}
+
+export function addClassForVideoInVideoClass(nodeElement: HTMLElement): void {
+    nodeElement.classList.add(VIDEO_IN_VIDEO_CSS_CLASS);
 }
 
 export function isBodyElement(htmlElement: HTMLElement): boolean {

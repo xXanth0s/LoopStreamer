@@ -3,7 +3,7 @@ import { Message } from './message.interface';
 import { ControllerType } from '../enum/controller.type';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 
-export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize) : Message<DomElementSize> => ({
+export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize): Message<DomElementSize> => ({
     type: MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
@@ -12,7 +12,15 @@ export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize)
 export type RecaptchaRecognizedMessage = ReturnType<typeof createRecaptchaRecognizedMessage>;
 
 
-export const createMinimizeWindowMessage = (windowId: number) : Message<number> => ({
+export const createStartVideoInVideoMessage = (): Message => ({
+    type: MessageType.BACKGROUND_START_VIDEO_IN_VIDEO,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+});
+export type StartVideoInVideoMessage = ReturnType<typeof createStartVideoInVideoMessage>;
+
+
+export const createMinimizeWindowMessage = (windowId: number): Message<number> => ({
     type: MessageType.BACKGROUND_MINIMIZE_WINDOW,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
