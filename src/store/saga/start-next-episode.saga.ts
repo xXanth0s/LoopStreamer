@@ -8,6 +8,7 @@ import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
 import { getNeighbourEpisode } from './shared-sagas/neighbour-episode.saga';
 import { raisePlayedEpisodesAction } from '../reducers/control-state.reducer';
+import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 
 
 export function* startNextEpisode(action: ReturnType<typeof startNextEpisodeAction>) {
@@ -27,6 +28,9 @@ export function* startNextEpisode(action: ReturnType<typeof startNextEpisodeActi
     const nextEpisode: SeriesEpisode = yield getNeighbourEpisode(episodeKey, series.lastUsedPortal, true);
     if (!nextEpisode) {
         return;
+    }
+    if (!userAction) {
+        yield put(setSeriesEpisodeTimeStampAction({ seriesEpisodeKey: nextEpisode.key, timestamp: null }));
     }
 
     const episodeStartSuccessful: boolean = yield startEpisode(nextEpisode.key);
