@@ -149,13 +149,17 @@
             fromEvent<KeyboardEvent>(document.body, 'keyup').pipe(
                 filter(() => this.fullscreen),
                 filter(event => event.key === 'Escape'),
-            ).subscribe(() => {
+            ).subscribe(event => {
+                event.preventDefault();
+                event.stopPropagation();
                 this.toggleFullscreenMode();
             });
 
             fromEvent<KeyboardEvent>(document.body, 'keyup').pipe(
                 filter(event => event.key === 'f'),
-            ).subscribe(() => {
+            ).subscribe(event => {
+                event.preventDefault();
+                event.stopPropagation();
                 this.toggleFullscreenMode();
             });
         }
