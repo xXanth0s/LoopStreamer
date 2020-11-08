@@ -48,6 +48,7 @@ export class WindowService {
             return window;
         } catch (e) {
             Logger.error('[WindowService->openWindow]', e);
+            throw(e);
         }
 
     }

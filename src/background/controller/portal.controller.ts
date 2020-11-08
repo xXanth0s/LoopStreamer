@@ -17,6 +17,7 @@ import { PORTALS } from '../../store/enums/portals.enum';
 import {
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
+    resetControlStateAction,
     setActivePortalAction,
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
@@ -35,6 +36,8 @@ import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
 import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
 import { PROVIDORS } from '../../store/enums/providors.enum';
+import { AsyncInteraction } from '../../store/models/async-interaction.model';
+import { Logger } from '../../shared/services/logger';
 
 @injectable()
 export class PortalController {
@@ -47,18 +50,15 @@ export class PortalController {
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
-        let seriesInfos = [];
-        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_ALL_SERIES, { portalKey });
-        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
 
-        try {
-            seriesInfos = await this.openPageAndGetDataForMessage(portal.seriesListUrl, portalKey, createGetAllSeriesFromPortalMessage());
-        } catch (e) {
-            console.error('[PortalController -> getAllSeriesFromPortal]', e);
-        } finally {
-            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
-        }
-        return seriesInfos;
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_ALL_SERIES, { portalKey });
+
+        return this.openPageAndGetDataForMessage(
+            portal.seriesListUrl,
+            portalKey,
+            createGetAllSeriesFromPortalMessage(),
+            asyncInteractionModel
+        );
     }
 
     public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesInfoDto> {
@@ -67,21 +67,17 @@ export class PortalController {
             console.error(`[PortalController->getDetailedSeriesInformation] tried to load detailed info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`, seriesInfo);
         }
 
-        let detailedSeriesInfo: SeriesInfoDto = null;
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_DETAILED_SERIES, {
             seriesKey,
             portalKey
         });
-        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
-        try {
-            detailedSeriesInfo = await this.openPageAndGetDataForMessage(seriesInfo.portalLinks[portalKey], portalKey, createGetDetailedSeriesInformationMessage());
-        } catch (e) {
-            console.error('[PortalController->getDetailedSeriesInformation]', e);
-        } finally {
-            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
-        }
 
-        return detailedSeriesInfo;
+        return this.openPageAndGetDataForMessage(
+            seriesInfo.portalLinks[portalKey],
+            portalKey,
+            createGetDetailedSeriesInformationMessage(),
+            asyncInteractionModel
+        );
     }
 
     public async getEpisodesForSeason(seasonKey: string, portalKey: PORTALS): Promise<SeriesEpisodeDto[]> {
@@ -90,21 +86,17 @@ export class PortalController {
             console.error(`[PortalController -> getEpisodesForSeason] tried to load episode info for season ${seasonKey} and ${portalKey}, but no valid data found. Data found:`, seriesSeason);
         }
 
-        let seriesEpisodes: SeriesEpisodeDto[] = [];
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_SEASON_EPISODES, {
             seasonKey,
             portalKey
         });
-        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
-        try {
-            seriesEpisodes = await this.openPageAndGetDataForMessage(seriesSeason.portalLinks[portalKey], portalKey, createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber));
-        } catch (e) {
-            console.error('[PortalController->getEpisodesForSeason]', e);
-        } finally {
-            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
-        }
 
-        return seriesEpisodes;
+        return this.openPageAndGetDataForMessage(
+            seriesSeason.portalLinks[portalKey],
+            portalKey,
+            createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber),
+            asyncInteractionModel
+        );
     }
 
     public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS): Promise<ProvidorLink> {
@@ -116,19 +108,12 @@ export class PortalController {
             return null;
         }
 
-        let link: string = null;
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_EPISODE_INFO, {
             episodeKey,
             portalKey
         });
-        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
-        try {
-            link = await this.openPageAndGetDataForMessage(portalLink, portalKey, createGetProvidorLinkForEpisode(episode, providor));
-        } catch (e) {
-            console.error('[PortalController -> getProvidorLinkForEpisode]', e);
-        } finally {
-            this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
-        }
+
+        const link = await this.openPageAndGetDataForMessage(portalLink, portalKey, createGetProvidorLinkForEpisode(episode, providor), asyncInteractionModel);
 
         return {
             providor,
@@ -147,32 +132,36 @@ export class PortalController {
         );
     }
 
-    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portalKey: PORTALS, message: Message<T, R>): Promise<R> {
-        return new Promise<R>((resolve, reject) => {
+    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portalKey: PORTALS, message: Message<T, R>, asyncInteraction: AsyncInteraction): Promise<R> {
+        this.store.dispatch(addAsyncInteractionAction(asyncInteraction));
+
+        return new Promise<R>(resolve => {
             const sub = this.openPortalUrl(portalUrl, portalKey).pipe(
                 catchError(err => {
-                    reject(err);
+                    Logger.error(`[PortalController->openPageAndGetDataForMessage] error for message ${message} while opening url ${portalUrl} for portal ${portalKey}`, err);
+                    this.store.dispatch(resetControlStateAction());
                     return null;
                 }),
                 filter<BrowserWindow>(Boolean),
             ).subscribe(async (window) => {
-                let result: R;
+                const closeSub = fromEvent(window, 'close').pipe(
+                    first()
+                ).subscribe(() => this.store.dispatch(resetControlStateAction()));
 
                 try {
-                    result = await this.messageService.sendMessageToBrowserWindow(window.id, message);
-                } catch (e) {
-                    reject(e);
+                    const result = await this.messageService.sendMessageToBrowserWindow(window.id, message);
+                    resolve(result);
+                } catch (err) {
+                    Logger.error(`[PortalController->openPageAndGetDataForMessage] error while sending message ${message}`, err);
+                } finally {
+                    this.store.dispatch(setWindowIdForWindowTypeAction({
+                        windowId: null,
+                        windowType: WindowType.PORTAL
+                    }));
+                    this.store.dispatch(removeAsyncInteractionAction(asyncInteraction.key));
+                    sub.unsubscribe();
+                    closeSub.unsubscribe();
                 }
-
-                resolve(result);
-
-                this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: null, windowType: WindowType.PORTAL }));
-                sub.unsubscribe();
-
-                // return null, when window gets closed, so outer function gets notified about it
-                fromEvent(window, 'close').pipe(
-                    first()
-                ).subscribe(() => resolve(null));
             });
         });
     }
