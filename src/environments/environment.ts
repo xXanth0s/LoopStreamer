@@ -5,4 +5,5 @@ export const environment: EnvironmentType = {
     openAppDevTools: true,
     openDevTools: true,
     showNewWindows: false,
+    reduxDevToolsVersion: '2.17.0_0',
 };

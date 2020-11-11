@@ -43,7 +43,7 @@ export class RootBackgroundController {
 
     public openApp(): void {
         let href: string;
-        const { isDev, openAppDevTools } = environment;
+        const {isDev, openAppDevTools} = environment;
         if (isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
         } else {
@@ -53,10 +53,14 @@ export class RootBackgroundController {
 
         const window = this.windowService.openWindow(href, this.appWindowConfig);
 
-        this.store.dispatch(setWindowIdForWindowTypeAction({ windowId: window.id, windowType: WindowType.APP }));
+        this.store.dispatch(setWindowIdForWindowTypeAction({
+            windowId: window.id,
+            windowType: WindowType.APP
+        }));
 
         if (openAppDevTools) {
             window.webContents.openDevTools();
+            this.windowService.addReduxDevTools();
         }
     }
 

@@ -3,4 +3,5 @@ export type EnvironmentType = {
     openAppDevTools: boolean;
     openDevTools: boolean;
     showNewWindows: boolean;
+    reduxDevToolsVersion: string;
 };

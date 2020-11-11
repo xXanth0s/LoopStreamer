@@ -34,6 +34,12 @@ export class WindowService {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
+    public addReduxDevTools(): void {
+        BrowserWindow.addDevToolsExtension(
+            path.join(__dirname, 'extensions', 'redux-dev-tools', environment.reduxDevToolsVersion)
+        )
+    }
+
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
         try {
             let finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
