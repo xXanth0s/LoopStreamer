@@ -23,3 +23,14 @@ export function sortArrayForKey<T>(array: Array<T>, getValue: (T) => any): T[] {
         return 0;
     });
 }
+
+export function addToArrayIfNotExists<T>(array: T[], elementToAdd: T): T[] {
+    if(array.includes(elementToAdd)) {
+        return array;
+    }
+
+    return [
+        ...array,
+        elementToAdd,
+    ]
+}

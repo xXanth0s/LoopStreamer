@@ -12,7 +12,7 @@ export const getSeasonsForSeries = (state: StateModel, seriesKey: SeriesSeason['
 
 export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): SeriesSeason => {
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
-    const seasonKey = getKeyForSeriesSeason(episode.seriesKey, episode.season);
+    const seasonKey = getKeyForSeriesSeason(episode.seriesKey, `${episode.season}`);
 
     return getSeriesSeasonByKey(state, seasonKey);
 };

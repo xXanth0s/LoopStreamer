@@ -1,5 +1,6 @@
 import SeriesEpisode from './series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
+import { LinkModel } from './link.model';
 
 export default interface Series {
     key: string;
@@ -10,9 +11,7 @@ export default interface Series {
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
     posterHref?: string;
-    portalLinks: Partial<{
-        [key in PORTALS]: string
-    }>,
+    portalLinks: LinkModel['key'][]
     scipStartTime?: number;
     scipEndTime?: number;
 }

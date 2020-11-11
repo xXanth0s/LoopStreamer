@@ -7,11 +7,12 @@ import { SeriesSeason } from '../models/series-season.model';
 import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
 
 export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
-    const { seriesTitle, epdisodeNumber, seasonNumber, portalLinks, portal, providorLinks } = seriesEpisodeDto;
+    const {seriesTitle, epdisodeNumber, seasonNumber, portalLinks, portal, providorLinks} = seriesEpisodeDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
-    const seasonKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
+    const seasonKey = getKeyForSeriesSeason(seriesKey, `${seasonNumber}`);
     const key = getKeyForSeriesEpisode(seriesKey, seasonNumber, epdisodeNumber);
+
 
     return {
         key,
@@ -28,7 +29,7 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
 
 
 export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
-    const { title, posterHref, description, portal, link } = seriesInfo;
+    const { title, posterHref, description } = seriesInfo;
     const key = getKeyForSeriesTitle(seriesInfo.title);
     if (posterHref || description) {
         return {
@@ -36,14 +37,14 @@ export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
             title,
             posterHref,
             description,
-            portalLinks: { [portal]: link },
+            portalLinks: [],
         };
     }
 
     return {
         key,
         title,
-        portalLinks: { [portal]: link },
+        portalLinks: []
     };
 }
 
@@ -51,13 +52,13 @@ export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): Seri
     const seriesKey = getKeyForSeriesTitle(seriesInfo.title);
     return Object.keys(seriesInfo.seasonsLinks).map(seasonNumber => {
 
-        const key = getKeyForSeriesSeason(seriesKey, +seasonNumber);
+        const key = getKeyForSeriesSeason(seriesKey, seasonNumber);
 
         return {
             key,
             seriesKey,
-            seasonNumber: +seasonNumber,
-            portalLinks: { [seriesInfo.portal]: seriesInfo.seasonsLinks[seasonNumber] },
+            seasonNumber: seasonNumber,
+            portalLinks: {}
         };
     });
 }

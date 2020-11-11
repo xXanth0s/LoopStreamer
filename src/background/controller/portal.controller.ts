@@ -38,6 +38,7 @@ import { AsyncInteractionType } from '../../store/enums/async-interaction-type.e
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { AsyncInteraction } from '../../store/models/async-interaction.model';
 import { Logger } from '../../shared/services/logger';
+import { getLinkForSeriesAndPortal } from '../../store/selectors/línk.selector';
 
 @injectable()
 export class PortalController {
@@ -62,9 +63,9 @@ export class PortalController {
     }
 
     public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesInfoDto> {
-        const seriesInfo = this.store.selectSync(getSeriesByKey, seriesKey);
-        if (!seriesInfo?.portalLinks[portalKey]) {
-            console.error(`[PortalController->getDetailedSeriesInformation] tried to load detailed info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`, seriesInfo);
+        const link = this.store.selectSync(getLinkForSeriesAndPortal, seriesKey, portalKey);
+        if (!link) {
+            Logger.error(`[PortalController->getDetailedSeriesInformation] tried to load link info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`);
         }
 
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_DETAILED_SERIES, {
@@ -72,8 +73,9 @@ export class PortalController {
             portalKey
         });
 
+
         return this.openPageAndGetDataForMessage(
-            seriesInfo.portalLinks[portalKey],
+            link.href,
             portalKey,
             createGetDetailedSeriesInformationMessage(),
             asyncInteractionModel
@@ -91,10 +93,11 @@ export class PortalController {
             portalKey
         });
 
+
         return this.openPageAndGetDataForMessage(
             seriesSeason.portalLinks[portalKey],
             portalKey,
-            createGetEpisodesForSeasonMessage(seriesSeason.seasonNumber),
+            createGetEpisodesForSeasonMessage(+seriesSeason.seasonNumber),
             asyncInteractionModel
         );
     }

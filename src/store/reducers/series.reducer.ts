@@ -1,12 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Series from '../models/series.model';
 import { StateModel } from '../models/state.model';
-import { seriesEpisodeStartedAction } from './series-episode.reducer';
 import SeriesEpisode from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { Logger } from '../../shared/services/logger';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { filterObject } from '../utils/selector.utils';
+import { addOrUpdateMultipleLinksAction } from './link.reducer';
+import { LinkModel } from '../models/link.model';
+import { LINK_TYPE } from '../enums/link-type.enum';
+import { addToArrayIfNotExists } from '../../utils/array.utils';
+import {
+    addOrUpdateMultipleLinksAliasedAction,
+    addOrUpdateMultipleLinksActionType
+} from '../actions/aliased.actions';
+import { createGetEpisodesForSeasonMessage } from '../../browserMessages/messages/portal.messages';
 
 const initialState: StateModel['series'] = {};
 
@@ -48,15 +56,13 @@ const setEndTimeForSeries = (state: { [key: string]: Series }, key: Series['key'
 };
 
 function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): void {
-    const { key, portalLinks } = seriesInfo;
+    const {key} = seriesInfo;
 
+    const portalLinks = state[key]?.portalLinks || [];
     state[key] = {
         ...state[key],
         ...seriesInfo,
-        portalLinks: {
-            ...state[key]?.portalLinks,
-            ...portalLinks,
-        }
+        portalLinks
     };
 }
 
@@ -67,7 +73,7 @@ function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos
 }
 
 function setLastWatchedEpisode(state: StateModel['series'], actionData: { seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }): void {
-    const { seriesEpisodeKey, seriesKey } = actionData;
+    const {seriesEpisodeKey, seriesKey} = actionData;
     if (!state[seriesKey]) {
         console.error(`[SeriesReducer->seriesStarted] tried to update series ${seriesKey} but no series found`);
         return;
@@ -76,7 +82,7 @@ function setLastWatchedEpisode(state: StateModel['series'], actionData: { series
     state[seriesKey].lastEpisodeWatched = seriesEpisodeKey;
 }
 
-function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, portal }: { seriesKey: Series['key']; portal: PORTALS }): void {
+function setLastUsedPortalForSeries(state: StateModel['series'], {seriesKey, portal}: { seriesKey: Series['key']; portal: PORTALS }): void {
     if (!state[seriesKey]) {
         Logger.error(`[SeriesReducer->setLastUsedPortalForSeries] tried to update series ${seriesKey} but no series found`);
         return;
@@ -87,6 +93,27 @@ function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, po
 
 function deleteSeries(state: StateModel['series'], seriesKey: string): StateModel['series'] {
     return filterObject(state, series => series.key !== seriesKey);
+}
+
+function addMultipleLinks(state: StateModel['series'], links: LinkModel[]) {
+    links.forEach(link => addLink(state, link));
+}
+
+function addLink(state: StateModel['series'], link: LinkModel): void {
+    console.count('addLink');
+    if(link.type !== LINK_TYPE.PORTAL_SERIES_LINK ) {
+        return
+    }
+
+    const series = state[link.parentKey];
+    if(!series) {
+        // Logger.error(`[SeriesReducerducer->addLink] try to add link to series ${link.parentKey}, but no series found`);
+        return;
+    }
+    const t = {...series};
+    // const tt = [...series.portalLinks]
+    const ttt = {...series.portalLinks}
+    series.portalLinks = addToArrayIfNotExists(series.portalLinks, link.key);
 }
 
 const seriesSlice = createSlice({
@@ -110,10 +137,15 @@ const seriesSlice = createSlice({
         setLastWatchedEpisodeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }>) =>
             setLastWatchedEpisode(state, action.payload),
     }, extraReducers: (builder) => {
-        builder.addCase(seriesEpisodeStartedAction, (state: StateModel['series'], action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'], duration: SeriesEpisode['duration'] }>) =>
-            setLastWatchedEpisode(state, action.payload));
         builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
             deleteSeries(state, action.payload));
+        // builder.addCase(addOrUpdateMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
+        //     addMultipleLinks(state, action.payload));
+        builder.addCase(addOrUpdateMultipleLinksActionType, (state: StateModel['series'], action: any) => {
+            console.log('I am here')
+            return addMultipleLinks(state, action.payload);
+
+            });
     },
 });
 

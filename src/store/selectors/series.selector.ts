@@ -4,6 +4,7 @@ import { PORTALS } from '../enums/portals.enum';
 import { getNextEpisode, getSeriesEpisodeByKey } from './series-episode.selector';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeasonWithOffset } from './series-season.selector';
+import { getLinksByKeys } from './línk.selector';
 
 export const getAllSeries = (state: StateModel): Series[] => Object.values(state.series);
 
@@ -15,7 +16,7 @@ export const getLastUsedEpisodeForSeries = (state: StateModel, seriesKey: Series
 
 export const getSeriesForPortal = (state: StateModel, portal: PORTALS): Series[] => {
     return Object.values(state.series).filter(series => {
-        return Object.keys(series.portalLinks).some(availablePortal => availablePortal === portal);
+        return getLinksByKeys(state, series.portalLinks).some(link => link.destination === portal);
     });
 };
 

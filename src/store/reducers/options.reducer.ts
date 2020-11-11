@@ -10,6 +10,7 @@ const initialOptionsData: Options = {
 };
 
 const updateOptions = function (options: Options): Options {
+    debugger
     return options;
 };
 

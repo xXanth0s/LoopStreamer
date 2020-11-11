@@ -14,6 +14,7 @@ import { getStorageData, StorageMiddlerware } from '../middleware/storage.middle
 import { environment } from '../../environments/environment';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
 import { watcherSaga } from '../saga/watcher.saga';
+import linkSlice from '../reducers/link.reducer';
 
 // const composeEnhancers = composeWithDevTools({ realtime: true,  hostname: 'localhost', port: 8000 });
 
@@ -31,21 +32,20 @@ const backgroundStore = configureStore<StateModel>({
         portals: portalsSlice.reducer,
         seriesSeasons: seriesSeasonsReducer.reducer,
         seriesEpisodes: seriesEpisodesReducer.reducer,
+        links: linkSlice.reducer
     },
     // @ts-ignore
     middleware: [
-        ...getDefaultMiddleware({ serializableCheck: false, immutableCheck: false }),
         triggerAlias,
-        forwardToRenderer,
         StorageMiddlerware,
-        sagaMiddleware
+        sagaMiddleware,
+        forwardToRenderer
     ],
     devTools: environment.isDev,
-    // enhancers: [
-    //     composeEnhancers.apply(BrowserStorageMiddlerware)
-    // ]
     preloadedState
 });
+
+console.log('background store loaded ')
 
 sagaMiddleware.run(watcherSaga);
 

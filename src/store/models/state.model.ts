@@ -8,6 +8,8 @@ import { SeriesSeason } from './series-season.model';
 import { PROVIDORS } from '../enums/providors.enum';
 import { PORTALS } from '../enums/portals.enum';
 import AppControlStateModel from './app-control-state.model';
+import { LinkModel } from './link.model';
+import { KeyRecord } from '../types/key.record.type';
 
 export interface StateModel {
     controlState: ControlState;
@@ -18,4 +20,5 @@ export interface StateModel {
     series: Record<Series['key'], Series>;
     seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;
     seriesSeasons: Record<SeriesSeason['key'], SeriesSeason>;
+    links: KeyRecord<LinkModel>
 }

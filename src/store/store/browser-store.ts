@@ -10,6 +10,7 @@ import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
+import linkSlice from '../reducers/link.reducer';
 
 const initialState = getInitialStateRenderer();
 
@@ -23,18 +24,18 @@ const browserStore = configureStore<StateModel>({
         portals: portalsSlice.reducer,
         seriesSeasons: seriesSeasonsReducer.reducer,
         seriesEpisodes: seriesEpisodesReducer.reducer,
+        links: linkSlice.reducer,
     },
     preloadedState: initialState,
     // @ts-ignore
     middleware: [
-        ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
         forwardToMainWithParams(),
     ],
     devTools: environment.isDev,
 });
 
+replayActionRenderer(browserStore);
 export const initBrowserStore = () => {
-    replayActionRenderer(browserStore);
 
 }
 
