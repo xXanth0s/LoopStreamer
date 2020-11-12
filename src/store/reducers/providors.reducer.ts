@@ -40,13 +40,13 @@ const updateProvidors = (providors: Providor[]): {[key: string]: Providor} => {
     return mapArrayToObject(providors, 'key');
 };
 
-export const providorsReducer = createSlice({
+export const providorsSlice = createSlice({
     name: 'providors',
     initialState,
     reducers: {
-        updateProvidorsAction: (state: {[key: string]: Providor}, action: PayloadAction<Providor[]>) => updateProvidors(action.payload)
+        updateProvidorsAction: (state: { [key: string]: Providor }, action: PayloadAction<Providor[]>) => updateProvidors(action.payload)
     }
 });
 
 
-export const {updateProvidorsAction} = providorsReducer.actions;
+export const {updateProvidorsAction} = providorsSlice.actions;

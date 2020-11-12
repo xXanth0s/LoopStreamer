@@ -1,7 +1,6 @@
 import { BACKGROUND_TYPES } from './container/BACKGROUND_TYPES';
 import { RootBackgroundController } from './controller/root-background.controller';
 import { inversifyContainer } from './container/container';
-import { initStore } from '../store/store/background-store';
 import { app } from 'electron';
 import { TestController } from './controller/test.controller';
 import { environment } from '../environments/environment';
@@ -9,7 +8,6 @@ import { environment } from '../environments/environment';
 
 app.commandLine.appendSwitch ("disable-http-cache");
 async function initialize(): Promise<void> {
-   await initStore();
    const rootController = inversifyContainer.get<RootBackgroundController>(BACKGROUND_TYPES.RootController);
 
    rootController.initializeHandler();

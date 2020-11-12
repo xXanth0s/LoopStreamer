@@ -5,7 +5,6 @@ import { call, put } from 'redux-saga/effects';
 import { mapSeriesInfoDtoToSeries } from '../utils/series.utils';
 import { generateLinkForSeries } from '../utils/link.utils';
 import { addOrUpdateMultipleLinksAction } from '../reducers/link.reducer';
-import { addOrUpdateMultipleLinksAliasedAction } from '../actions/aliased.actions';
 import { updateOrAddMultipleSeriesAction } from '../reducers/series.reducer';
 
 export function* loadAllSeriesForPortal(action: ReturnType<typeof setActivePortalForAppAction>) {
@@ -18,7 +17,7 @@ export function* loadAllSeriesForPortal(action: ReturnType<typeof setActivePorta
         yield put(updateOrAddMultipleSeriesAction(series));
 
         const links = seriesMetaInfo.map(generateLinkForSeries);
-        yield put(addOrUpdateMultipleLinksAliasedAction(links));
+        yield put(addOrUpdateMultipleLinksAction(links));
     }
 }
 

@@ -17,12 +17,9 @@ import {
     Tooltip
 } from 'element-ui';
 import BootstrapVue from 'bootstrap-vue';
-import { initBrowserStore } from '../../store/store/browser-store';
 import { ToggleButton } from 'vue-js-toggle-button';
 
 Vue.config.productionTip = false;
-
-initBrowserStore();
 
 Vue.component('ToggleButton', ToggleButton);
 Vue.use(Switch);

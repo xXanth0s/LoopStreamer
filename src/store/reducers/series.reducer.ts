@@ -10,11 +10,6 @@ import { addOrUpdateMultipleLinksAction } from './link.reducer';
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
-import {
-    addOrUpdateMultipleLinksAliasedAction,
-    addOrUpdateMultipleLinksActionType
-} from '../actions/aliased.actions';
-import { createGetEpisodesForSeasonMessage } from '../../browserMessages/messages/portal.messages';
 
 const initialState: StateModel['series'] = {};
 
@@ -100,19 +95,16 @@ function addMultipleLinks(state: StateModel['series'], links: LinkModel[]) {
 }
 
 function addLink(state: StateModel['series'], link: LinkModel): void {
-    console.count('addLink');
     if(link.type !== LINK_TYPE.PORTAL_SERIES_LINK ) {
         return
     }
 
     const series = state[link.parentKey];
     if(!series) {
-        // Logger.error(`[SeriesReducerducer->addLink] try to add link to series ${link.parentKey}, but no series found`);
+        Logger.error(`[SeriesReducerducer->addLink] try to add link to series ${link.parentKey}, but no series found`);
         return;
     }
-    const t = {...series};
-    // const tt = [...series.portalLinks]
-    const ttt = {...series.portalLinks}
+
     series.portalLinks = addToArrayIfNotExists(series.portalLinks, link.key);
 }
 
@@ -139,13 +131,8 @@ const seriesSlice = createSlice({
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
             deleteSeries(state, action.payload));
-        // builder.addCase(addOrUpdateMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
-        //     addMultipleLinks(state, action.payload));
-        builder.addCase(addOrUpdateMultipleLinksActionType, (state: StateModel['series'], action: any) => {
-            console.log('I am here')
-            return addMultipleLinks(state, action.payload);
-
-            });
+        builder.addCase(addOrUpdateMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
+            addMultipleLinks(state, action.payload));
     },
 });
 

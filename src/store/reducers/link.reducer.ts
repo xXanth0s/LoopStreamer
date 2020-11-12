@@ -1,32 +1,22 @@
 import { StateModel } from '../models/state.model';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LinkModel } from '../models/link.model';
+import { mapArrayToObject } from '../utils/selector.utils';
 
 const initialState: StateModel['links'] = {};
 
 function addOrUpdateMultipleLinks(state: StateModel['links'], links: LinkModel[]): StateModel['links'] {
-    return links.reduce((newState, link) => {
-        return addOrUpdateLink(newState, link);
-    }, state)
+    return {
+        ...state,
+        ...mapArrayToObject(links, 'key')
+    }
 }
 
 function addOrUpdateLink(state: StateModel['links'], linkModel: LinkModel): StateModel['links'] {
-    const oldLink = state[linkModel.key];
-    if(oldLink) {
-        return {
-            ...state,
-            [linkModel.key]: {
-                ...oldLink,
-                ...linkModel,
-                dateAdded: oldLink.dateAdded,
-            }
-        }
-    }
-
     return {
         ...state,
         [linkModel.key]: linkModel,
-    }
+    };
 }
 
 const linkSlice = createSlice({

@@ -10,5 +10,4 @@ export interface LinkModel {
     destination: PORTALS | PROVIDORS;
     language: Language;
     type: LINK_TYPE;
-    dateAdded: Date;
 }

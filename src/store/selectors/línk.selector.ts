@@ -11,5 +11,5 @@ export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['
 }
 
 export function getLinksByKeys(state: StateModel, linkKeys: LinkModel['key'][]): LinkModel[] {
-    return linkKeys.map(key => state.links[key]);
+    return linkKeys.map(key => state.links[key]).filter(Boolean);
 }

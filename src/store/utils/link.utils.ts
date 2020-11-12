@@ -15,7 +15,6 @@ export function generateLinkForSeries(seriesInfo: SeriesInfoDto): LinkModel {
         language: Language.NONE,
         destination: portal,
         href: link,
-        dateAdded: new Date(),
         type: LINK_TYPE.PORTAL_SERIES_LINK,
     }
 }
@@ -28,7 +27,7 @@ export function generateLinksForSeriesSeason(seriesInfo: SeriesInfoDto): LinkMod
         const seasonNumber = value[0];
         const parentKey = getKeyForSeriesSeason(seriesKey, seasonNumber)
 
-        Object.entries(value[1]).reduce((accumulator, linkValue) => {
+        return Object.entries(value[1]).reduce((accumulator, linkValue) => {
             const language = linkValue[0] as Language;
             const href = linkValue[1];
             const key = getKeyForLink(parentKey, seriesInfo.portal, language);
@@ -40,12 +39,10 @@ export function generateLinksForSeriesSeason(seriesInfo: SeriesInfoDto): LinkMod
                     language,
                     href,
                     destination: portal,
-                    dateAdded: new Date(),
                     type: LINK_TYPE.PORTAL_SEASON_LINK,
                 }
             ]
         }, accumulator)
-        return accumulator;
     }, [])
 }
 
