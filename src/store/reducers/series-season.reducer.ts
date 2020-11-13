@@ -4,6 +4,11 @@ import { SeriesSeason } from '../models/series-season.model';
 import Series from '../models/series.model';
 import { filterObject } from '../utils/selector.utils';
 import { deleteSeriesAction } from '../actions/shared.actions';
+import { updateOrAddLinkAction, updateOrAddMultipleLinksAction } from './link.reducer';
+import { LinkModel } from '../models/link.model';
+import { LINK_TYPE } from '../enums/link-type.enum';
+import { Logger } from '../../shared/services/logger';
+import { addToArrayIfNotExists } from '../../utils/array.utils';
 
 
 const initialState: StateModel['seriesSeasons'] = {};
@@ -15,10 +20,10 @@ const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], se
     state[seriesSeason.key] = {
         ...oldSeasonObject,
         ...seriesSeason,
-        portalLinks: {
-            ...oldSeasonObject?.portalLinks,
+        portalLinks: [
+            ...(oldSeasonObject?.portalLinks || []),
             ...seriesSeason.portalLinks,
-        }
+        ]
     };
 };
 
@@ -30,6 +35,26 @@ function deleteAllSeasonsForSeries(state: StateModel['seriesSeasons'], seriesKey
     return filterObject(state, season => season.seriesKey !== seriesKey);
 }
 
+function addLinks(state: Record<string, SeriesSeason>, links: LinkModel[]) {
+    if (links.some(link => link.type === LINK_TYPE.PORTAL_SEASON_LINK)) {
+        links.forEach(link => addLink(state, link));
+    }
+}
+
+function addLink(state: Record<string, SeriesSeason>, link: LinkModel) {
+    if (link.type !== LINK_TYPE.PORTAL_SEASON_LINK) {
+        return;
+    }
+
+    const season = state[link.parentKey];
+    if (!season) {
+        Logger.error(`[SeriesSeasonReducerducer->addLink] try to add link to season ${link.parentKey}, but no season found`);
+        return;
+    }
+
+    season.portalLinks = addToArrayIfNotExists(season.portalLinks, link.key);
+}
+
 const seriesSeasonsReducer = createSlice({
     name: 'seriesSeasons',
     initialState,
@@ -38,7 +63,11 @@ const seriesSeasonsReducer = createSlice({
         updateOrAddMutlipleSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason[]>) => updateOrAddMultipleSeriesSeason(state, action.payload),
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['seriesSeasons'], action: PayloadAction<Series['key']>) =>
-            deleteAllSeasonsForSeries(state, action.payload))
+            deleteAllSeasonsForSeries(state, action.payload));
+        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel[]>) =>
+            addLinks(state, action.payload));
+        builder.addCase(updateOrAddLinkAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel>) =>
+            addLink(state, action.payload));
     }
 });
 

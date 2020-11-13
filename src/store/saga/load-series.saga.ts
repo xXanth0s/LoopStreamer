@@ -9,6 +9,8 @@ import { updateOrAddSeriesAction } from '../reducers/series.reducer';
 import { PORTALS } from '../enums/portals.enum';
 import Series from '../models/series.model';
 import { updateOrAddMutlipleSeriesSeasonAction } from '../reducers/series-season.reducer';
+import { generateLinksForSeriesSeason } from '../utils/link.utils';
+import { updateOrAddMultipleLinksAction } from '../reducers/link.reducer';
 
 export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelectedSeriesForAppAction>) {
     const state: StateModel = yield select();
@@ -37,6 +39,9 @@ export function* loadSeriesInformationForPortal(seriesKey: Series['key'], portal
 
         const seasons = mapSeriesInfoDtoToSeriesSeasons(seriesInfo);
         yield put(updateOrAddMutlipleSeriesSeasonAction(seasons));
+
+        const links = generateLinksForSeriesSeason(seriesInfo);
+        yield put(updateOrAddMultipleLinksAction(links));
     }
 
     return Boolean(seriesInfo);

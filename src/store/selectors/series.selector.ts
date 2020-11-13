@@ -18,7 +18,7 @@ export const getSeriesForPortal = (state: StateModel, portal: PORTALS): Series[]
     return Object.values(state.series)
         .filter(series => {
             return getLinksByKeys(state, series.portalLinks)
-                .some(link => link.destination === portal);
+                .some(link => link.portal === portal);
         });
 };
 

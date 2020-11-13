@@ -5,14 +5,14 @@ import { mapArrayToObject } from '../utils/selector.utils';
 
 const initialState: StateModel['links'] = {};
 
-function addOrUpdateMultipleLinks(state: StateModel['links'], links: LinkModel[]): StateModel['links'] {
+function updateOrAddMultipleLinks(state: StateModel['links'], links: LinkModel[]): StateModel['links'] {
     return {
         ...state,
         ...mapArrayToObject(links, 'key')
     }
 }
 
-function addOrUpdateLink(state: StateModel['links'], linkModel: LinkModel): StateModel['links'] {
+function updateOrAddLink(state: StateModel['links'], linkModel: LinkModel): StateModel['links'] {
     return {
         ...state,
         [linkModel.key]: linkModel,
@@ -23,16 +23,16 @@ const linkSlice = createSlice({
     name: 'links',
     initialState,
     reducers: {
-        addOrUpdateMultipleLinksAction: (state: StateModel['links'], action: PayloadAction<LinkModel[]>) =>
-            addOrUpdateMultipleLinks(state, action.payload),
-        addOrUpdateLinkAction: (state: StateModel['links'], action: PayloadAction<LinkModel>) =>
-            addOrUpdateLink(state, action.payload)
+        updateOrAddMultipleLinksAction: (state: StateModel['links'], action: PayloadAction<LinkModel[]>) =>
+            updateOrAddMultipleLinks(state, action.payload),
+        updateOrAddLinkAction: (state: StateModel['links'], action: PayloadAction<LinkModel>) =>
+            updateOrAddLink(state, action.payload)
     }
 })
 
 export const {
-    addOrUpdateLinkAction,
-    addOrUpdateMultipleLinksAction,
+    updateOrAddLinkAction,
+    updateOrAddMultipleLinksAction,
 } = linkSlice.actions
 
 export default linkSlice;

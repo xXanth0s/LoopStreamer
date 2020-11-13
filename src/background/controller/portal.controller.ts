@@ -32,13 +32,15 @@ import { WindowController } from './window.controller';
 import { finalizeWithValue, waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
 import Series from '../../store/models/series.model';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
 import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
 import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { AsyncInteraction } from '../../store/models/async-interaction.model';
 import { Logger } from '../../shared/services/logger';
-import { getLinkForSeriesAndPortal } from '../../store/selectors/línk.selector';
+import {
+    getLinkForSeriesAndPortal,
+    getLinkForSeriesSeasonAndPortal
+} from '../../store/selectors/línk.selector';
 
 @injectable()
 export class PortalController {
@@ -84,7 +86,8 @@ export class PortalController {
 
     public async getEpisodesForSeason(seasonKey: string, portalKey: PORTALS): Promise<SeriesEpisodeDto[]> {
         const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey);
-        if (!seriesSeason?.portalLinks[portalKey]) {
+        const link = this.store.selectSync(getLinkForSeriesSeasonAndPortal, seasonKey, portalKey);
+        if (!link || !seriesSeason) {
             console.error(`[PortalController -> getEpisodesForSeason] tried to load episode info for season ${seasonKey} and ${portalKey}, but no valid data found. Data found:`, seriesSeason);
         }
 
@@ -95,7 +98,7 @@ export class PortalController {
 
 
         return this.openPageAndGetDataForMessage(
-            seriesSeason.portalLinks[portalKey],
+            link.href,
             portalKey,
             createGetEpisodesForSeasonMessage(+seriesSeason.seasonNumber),
             asyncInteractionModel

@@ -3,11 +3,19 @@ import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
 import { LinkModel } from '../models/link.model';
 import { getSeriesByKey } from './series.selector';
+import { SeriesSeason } from '../models/series-season.model';
+import { getSeriesSeasonByKey } from './series-season.selector';
 
 export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['key'], portal: PORTALS): LinkModel {
     const series = getSeriesByKey(state, seriesKey);
 
-    return getLinksByKeys(state, series.portalLinks).find(link => link.destination === portal);
+    return getLinksByKeys(state, series.portalLinks).find(link => link.portal === portal);
+}
+
+export function getLinkForSeriesSeasonAndPortal(state: StateModel, seriesSeasonKey: SeriesSeason['key'], portal: PORTALS): LinkModel {
+    const season = getSeriesSeasonByKey(state, seriesSeasonKey);
+
+    return getLinksByKeys(state, season.portalLinks).find(link => link.portal === portal);
 }
 
 export function getLinksByKeys(state: StateModel, linkKeys: LinkModel['key'][]): LinkModel[] {

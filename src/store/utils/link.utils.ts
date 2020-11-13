@@ -7,13 +7,13 @@ import { LINK_TYPE } from '../enums/link-type.enum';
 export function generateLinkForSeries(seriesInfo: SeriesInfoDto): LinkModel {
     const { title, link, portal } = seriesInfo;
     const parentKey = getKeyForSeriesTitle(title);
-    const key = getKeyForLink(parentKey, portal, Language.NONE);
+    const key = getKeyForLink({parentKey, portal, language: Language.NONE});
 
     return {
         key,
         parentKey,
+        portal,
         language: Language.NONE,
-        destination: portal,
         href: link,
         type: LINK_TYPE.PORTAL_SERIES_LINK,
     }
@@ -30,7 +30,7 @@ export function generateLinksForSeriesSeason(seriesInfo: SeriesInfoDto): LinkMod
         return Object.entries(value[1]).reduce((accumulator, linkValue) => {
             const language = linkValue[0] as Language;
             const href = linkValue[1];
-            const key = getKeyForLink(parentKey, seriesInfo.portal, language);
+            const key = getKeyForLink({parentKey, portal, language});
             return [
                 ...accumulator,
                 {

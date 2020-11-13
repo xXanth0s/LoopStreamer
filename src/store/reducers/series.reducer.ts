@@ -6,7 +6,7 @@ import { PORTALS } from '../enums/portals.enum';
 import { Logger } from '../../shared/services/logger';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { filterObject } from '../utils/selector.utils';
-import { addOrUpdateMultipleLinksAction } from './link.reducer';
+import { updateOrAddMultipleLinksAction } from './link.reducer';
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
@@ -91,16 +91,18 @@ function deleteSeries(state: StateModel['series'], seriesKey: string): StateMode
 }
 
 function addMultipleLinks(state: StateModel['series'], links: LinkModel[]) {
-    links.forEach(link => addLink(state, link));
+    if (links.some(link => link.type === LINK_TYPE.PORTAL_SERIES_LINK)) {
+        links.forEach(link => addLink(state, link));
+    }
 }
 
 function addLink(state: StateModel['series'], link: LinkModel): void {
-    if(link.type !== LINK_TYPE.PORTAL_SERIES_LINK ) {
+    if (link.type !== LINK_TYPE.PORTAL_SERIES_LINK) {
         return
     }
 
     const series = state[link.parentKey];
-    if(!series) {
+    if (!series) {
         Logger.error(`[SeriesReducerducer->addLink] try to add link to series ${link.parentKey}, but no series found`);
         return;
     }
@@ -131,7 +133,7 @@ const seriesSlice = createSlice({
     }, extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
             deleteSeries(state, action.payload));
-        builder.addCase(addOrUpdateMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
+        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
             addMultipleLinks(state, action.payload));
     },
 });

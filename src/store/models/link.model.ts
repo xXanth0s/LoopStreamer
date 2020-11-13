@@ -7,7 +7,8 @@ export interface LinkModel {
     key: string;
     href: string;
     parentKey: string;
-    destination: PORTALS | PROVIDORS;
+    portal?: PORTALS;
+    providor?: PROVIDORS;
     language: Language;
     type: LINK_TYPE;
 }

@@ -7,9 +7,13 @@ import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
-import { getAllUsedProvidors, getProvidorForName } from '../../../store/selectors/providors.selector';
+import {
+    getAllUsedProvidors,
+    getProvidorForName
+} from '../../../store/selectors/providors.selector';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
+import { Language } from '../../../store/enums/language.enum';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -130,10 +134,14 @@ export class BurningSeriesController implements IPortalController {
         const posterHref = this.seriesImageSelector()
         const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
-        const seasonsLinks = seasonsLinksElements.reduce((obj, link) => {
-            obj[link.innerHTML] = link.href;
-            return obj;
-        }, {})
+        const seasonsLinks: SeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
+            return {
+                ...obj,
+                [link.innerHTML]: {
+                    [Language.NONE]: link.href
+                }
+            }
+        }, {});
 
         return {
             title,

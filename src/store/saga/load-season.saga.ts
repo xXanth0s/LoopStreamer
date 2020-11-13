@@ -35,6 +35,7 @@ export function* loadSeasonInformationForPortal(seasonKey: SeriesSeason['key'], 
         const episodes = seasonEpisodes.map(mapSeriesEpisodeDtoToSeriesEpisode);
 
         yield put(updateOrAddMultipleSeriesEpisodeAction(episodes));
+
         return true;
     }
 
