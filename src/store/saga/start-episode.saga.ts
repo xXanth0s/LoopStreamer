@@ -47,8 +47,12 @@ export function* startEpisode(episodeKey: SeriesEpisode['key'], fetchPortalLinks
     const portal = state.appControlState.activePortal ? state.appControlState.activePortal : series.lastUsedPortal;
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
-
-    while (providorLink && !(yield startVideo(episodeKey, providorLink, portal, language))) {
+    debugger;
+    while (providorLink) {
+        const episodeStarted: boolean = yield startVideo(episodeKey, providorLink, portal, language);
+        if (episodeStarted) {
+            return true;
+        }
         usedProvidors.push(providorLink.providor);
         providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, usedProvidors);
     }
@@ -91,7 +95,7 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
         const providorLink = episodeProvidorLinks.find(link => link.providor === provider.key);
         if (providorLink) {
             const result: ProvidorLink = {
-                link: seriesEpisode.providorLinks[provider.key],
+                link: providorLink.href,
                 providor: provider.key
             };
 
