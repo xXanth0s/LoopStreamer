@@ -5,14 +5,24 @@ import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import SeriesEpisode from '../../store/models/series-episode.model';
+import { LANGUAGE } from '../../store/enums/language.enum';
+import { ProvidorLink } from '../../background/models/providor-link.model';
 
-export const createGetProvidorLinkForEpisode = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode }, string> => ({
-    type: MessageType.PORTAL_GET_PROVIDOR_LINK_FOR_EPISODE,
+export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode }, string> => ({
+    type: MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
     payload: { providor, episodeInfo }
 });
-export type GetProvidorLinkForEpisode = ReturnType<typeof createGetProvidorLinkForEpisode>;
+export type GetResolvedProvidorLinkForEpisode = ReturnType<typeof createGetResolvedProvidorLinkForEpisodeMessage>;
+
+export const createGetAllProvidorLinksForEpisodeMessage = (language: LANGUAGE): Message<{ language: LANGUAGE }, ProvidorLink[]> => ({
+    type: MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS,
+    destinationController: ControllerType.PORTAL,
+    hasReply: true,
+    payload: { language }
+});
+export type GetAllProvidorLinksForEpisodeMessage = ReturnType<typeof createGetAllProvidorLinksForEpisodeMessage>;
 
 
 export const createGetNextVideoLinkMessage = (): Message<undefined, string> => ({

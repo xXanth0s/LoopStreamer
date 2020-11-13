@@ -1,3 +1,3 @@
-import { Language } from '../enums/language.enum';
+import { LANGUAGE } from '../enums/language.enum';
 
-export type LanguageLinkCollection = Partial<Record<Language, string>>;
+export type LanguageLinkCollection = Partial<Record<LANGUAGE, string>>;

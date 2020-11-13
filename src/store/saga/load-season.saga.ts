@@ -9,7 +9,7 @@ import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { mapSeriesEpisodeDtoToSeriesEpisode } from '../utils/series.utils';
 import { updateOrAddMultipleSeriesEpisodeAction } from '../reducers/series-episode.reducer';
 import { SeriesSeason } from '../models/series-season.model';
-import { generateLinkForSeriesEpisode } from '../utils/link.utils';
+import { generateLinkForSeriesEpisodeDto } from '../utils/link.utils';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { updateOrAddMultipleLinksAction } from '../reducers/link.reducer';
 
@@ -38,7 +38,7 @@ export function* loadSeasonInformationForPortal(seasonKey: SeriesSeason['key'], 
         const episodes = seasonEpisodes.map(mapSeriesEpisodeDtoToSeriesEpisode);
         yield put(updateOrAddMultipleSeriesEpisodeAction(episodes));
 
-        const links = seasonEpisodes.map(episode => generateLinkForSeriesEpisode(episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
+        const links = seasonEpisodes.map(episode => generateLinkForSeriesEpisodeDto(episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
         yield put(updateOrAddMultipleLinksAction(links));
 
         return true;

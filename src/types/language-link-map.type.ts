@@ -1,3 +1,3 @@
-import { Language } from '../store/enums/language.enum';
+import { LANGUAGE } from '../store/enums/language.enum';
 
-export type LanguageLinkMap = Partial<Record<Language, string>>
+export type LanguageLinkMap = Partial<Record<LANGUAGE, string>>

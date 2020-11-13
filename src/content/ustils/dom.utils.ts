@@ -7,6 +7,8 @@ import {
 } from '../constants/class-names';
 import { Observable, Subject } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import Providor from '../../store/models/providor.model';
+import { ProvidorLink } from '../../background/models/providor-link.model';
 
 export function isDomElementVisible(domElement: HTMLElement): boolean {
     const elemntStyles = window.getComputedStyle(domElement);
@@ -25,7 +27,7 @@ export function getDomElementSize(domElement: HTMLElement): DomElementSize {
     return {
         width,
         height
-    }
+    };
 }
 
 function getNumberFromPixelString(pixelString: string): number {
@@ -92,4 +94,25 @@ export function getElementWithTitle<T extends Element>(element: Element, titles:
     }
 
     return result;
+}
+
+export function getLinksForProviders(providers: Providor[], providorContainer: HTMLElement): ProvidorLink[] {
+    return providers.map(providor => {
+        const linkElement = getLinkWithText(providorContainer, providor.names);
+        if (linkElement) {
+            return {
+                link: linkElement.href,
+                providor: providor.key,
+            };
+        }
+    }).filter(Boolean);
+}
+
+export function getLinkWithText(containerElement: Element, textPossibilities: string[]): HTMLAnchorElement {
+    const links: HTMLAnchorElement[] = Array.from(containerElement.querySelectorAll('a'));
+
+    return links.find(link => {
+        const content = link.textContent.toLowerCase();
+        return textPossibilities.some(text => content.includes(text.toLowerCase()));
+    });
 }

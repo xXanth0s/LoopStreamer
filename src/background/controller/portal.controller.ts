@@ -5,10 +5,11 @@ import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { catchError, debounceTime, filter, first, takeUntil, tap } from 'rxjs/operators';
 import {
+    createGetAllProvidorLinksForEpisodeMessage,
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
     createGetEpisodesForSeasonMessage,
-    createGetProvidorLinkForEpisode
+    createGetResolvedProvidorLinkForEpisodeMessage
 } from '../../browserMessages/messages/portal.messages';
 import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
@@ -39,8 +40,11 @@ import { AsyncInteraction } from '../../store/models/async-interaction.model';
 import { Logger } from '../../shared/services/logger';
 import {
     getLinkForSeriesAndPortal,
-    getLinkForSeriesSeasonAndPortal
+    getLinkForSeriesSeasonAndPortal,
+    getLinksByKeys
 } from '../../store/selectors/línk.selector';
+import SeriesEpisode from '../../store/models/series-episode.model';
+import { LANGUAGE } from '../../store/enums/language.enum';
 
 @injectable()
 export class PortalController {
@@ -105,12 +109,31 @@ export class PortalController {
         );
     }
 
-    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS): Promise<ProvidorLink> {
+    public getAllProviderPortalLinksForEpisode(episodeKey: SeriesEpisode['key'],
+                                               portalKey: PORTALS,
+                                               language: LANGUAGE): Promise<ProvidorLink[]> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
-        const portalLink = episode?.portalLinks[portalKey][providor];
+        const links = this.store.selectSync(getLinksByKeys, episode.portalLinks);
+        const portalLink = links.find(link => link.portal === portalKey && link.providor === PROVIDORS.None);
 
         if (!portalLink) {
-            console.error(`[PortalController->getProvidorLinkForEpisode] tried to load portal links for episode ${episode} and ${portalKey}, but no valid data found.`);
+            return null;
+        }
+
+        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_ALL_PROVIDOR_LINKS, {
+            episodeKey,
+            portalKey
+        });
+
+        return this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetAllProvidorLinksForEpisodeMessage(language), asyncInteractionModel);
+    }
+
+    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS): Promise<ProvidorLink> {
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+        const links = this.store.selectSync(getLinksByKeys, episode.portalLinks);
+        const portalLink = links.find(link => link.portal === portalKey && link.providor === providor);
+
+        if (!portalLink) {
             return null;
         }
 
@@ -119,7 +142,7 @@ export class PortalController {
             portalKey
         });
 
-        const link = await this.openPageAndGetDataForMessage(portalLink, portalKey, createGetProvidorLinkForEpisode(episode, providor), asyncInteractionModel);
+        const link = await this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetResolvedProvidorLinkForEpisodeMessage(episode, providor), asyncInteractionModel);
 
         return {
             providor,

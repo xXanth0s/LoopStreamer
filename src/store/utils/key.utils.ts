@@ -4,7 +4,7 @@ import { LinkModel } from '../models/link.model';
 type linkKeyData = {
     parentKey: LinkModel['parentKey'],
     portal?: LinkModel['portal'],
-    providor?: LinkModel['portal'],
+    providor?: LinkModel['providor'],
     language: LinkModel['language']
 }
 

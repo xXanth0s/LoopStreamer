@@ -6,7 +6,6 @@ import { getPortalController, getVideoController } from '../../background/contai
 import SeriesEpisode from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { getAllUsedProvidors } from '../selectors/providors.selector';
-import { addProvidorLinkToEpisodeAction } from '../reducers/series-episode.reducer';
 import { PROVIDORS } from '../enums/providors.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
@@ -17,6 +16,12 @@ import {
     setActiveEpisodeAction
 } from '../reducers/control-state.reducer';
 import { stopPlayer } from '../utils/stop-player.util';
+import { getLinksByKeys } from '../selectors/línk.selector';
+import { loadAllProvidorLinksForEpisode } from './load-all-providors-for-episode.saga';
+import { LANGUAGE } from '../enums/language.enum';
+import { generateLinkForProvidorLink } from '../utils/link.utils';
+import { LINK_TYPE } from '../enums/link-type.enum';
+import { updateOrAddLinkAction } from '../reducers/link.reducer';
 
 
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
@@ -32,7 +37,7 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
     }
 }
 
-export function* startEpisode(episodeKey: SeriesEpisode['key']) {
+export function* startEpisode(episodeKey: SeriesEpisode['key'], fetchPortalLinks: boolean = true, language: LANGUAGE = LANGUAGE.GERMAN) {
     const usedProvidors = [];
     const state: StateModel = yield select();
     const series = getSeriesForEpisode(state, episodeKey);
@@ -43,9 +48,14 @@ export function* startEpisode(episodeKey: SeriesEpisode['key']) {
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
 
-    while (providorLink && !(yield startVideo(episodeKey, providorLink, portal))) {
+    while (providorLink && !(yield startVideo(episodeKey, providorLink, portal, language))) {
         usedProvidors.push(providorLink.providor);
         providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, usedProvidors);
+    }
+
+    if (fetchPortalLinks) {
+        yield loadAllProvidorLinksForEpisode(episodeKey, portal, LANGUAGE.GERMAN);
+        return yield startEpisode(episodeKey, false);
     }
 
     // TODO show error message
@@ -54,12 +64,13 @@ export function* startEpisode(episodeKey: SeriesEpisode['key']) {
     return false;
 }
 
-function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLink, linkSourcePortal: PORTALS) {
+function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLink, linkSourcePortal: PORTALS, language: LANGUAGE) {
     const videoController = getVideoController();
     const series = getSeriesForEpisode(yield select(), episodeKey);
     const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
     if (success) {
-        yield put(addProvidorLinkToEpisodeAction({ episodeKey, providorLink }));
+        const link = generateLinkForProvidorLink(episodeKey, providorLink, language, LINK_TYPE.PROVIDER_LINK);
+        yield put(updateOrAddLinkAction(link));
         yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal: linkSourcePortal }));
         return true;
     }
@@ -74,9 +85,11 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
     const seriesEpisode = getSeriesEpisodeByKey(state, episodeKey);
 
     const providors = getAllUsedProvidors(state).filter(providor => !providersToIgnore.includes(providor.key));
+    const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks);
 
     for (const provider of providors) {
-        if (seriesEpisode.providorLinks[provider.key]) {
+        const providorLink = episodeProvidorLinks.find(link => link.providor === provider.key);
+        if (providorLink) {
             const result: ProvidorLink = {
                 link: seriesEpisode.providorLinks[provider.key],
                 providor: provider.key

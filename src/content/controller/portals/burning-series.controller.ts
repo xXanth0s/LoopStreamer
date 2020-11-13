@@ -7,24 +7,112 @@ import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
-import { getProvidorForName } from '../../../store/selectors/providors.selector';
+import { getAllUsedProvidors, getProvidorForName } from '../../../store/selectors/providors.selector';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
-import { Language } from '../../../store/enums/language.enum';
+import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
+import { getLinksForProviders } from '../../ustils/dom.utils';
+import { ProvidorLink } from '../../../background/models/providor-link.model';
 
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
 
     private readonly portalKey = PORTALS.BS;
-    private readonly languageMap: Partial<{ [key in Language]: string }> = {
-        [Language.GERMAN]: 'de',
-        [Language.ENGLISH]: 'en',
+    private readonly languageMap: Partial<{ [key in LANGUAGE]: string }> = {
+        [LANGUAGE.GERMAN]: 'de',
+        [LANGUAGE.ENGLISH]: 'en',
     };
 
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
+
+    public async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
+        if (this.getActiveProvidor()?.controllerName === providor) {
+            const link = this.getVideoUrl();
+            if (link) {
+                return link;
+            }
+
+            if (this.isVideoOpenWithProvidor()) {
+                const playButtonElement = this.videoContainerSelector() as HTMLElement;
+                simulateEvent(playButtonElement,
+                    'click',
+                    { pointerX: playButtonElement.clientLeft, pointerY: playButtonElement.clientTop }
+                );
+                return new Promise((resolve) => {
+                    const videoContainer = this.videoContainerSelector();
+
+                    const config = { attributes: false, childList: true, subtree: true };
+
+                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
+                        const link = this.getVideoUrl();
+                        if (link) {
+                            resolve(link);
+                            observer.disconnect();
+                        }
+                    };
+
+                    const observer = new MutationObserver(callback);
+                    observer.observe(videoContainer, config);
+                });
+            }
+        } else {
+            return '';
+        }
+    }
+
+    public getAllPortalProviderLinksForEpisode(language: LANGUAGE): ProvidorLink[] {
+        const activeLanguage = this.getActiveLanguage();
+        if (activeLanguage !== language) {
+            return [];
+        }
+
+        const providorContainer = this.providorContainerSelector();
+        const usedProvidors = this.store.selectSync(getAllUsedProvidors);
+
+        return getLinksForProviders(usedProvidors, providorContainer);
+    }
+
+    getSeriesMetaInformation(): SeriesInfoDto {
+        const title = this.seriesTitleSelector();
+        const description = this.seriesDescriptionSelector();
+        const posterHref = this.seriesImageSelector();
+        const link = window.location.href;
+        const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
+        const seasonsLinks: SeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
+            return {
+                ...obj,
+                [link.innerHTML]: {
+                    [LANGUAGE.NONE]: link.href
+                }
+            }
+        }, {});
+
+        return {
+            title,
+            description,
+            posterHref,
+            seasonsLinks,
+            link,
+            portal: this.portalKey,
+        };
+    }
+
+    private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
+
+    private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
+
+    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
+
+    private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLLinkElement> => document.querySelector('.episodes').querySelectorAll('tr > td:nth-child(1) > a');
+
+    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
+
+    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
+
+    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
@@ -61,40 +149,9 @@ export class BurningSeriesController implements IPortalController {
         }).filter(Boolean);
     }
 
-    public async getProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
-        if (this.getActiveProvidor()?.controllerName === providor) {
-            const link = this.getVideoUrl();
-            if (link) {
-                return link;
-            }
+    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
 
-            if (this.isVideoOpenWithProvidor()) {
-                const playButtonElement = this.videoContainerSelector() as HTMLElement;
-                simulateEvent(playButtonElement,
-                    'click',
-                    { pointerX: playButtonElement.clientLeft, pointerY: playButtonElement.clientTop }
-                );
-                return new Promise((resolve) => {
-                    const videoContainer = this.videoContainerSelector();
-
-                    const config = { attributes: false, childList: true, subtree: true };
-
-                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
-                        const link = this.getVideoUrl();
-                        if (link) {
-                            resolve(link);
-                            observer.disconnect();
-                        }
-                    };
-
-                    const observer = new MutationObserver(callback);
-                    observer.observe(videoContainer, config);
-                });
-            }
-        } else {
-            return '';
-        }
-    }
+    private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
 
     public getAllSeriesInfo(): SeriesInfoDto[] {
         const links = this.seriesOverviewListLinkSelector() || [];
@@ -108,43 +165,10 @@ export class BurningSeriesController implements IPortalController {
                 title,
                 portal: this.portalKey,
             };
-        })
+        });
     }
 
-    getSeriesMetaInformation(): SeriesInfoDto {
-        const title = this.seriesTitleSelector();
-        const description = this.seriesDescriptionSelector();
-        const posterHref = this.seriesImageSelector();
-        const link = window.location.href;
-        const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
-        const seasonsLinks: SeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
-            return {
-                ...obj,
-                [link.innerHTML]: {
-                    [Language.NONE]: link.href
-                }
-            }
-        }, {});
-
-        return {
-            title,
-            description,
-            posterHref,
-            seasonsLinks,
-            link,
-            portal: this.portalKey,
-        };
-    }
-
-    private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
-
-    private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
-
-    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
-
-    private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLLinkElement> => document.querySelector('.episodes').querySelectorAll('tr > td:nth-child(1) > a');
-
-    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
+    private readonly providorContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
 
     isVideoOpenWithProvidor(): Providor | null {
         return this.videoContainerSelector() ? this.getActiveProvidor() : null;
@@ -160,27 +184,18 @@ export class BurningSeriesController implements IPortalController {
         return null;
     }
 
-    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
-
-    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
-
-    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
-
-
-    private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
-
     private getVideoUrl(): string {
         return this.videoUrlSelector()?.href || this.videoIframeSelector()?.src;
     }
 
-    private getAvailableLanguages(): Language[] {
+    private getAvailableLanguages(): LANGUAGE[] {
         return this.languagesSelector()
             .map(element => element.dataset.value)
             .map(languageString => this.stringToLanguage(languageString))
             .filter(Boolean);
     }
 
-    private transformLinkToLanguagesLinksCollection(link: string, languages: Language[]): LanguageLinkCollection {
+    private transformLinkToLanguagesLinksCollection(link: string, languages: LANGUAGE[]): LanguageLinkCollection {
         const sourceLanguage = this.getLanguageForLink(link);
         if (!sourceLanguage) {
             return null;
@@ -197,9 +212,9 @@ export class BurningSeriesController implements IPortalController {
         }, {});
     }
 
-    private getLanguageForLink(link: string): Language {
+    private getLanguageForLink(link: string): LANGUAGE {
         for (const language of Object.keys(this.languageMap)) {
-            const lang = language as Language;
+            const lang = language as LANGUAGE;
             const regex = this.getLinkRegexForLanguage(lang);
             if (regex.test(link)) {
                 return lang;
@@ -208,30 +223,26 @@ export class BurningSeriesController implements IPortalController {
         return null;
     }
 
-    private getLinkRegexForLanguage(language: Language): RegExp {
+    private getLinkRegexForLanguage(language: LANGUAGE): RegExp {
         return new RegExp(`([^\/]*${this.languageMap[language]}$)`);
     }
 
-    private stringToLanguage(languageString: string): Language {
+    private stringToLanguage(languageString: string): LANGUAGE {
         for (const language of Object.keys(this.languageMap)) {
             if (languageString === this.languageMap[language]) {
-                return language as Language;
+                return language as LANGUAGE;
             }
         }
 
         return null;
     }
 
-    //
-    // private getLinksForProvidors(providers: Providor) {
-    //
-    //     const portalLinks = providors.reduce((obj, providor) => {
-    //         const titleElement = getElementWithTitle<HTMLAnchorElement>(episode, providor.names);
-    //         if (titleElement) {
-    //             obj[providor.controllerName] = titleElement.href;
-    //         }
-    //
-    //         return obj;
-    //     }, {})
-    // }
+    private getActiveLanguage(): LANGUAGE {
+        const languageElement = this.languagesSelector().find(link => link.classList.contains('selected'));
+        if (!languageElement) {
+            return LANGUAGE.NONE;
+        }
+
+        return this.stringToLanguage(languageElement.dataset.value);
+    }
 }

@@ -5,10 +5,11 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
+    GetAllProvidorLinksForEpisodeMessage,
     GetAllSeriesFromPortalMessage,
     GetDetailedSeriesInformationMessage,
     GetEpisodesForSeasonMessage,
-    GetProvidorLinkForEpisode
+    GetResolvedProvidorLinkForEpisode
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
@@ -34,8 +35,8 @@ export class RootContentController {
     }
 
     public init(): void {
-        ipcRenderer.on(MessageType.PORTAL_GET_PROVIDOR_LINK_FOR_EPISODE, (event, message: GetProvidorLinkForEpisode) => {
-            this.getProvidorLinkHandler(event, message);
+        ipcRenderer.on(MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE, (event, message: GetResolvedProvidorLinkForEpisode) => {
+            this.getResolvedProvidorLinkHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_ALL_SERIES, (event, message: GetAllSeriesFromPortalMessage) => {
@@ -58,11 +59,22 @@ export class RootContentController {
             this.startVideoForProvidorHandler(event, message);
         });
 
+        ipcRenderer.on(MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS, (event, message: GetAllProvidorLinksForEpisodeMessage) => {
+            console.log(message);
+            this.getAllProvidorLinksForEpisode(event, message);
+        });
+
     }
 
-    private async getProvidorLinkHandler(event: IpcRendererEvent, message: GetProvidorLinkForEpisode): Promise<void> {
+    private async getResolvedProvidorLinkHandler(event: IpcRendererEvent, message: GetResolvedProvidorLinkForEpisode): Promise<void> {
         const { providor, episodeInfo } = message.payload;
-        const result = await this.portalService.getPortalController().getProvidorLinkForEpisode(episodeInfo, providor);
+        const result = await this.portalService.getPortalController().getResolvedProvidorLinkForEpisode(episodeInfo, providor);
+        this.messageService.replyToSender(message, event.sender, result);
+    }
+
+    private getAllProvidorLinksForEpisode(event: IpcRendererEvent, message: GetAllProvidorLinksForEpisodeMessage): void {
+        const { language } = message.payload;
+        const result = this.portalService.getPortalController().getAllPortalProviderLinksForEpisode(language);
         this.messageService.replyToSender(message, event.sender, result);
     }
 

@@ -1,6 +1,6 @@
 import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
-import { Language } from '../enums/language.enum';
+import { LANGUAGE } from '../enums/language.enum';
 import { LINK_TYPE } from '../enums/link-type.enum';
 
 export interface LinkModel {
@@ -9,6 +9,6 @@ export interface LinkModel {
     parentKey: string;
     portal?: PORTALS;
     providor?: PROVIDORS;
-    language: Language;
+    language: LANGUAGE;
     type: LINK_TYPE;
 }
