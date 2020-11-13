@@ -1,7 +1,6 @@
 import { PORTALS } from '../store/enums/portals.enum';
-import { Language } from '../store/enums/language.enum';
+import { LanguageLinkMap } from '../types/language-link-map.type';
 
-type languageLinkMap = Partial<Record<Language, string>>
 
 export interface SeriesInfoDto {
     title: string;
@@ -9,5 +8,5 @@ export interface SeriesInfoDto {
     portal: PORTALS
     posterHref?: string;
     description?: string;
-    seasonsLinks?: { [season: string]: languageLinkMap };
+    seasonsLinks?: { [season: string]: LanguageLinkMap };
 }

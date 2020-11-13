@@ -84,3 +84,12 @@ export function isPictureInPicture(): boolean {
     // @ts-ignore
     return Boolean(document.pictureInPictureElement);
 }
+
+export function getElementWithTitle<T extends Element>(element: Element, titles: string[]): T {
+    let result: T = null;
+    for (const title of titles) {
+        result = element.querySelector(`[title^="${title}" i]`);
+    }
+
+    return result;
+}

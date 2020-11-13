@@ -1,6 +1,5 @@
-import { PORTALS } from '../enums/portals.enum';
-import { PROVIDORS } from '../enums/providors.enum';
 import Series from './series.model';
+import { LinkModel } from './link.model';
 
 export default interface SeriesEpisode {
     key: string;
@@ -11,12 +10,8 @@ export default interface SeriesEpisode {
     duration?: number;
     hasNextEpisode?: boolean;
     hasPreviousEpisode?: boolean;
-    portalLinks: Partial<{
-        [key in PORTALS]: {
-            [key in PROVIDORS]: string
-        }
-    }>;
-    providorLinks: Partial<{ [key in PROVIDORS]?: string }>
+    portalLinks: LinkModel['key'][];
+    providorLinks: LinkModel['key'][];
     timestamp?: number;
     isFinished?: boolean;
 }

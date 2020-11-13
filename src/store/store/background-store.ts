@@ -9,7 +9,7 @@ import createSagaMiddleware from 'redux-saga';
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
-import { getStorageData } from '../middleware/storage.middlerware';
+import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
 import { watcherSaga } from '../saga/watcher.saga';
 import linkSlice from '../reducers/link.reducer';
@@ -20,6 +20,7 @@ const sagaMiddleware = createSagaMiddleware();
 const middleware = [
     triggerAlias,
     sagaMiddleware,
+    StorageMiddlerware,
     forwardToRenderer
 ]
 

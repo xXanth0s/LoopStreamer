@@ -4,18 +4,14 @@ import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } f
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
-import {
-    END_TIME_BUFFER,
-    TIME_FOR_NEXT_EPISODE_POPUP,
-    TIME_FOR_SET_ENDTIME_POPUP
-} from '../../constants/popup-config';
+import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
 
 export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
-    const {seriesTitle, epdisodeNumber, seasonNumber, portalLinks, portal, providorLinks} = seriesEpisodeDto;
+    const { seriesTitle, episodeNumber, seasonNumber } = seriesEpisodeDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
     const seasonKey = getKeyForSeriesSeason(seriesKey, `${seasonNumber}`);
-    const key = getKeyForSeriesEpisode(seriesKey, seasonNumber, epdisodeNumber);
+    const key = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);
 
 
     return {
@@ -23,11 +19,9 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
         seriesKey,
         seasonKey,
         season: seasonNumber,
-        episodeNumber: epdisodeNumber,
-        portalLinks: {
-            [portal]: portalLinks
-        },
-        providorLinks: providorLinks
+        episodeNumber: episodeNumber,
+        portalLinks: [],
+        providorLinks: [],
     };
 }
 
