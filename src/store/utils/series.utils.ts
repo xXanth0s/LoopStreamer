@@ -5,8 +5,10 @@ import { SeriesInfoDto } from '../../dto/series-info.dto';
 import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
+import { SeriesSeasonDto } from '../../dto/series-season.dto';
 
 export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
+    debugger
     const { seriesTitle, episodeNumber, seasonNumber } = seriesEpisodeDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
@@ -61,6 +63,20 @@ export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): Seri
     });
 }
 
+export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: SeriesSeasonDto): SeriesSeason {
+    const { seasonNumber, seriesTitle } = seasonDto;
+
+    const seriesKey = getKeyForSeriesTitle(seriesTitle);
+    const key = getKeyForSeriesSeason(seriesKey, seasonNumber);
+
+    return {
+        key,
+        seriesKey,
+        seasonNumber: seasonNumber,
+        portalLinks: []
+    };
+}
+
 export function getProgressForEpisode(seriesEpisode: SeriesEpisode): number {
     if (seriesEpisode.isFinished) {
         return 100;
@@ -78,13 +94,15 @@ export function getSeriesEpisodeTitle(seriesEpisode: SeriesEpisode): string {
     return `S${addLeadingZero(seriesEpisode.season)} E${addLeadingZero(seriesEpisode.episodeNumber)}`;
 }
 
-function addLeadingZero(digit: number): string {
-    const stringDigit = `${digit}`;
-    if (stringDigit.length === 1) {
+function addLeadingZero(digit: string): string {
+    if (isNaN(+digit)) {
+        return digit;
+    }
+    if (digit.length === 1) {
         return `0${digit}`;
     }
 
-    return stringDigit;
+    return digit;
 }
 
 export function getPopupEndTimeForSeriesEpisode(series: Series) {

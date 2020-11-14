@@ -16,9 +16,9 @@ export const getKeyForSeriesSeason = (seriesKey: Series['key'], season: string):
     return `${seriesKey}-S${season}`;
 }
 
-export const getKeyForSeriesEpisode = (seriesKey: string, seasonNumber: number, episodeNumber: number): string => {
+export const getKeyForSeriesEpisode = (seriesKey: string, seasonNumber: string, episodeNumber: string): string => {
     return `${seriesKey}-S${seasonNumber}-E${episodeNumber}`;
-}
+};
 
 export function getKeyForLink(data: linkKeyData): string {
     const {language, parentKey, portal, providor} = data

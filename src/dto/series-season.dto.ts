@@ -4,9 +4,9 @@ import { SeriesEpisodeDto } from './series-episode.dto';
 
 export interface SeriesSeasonDto {
     seriesTitle: string;
-    seasonNumber: number;
+    seasonNumber: string;
     portal: PORTALS;
-    link: LanguageLinkCollection;
+    seasonLinks: LanguageLinkCollection;
     episodes: SeriesEpisodeDto[];
 
 }

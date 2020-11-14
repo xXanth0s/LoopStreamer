@@ -5,6 +5,7 @@ import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
+import { SeriesSeasonDto } from '../../../dto/series-season.dto';
 
 export interface IPortalController {
 
@@ -16,7 +17,9 @@ export interface IPortalController {
 
     getAllSeriesInfo(): SeriesInfoDto[];
 
+    getSeasonInfo(seasonNumber: string): SeriesSeasonDto;
+
     getSeriesMetaInformation(): SeriesInfoDto;
 
-    getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[];
+    getSeasonEpisodes(seasonNumber: string): SeriesEpisodeDto[];
 }

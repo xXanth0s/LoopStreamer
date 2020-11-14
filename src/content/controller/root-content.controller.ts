@@ -8,8 +8,8 @@ import {
     GetAllProvidorLinksForEpisodeMessage,
     GetAllSeriesFromPortalMessage,
     GetDetailedSeriesInformationMessage,
-    GetEpisodesForSeasonMessage,
-    GetResolvedProvidorLinkForEpisode
+    GetResolvedProvidorLinkForEpisode,
+    GetSeasonInfoMessage
 } from '../../browserMessages/messages/portal.messages';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
@@ -49,7 +49,7 @@ export class RootContentController {
             this.getDetailedSeriesInformationHandler(event, message);
         });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_EPISODES_FOR_SEASON, (event, message: GetEpisodesForSeasonMessage) => {
+        ipcRenderer.on(MessageType.PORTAL_GET_SEASON_INFO, (event, message: GetSeasonInfoMessage) => {
             console.log(message);
             this.getSeasonsEpisodeInformationHandler(event, message);
         });
@@ -88,9 +88,9 @@ export class RootContentController {
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
-    private async getSeasonsEpisodeInformationHandler(event: IpcRendererEvent, message: GetEpisodesForSeasonMessage): Promise<void> {
-        const seriesInfo = await this.portalService.getPortalController()?.getSeasonEpisodes(message.payload);
-        this.messageService.replyToSender(message, event.sender, seriesInfo);
+    private async getSeasonsEpisodeInformationHandler(event: IpcRendererEvent, message: GetSeasonInfoMessage): Promise<void> {
+        const seasonInfo = await this.portalService.getPortalController()?.getSeasonInfo(message.payload.seasonNumber);
+        this.messageService.replyToSender(message, event.sender, seasonInfo);
     }
 
     private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoMessage): void {

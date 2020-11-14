@@ -96,9 +96,10 @@ export function getElementWithTitle<T extends Element>(element: Element, titles:
     return result;
 }
 
-export function getLinksForProviders(providers: Providor[], providorContainer: HTMLElement): ProvidorLink[] {
+export function getLinksForProviders(providers: Providor[], providorContainer?: HTMLElement): ProvidorLink[] {
+    const container = providorContainer || document.body;
     return providers.map(providor => {
-        const linkElement = getLinkWithText(providorContainer, providor.names);
+        const linkElement = getLinkWithText(container, providor.names) || getElementWithTitle(container, providor.names);
         if (linkElement) {
             return {
                 link: linkElement.href,

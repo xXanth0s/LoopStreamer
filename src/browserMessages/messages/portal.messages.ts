@@ -1,12 +1,12 @@
 import { MessageType } from '../enum/message-type.enum';
 import { Message } from './message.interface';
 import { ControllerType } from '../enum/controller.type';
-import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
+import { SeriesSeasonDto } from '../../dto/series-season.dto';
 
 export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode }, string> => ({
     type: MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
@@ -55,10 +55,10 @@ export const createGetDetailedSeriesInformationMessage = (): Message<undefined, 
 });
 export type GetDetailedSeriesInformationMessage = ReturnType<typeof createGetDetailedSeriesInformationMessage>;
 
-export const createGetEpisodesForSeasonMessage = (seasonNumber: number): Message<number, SeriesEpisodeDto[]> => ({
-    type: MessageType.PORTAL_GET_EPISODES_FOR_SEASON,
+export const createGetSeasonInfoMessage = (seasonNumber: string): Message<{ seasonNumber: string }, SeriesSeasonDto> => ({
+    type: MessageType.PORTAL_GET_SEASON_INFO,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
-    payload: seasonNumber,
+    payload: { seasonNumber },
 });
-export type GetEpisodesForSeasonMessage = ReturnType<typeof createGetEpisodesForSeasonMessage>;
+export type GetSeasonInfoMessage = ReturnType<typeof createGetSeasonInfoMessage>;

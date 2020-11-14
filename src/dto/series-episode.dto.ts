@@ -1,17 +1,13 @@
-import { PROVIDORS } from '../store/enums/providors.enum';
 import { PORTALS } from '../store/enums/portals.enum';
-import { LanguageLinkCollection } from '../store/models/language-link.model';
 import { LANGUAGE } from '../store/enums/language.enum';
+import { ProvidorLink } from '../background/models/providor-link.model';
 
 export interface SeriesEpisodeDto {
-    episodeNumber: number;
-    seasonNumber: number;
+    episodeNumber: string;
+    seasonNumber: string;
     portalLinks: {
-        [key in LANGUAGE]?: {
-            [key in PROVIDORS]?: string
-        }
+        [key in LANGUAGE]?: ProvidorLink[]
     };
-    providorLinks: { [key in PROVIDORS]?: LanguageLinkCollection }
     portal: PORTALS;
     seriesTitle: string;
 }

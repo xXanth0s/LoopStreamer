@@ -14,6 +14,7 @@ import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
 import { getLinksForProviders } from '../../ustils/dom.utils';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
+import { SeriesSeasonDto } from '../../../dto/series-season.dto';
 
 
 @injectable()
@@ -32,7 +33,8 @@ export class BurningSeriesController implements IPortalController {
     private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
     private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
     private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
-    private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLLinkElement> => document.querySelector('.episodes').querySelectorAll('tr > td:nth-child(1) > a');
+    private readonly activeSeriesSeasonSelector = (): HTMLAnchorElement => document.querySelector('#seasons').querySelector('.active > a');
+    private readonly episodesSelector = (): NodeListOf<HTMLElement> => document.querySelector('.episodes').querySelectorAll('tr');
     private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
     private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
@@ -99,7 +101,7 @@ export class BurningSeriesController implements IPortalController {
                 [link.innerHTML]: {
                     [LANGUAGE.NONE]: link.href
                 }
-            }
+            };
         }, {});
 
         return {
@@ -112,36 +114,47 @@ export class BurningSeriesController implements IPortalController {
         };
     }
 
-    public getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[] {
+    public getSeasonInfo(seasonNumber: string): SeriesSeasonDto {
+        const activeSeason = this.activeSeriesSeasonSelector();
+        if (activeSeason.innerText.trim() !== seasonNumber) {
+            return null;
+        }
+
         const seriesTitle = this.seriesTitleSelector();
-        const languages = this.getAvailableLanguages();
-        const episodeLinks = [ ...this.seriesSeasonEpisodesSelector() ].map(link => link.href);
+        const availableLanguages = this.getAvailableLanguages();
+        const seasonLink = activeSeason.href;
 
-        return episodeLinks.map((link, index) => {
+        const seasonLinks = this.transformLinkToLanguagesLinksCollection(seasonLink, availableLanguages);
+        const episodes = this.getSeasonEpisodes(seasonNumber);
 
-            const languageLinkMap = this.transformLinkToLanguagesLinksCollection(link, languages);
-            if (!languageLinkMap) {
-                return;
-            }
+        return {
+            portal: this.portalKey,
+            seriesTitle,
+            seasonNumber,
+            episodes,
+            seasonLinks
+        };
+    }
 
-            const portalLinks = Object.keys(languageLinkMap).reduce<SeriesEpisodeDto['portalLinks']>((accumulator, language) => {
-                return {
-                    ...accumulator,
-                    [language]: {
-                        [PROVIDORS.None]: languageLinkMap[language]
-                    }
-                };
-            }, {});
+    public getSeasonEpisodes(seasonNumber: string): SeriesEpisodeDto[] {
+        const seriesTitle = this.seriesTitleSelector();
+        const providors = this.store.selectSync(getAllUsedProvidors);
+        const activeLanguage = this.getActiveLanguage();
+        const episodesHtmlContainer = [ ...this.episodesSelector() ];
+
+        return episodesHtmlContainer.map((episodeHtmlContainer, index) => {
+            const portalLinks = getLinksForProviders(providors, episodeHtmlContainer,);
 
             return {
                 seriesTitle,
                 seasonNumber,
-                portalLinks,
-                episodeNumber: ++index,
-                providorLinks: {},
+                portalLinks: {
+                    [activeLanguage]: portalLinks,
+                },
+                episodeNumber: `${++index}`,
                 portal: this.portalKey,
             };
-        }).filter(Boolean);
+        });
     }
 
     public getAllSeriesInfo(): SeriesInfoDto[] {

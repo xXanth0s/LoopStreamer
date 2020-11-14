@@ -7,11 +7,12 @@ import {
     getLastEpisodeForSeason,
     getSeriesEpisodeByKey
 } from '../../selectors/series-episode.selector';
-import { loadSeasonInformationForPortal } from '../load-season.saga';
+import { updateSeasonInformationForPortal } from '../load-season.saga';
 import { SeriesSeason } from '../../models/series-season.model';
 import { StateModel } from '../../models/state.model';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from '../../selectors/series-season.selector';
 import { loadSeriesInformationForPortal } from '../load-series.saga';
+import { getSeriesByKey } from '../../selectors/series.selector';
 
 export function* getNeighbourEpisode(startEpisodeKey: SeriesEpisode['key'], portalKey: PORTALS, higherNeighbour: boolean) {
     const lastEpisode = getSeriesEpisodeByKey(yield select(), startEpisodeKey);
@@ -27,16 +28,22 @@ export function* getNeighbourEpisode(startEpisodeKey: SeriesEpisode['key'], port
     return yield getNextEpisodeForNeighbourSeason(lastEpisode.seasonKey, portalKey, higherNeighbour);
 }
 
-function* getNeighbourEpisodeForSameSeason({ key, seasonKey }: SeriesEpisode, portalKey: PORTALS, higherNeighbour: boolean) {
-    const offest = higherNeighbour ? 1 : -1;
-    const neighbourEpisode = getEpisodeWithOffset(yield select(), key, offest);
+function* getNeighbourEpisodeForSameSeason({ key, seasonKey, seriesKey }: SeriesEpisode, portalKey: PORTALS, higherNeighbour: boolean) {
+    const offset = higherNeighbour ? 1 : -1;
+    const neighbourEpisode = getEpisodeWithOffset(yield select(), key, offset);
     if (neighbourEpisode) {
         return neighbourEpisode;
     }
 
-    yield loadSeasonInformationForPortal(seasonKey, portalKey);
+    const series = getSeriesByKey(yield select(), seriesKey);
 
-    return getEpisodeWithOffset(yield select(), key, offest);
+    yield updateSeasonInformationForPortal({
+        seasonKey,
+        portalKey,
+        language: series.lastUsedLanguage
+    });
+
+    return getEpisodeWithOffset(yield select(), key, offset);
 }
 
 function* getNextEpisodeForNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey: PORTALS, higherNeighbour: boolean) {
@@ -56,22 +63,31 @@ function* getNextEpisodeForNeighbourSeason(seasonKey: SeriesSeason['key'], porta
 function* getAndUpdateNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey: PORTALS, higherNeighbour: boolean) {
     const state: StateModel = yield select();
     const offset = higherNeighbour ? 1 : -1;
+    const currentSeason = getSeriesSeasonByKey(state, seasonKey);
+    const series = getSeriesByKey(state, currentSeason.seriesKey);
 
     let neighbourSeason = getSeasonWithOffset(state, seasonKey, offset);
     if (neighbourSeason) {
-        yield loadSeasonInformationForPortal(neighbourSeason.key, portalKey);
+        yield updateSeasonInformationForPortal({
+            seasonKey: neighbourSeason.key,
+            language: series.lastUsedLanguage,
+            portalKey,
+        });
         return getSeasonWithOffset(yield select(), seasonKey, offset);
     }
-
-    const currentSeason = getSeriesSeasonByKey(state, seasonKey);
 
     yield loadSeriesInformationForPortal(currentSeason.seriesKey, portalKey);
 
     const hasNewNeighbourSeason = Boolean(getSeasonWithOffset(yield select(), seasonKey, offset));
-    if (hasNewNeighbourSeason) {
-        yield loadSeasonInformationForPortal(neighbourSeason.key, portalKey);
-        return getSeasonWithOffset(yield select(), seasonKey, offset);
+    if (!hasNewNeighbourSeason) {
+        return null;
     }
 
-    return null;
+    yield updateSeasonInformationForPortal({
+        seasonKey: neighbourSeason.key,
+        language: series.lastUsedLanguage,
+        portalKey,
+    });
+    return getSeasonWithOffset(yield select(), seasonKey, offset);
+
 }

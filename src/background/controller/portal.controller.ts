@@ -8,8 +8,8 @@ import {
     createGetAllProvidorLinksForEpisodeMessage,
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
-    createGetEpisodesForSeasonMessage,
-    createGetResolvedProvidorLinkForEpisodeMessage
+    createGetResolvedProvidorLinkForEpisodeMessage,
+    createGetSeasonInfoMessage
 } from '../../browserMessages/messages/portal.messages';
 import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
@@ -23,9 +23,7 @@ import {
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
-import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
-import { getSeriesSeasonByKey } from '../../store/selectors/series-season.selector';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { ProvidorLink } from '../models/providor-link.model';
 import { BrowserWindow } from 'electron';
@@ -38,13 +36,11 @@ import { AsyncInteractionType } from '../../store/enums/async-interaction-type.e
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { AsyncInteraction } from '../../store/models/async-interaction.model';
 import { Logger } from '../../shared/services/logger';
-import {
-    getLinkForSeriesAndPortal,
-    getLinkForSeriesSeasonAndPortal,
-    getLinksByKeys
-} from '../../store/selectors/línk.selector';
+import { getLinkForSeriesAndPortal, getLinksByKeys } from '../../store/selectors/línk.selector';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
+import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { LinkModel } from '../../store/models/link.model';
 
 @injectable()
 export class PortalController {
@@ -88,23 +84,16 @@ export class PortalController {
         );
     }
 
-    public async getEpisodesForSeason(seasonKey: string, portalKey: PORTALS): Promise<SeriesEpisodeDto[]> {
-        const seriesSeason = this.store.selectSync(getSeriesSeasonByKey, seasonKey);
-        const link = this.store.selectSync(getLinkForSeriesSeasonAndPortal, seasonKey, portalKey);
-        if (!link || !seriesSeason) {
-            console.error(`[PortalController -> getEpisodesForSeason] tried to load episode info for season ${seasonKey} and ${portalKey}, but no valid data found. Data found:`, seriesSeason);
-        }
-
+    public async getSeasonInfoForLink(link: LinkModel, seasonNumber: string): Promise<SeriesSeasonDto> {
         const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.PORTAL_GET_SEASON_EPISODES, {
-            seasonKey,
-            portalKey
+            link,
+            seasonNumber
         });
-
 
         return this.openPageAndGetDataForMessage(
             link.href,
-            portalKey,
-            createGetEpisodesForSeasonMessage(+seriesSeason.seasonNumber),
+            link.portal,
+            createGetSeasonInfoMessage(seasonNumber),
             asyncInteractionModel
         );
     }

@@ -12,10 +12,10 @@ export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['
     return getLinksByKeys(state, series.portalLinks).find(link => link.portal === portal);
 }
 
-export function getLinkForSeriesSeasonAndPortal(state: StateModel, seriesSeasonKey: SeriesSeason['key'], portal: PORTALS): LinkModel {
+export function getLinksForSeriesSeasonAndPortal(state: StateModel, seriesSeasonKey: SeriesSeason['key'], portal: PORTALS): LinkModel[] {
     const season = getSeriesSeasonByKey(state, seriesSeasonKey);
 
-    return getLinksByKeys(state, season.portalLinks).find(link => link.portal === portal);
+    return getLinksByKeys(state, season.portalLinks).filter(link => link.portal === portal);
 }
 
 export function getLinksByKeys(state: StateModel, linkKeys: LinkModel['key'][]): LinkModel[] {

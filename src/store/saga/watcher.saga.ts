@@ -20,21 +20,26 @@ import { startNextEpisode } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
 import { continueAutoplaySaga } from './continue-autoplay.saga';
+import { Logger } from '../../shared/services/logger';
 
 export function* watcherSaga() {
-    yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortal);
-    yield takeEvery(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
-    yield takeEvery(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
+    try {
+        yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortal);
+        yield takeEvery(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
+        yield takeEvery(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 
-    // episode state controlling
-    yield takeLatest(setSeriesEpisodeTimeStampAction.type, episodeTimeUpdateSaga);
-    yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
+        // episode state controlling
+        yield takeLatest(setSeriesEpisodeTimeStampAction.type, episodeTimeUpdateSaga);
+        yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
 
-    // control actions from app
-    yield takeEvery(startEpisodeAction.type, startEpisodeSaga);
+        // control actions from app
+        yield takeEvery(startEpisodeAction.type, startEpisodeSaga);
 
-    // control actions from video
-    yield takeLatest(startNextEpisodeAction.type, startNextEpisode);
-    yield takeLatest(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
-    yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
+        // control actions from video
+        yield takeLatest(startNextEpisodeAction.type, startNextEpisode);
+        yield takeLatest(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
+        yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
+    } catch (e) {
+        Logger.error('[WatcherSaga] Error occurred', e);
+    }
 }
