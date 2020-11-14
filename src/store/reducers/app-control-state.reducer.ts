@@ -5,6 +5,7 @@ import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { StateModel } from '../models/state.model';
+import { LANGUAGE } from '../enums/language.enum';
 
 const initialState: AppControlStateModel = {};
 
@@ -22,11 +23,16 @@ function setSelectedSeason(state: AppControlStateModel, seasonKey: SeriesSeason[
     state.selectedSeason = seasonKey;
 }
 
+function setSelectedLanguage(state: AppControlStateModel, { selectedLanguage }: { selectedLanguage: LANGUAGE }): void {
+    state.selectedLanguage = selectedLanguage;
+}
+
 function reset(): AppControlStateModel {
     return {
         selectedSeason: null,
         activePortal: null,
         selectedSeriesKey: null,
+        selectedLanguage: null
     };
 }
 
@@ -40,6 +46,8 @@ export const appControlStateSlice = createSlice({
             toggleSelectedSeries(state, action.payload),
         setSelectedSeasonForAppAction: (state: AppControlStateModel, action: PayloadAction<SeriesSeason['key']>) =>
             setSelectedSeason(state, action.payload),
+        setSelectedLanguageAction: (state: AppControlStateModel, action: PayloadAction<{ selectedLanguage: LANGUAGE }>) =>
+            setSelectedLanguage(state, action.payload),
         resetAppControlStateAction: (state: AppControlStateModel) =>
             reset(),
     }, extraReducers: (builder) => {
@@ -52,5 +60,6 @@ export const {
     setActivePortalForAppAction,
     toggleSelectedSeriesForAppAction,
     setSelectedSeasonForAppAction,
+    setSelectedLanguageAction,
     resetAppControlStateAction,
 } = appControlStateSlice.actions;

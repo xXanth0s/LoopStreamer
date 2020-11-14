@@ -10,6 +10,7 @@ import { updateOrAddMultipleLinksAction } from './link.reducer';
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
+import { LANGUAGE } from '../enums/language.enum';
 
 const initialState: StateModel['series'] = {};
 
@@ -110,6 +111,16 @@ function addLink(state: StateModel['series'], link: LinkModel): void {
     series.portalLinks = addToArrayIfNotExists(series.portalLinks, link.key);
 }
 
+function setLastUsedLanguageForSeries(state: { [key: string]: Series }, { seriesKey, language }: { seriesKey: Series['key']; language: LANGUAGE }) {
+    const series = state[seriesKey];
+    if (!series) {
+        Logger.error(`[SeriesReducerducer->setLastUsedLanguageForSeries] try to add link to series ${seriesKey}, but no series found`);
+        return;
+    }
+
+    series.lastUsedLanguage = language;
+}
+
 const seriesSlice = createSlice({
     name: 'series',
     initialState,
@@ -128,6 +139,8 @@ const seriesSlice = createSlice({
             updateOrAddMultipleSeries(state, action.payload),
         setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], portal: PORTALS }>) =>
             setLastUsedPortalForSeries(state, action.payload),
+        setLastUsedLanguageForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], language: LANGUAGE }>) =>
+            setLastUsedLanguageForSeries(state, action.payload),
         setLastWatchedEpisodeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }>) =>
             setLastWatchedEpisode(state, action.payload),
     }, extraReducers: (builder) => {
@@ -146,7 +159,8 @@ export const {
     updateOrAddSeriesAction,
     updateOrAddMultipleSeriesAction,
     setLastUsedPortalForSeriesAction,
-    setLastWatchedEpisodeAction
+    setLastWatchedEpisodeAction,
+    setLastUsedLanguageForSeriesAction,
 } = seriesSlice.actions;
 
 export default seriesSlice;

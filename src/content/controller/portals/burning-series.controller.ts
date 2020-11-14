@@ -27,6 +27,18 @@ export class BurningSeriesController implements IPortalController {
 
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
+    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
+    private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
+    private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
+    private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
+    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
+    private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLLinkElement> => document.querySelector('.episodes').querySelectorAll('tr > td:nth-child(1) > a');
+    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
+    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
+    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
+
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    }
 
     public async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
         if (this.getActiveProvidor()?.controllerName === providor) {
@@ -75,7 +87,7 @@ export class BurningSeriesController implements IPortalController {
         return getLinksForProviders(usedProvidors, providorContainer);
     }
 
-    getSeriesMetaInformation(): SeriesInfoDto {
+    public getSeriesMetaInformation(): SeriesInfoDto {
         const title = this.seriesTitleSelector();
         const description = this.seriesDescriptionSelector();
         const posterHref = this.seriesImageSelector();
@@ -100,24 +112,7 @@ export class BurningSeriesController implements IPortalController {
         };
     }
 
-    private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
-
-    private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
-
-    private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
-
-    private readonly seriesSeasonEpisodesSelector = (): NodeListOf<HTMLLinkElement> => document.querySelector('.episodes').querySelectorAll('tr > td:nth-child(1) > a');
-
-    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
-
-    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
-
-    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
-
-    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
-    }
-
-    getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[] {
+    public getSeasonEpisodes(seasonNumber: number): SeriesEpisodeDto[] {
         const seriesTitle = this.seriesTitleSelector();
         const languages = this.getAvailableLanguages();
         const episodeLinks = [ ...this.seriesSeasonEpisodesSelector() ].map(link => link.href);
@@ -148,10 +143,6 @@ export class BurningSeriesController implements IPortalController {
             };
         }).filter(Boolean);
     }
-
-    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
-
-    private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
 
     public getAllSeriesInfo(): SeriesInfoDto[] {
         const links = this.seriesOverviewListLinkSelector() || [];

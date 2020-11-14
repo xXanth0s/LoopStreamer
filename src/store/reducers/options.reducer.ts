@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Options from '../models/options.model';
+import { LANGUAGE } from '../enums/language.enum';
 
 
 const initialOptionsData: Options = {
@@ -7,6 +8,7 @@ const initialOptionsData: Options = {
     timeTillSetEndtimePopup: 180,
     timeForEndtimeCountdown: 15,
     scipIfNoVideo: false,
+    defaultLanguage: LANGUAGE.GERMAN,
 };
 
 const updateOptions = function (options: Options): Options {

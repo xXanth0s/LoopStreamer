@@ -3,6 +3,8 @@ import SeriesEpisode from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-episode.selector';
 import { getKeyForSeriesSeason } from '../utils/key.utils';
+import { LANGUAGE } from '../enums/language.enum';
+import { getLinksByKeys } from './línk.selector';
 
 export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
@@ -36,3 +38,17 @@ export const hasSeasonAlreadyPlayedEpisodes = (state: StateModel, seasonKey: Ser
     const episodes = getSeriesEpisodesForSeason(state, seasonKey);
     return episodes.some(episode => Boolean(episode.timestamp));
 };
+
+export function getAvailableLanguagesForSeasonAndActivePortal(state: StateModel, seasonKey: SeriesSeason['key']): LANGUAGE[] {
+    const episodes = getSeriesEpisodesForSeason(state, seasonKey);
+    const linkKeys = episodes.map(episode => episode.portalLinks).flat();
+    const links = getLinksByKeys(state, linkKeys);
+    const portal = state.appControlState.activePortal;
+
+    const languages = links
+        .filter(link => link.portal === portal
+            && link.language !== LANGUAGE.NONE)
+        .map(link => link.language);
+
+    return [ ...new Set(languages) ];
+}

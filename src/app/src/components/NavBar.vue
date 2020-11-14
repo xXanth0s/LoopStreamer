@@ -17,7 +17,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import WindowControlButtons from '../../../shared/html/components/WindowControlButtons.vue';
-    import { globalRoutes } from '../../constants/globalRoutes';
+    import { globalRoutes } from '../constants/globalRoutes';
     import { environment } from '../../../environments/environment';
 
     @Component({

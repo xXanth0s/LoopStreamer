@@ -3,6 +3,7 @@ import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from './series.selector';
+import { LANGUAGE } from '../enums/language.enum';
 
 export const getExpandedSeries = (state: StateModel): Series['key'] => state.appControlState.selectedSeriesKey;
 
@@ -16,6 +17,10 @@ export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['
 
 export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => {
     return state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
+};
+
+export const getSelectedLanguage = (state: StateModel): LANGUAGE => {
+    return state.appControlState.selectedLanguage;
 };
 
 export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);

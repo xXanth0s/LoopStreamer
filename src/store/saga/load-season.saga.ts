@@ -1,8 +1,11 @@
-import { setSelectedSeasonForAppAction } from '../reducers/app-control-state.reducer';
+import { setSelectedLanguageAction, setSelectedSeasonForAppAction } from '../reducers/app-control-state.reducer';
 import { StateModel } from '../models/state.model';
 import { call, put, select } from 'redux-saga/effects';
-import { getSeriesSeasonByKey } from '../selectors/series-season.selector';
-import { getSeriesByKey } from '../selectors/series.selector';
+import {
+    getAvailableLanguagesForSeasonAndActivePortal,
+    getSeriesSeasonByKey
+} from '../selectors/series-season.selector';
+import { getSeriesByKey, getSeriesForSeason } from '../selectors/series.selector';
 import { PORTALS } from '../enums/portals.enum';
 import { getPortalController } from '../../background/container/container.utils';
 import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
@@ -19,6 +22,8 @@ export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelected
         return;
     }
 
+    yield setSelectedLanguageForSeasonAndPortal(seasonKey);
+
     const state: StateModel = yield select();
     let portal = state.appControlState.activePortal;
     if (!portal) {
@@ -29,6 +34,7 @@ export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelected
     }
 
     yield loadSeasonInformationForPortal(action.payload, portal);
+    yield setSelectedLanguageForSeasonAndPortal(seasonKey);
 }
 
 export function* loadSeasonInformationForPortal(seasonKey: SeriesSeason['key'], portalKey: PORTALS) {
@@ -45,4 +51,30 @@ export function* loadSeasonInformationForPortal(seasonKey: SeriesSeason['key'], 
     }
 
     return false;
+}
+
+export function* setSelectedLanguageForSeasonAndPortal(seasonKey: SeriesSeason['key']) {
+    const state: StateModel = yield select();
+    const { selectedLanguage } = state.appControlState;
+    const { defaultLanguage } = state.options;
+    const languages = getAvailableLanguagesForSeasonAndActivePortal(yield select(), seasonKey);
+    const series = getSeriesForSeason(yield select(), seasonKey);
+
+    if (languages.length === 0) {
+        return;
+    }
+
+    if (languages.find(language => language === selectedLanguage)) {
+        return;
+    }
+
+    if (languages.find(language => language === series.lastUsedLanguage)) {
+        yield put(setSelectedLanguageAction({ selectedLanguage: series.lastUsedLanguage }));
+    }
+
+    if (languages.find(language => language === defaultLanguage)) {
+        yield put(setSelectedLanguageAction({ selectedLanguage: defaultLanguage }));
+    }
+
+    yield put(setSelectedLanguageAction({ selectedLanguage: languages[0] }));
 }

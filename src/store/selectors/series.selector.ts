@@ -3,10 +3,9 @@ import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
 import { getNextEpisode, getSeriesEpisodeByKey } from './series-episode.selector';
 import SeriesEpisode from '../models/series-episode.model';
-import { getSeasonWithOffset } from './series-season.selector';
+import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
 import { getLinksByKeys } from './línk.selector';
-
-export const getAllSeries = (state: StateModel): Series[] => Object.values(state.series);
+import { SeriesSeason } from '../models/series-season.model';
 
 export const getAllWatchedSeries = (state: StateModel): Series[] => Object.values(state.series).filter(series => series.lastEpisodeWatched);
 
@@ -60,4 +59,9 @@ export const isEndTimeConfiguredForSeries = (state: StateModel, seriesKey: Serie
 export const getSeriesForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): Series => {
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
     return getSeriesByKey(state, episode?.seriesKey);
+};
+
+export const getSeriesForSeason = (state: StateModel, seriesSeasonKey: SeriesSeason['key']): Series => {
+    const season = getSeriesSeasonByKey(state, seriesSeasonKey);
+    return getSeriesByKey(state, season?.seriesKey);
 };

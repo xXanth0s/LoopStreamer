@@ -1,6 +1,7 @@
 import SeriesEpisode from './series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { LinkModel } from './link.model';
+import { LANGUAGE } from '../enums/language.enum';
 
 export default interface Series {
     key: string;
@@ -8,6 +9,7 @@ export default interface Series {
     description?: string;
     lastEpisodeWatched?: SeriesEpisode['key'];
     lastUsedPortal?: PORTALS;
+    lastUsedLanguage?: LANGUAGE;
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
     posterHref?: string;

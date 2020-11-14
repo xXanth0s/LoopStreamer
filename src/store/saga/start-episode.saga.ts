@@ -9,7 +9,7 @@ import { getAllUsedProvidors } from '../selectors/providors.selector';
 import { PROVIDORS } from '../enums/providors.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
-import { setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
+import { setLastUsedLanguageForSeriesAction, setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
 import {
     raisePlayedEpisodesAction,
     resetPlayedEpisodesAction,
@@ -76,6 +76,7 @@ function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLin
         const link = generateLinkForProvidorLink(episodeKey, providorLink, language, LINK_TYPE.PROVIDER_LINK);
         yield put(updateOrAddLinkAction(link));
         yield put(setLastUsedPortalForSeriesAction({ seriesKey: series.key, portal: linkSourcePortal }));
+        yield put(setLastUsedLanguageForSeriesAction({ seriesKey: series.key, language }));
         return true;
     }
 

@@ -42,7 +42,7 @@
     import { updateOptionsAction } from '../../../store/reducers/options.reducer';
     import MinusPlusInput from './MinusPlusInput.vue';
     import CardTile from './CardTile.vue';
-    import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
+    import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../constants/tooltip-texts';
     import { Context } from '../enums/context.enum';
     import Toast from './Toast.vue';
 

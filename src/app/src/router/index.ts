@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { globalRoutes } from '../../constants/globalRoutes';
+import { globalRoutes } from '../constants/globalRoutes';
 import SeriesOverview from '../views/SeriesOverview.vue';
 import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';

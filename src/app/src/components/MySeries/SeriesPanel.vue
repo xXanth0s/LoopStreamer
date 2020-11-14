@@ -92,7 +92,7 @@
         setStartTimeForSeriesAction
     } from '../../../../store/reducers/series.reducer';
     import InfoTooltip from '../InfoTooltip.vue';
-    import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../../constants/tooltip-texts';
+    import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../constants/tooltip-texts';
     import MinusPlusInput from '../MinusPlusInput.vue';
     import { deleteSeriesAction } from '../../../../store/actions/shared.actions';
     import { toggleSelectedSeriesForAppAction } from '../../../../store/reducers/app-control-state.reducer';
