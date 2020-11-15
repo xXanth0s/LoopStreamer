@@ -17,6 +17,8 @@ function setActivePortal(state: AppControlStateModel, payload: PORTALS): void {
 function toggleSelectedSeries(state: AppControlStateModel, seriesKey: Series['key']) {
     const isDifferent = state.selectedSeriesKey !== seriesKey;
     state.selectedSeriesKey = isDifferent ? seriesKey : null;
+    state.selectedSeason = null;
+    state.selectedLanguage = LANGUAGE.NONE;
 }
 
 function setSelectedSeason(state: AppControlStateModel, seasonKey: SeriesSeason['key']) {

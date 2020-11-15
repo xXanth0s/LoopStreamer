@@ -1,6 +1,6 @@
-import { setSelectedLanguageAction, toggleSelectedSeriesForAppAction } from '../../reducers/app-control-state.reducer';
+import { toggleSelectedSeriesForAppAction } from '../../reducers/app-control-state.reducer';
 import { getPortalController } from '../../../background/container/container.utils';
-import { call, put, select } from 'redux-saga/effects';
+import { call, select } from 'redux-saga/effects';
 import { StateModel } from '../../models/state.model';
 import { getSeriesByKey } from '../../selectors/series.selector';
 import { SeriesInfoDto } from '../../../dto/series-info.dto';
@@ -14,8 +14,6 @@ export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelec
     if (!seriesKey) {
         return;
     }
-
-    yield put(setSelectedLanguageAction({ selectedLanguage: null }));
 
     let portalKey = state.appControlState.activePortal;
 

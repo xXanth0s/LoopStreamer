@@ -59,7 +59,6 @@ export function* startEpisode(options: StartEpisodeOptions) {
 
     yield put(setActiveEpisodeAction(episodeKey));
 
-    debugger
     const portal = state.appControlState.activePortal ? state.appControlState.activePortal : series.lastUsedPortal;
 
     let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, [], language);
@@ -107,7 +106,6 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
     const providors = getAllUsedProvidors(state).filter(providor => !providersToIgnore.includes(providor.key));
     const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks).filter(link => link.language === language);
 
-    debugger
     for (const provider of providors) {
         const providorLink = episodeProvidorLinks.find(link => link.providor === provider.key);
         if (providorLink) {

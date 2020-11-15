@@ -17,14 +17,21 @@ export function* setActiveLanguageForSeasonAndPortal(seasonKey: SeriesSeason['ke
         yield put(setSelectedLanguageAction({ selectedLanguage: LANGUAGE.NONE }));
     }
 
-    if (selectedLanguage === LANGUAGE.NONE) {
-        if (languages.find(language => language === series.lastUsedLanguage)) {
-            yield put(setSelectedLanguageAction({ selectedLanguage: series.lastUsedLanguage }));
+    if (selectedLanguage && selectedLanguage !== LANGUAGE.NONE) {
+        const isSelectedLanguageAvailable = languages.find(language => language === selectedLanguage);
+        if (isSelectedLanguageAvailable) {
+            return;
         }
+    }
 
-        if (languages.find(language => language === defaultLanguage)) {
-            yield put(setSelectedLanguageAction({ selectedLanguage: defaultLanguage }));
-        }
+    if (languages.find(language => language === series.lastUsedLanguage)) {
+        yield put(setSelectedLanguageAction({ selectedLanguage: series.lastUsedLanguage }));
+        return;
+    }
+
+    if (languages.find(language => language === defaultLanguage)) {
+        yield put(setSelectedLanguageAction({ selectedLanguage: defaultLanguage }));
+        return;
     }
 
     const fallbackLanguage = languages.filter(language => language !== LANGUAGE.NONE)[0] || LANGUAGE.NONE;
