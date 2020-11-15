@@ -25,15 +25,8 @@
                     </div>
                     <div v-if="episodes.length">
 
-                        <div class="mb-2 mt-1 flex items-center justify-content-center" v-if="availableLanguages">
-                            <language-icon class="mx-1"
-                                           v-for="language in availableLanguages"
-                                           :key="language"
-                                           @click="languageClicked"
-                                           :image-src="languageFlagMap[language].src"
-                                           :title="languageFlagMap[language].title"
-                                           :is-active="language === selectedLanguage"/>
-                        </div>
+                        <language-selection :season-key="selectedSeasonKey" class="mb-2 mt-1"/>
+
                         <div class="content-series-items mb-3">
                         <span class="pz-3 mt-1 flex-center white-tile">
                             <b>Episoden:</b>
@@ -71,10 +64,7 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { SeriesSeason } from '../../../../store/models/series-season.model';
-    import {
-        getAvailableLanguagesForSeasonAndActivePortal,
-        getSeasonsForSeries
-    } from '../../../../store/selectors/series-season.selector';
+    import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getLastWatchedEpisode, getSeriesByKey } from '../../../../store/selectors/series.selector';
@@ -83,20 +73,14 @@
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
-    import {
-        setSelectedLanguageAction,
-        setSelectedSeasonForAppAction
-    } from '../../../../store/reducers/app-control-state.reducer';
+    import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
     import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
-    import { LANGUAGE } from '../../../../store/enums/language.enum';
-    import { LABGUAGE_FLAG_DATA_MAP } from '../../data/language-flag-data.map';
-    import LanguageIcon from '../LanguageIcon.vue';
-    import { getSelectedLanguage } from '../../../../store/selectors/app-control-state.selector';
+    import LanguageSelection from '../LanguageSelection.vue';
 
     @Component({
         name: 'series-detail-view',
         components: {
-            LanguageIcon,
+            LanguageSelection,
             SeriesEpisodeButton,
             SeriesSeasonButton,
             ContinueSeriesButton,
@@ -107,7 +91,6 @@
         private readonly seriesChanged$ = new Subject();
         private readonly seasonChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();
-        private readonly languageFlagMap = LABGUAGE_FLAG_DATA_MAP;
 
         @Prop(String)
         private seriesKey: Series['key'];
@@ -124,8 +107,6 @@
         private episodes: SeriesEpisode[] = [];
         private selectedSeasonKey: string = null;
         private episodeToContinue: SeriesEpisode = null;
-        private availableLanguages: LANGUAGE[];
-        private selectedLanguage: LANGUAGE;
 
         private get isSeriesLoading(): boolean {
             return this.seasons.length === 0;
@@ -148,7 +129,6 @@
             if (isExpanded) {
                 this.fetchLoadingStateFromStore();
                 this.fetchSeasonLoadingStateFromStore();
-                this.fetchSelectedLanguageFromStore();
             } else {
                 this.takeUntil$.next();
             }
@@ -173,7 +153,6 @@
                 this.episodes = [];
 
                 this.fetchSeriesEpisodesFromStore(seasonKey);
-                this.fetchAvailableLanguagesFromStore(seasonKey);
 
                 this.store.dispatch(setSelectedSeasonForAppAction(seasonKey));
             }
@@ -185,19 +164,12 @@
             }
         }
 
-        public languageClicked(language: LANGUAGE): void {
-            if (language !== this.selectedLanguage) {
-                this.store.dispatch(setSelectedLanguageAction({ selectedLanguage: language }));
-            }
-        }
-
         private resetData(): void {
             this.seasonChanged$.next();
             this.seriesData = null;
             this.selectedSeasonKey = null;
             this.seasons = [];
             this.episodes = [];
-            this.availableLanguages = [];
         }
 
         private async fetchEpisodeToContinueFromStore(): Promise<void> {
@@ -244,19 +216,6 @@
             ).subscribe(episodes => {
                 this.episodes = episodes;
             });
-        }
-
-        private fetchAvailableLanguagesFromStore(seriesSeasonKey: SeriesSeason['key']): void {
-            const takeUntil$ = merge(this.seasonChanged$, this.seriesChanged$, this.takeUntil$);
-            this.store.selectBehaviour(getAvailableLanguagesForSeasonAndActivePortal, seriesSeasonKey).pipe(
-                takeUntil(takeUntil$),
-            ).subscribe(languages => this.availableLanguages = languages);
-        }
-
-        private fetchSelectedLanguageFromStore(): void {
-            this.store.selectBehaviour(getSelectedLanguage).pipe(
-                takeUntil(this.takeUntil$),
-            ).subscribe(language => this.selectedLanguage = language);
         }
     }
 </script>

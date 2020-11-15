@@ -5,6 +5,7 @@ import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-epis
 import { getKeyForSeriesSeason } from '../utils/key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal } from './línk.selector';
+import { getSeriesForSeason } from './series.selector';
 
 export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
@@ -40,12 +41,16 @@ export const hasSeasonAlreadyPlayedEpisodes = (state: StateModel, seasonKey: Ser
 };
 
 export function getAvailableLanguagesForSeasonAndActivePortal(state: StateModel, seasonKey: SeriesSeason['key']): LANGUAGE[] {
-    const portal = state.appControlState.activePortal;
+    let portal = state.appControlState.activePortal;
+    if (!portal) {
+        const series = getSeriesForSeason(state, seasonKey);
+        portal = series.lastUsedPortal;
+    }
     const links = getLinksForSeriesSeasonAndPortal(state, seasonKey, portal);
 
     const languages = links
         .map(link => link.language)
-        .filter(language => language !== LANGUAGE.NONE)
+        .filter(language => language !== LANGUAGE.NONE);
 
     return [ ...new Set(languages) ];
 }
