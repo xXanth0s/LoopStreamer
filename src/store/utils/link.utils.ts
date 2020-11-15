@@ -8,6 +8,7 @@ import SeriesEpisode from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { Logger } from '../../shared/services/logger';
 
 export function generateLinkForSeries(seriesInfo: SeriesInfoDto): LinkModel {
     const { title, link, portal } = seriesInfo;
@@ -53,9 +54,13 @@ export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: SeriesInfo
 
 export function generateLinksForSeriesSeasonDto(seriesSeasonDto: SeriesSeasonDto): LinkModel[] {
     const { seriesTitle, seasonNumber, seasonLinks, portal } = seriesSeasonDto;
-
+    if (!seasonLinks) {
+        Logger.error(`[generateLinksForSeriesSeasonDto] no season links found in seriesSeasonDto`, seasonLinks);
+        return [];
+    }
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
     const parentKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
+
 
     return Object.keys(seasonLinks).map((language: LANGUAGE) => {
         const key = getKeyForLink({ parentKey, portal, language });

@@ -7,11 +7,11 @@ import {
     getLastEpisodeForSeason,
     getSeriesEpisodeByKey
 } from '../../selectors/series-episode.selector';
-import { updateSeasonInformationForPortal } from '../load-season.saga';
+import { updateSeriesSeasonForPortal } from '../load-series-data/load-season.saga';
 import { SeriesSeason } from '../../models/series-season.model';
 import { StateModel } from '../../models/state.model';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from '../../selectors/series-season.selector';
-import { loadSeriesInformationForPortal } from '../load-series.saga';
+import { loadSeriesInformationForPortal } from '../load-series-data/load-series.saga';
 import { getSeriesByKey } from '../../selectors/series.selector';
 
 export function* getNeighbourEpisode(startEpisodeKey: SeriesEpisode['key'], portalKey: PORTALS, higherNeighbour: boolean) {
@@ -37,7 +37,7 @@ function* getNeighbourEpisodeForSameSeason({ key, seasonKey, seriesKey }: Series
 
     const series = getSeriesByKey(yield select(), seriesKey);
 
-    yield updateSeasonInformationForPortal({
+    yield updateSeriesSeasonForPortal({
         seasonKey,
         portalKey,
         language: series.lastUsedLanguage
@@ -68,7 +68,7 @@ function* getAndUpdateNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey:
 
     let neighbourSeason = getSeasonWithOffset(state, seasonKey, offset);
     if (neighbourSeason) {
-        yield updateSeasonInformationForPortal({
+        yield updateSeriesSeasonForPortal({
             seasonKey: neighbourSeason.key,
             language: series.lastUsedLanguage,
             portalKey,
@@ -83,7 +83,7 @@ function* getAndUpdateNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey:
         return null;
     }
 
-    yield updateSeasonInformationForPortal({
+    yield updateSeriesSeasonForPortal({
         seasonKey: neighbourSeason.key,
         language: series.lastUsedLanguage,
         portalKey,

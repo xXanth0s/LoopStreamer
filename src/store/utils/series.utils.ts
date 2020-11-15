@@ -8,7 +8,6 @@ import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPU
 import { SeriesSeasonDto } from '../../dto/series-season.dto';
 
 export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
-    debugger
     const { seriesTitle, episodeNumber, seasonNumber } = seriesEpisodeDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);

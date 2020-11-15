@@ -3,7 +3,7 @@ import {
     setSelectedSeasonForAppAction,
     toggleSelectedSeriesForAppAction
 } from '../reducers/app-control-state.reducer';
-import { loadSeriesInformationSaga } from './load-series.saga';
+import { loadSeriesInformationSaga } from './load-series-data/load-series.saga';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
@@ -14,8 +14,8 @@ import {
     startPreviousEpisodeAction
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
-import { loadAllSeriesForPortal } from './load-all-series.saga';
-import { loadSeasonInformationSaga } from './load-season.saga';
+import { loadAllSeriesForPortal } from './load-series-data/load-all-series.saga';
+import { loadSeasonInformationSaga } from './load-series-data/load-season.saga';
 import { startNextEpisode } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
