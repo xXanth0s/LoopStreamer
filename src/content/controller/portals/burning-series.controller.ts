@@ -24,6 +24,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly languageMap: Partial<{ [key in LANGUAGE]: string }> = {
         [LANGUAGE.GERMAN]: 'de',
         [LANGUAGE.ENGLISH]: 'en',
+        [LANGUAGE.NONE]: '',
     };
 
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
@@ -193,10 +194,16 @@ export class BurningSeriesController implements IPortalController {
     }
 
     private getAvailableLanguages(): LANGUAGE[] {
-        return this.languagesSelector()
+        const languages = this.languagesSelector()
             .map(element => element.dataset.value)
-            .map(languageString => this.stringToLanguage(languageString))
-            .filter(Boolean);
+            .map(languageString => this.stringToLanguage(languageString));
+        const filteredLanguages = languages.filter(Boolean);
+
+        if (languages.length > 0 && filteredLanguages.length === 0) {
+            return [ LANGUAGE.NONE ];
+        }
+
+        return filteredLanguages;
     }
 
     private transformLinkToLanguagesLinksCollection(link: string, languages: LANGUAGE[]): LanguageLinkCollection {
@@ -224,7 +231,7 @@ export class BurningSeriesController implements IPortalController {
                 return lang;
             }
         }
-        return null;
+        return LANGUAGE.NONE;
     }
 
     private getLinkRegexForLanguage(language: LANGUAGE): RegExp {

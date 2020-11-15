@@ -12,7 +12,7 @@ import { LANGUAGE } from '../../enums/language.enum';
 import { Logger } from '../../../shared/services/logger';
 
 export function* addMultipleEpisodesSaga(episodes: SeriesEpisodeDto[]) {
-    if (!episodes || episodes.length) {
+    if (!episodes || episodes.length === 0) {
         Logger.error(`[addMultipleEpisodesSaga] tried to add empty SeriesEpisodeDto array`);
         return;
     }
