@@ -16,7 +16,7 @@ export const getKeyForSeriesSeason = (seriesKey: Series['key'], season: string):
     return `${seriesKey}-S${season}`;
 }
 
-export const getKeyForSeriesEpisode = (seriesKey: string, seasonNumber: string, episodeNumber: string): string => {
+export const getKeyForSeriesEpisode = (seriesKey: string, seasonNumber: string, episodeNumber: number): string => {
     return `${seriesKey}-S${seasonNumber}-E${episodeNumber}`;
 };
 

@@ -6,7 +6,7 @@ export default interface SeriesEpisode {
     seriesKey: string;
     seasonKey: Series['key'];
     season: string;
-    episodeNumber: string;
+    episodeNumber: number;
     duration?: number;
     hasNextEpisode?: boolean;
     hasPreviousEpisode?: boolean;

@@ -19,8 +19,8 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
         key,
         seriesKey,
         seasonKey,
+        episodeNumber,
         season: seasonNumber,
-        episodeNumber: episodeNumber,
         portalLinks: [],
         providorLinks: [],
     };
@@ -93,15 +93,16 @@ export function getSeriesEpisodeTitle(seriesEpisode: SeriesEpisode): string {
     return `S${addLeadingZero(seriesEpisode.season)} E${addLeadingZero(seriesEpisode.episodeNumber)}`;
 }
 
-function addLeadingZero(digit: string): string {
-    if (isNaN(+digit)) {
-        return digit;
+function addLeadingZero(digit: string | number): string {
+    const stringValue = `${digit}`;
+    if (isNaN(+stringValue)) {
+        return stringValue;
     }
-    if (digit.length === 1) {
+    if (stringValue.length === 1) {
         return `0${digit}`;
     }
 
-    return digit;
+    return stringValue;
 }
 
 export function getPopupEndTimeForSeriesEpisode(series: Series) {
@@ -116,4 +117,8 @@ export function getPopupEndTimeForSeriesEpisode(series: Series) {
     }
 
     return scipEndTime + TIME_FOR_NEXT_EPISODE_POPUP - END_TIME_BUFFER;
+}
+
+export function isVeryFirstEpisode(seriesEpisode: SeriesEpisode): boolean {
+    return +seriesEpisode.season === 1 && seriesEpisode.episodeNumber === 1;
 }

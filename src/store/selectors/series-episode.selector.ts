@@ -54,5 +54,5 @@ export const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisod
 
     const seasonEpisodes = getSeriesEpisodesForSeason(state, episode.seasonKey);
 
-    return seasonEpisodes.find(seaspmEpisode => seaspmEpisode.episodeNumber === (episode.episodeNumber + offset));
+    return seasonEpisodes.find(seasonEpisode => seasonEpisode.episodeNumber === (episode.episodeNumber + offset));
 };

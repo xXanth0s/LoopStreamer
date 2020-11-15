@@ -3,7 +3,7 @@ import {
     setSeriesEpisodeNextEpisodeStateAction,
     setSeriesEpisodePreviousEpisodeStateAction
 } from '../reducers/series-episode.reducer';
-import { getNeighbourEpisode } from './shared-sagas/neighbour-episode.saga';
+import { getNeighbourEpisode } from './load-series-data/load-neighbour-series-episode.saga';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { put, select } from 'redux-saga/effects';
 

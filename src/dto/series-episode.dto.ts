@@ -3,7 +3,7 @@ import { LANGUAGE } from '../store/enums/language.enum';
 import { ProvidorLink } from '../background/models/providor-link.model';
 
 export interface SeriesEpisodeDto {
-    episodeNumber: string;
+    episodeNumber: number;
     seasonNumber: string;
     portalLinks: {
         [key in LANGUAGE]?: ProvidorLink[]

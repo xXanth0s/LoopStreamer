@@ -7,16 +7,21 @@ import {
     getLastEpisodeForSeason,
     getSeriesEpisodeByKey
 } from '../../selectors/series-episode.selector';
-import { updateSeriesSeasonForPortal } from '../load-series-data/load-season.saga';
+import { updateSeriesSeasonForPortal } from './load-season.saga';
 import { SeriesSeason } from '../../models/series-season.model';
 import { StateModel } from '../../models/state.model';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from '../../selectors/series-season.selector';
-import { loadSeriesInformationForPortal } from '../load-series-data/load-series.saga';
+import { loadSeriesInformationForPortal } from './load-series.saga';
 import { getSeriesByKey } from '../../selectors/series.selector';
+import { isVeryFirstEpisode } from '../../utils/series.utils';
 
 export function* getNeighbourEpisode(startEpisodeKey: SeriesEpisode['key'], portalKey: PORTALS, higherNeighbour: boolean) {
     const lastEpisode = getSeriesEpisodeByKey(yield select(), startEpisodeKey);
     if (!lastEpisode) {
+        return null;
+    }
+
+    if (!higherNeighbour && isVeryFirstEpisode(lastEpisode)) {
         return null;
     }
 
@@ -28,7 +33,8 @@ export function* getNeighbourEpisode(startEpisodeKey: SeriesEpisode['key'], port
     return yield getNextEpisodeForNeighbourSeason(lastEpisode.seasonKey, portalKey, higherNeighbour);
 }
 
-function* getNeighbourEpisodeForSameSeason({ key, seasonKey, seriesKey }: SeriesEpisode, portalKey: PORTALS, higherNeighbour: boolean) {
+function* getNeighbourEpisodeForSameSeason(startEpisode: SeriesEpisode, portalKey: PORTALS, higherNeighbour: boolean) {
+    const { key, seasonKey, seriesKey } = startEpisode;
     const offset = higherNeighbour ? 1 : -1;
     const neighbourEpisode = getEpisodeWithOffset(yield select(), key, offset);
     if (neighbourEpisode) {

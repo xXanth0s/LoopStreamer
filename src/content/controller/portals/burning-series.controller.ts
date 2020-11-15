@@ -39,6 +39,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
     private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
+    private readonly providorContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
@@ -97,10 +98,11 @@ export class BurningSeriesController implements IPortalController {
         const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
         const seasonsLinks: SeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
+            const language = this.getLanguageForLink(link.href);
             return {
                 ...obj,
                 [link.innerHTML]: {
-                    [LANGUAGE.NONE]: link.href
+                    [language]: link.href
                 }
             };
         }, {});
@@ -152,7 +154,7 @@ export class BurningSeriesController implements IPortalController {
                 portalLinks: {
                     [activeLanguage]: portalLinks,
                 },
-                episodeNumber: `${++index}`,
+                episodeNumber: ++index,
                 portal: this.portalKey,
             };
         });
@@ -173,9 +175,8 @@ export class BurningSeriesController implements IPortalController {
         });
     }
 
-    private readonly providorContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
 
-    isVideoOpenWithProvidor(): Providor | null {
+    public isVideoOpenWithProvidor(): Providor | null {
         return this.videoContainerSelector() ? this.getActiveProvidor() : null;
     }
 
