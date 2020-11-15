@@ -13,8 +13,6 @@ export function* addSeriesSeasonSaga(seasonData: SeriesSeasonDto) {
         return;
     }
 
-    debugger
-
     const convertedSeason = mapSeriesSeasonDtoToSeriesSeason(seasonData);
     yield put(updateOrAddSeriesSeasonAction(convertedSeason));
 
