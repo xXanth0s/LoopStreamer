@@ -32,7 +32,7 @@ function reset(): AppControlStateModel {
         selectedSeason: null,
         activePortal: null,
         selectedSeriesKey: null,
-        selectedLanguage: null
+        selectedLanguage: LANGUAGE.NONE,
     };
 }
 

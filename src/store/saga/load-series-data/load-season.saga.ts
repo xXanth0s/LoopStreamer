@@ -43,6 +43,8 @@ export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelected
         portalKey: portal,
         language: state.appControlState.selectedLanguage,
     });
+
+    yield setActiveLanguageForSeasonAndPortal(seasonKey);
 }
 
 export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptions) {
@@ -61,7 +63,7 @@ export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptio
 
     let linkForLanguage = links.find(link => link.language === finalLanguage);
 
-    if (!linkForLanguage) {
+    if (!linkForLanguage && language !== LANGUAGE.NONE) {
         if (isSeasonUpToData) {
             return false;
         }
