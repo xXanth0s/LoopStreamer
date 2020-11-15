@@ -2,7 +2,7 @@ import { StateModel } from '../models/state.model';
 import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
 import SeriesEpisode from '../models/series-episode.model';
-import { getSeriesForEpisode, getSeriesForSeason } from './series.selector';
+import { getSeriesByKey, getSeriesForEpisode, getSeriesForSeason } from './series.selector';
 import { LANGUAGE } from '../enums/language.enum';
 import { SeriesSeason } from '../models/series-season.model';
 
@@ -20,12 +20,23 @@ export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey
     return state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
 };
 
-export const getSelectedLanguageOrLastUsedSeriesLanguage = (state: StateModel, seriesSeasonKey: SeriesSeason['key']): LANGUAGE => {
-    if (state.appControlState.selectedLanguage !== LANGUAGE.NONE) {
+export const getSelectedLanguageOrLastUsedSeriesLanguageForSeason = (state: StateModel, seriesSeasonKey: SeriesSeason['key']): LANGUAGE => {
+    const series = getSeriesForSeason(state, seriesSeasonKey);
+    return getSelectedLanguageOrLastUsedSeriesLanguage(state, series.key);
+};
+
+export const getSelectedLanguageOrLastUsedSeriesLanguageForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): LANGUAGE => {
+    const series = getSeriesForEpisode(state, seriesEpisodeKey);
+    return getSelectedLanguageOrLastUsedSeriesLanguage(state, series.key);
+};
+
+export const getSelectedLanguageOrLastUsedSeriesLanguage = (state: StateModel, seriesKey: Series['key']): LANGUAGE => {
+    const { selectedLanguage } = state.appControlState;
+    if (selectedLanguage && selectedLanguage !== LANGUAGE.NONE) {
         return state.appControlState.selectedLanguage;
     }
 
-    const series = getSeriesForSeason(state, seriesSeasonKey);
+    const series = getSeriesByKey(state, seriesKey);
     return series.lastUsedLanguage || LANGUAGE.NONE;
 };
 

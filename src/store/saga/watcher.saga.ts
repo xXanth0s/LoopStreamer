@@ -11,7 +11,8 @@ import {
     continueAutoplayAction,
     startEpisodeAction,
     startNextEpisodeAction,
-    startPreviousEpisodeAction
+    startPreviousEpisodeAction,
+    userChangedLanguageAction
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
 import { loadAllSeriesForPortal } from './load-series-data/load-all-series.saga';
@@ -21,6 +22,7 @@ import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
 import { continueAutoplaySaga } from './continue-autoplay.saga';
 import { Logger } from '../../shared/services/logger';
+import { loadSeriesSeasonForLanguageSaga } from './load-series-data/load-series-season-for-language.saga';
 
 export function* watcherSaga() {
     try {
@@ -33,7 +35,8 @@ export function* watcherSaga() {
         yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
 
         // control actions from app
-        yield takeEvery(startEpisodeAction.type, startEpisodeSaga);
+        yield takeLatest(startEpisodeAction.type, startEpisodeSaga);
+        yield takeLatest(userChangedLanguageAction.type, loadSeriesSeasonForLanguageSaga);
 
         // control actions from video
         yield takeLatest(startNextEpisodeAction.type, startNextEpisode);

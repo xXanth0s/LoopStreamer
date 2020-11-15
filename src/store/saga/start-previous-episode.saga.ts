@@ -15,6 +15,6 @@ export function* startPreviousEpisodeSaga(action: ReturnType<typeof startPreviou
 
     const previousEpisode: SeriesEpisode = yield getNeighbourEpisode(episodeKey, series.lastUsedPortal, false);
     if (previousEpisode) {
-        yield startEpisode(previousEpisode.key);
+        yield startEpisode({ episodeKey: previousEpisode.key, language: series.lastUsedLanguage });
     }
 }

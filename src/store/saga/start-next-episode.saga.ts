@@ -33,7 +33,10 @@ export function* startNextEpisode(action: ReturnType<typeof startNextEpisodeActi
         yield put(setSeriesEpisodeTimeStampAction({ seriesEpisodeKey: nextEpisode.key, timestamp: null }));
     }
 
-    const episodeStartSuccessful: boolean = yield startEpisode(nextEpisode.key);
+    const episodeStartSuccessful: boolean = yield startEpisode({
+        episodeKey: nextEpisode.key,
+        language: series.lastUsedLanguage
+    });
 
     if (episodeStartSuccessful && !userAction) {
         yield put(raisePlayedEpisodesAction());

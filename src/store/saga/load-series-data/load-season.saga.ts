@@ -71,7 +71,7 @@ export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptio
         return yield updateSeriesSeasonForPortal({ ...options, isSeasonUpToData: true });
     }
 
-    return yield updateSeriesSeasonForLink(seasonKey, links[0]);
+    return yield updateSeriesSeasonForLink(seasonKey, linkForLanguage);
 }
 
 function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkModel) {

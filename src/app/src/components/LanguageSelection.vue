@@ -19,18 +19,18 @@
     import { StoreService } from '../../../shared/services/store.service';
     import { optionsContainer } from '../container/container';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
-    import { getSelectedLanguageOrLastUsedSeriesLanguage } from '../../../store/selectors/app-control-state.selector';
+    import { getSelectedLanguageOrLastUsedSeriesLanguageForSeason } from '../../../store/selectors/app-control-state.selector';
     import { LANGUAGE } from '../../../store/enums/language.enum';
     import { getAvailableLanguagesForSeasonAndActivePortal } from '../../../store/selectors/series-season.selector';
     import LanguageIcon from './LanguageIcon.vue';
     import { LABGUAGE_FLAG_DATA_MAP } from '../data/language-flag-data.map';
-    import { setSelectedLanguageAction } from '../../../store/reducers/app-control-state.reducer';
+    import { userChangedLanguageAction } from '../../../store/actions/shared.actions';
 
     @Component({
         name: 'language-selection',
         components: {
             LanguageIcon,
-        }
+        },
     })
     export default class LanguageSelection extends Vue {
 
@@ -74,13 +74,15 @@
         }
 
         private fetchSelectedLanguageFromStore(): void {
-            this.store.selectBehaviour(getSelectedLanguageOrLastUsedSeriesLanguage, this.seasonKey).pipe(
+            this.store.selectBehaviour(getSelectedLanguageOrLastUsedSeriesLanguageForSeason, this.seasonKey).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(language => this.selectedLanguage = language);
         }
 
         private languageClicked(selectedLanguage: LANGUAGE): void {
-            this.store.dispatch(setSelectedLanguageAction({ selectedLanguage }));
+            if (this.selectedLanguage !== selectedLanguage) {
+                this.store.dispatch(userChangedLanguageAction({ selectedLanguage, seriesSeasonKey: this.seasonKey }));
+            }
         }
     }
 </script>

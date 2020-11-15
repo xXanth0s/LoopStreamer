@@ -117,10 +117,14 @@ export class PortalController {
         return this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetAllProvidorLinksForEpisodeMessage(language), asyncInteractionModel);
     }
 
-    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS): Promise<ProvidorLink> {
+    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS, language: LANGUAGE): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const links = this.store.selectSync(getLinksByKeys, episode.portalLinks);
-        const portalLink = links.find(link => link.portal === portalKey && link.providor === providor);
+        const portalLink = links.find(link => {
+            return link.portal === portalKey
+                && link.providor === providor
+                && link.language === language;
+        });
 
         if (!portalLink) {
             return null;

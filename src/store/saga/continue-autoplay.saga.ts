@@ -21,7 +21,10 @@ export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpi
         return;
     }
 
-    const episodeStartSuccessful: boolean = yield startEpisode(nextEpisode.key);
+    const episodeStartSuccessful: boolean = yield startEpisode({
+        episodeKey: nextEpisode.key,
+        language: series.lastUsedLanguage
+    });
 
     if (episodeStartSuccessful) {
         yield put(raisePlayedEpisodesAction());

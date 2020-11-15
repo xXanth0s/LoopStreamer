@@ -22,7 +22,19 @@ import { LANGUAGE } from '../enums/language.enum';
 import { generateLinkForProvidorLink } from '../utils/link.utils';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { updateOrAddLinkAction } from '../reducers/link.reducer';
+import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from '../selectors/app-control-state.selector';
 
+export type StartEpisodeOptions = {
+    episodeKey: SeriesEpisode['key'];
+    language: LANGUAGE;
+    fetchPortalLinks?: boolean;
+}
+
+const defaultConfig: StartEpisodeOptions = {
+    episodeKey: '',
+    fetchPortalLinks: true,
+    language: LANGUAGE.NONE
+};
 
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
     stopPlayer();
@@ -30,35 +42,39 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
 
     yield put(resetPlayedEpisodesAction());
 
-    const episodeStartSuccessful: boolean = yield startEpisode(episodeKey);
+    const language = getSelectedLanguageOrLastUsedSeriesLanguageForEpisode(yield select(), episodeKey);
+
+    const episodeStartSuccessful: boolean = yield startEpisode({ episodeKey, language });
 
     if (episodeStartSuccessful) {
         yield put(raisePlayedEpisodesAction());
     }
 }
 
-export function* startEpisode(episodeKey: SeriesEpisode['key'], fetchPortalLinks: boolean = true, language: LANGUAGE = LANGUAGE.GERMAN) {
+export function* startEpisode(options: StartEpisodeOptions) {
+    const { episodeKey, language, fetchPortalLinks } = { ...defaultConfig, ...options };
     const usedProvidors = [];
     const state: StateModel = yield select();
     const series = getSeriesForEpisode(state, episodeKey);
 
     yield put(setActiveEpisodeAction(episodeKey));
 
+    debugger
     const portal = state.appControlState.activePortal ? state.appControlState.activePortal : series.lastUsedPortal;
 
-    let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, []);
+    let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, [], language);
     while (providorLink) {
         const episodeStarted: boolean = yield startVideo(episodeKey, providorLink, portal, language);
         if (episodeStarted) {
             return true;
         }
         usedProvidors.push(providorLink.providor);
-        providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, usedProvidors);
+        providorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, usedProvidors, language);
     }
 
     if (fetchPortalLinks) {
         yield loadAllProvidorLinksForEpisode(episodeKey, portal, LANGUAGE.GERMAN);
-        return yield startEpisode(episodeKey, false);
+        return yield startEpisode({ ...options, fetchPortalLinks: false });
     }
 
     // TODO show error message
@@ -82,15 +98,16 @@ function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLin
     return success;
 }
 
-function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[]) {
+function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[], language: LANGUAGE) {
     const portalController = getPortalController();
 
     const state: StateModel = yield select();
     const seriesEpisode = getSeriesEpisodeByKey(state, episodeKey);
 
     const providors = getAllUsedProvidors(state).filter(providor => !providersToIgnore.includes(providor.key));
-    const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks);
+    const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks).filter(link => link.language === language);
 
+    debugger
     for (const provider of providors) {
         const providorLink = episodeProvidorLinks.find(link => link.providor === provider.key);
         if (providorLink) {
@@ -102,7 +119,7 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
             return result;
         }
 
-        const link: ProvidorLink = yield call([ portalController, portalController.getProvidorLinkForEpisode ], episodeKey, portalKey, provider.key);
+        const link: ProvidorLink = yield call([ portalController, portalController.getProvidorLinkForEpisode ], episodeKey, portalKey, provider.key, language);
 
         if (link) {
             return link;
