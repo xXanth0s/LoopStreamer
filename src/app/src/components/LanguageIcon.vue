@@ -1,10 +1,10 @@
 <template>
-
-    <div :title="title" class="relative w-5 h-5"
-         :class="{'cursor-pointer': !isActive}">
-        <img :src="imageSrc">
-        <div v-if="!isActive && !isHover"
-             class="rounded-full absolute bottom-0 h-full w-full bg-gray-400 bg-opacity-75"></div>
+    <div @mouseover="isHover = true"
+         @mouseout="isHover = false"
+         :title="title"
+         class="relative w-6 h-6 rounded-full"
+         :class="containerClass">
+        <img :src="imageSrc" :class="{active: isActive}">
     </div>
 </template>
 
@@ -19,6 +19,16 @@
     })
     export default class LanguageIcon extends Vue {
         private isHover = false;
+
+        get containerClass() {
+            const showHoverEffect = !this.isActive && this.isHover;
+            return {
+                'cursor-pointer': !this.isActive,
+                'p-1': !this.isActive && !this.isHover,
+                active: this.isActive,
+                hover: showHoverEffect,
+            };
+        }
 
         @Prop(String)
         private title: string;
@@ -38,3 +48,17 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    @import "src/styles/variables";
+
+    .active {
+        border-width: 4px;
+        border-color: darken($primary-color, 5%);
+    }
+
+    .hover {
+        border-width: 4px;
+        border-color: $primary-color;
+    }
+</style>

@@ -39,7 +39,6 @@
 
         @Prop({
             type: String,
-            required: true,
         })
         private seasonKey: string;
 
@@ -49,7 +48,9 @@
         private availableLanguages: LANGUAGE[] = [];
 
         public get isVisible(): boolean {
-            return this.selectedLanguage && this.availableLanguages.length > 0;
+            return this.seasonKey
+                && this.selectedLanguage
+                && this.availableLanguages.length > 0;
         }
 
         public beforeCreate(): void {
@@ -62,9 +63,11 @@
 
         @Watch('seasonKey', { immediate: true })
         private seasonChanged(): void {
-            this.takeUntil$.next();
-            this.fetchAvailableLanguagesFromStore();
-            this.fetchSelectedLanguageFromStore();
+            if (this.seasonKey) {
+                this.takeUntil$.next();
+                this.fetchAvailableLanguagesFromStore();
+                this.fetchSelectedLanguageFromStore();
+            }
         }
 
         private fetchAvailableLanguagesFromStore(): void {
@@ -86,7 +89,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

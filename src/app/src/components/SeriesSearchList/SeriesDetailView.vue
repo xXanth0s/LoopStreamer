@@ -12,7 +12,10 @@
                     <div class="content-description py-3">{{seriesData.description}}</div>
                     <continue-series-button :series-episode-key="episodeToContinue.key" class="my-3"
                                             v-if="episodeToContinue"/>
-                    <div class="content-series-items mb-2">
+
+                    <language-selection :season-key="seasonKeyForLanguageSelection" class="mb-2 mt-1"/>
+
+                    <div class="content-series-items mb-3">
                         <div class="px-3 mt-1 flex-center white-tile">
                             <b>Staffeln:</b>
                         </div>
@@ -24,8 +27,6 @@
                                 @clicked="seasonClicked"/>
                     </div>
                     <div v-if="episodes.length">
-
-                        <language-selection :season-key="selectedSeasonKey" class="mb-2 mt-1"/>
 
                         <div class="content-series-items mb-3">
                         <span class="pz-3 mt-1 flex-center white-tile">
@@ -114,6 +115,10 @@
 
         private get areEpisodesLoading(): boolean {
             return this.isSeasonLoading && !this.episodes.length && Boolean(this.selectedSeasonKey);
+        }
+
+        private get seasonKeyForLanguageSelection(): SeriesSeason['key'] {
+            return this.selectedSeasonKey || this.episodeToContinue?.seasonKey;
         }
 
         public beforeCreate(): void {
