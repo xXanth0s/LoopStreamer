@@ -165,3 +165,7 @@ body {
     font-weight: 500;
   }
 }
+
+button:disabled {
+  cursor: default;
+}

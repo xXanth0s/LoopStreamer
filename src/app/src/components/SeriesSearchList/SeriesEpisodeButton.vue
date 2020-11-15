@@ -1,7 +1,8 @@
 <template>
     <button-tile
             :is-active="episodeInfo.key === activeEpisodeKey"
-            :is-disabled="isDisabled || isAnyEpisodeLoading"
+            :is-disabled="isAnyEpisodeLoading"
+            :is-unavailable="!hasValidLinks"
             :title="title"
             :progress="progress"
             :is-loading="episodeInfo.key === activeEpisodeKey && isAnyEpisodeLoading"
@@ -25,6 +26,7 @@
     import { getProgressForEpisode } from '../../../../store/utils/series.utils';
     import { PORTALS } from '../../../../store/enums/portals.enum';
     import { getActivePortalOnAppOrSeries } from '../../../../store/selectors/app-control-state.selector';
+    import { hasEpisodeLinksForSelectedLanguageAndPortal } from '../../../../store/selectors/series-episode.selector';
 
     @Component({
         name: 'series-episode-button',
@@ -41,6 +43,7 @@
 
         private store: StoreService;
         private isAnyEpisodeLoading = false;
+        private hasValidLinks = false;
         private activeEpisodeKey = '';
         private activePortal: PORTALS;
 
@@ -48,19 +51,13 @@
             return getProgressForEpisode(this.episodeInfo);
         }
 
-        public get isDisabled(): boolean {
-            if (this.activePortal) {
-                return Object.keys(this.episodeInfo?.portalLinks[this.activePortal]).length === 0;
-            }
-
-            return false;
-        }
-
         public get title(): string {
-            if (this.isDisabled) {
-                return 'Es wurden keine verfügbaren Streams für diese Episode gefunden';
+            if (!this.hasValidLinks) {
+                return 'Für die ausgwählte Sprache wurde kein verfügbarer Stream gefunden.';
             }
-
+            if (this.isAnyEpisodeLoading) {
+                return 'Es wird bereits eine Episode vorbereitet.';
+            }
             return '';
         }
 
@@ -70,6 +67,7 @@
 
         public mounted(): void {
             this.fetchEpisodeLoadingStateFromStore();
+            this.fetchEpisoeLinkStatusFromStore();
             this.setSelectedEpisode();
 
             this.activePortal = this.store.selectSync(getActivePortalOnAppOrSeries, this.episodeInfo.key);
@@ -99,6 +97,12 @@
             ).subscribe(isLoading => {
                 this.isAnyEpisodeLoading = isLoading;
             });
+        }
+
+        private fetchEpisoeLinkStatusFromStore(): void {
+            this.store.selectBehaviour(hasEpisodeLinksForSelectedLanguageAndPortal, this.episodeInfo.key).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(hasEpisodeLinks => this.hasValidLinks = hasEpisodeLinks);
         }
     }
 </script>

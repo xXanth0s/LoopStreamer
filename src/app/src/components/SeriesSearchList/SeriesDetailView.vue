@@ -13,7 +13,7 @@
                     <continue-series-button :series-episode-key="episodeToContinue.key" class="my-3"
                                             v-if="episodeToContinue"/>
 
-                    <language-selection :season-key="seasonKeyForLanguageSelection" class="mb-2 mt-1"/>
+                    <language-selection class="mb-2 mt-1" :season-key="seasonKeyForLanguageSelection"/>
 
                     <div class="content-series-items mb-3">
                         <div class="px-3 mt-1 flex-center white-tile">

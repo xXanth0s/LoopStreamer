@@ -1,6 +1,10 @@
 <template>
     <div v-if="seriesEpisode && !seriesEpisode.isFinished">
-        <b-button @click="continueEpisode" block class="float-right mb-2" variant="primary">
+        <b-button block
+                  class="float-right mb-2"
+                  variant="primary"
+                  @click="continueEpisode"
+                  :disabled="!hasValidLinks" :title="title">
             <span v-if="isLoading">
                 <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;">
                     <span class="sr-only"></span>
@@ -30,7 +34,10 @@
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../store/utils/series.utils';
     import { StoreService } from '../../../../shared/services/store.service';
     import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
-    import { getSeriesEpisodeByKey } from '../../../../store/selectors/series-episode.selector';
+    import {
+        getSeriesEpisodeByKey,
+        hasEpisodeLinksForSelectedLanguageAndPortal
+    } from '../../../../store/selectors/series-episode.selector';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
 
     @Component({
@@ -49,6 +56,7 @@
 
         private seriesEpisode: SeriesEpisode = null;
         private isLoading = false;
+        private hasValidLinks = false;
 
         public get buttonText(): string {
             return `${getSeriesEpisodeTitle(this.seriesEpisode)} Fortsetzen`;
@@ -56,6 +64,14 @@
 
         public get progress(): number {
             return getProgressForEpisode(this.seriesEpisode);
+        }
+
+        public get title(): string {
+            if (!this.hasValidLinks) {
+                return 'Für die ausgwählte Sprache wurde kein verfügbarer Stream gefunden.';
+            }
+
+            return '';
         }
 
         public beforeCreate(): void {
@@ -79,6 +95,7 @@
         private episodeChanged(): void {
             this.episodeChanged$.next();
             this.fetchSeriesEpisodeFromStore();
+            this.fetchEpisoeLinkStatusFromStore();
         }
 
         private fetchLoadingStateFromStore(): void {
@@ -94,6 +111,12 @@
                 this.seriesEpisode = seriesEpisode;
                 this.$forceUpdate();
             });
+        }
+
+        private fetchEpisoeLinkStatusFromStore(): void {
+            this.store.selectBehaviour(hasEpisodeLinksForSelectedLanguageAndPortal, this.seriesEpisodeKey).pipe(
+                takeUntil(merge(this.takeUntil$, this.episodeChanged$)),
+            ).subscribe(hasEpisodeLinks => this.hasValidLinks = hasEpisodeLinks);
         }
     }
 </script>

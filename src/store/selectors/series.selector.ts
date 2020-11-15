@@ -65,3 +65,14 @@ export const getSeriesForSeason = (state: StateModel, seriesSeasonKey: SeriesSea
     const season = getSeriesSeasonByKey(state, seriesSeasonKey);
     return getSeriesByKey(state, season?.seriesKey);
 };
+
+export const getActiveOrLastUsedPortalForSeries = (state: StateModel, seriesKey: Series['key']): PORTALS => {
+    const portal = state.appControlState.activePortal;
+    if (portal) {
+        return portal;
+    }
+
+    const series = getSeriesByKey(state, seriesKey);
+    return series?.lastUsedPortal;
+
+};
