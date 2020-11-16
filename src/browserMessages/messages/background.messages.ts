@@ -47,12 +47,21 @@ export const createToggleWindowMaximizationMessage = (windowId: number) : Messag
 export type ToggleWindowMaximizationMessage = ReturnType<typeof createToggleWindowMaximizationMessage>;
 
 
-export const createCloseWindowMessage = (windowId: number) : Message<number> => ({
+export const createCloseWindowMessage = (windowId: number): Message<number> => ({
     type: MessageType.BACKGROUND_CLOSE_WINDOW,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
     payload: windowId
 });
 export type CloseWindowMessage = ReturnType<typeof createCloseWindowMessage>;
+
+
+export const createExecuteScriptMessage = (script: string): Message<{ script: string }> => ({
+    type: MessageType.BACKGROUND_EXECUTE_SCRIPT,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false,
+    payload: { script }
+});
+export type ExecuteScriptMessage = ReturnType<typeof createExecuteScriptMessage>;
 
 

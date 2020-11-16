@@ -1,6 +1,5 @@
 import { IPortalController } from './portal.controller.interface';
 import { inject, injectable } from 'inversify';
-import { simulateEvent } from '../../ustils/simulate-event';
 import Providor from '../../../store/models/providor.model';
 import { PORTALS } from '../../../store/enums/portals.enum';
 import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
@@ -15,6 +14,8 @@ import { LanguageLinkCollection } from '../../../store/models/language-link.mode
 import { getLinksForProviders } from '../../ustils/dom.utils';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
 import { SeriesSeasonDto } from '../../../dto/series-season.dto';
+import { MessageService } from '../../../shared/services/message.service';
+import { createExecuteScriptMessage } from '../../../browserMessages/messages/background.messages';
 
 
 @injectable()
@@ -41,7 +42,8 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
     private readonly providorContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
 
-    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
+                @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
 
     public async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
@@ -50,13 +52,15 @@ export class BurningSeriesController implements IPortalController {
             if (link) {
                 return link;
             }
-
             if (this.isVideoOpenWithProvidor()) {
                 const playButtonElement = this.videoContainerSelector() as HTMLElement;
-                simulateEvent(playButtonElement,
+                this.videoContainerSelector.toString();
+                const scriptToBeExecuted =
+                    `window.simulateEvent((${this.videoContainerSelector.toString()})(),
                     'click',
-                    { pointerX: playButtonElement.clientLeft, pointerY: playButtonElement.clientTop }
-                );
+                    { pointerX: ${playButtonElement.clientLeft}, pointerY: ${playButtonElement.clientTop} }
+                )`;
+                this.messageService.sendMessageToBackground(createExecuteScriptMessage(scriptToBeExecuted));
                 return new Promise((resolve) => {
                     const videoContainer = this.videoContainerSelector();
 

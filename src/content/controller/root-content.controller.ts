@@ -19,6 +19,7 @@ import styles from '../styles/content.scss';
 import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
 import { DEFAULT_TITLE } from '../../constants/electron-variables';
 import { getProvidorController } from '../container/content-container.utils';
+import { addGlobalFunctions } from '../ustils/global.utils';
 
 @injectable()
 export class RootContentController {
@@ -31,6 +32,7 @@ export class RootContentController {
             this.recaptchaService.checkForRecaptcha();
             addCustomFrame();
             window.document.title = DEFAULT_TITLE;
+            addGlobalFunctions();
         });
     }
 

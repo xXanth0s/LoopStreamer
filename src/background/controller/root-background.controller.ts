@@ -7,6 +7,7 @@ import { StoreService } from '../../shared/services/store.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     CloseWindowMessage,
+    ExecuteScriptMessage,
     MinimizeWindowMessage,
     RecaptchaRecognizedMessage,
     ToggleWindowFullscreenMessage,
@@ -94,6 +95,11 @@ export class RootBackgroundController {
             (event): void => {
                 this.startVideoInVideo(event);
             });
+
+        ipcMain.handle(MessageType.BACKGROUND_EXECUTE_SCRIPT,
+            (event, message: ExecuteScriptMessage): void => {
+                this.executeScriptEventHandler(event, message);
+            });
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -127,5 +133,11 @@ export class RootBackgroundController {
     private startVideoInVideo(event: Electron.IpcMainInvokeEvent): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         window.webContents.executeJavaScript(`document.querySelector('.${VIDEO_IN_VIDEO_CSS_CLASS}').requestPictureInPicture()`, true);
+    }
+
+    private executeScriptEventHandler(event: Electron.IpcMainInvokeEvent, message: ExecuteScriptMessage): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        const code = { code: message.payload.script };
+        window.webContents.executeJavaScriptInIsolatedWorld(999, [ code ], true);
     }
 }
