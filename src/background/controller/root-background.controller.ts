@@ -44,7 +44,7 @@ export class RootBackgroundController {
 
     public openApp(): void {
         let href: string;
-        const {isDev, openAppDevTools} = environment;
+        const { isDev, openAppDevTools } = environment;
         if (isDev) {
             href = process.env.WEBPACK_DEV_SERVER_URL as string;
         } else {
@@ -100,6 +100,11 @@ export class RootBackgroundController {
             (event, message: ExecuteScriptMessage): void => {
                 this.executeScriptEventHandler(event, message);
             });
+
+        ipcMain.handle(MessageType.BACKGROUND_MAKE_WINDOW_FULLSCREEN,
+            (event): void => {
+                this.makeWindowFullscreenEventHandler(event);
+            });
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
@@ -128,6 +133,11 @@ export class RootBackgroundController {
     private minimizeWindowEventHandler(event: IpcMainInvokeEvent, message: MinimizeWindowMessage): void {
         const windowId = message.payload;
         this.windowService.minimizeWindow(windowId);
+    }
+
+    private makeWindowFullscreenEventHandler(event: IpcMainInvokeEvent): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        this.windowService.makeFullscreen(window.id);
     }
 
     private startVideoInVideo(event: Electron.IpcMainInvokeEvent): void {

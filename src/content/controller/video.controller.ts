@@ -17,8 +17,11 @@ import {
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { isVideoPictureInPicture } from '../../store/selectors/app-control-state.selector';
 import { setPictureInPictureAction } from '../../store/reducers/control-state.reducer';
-import { addClassForVideoInVideoClass, isPictureInPicture, preventFullscreen } from '../ustils/dom.utils';
-import { createStartVideoInVideoMessage } from '../../browserMessages/messages/background.messages';
+import { addClassForVideoInVideoClass, isPictureInPicture } from '../ustils/dom.utils';
+import {
+    createMakeWindowFullscreenMessage,
+    createStartVideoInVideoMessage
+} from '../../browserMessages/messages/background.messages';
 
 @injectable()
 export class VideoController {
@@ -43,7 +46,7 @@ export class VideoController {
             this.isActive = true;
             videoElement.play().then(() => this.onVideoStarted(videoElement, seriesEpisodeKey));
             this.startErrorTimer(this.timeout);
-            preventFullscreen();
+            this.preventVideoFullscreen();
         }
     }
 
@@ -122,6 +125,15 @@ export class VideoController {
             }
 
             isProgrammatically = false;
+        });
+    }
+
+    private preventVideoFullscreen(): void {
+        document.addEventListener('fullscreenchange', async () => {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+                await this.messageService.sendMessageToBackground(createMakeWindowFullscreenMessage());
+            }
         });
     }
 }

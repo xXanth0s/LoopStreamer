@@ -29,7 +29,7 @@ export const createMinimizeWindowMessage = (windowId: number): Message<number> =
 export type MinimizeWindowMessage = ReturnType<typeof createMinimizeWindowMessage>;
 
 
-export const createToggleWindowFullscreenMessage = (windowId: number) : Message<number> => ({
+export const createToggleWindowFullscreenMessage = (windowId: number): Message<number> => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
@@ -38,7 +38,15 @@ export const createToggleWindowFullscreenMessage = (windowId: number) : Message<
 export type ToggleWindowFullscreenMessage = ReturnType<typeof createToggleWindowFullscreenMessage>;
 
 
-export const createToggleWindowMaximizationMessage = (windowId: number) : Message<number> => ({
+export const createMakeWindowFullscreenMessage = (): Message<number> => ({
+    type: MessageType.BACKGROUND_MAKE_WINDOW_FULLSCREEN,
+    destinationController: ControllerType.BACKGROUND,
+    hasReply: false
+});
+export type MakeWindowFullscreenMessage = ReturnType<typeof createMakeWindowFullscreenMessage>;
+
+
+export const createToggleWindowMaximizationMessage = (windowId: number): Message<number> => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,

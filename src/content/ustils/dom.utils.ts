@@ -51,14 +51,6 @@ export function addClassForVideoInVideoClass(nodeElement: HTMLElement): void {
     nodeElement.classList.add(VIDEO_IN_VIDEO_CSS_CLASS);
 }
 
-export function preventFullscreen(): void {
-    document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        }
-    });
-}
-
 export function isBodyElement(htmlElement: HTMLElement): boolean {
     return htmlElement === document.querySelector('body');
 }
