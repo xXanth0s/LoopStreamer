@@ -32,6 +32,7 @@ export class WindowController {
                     map(isValid => {
                         if (isValid) {
                             this.windowService.addDefaultHandlingForNewWindow(window);
+                            window.setParentWindow(originalWindow);
                             return window;
                         }
                         this.windowService.closeWindow(window.id);

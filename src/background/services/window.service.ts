@@ -66,17 +66,19 @@ export class WindowService {
 
         const appWindowState = this.store.selectSync(getWindowStateForWindowType, WindowType.APP);
         const browserWindow = BrowserWindow.fromId(windowId);
-        if (!browserWindow) {
+        if (!browserWindow?.closable) {
             return;
         }
 
         const parentWindowId = browserWindow.getParentWindow()?.id;
+        const isParentAppWindow = !parentWindowId || parentWindowId === appWindowState.windowId;
 
-        if (browserWindow?.closable) {
+        if (!closeParentWindows || (closeParentWindows && isParentAppWindow)) {
             browserWindow.close();
+            return;
         }
 
-        if (closeParentWindows && parentWindowId && parentWindowId !== appWindowState.windowId) {
+        if (closeParentWindows && !isParentAppWindow) {
             this.closeWindow(parentWindowId, closeParentWindows);
         }
 
@@ -120,6 +122,7 @@ export class WindowService {
 
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
         window.removeMenu();
+        window.webContents.setAudioMuted(true);
         this.hideNewWindows(window);
         this.stopPlayerWhenActiveWindowClosed(window);
         this.listenToWindowSizeChanges(window);

@@ -60,6 +60,7 @@ export class VideoController {
 
                 if (hasVideo) {
                     window.show();
+                    window.webContents.setAudioMuted(false);
                 }
 
                 resolve(hasVideo);
