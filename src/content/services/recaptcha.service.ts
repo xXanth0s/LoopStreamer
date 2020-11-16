@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
-import { fromEvent, Observable } from 'rxjs';
-import { first, switchMap } from 'rxjs/operators';
+import { asyncScheduler, fromEvent, Observable } from 'rxjs';
+import { first, switchMap, throttleTime } from 'rxjs/operators';
 import { checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement } from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
@@ -18,15 +18,16 @@ export class RecaptchaService {
     public checkForRecaptcha(): void {
         this.checkForRecaptchaContainer().pipe(
             switchMap(container => this.checkForRecaptchaChallenge(container))
-        ).subscribe(recaptchaElement => {
+        ).subscribe(async recaptchaElement => {
             this.hideNeighbourElementsWhenParentIsBody(recaptchaElement);
 
-            recaptchaElement.scrollIntoView();
-            fromEvent(window, 'resize').subscribe(() => recaptchaElement.scrollIntoView());
+            fromEvent(window, 'resize').pipe(
+                throttleTime(300, asyncScheduler, { trailing: true }),
+            ).subscribe(() => setTimeout(() => recaptchaElement.scrollIntoView()));
 
             const size = getDomElementSize(recaptchaElement);
             this.messageService.sendMessageToBackground(createRecaptchaRecognizedMessage(size));
-        })
+        });
     }
 
     private checkForRecaptchaContainer(): Observable<HTMLElement> {

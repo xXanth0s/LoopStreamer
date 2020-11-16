@@ -23,6 +23,8 @@ import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
+import { fromEvent } from 'rxjs';
+import { first, takeUntil } from 'rxjs/operators';
 
 @injectable()
 export class RootBackgroundController {
@@ -110,9 +112,21 @@ export class RootBackgroundController {
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
+        if (width < 100 || height < 100) {
+            return;
+        }
+
         window.setSize(width, height);
         window.webContents.closeDevTools();
         window.show();
+
+        const takeUntil$ = fromEvent(window, 'closed').pipe(
+            first(),
+        );
+
+        fromEvent(window.webContents, 'will-navigate').pipe(
+            takeUntil(takeUntil$),
+        ).subscribe(() => window.hide());
     }
 
     private closeWindowEventHandler(event: IpcMainInvokeEvent, message: CloseWindowMessage): void {
