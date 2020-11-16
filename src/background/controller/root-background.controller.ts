@@ -5,14 +5,7 @@ import { VideoController } from './video.controller';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
-import {
-    CloseWindowMessage,
-    ExecuteScriptMessage,
-    MinimizeWindowMessage,
-    RecaptchaRecognizedMessage,
-    ToggleWindowFullscreenMessage,
-    ToggleWindowMaximizationMessage
-} from '../../browserMessages/messages/background.messages';
+import { ExecuteScriptMessage, RecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
@@ -74,23 +67,23 @@ export class RootBackgroundController {
             });
 
         ipcMain.handle(MessageType.BACKGROUND_CLOSE_WINDOW,
-            (event, message: CloseWindowMessage): void => {
-                this.closeWindowEventHandler(event, message);
+            (event): void => {
+                this.closeWindowEventHandler(event);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
-            (event, message: ToggleWindowFullscreenMessage): void => {
-                this.toggleWindowFullscreenEventHandler(event, message);
+            (event): void => {
+                this.toggleWindowFullscreenEventHandler(event);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
-            (event, message: ToggleWindowMaximizationMessage): void => {
-                this.toggleWindowMaximizationEventHandler(event, message);
+            (event): void => {
+                this.toggleWindowMaximizationEventHandler(event);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_MINIMIZE_WINDOW,
-            (event, message: MinimizeWindowMessage): void => {
-                this.minimizeWindowEventHandler(event, message);
+            (event): void => {
+                this.minimizeWindowEventHandler(event);
             });
 
         ipcMain.handle(MessageType.BACKGROUND_START_VIDEO_IN_VIDEO,
@@ -101,11 +94,6 @@ export class RootBackgroundController {
         ipcMain.handle(MessageType.BACKGROUND_EXECUTE_SCRIPT,
             (event, message: ExecuteScriptMessage): void => {
                 this.executeScriptEventHandler(event, message);
-            });
-
-        ipcMain.handle(MessageType.BACKGROUND_MAKE_WINDOW_FULLSCREEN,
-            (event): void => {
-                this.makeWindowFullscreenEventHandler(event);
             });
     }
 
@@ -129,29 +117,24 @@ export class RootBackgroundController {
         ).subscribe(() => window.hide());
     }
 
-    private closeWindowEventHandler(event: IpcMainInvokeEvent, message: CloseWindowMessage): void {
-        const windowId = message.payload;
-        this.windowService.closeWindow(windowId, true);
-    }
-
-    private toggleWindowMaximizationEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowMaximizationMessage): void {
-        const windowId = message.payload;
-        this.windowService.toggleMaximization(windowId);
-    }
-
-    private toggleWindowFullscreenEventHandler(event: IpcMainInvokeEvent, message: ToggleWindowFullscreenMessage): void {
-        const windowId = message.payload;
-        this.windowService.toggleFullscreen(windowId);
-    }
-
-    private minimizeWindowEventHandler(event: IpcMainInvokeEvent, message: MinimizeWindowMessage): void {
-        const windowId = message.payload;
-        this.windowService.minimizeWindow(windowId);
-    }
-
-    private makeWindowFullscreenEventHandler(event: IpcMainInvokeEvent): void {
+    private closeWindowEventHandler(event: IpcMainInvokeEvent): void {
         const window = BrowserWindow.fromWebContents(event.sender);
-        this.windowService.makeFullscreen(window.id);
+        this.windowService.closeWindow(window.id, true);
+    }
+
+    private toggleWindowMaximizationEventHandler(event: IpcMainInvokeEvent): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        this.windowService.toggleMaximization(window.id);
+    }
+
+    private toggleWindowFullscreenEventHandler(event: IpcMainInvokeEvent): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        this.windowService.toggleFullscreen(window.id);
+    }
+
+    private minimizeWindowEventHandler(event: IpcMainInvokeEvent): void {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        this.windowService.minimizeWindow(window.id);
     }
 
     private startVideoInVideo(event: Electron.IpcMainInvokeEvent): void {

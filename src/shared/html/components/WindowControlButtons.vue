@@ -29,6 +29,8 @@
     import Component from 'vue-class-component';
     import Vue from 'vue';
     import { debounceTime, filter, tap } from 'rxjs/operators';
+    import { Prop } from 'vue-property-decorator';
+    import { Subject } from 'rxjs';
     import { optionsContainer } from '../../../app/src/container/container';
     import { StoreService } from '../../services/store.service';
     import { SHARED_TYPES } from '../../constants/SHARED_TYPES';
@@ -38,8 +40,6 @@
         createMinimizeWindowMessage,
         createToggleWindowMaximizationMessage,
     } from '../../../browserMessages/messages/background.messages';
-    import { Prop } from 'vue-property-decorator';
-    import { Subject } from 'rxjs';
 
     @Component({
         name: 'WindowControlButtons',
@@ -72,15 +72,15 @@
         }
 
         closeButtonClicked(): void {
-            this.messageService.sendMessageToBackground(createCloseWindowMessage(this.windowId));
+            this.messageService.sendMessageToBackground(createCloseWindowMessage());
         }
 
         minimizeButtonClicked(): void {
-            this.messageService.sendMessageToBackground(createMinimizeWindowMessage(this.windowId));
+            this.messageService.sendMessageToBackground(createMinimizeWindowMessage());
         }
 
         fullscreenButtonClicked(): void {
-            this.messageService.sendMessageToBackground(createToggleWindowMaximizationMessage(this.windowId));
+            this.messageService.sendMessageToBackground(createToggleWindowMaximizationMessage());
         }
 
         private initMouseEventListeners(): void {

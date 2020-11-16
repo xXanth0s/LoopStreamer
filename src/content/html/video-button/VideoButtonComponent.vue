@@ -117,7 +117,7 @@
         }
 
         public toggleFullscreenMode(): void {
-            this.messageService.sendMessageToBackground(createToggleWindowFullscreenMessage(this.windowId));
+            this.messageService.sendMessageToBackground(createToggleWindowFullscreenMessage());
         }
 
         public mounted(): void {
@@ -179,7 +179,7 @@
 
         private fetchPictureInPictureStateFromStore(): void {
             this.store.selectBehaviour(isVideoPictureInPicture)
-                .subscribe(isPictrueInPicture => this.isPictureInPicture = isPictrueInPicture);
+                .subscribe(isPictureInPicture => this.isPictureInPicture = isPictureInPicture);
         }
 
         private togglePictureInPicture(): void {

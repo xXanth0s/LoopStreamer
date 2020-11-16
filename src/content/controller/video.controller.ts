@@ -19,8 +19,8 @@ import { isVideoPictureInPicture } from '../../store/selectors/app-control-state
 import { setPictureInPictureAction } from '../../store/reducers/control-state.reducer';
 import { addClassForVideoInVideoClass, isPictureInPicture } from '../ustils/dom.utils';
 import {
-    createMakeWindowFullscreenMessage,
-    createStartVideoInVideoMessage
+    createStartVideoInVideoMessage,
+    createToggleWindowFullscreenMessage
 } from '../../browserMessages/messages/background.messages';
 
 @injectable()
@@ -132,7 +132,7 @@ export class VideoController {
         document.addEventListener('fullscreenchange', async () => {
             if (document.fullscreenElement) {
                 await document.exitFullscreen();
-                await this.messageService.sendMessageToBackground(createMakeWindowFullscreenMessage());
+                await this.messageService.sendMessageToBackground(createToggleWindowFullscreenMessage());
             }
         });
     }

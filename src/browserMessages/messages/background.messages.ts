@@ -20,46 +20,34 @@ export const createStartVideoInVideoMessage = (): Message => ({
 export type StartVideoInVideoMessage = ReturnType<typeof createStartVideoInVideoMessage>;
 
 
-export const createMinimizeWindowMessage = (windowId: number): Message<number> => ({
+export const createMinimizeWindowMessage = (): Message => ({
     type: MessageType.BACKGROUND_MINIMIZE_WINDOW,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: windowId
 });
 export type MinimizeWindowMessage = ReturnType<typeof createMinimizeWindowMessage>;
 
 
-export const createToggleWindowFullscreenMessage = (windowId: number): Message<number> => ({
+export const createToggleWindowFullscreenMessage = (): Message => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: windowId
 });
 export type ToggleWindowFullscreenMessage = ReturnType<typeof createToggleWindowFullscreenMessage>;
 
 
-export const createMakeWindowFullscreenMessage = (): Message<number> => ({
-    type: MessageType.BACKGROUND_MAKE_WINDOW_FULLSCREEN,
-    destinationController: ControllerType.BACKGROUND,
-    hasReply: false
-});
-export type MakeWindowFullscreenMessage = ReturnType<typeof createMakeWindowFullscreenMessage>;
-
-
-export const createToggleWindowMaximizationMessage = (windowId: number): Message<number> => ({
+export const createToggleWindowMaximizationMessage = (): Message => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: windowId
 });
 export type ToggleWindowMaximizationMessage = ReturnType<typeof createToggleWindowMaximizationMessage>;
 
 
-export const createCloseWindowMessage = (windowId: number): Message<number> => ({
+export const createCloseWindowMessage = (): Message => ({
     type: MessageType.BACKGROUND_CLOSE_WINDOW,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: windowId
 });
 export type CloseWindowMessage = ReturnType<typeof createCloseWindowMessage>;
 

@@ -112,14 +112,6 @@ export class WindowService {
         }
     }
 
-    public makeFullscreen(windowId: number): void {
-        debugger
-        const browserWindow = BrowserWindow.fromId(windowId);
-        if (browserWindow?.isFullScreenable()) {
-            browserWindow.setFullScreen(true);
-        }
-    }
-
     public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
         window.removeMenu();
         window.webContents.setAudioMuted(true);
