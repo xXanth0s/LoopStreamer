@@ -4,21 +4,25 @@ import { PORTALS } from '../enums/portals.enum';
 import { getNextEpisode, getSeriesEpisodeByKey } from './series-episode.selector';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
-import { getLinksByKeys } from './línk.selector';
 import { SeriesSeason } from '../models/series-season.model';
+import { Logger } from '../../shared/services/logger';
 
 export const getAllWatchedSeries = (state: StateModel): Series[] => Object.values(state.series).filter(series => series.lastEpisodeWatched);
+
+export const getMultipleSeriesByKey = (state: StateModel, seriesKeys: Series['key'][]): Series[] => seriesKeys.map(key => getSeriesByKey(state, key));
 
 export const getSeriesByKey = (state: StateModel, seriesKey: Series['key']): Series => state.series[seriesKey];
 
 export const getLastUsedEpisodeForSeries = (state: StateModel, seriesKey: Series['key']): PORTALS => getSeriesByKey(state, seriesKey)?.lastUsedPortal;
 
-export const getSeriesForPortal = (state: StateModel, portal: PORTALS): Series[] => {
-    return Object.values(state.series)
-        .filter(series => {
-            return getLinksByKeys(state, series.portalLinks)
-                .some(link => link.portal === portal);
-        });
+export const getSeriesForPortal = (state: StateModel, portalKey: PORTALS): Series[] => {
+    const portal = state.portals[portalKey];
+    if (!portal) {
+        Logger.error(`[getSeriesForPortal] no portal found for key ${portalKey}`);
+        return [];
+    }
+
+    return getMultipleSeriesByKey(state, portal.series);
 };
 
 export const getLastWatchedEpisode = (state: StateModel, seriesKey: Series['key']): SeriesEpisode => {

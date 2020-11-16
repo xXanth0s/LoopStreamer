@@ -5,12 +5,23 @@ import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-epis
 import { getKeyForSeriesSeason } from '../utils/key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal } from './línk.selector';
-import { getSeriesForSeason } from './series.selector';
+import { getSeriesByKey, getSeriesForSeason } from './series.selector';
+import { Logger } from '../../shared/services/logger';
+
+export const getMultipleSeriesSeasonByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => {
+    return keys.map(key => getSeriesSeasonByKey(state, key));
+};
 
 export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
 export const getSeasonsForSeries = (state: StateModel, seriesKey: SeriesSeason['seriesKey']): SeriesSeason[] => {
-    return Object.values(state.seriesSeasons).filter(season => season.seriesKey === seriesKey);
+    const series = getSeriesByKey(state, seriesKey);
+    if (!series) {
+        Logger.error(`[getSeasonsForSeries] no series found for key ${seriesKey}`);
+        return [];
+    }
+
+    return getMultipleSeriesSeasonByKeys(state, series.seasons);
 };
 
 export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): SeriesSeason => {

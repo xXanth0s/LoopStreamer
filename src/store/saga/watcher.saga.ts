@@ -44,5 +44,11 @@ export function* watcherSaga() {
         yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
     } catch (e) {
         Logger.error('[WatcherSaga] Error occurred', e);
+        throw new Error(e);
     }
+}
+
+
+export function sagaErrorHandler(error: Error, errorInfo) {
+    Logger.error(`[WatcherSage] error occured`, error, errorInfo);
 }

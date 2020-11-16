@@ -9,22 +9,32 @@ import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
+import SeriesEpisode from '../models/series-episode.model';
+import { updateOrAddMultipleSeriesEpisodeAction, updateOrAddSeriesEpisodeAction } from './series-episode.reducer';
 
 
 const initialState: StateModel['seriesSeasons'] = {};
 
 const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): void {
-
     const oldSeasonObject = state[seriesSeason.key];
 
-    state[seriesSeason.key] = {
-        ...oldSeasonObject,
-        ...seriesSeason,
-        portalLinks: [
-            ...(oldSeasonObject?.portalLinks || []),
-            ...seriesSeason.portalLinks,
-        ]
-    };
+    if (oldSeasonObject) {
+        state[seriesSeason.key] = {
+            ...oldSeasonObject,
+            ...seriesSeason,
+            portalLinks: [
+                ...oldSeasonObject.portalLinks,
+                ...seriesSeason.portalLinks,
+            ],
+            episodes: [
+                ...oldSeasonObject.episodes,
+                ...seriesSeason.episodes,
+            ]
+        };
+    } else {
+        state[seriesSeason.key] = seriesSeason;
+    }
+
 };
 
 const updateOrAddMultipleSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeasons: SeriesSeason[]): void {
@@ -55,6 +65,20 @@ function addLink(state: Record<string, SeriesSeason>, link: LinkModel) {
     season.portalLinks = addToArrayIfNotExists(season.portalLinks, link.key);
 }
 
+function addMultipleEpisodes(state: StateModel['seriesSeasons'], episodes: SeriesEpisode[]): void {
+    episodes.forEach(episode => addEpisode(state, episode));
+}
+
+function addEpisode(state: StateModel['seriesSeasons'], episode: SeriesEpisode): void {
+    const season = state[episode.seasonKey];
+    if (!season) {
+        Logger.error(`[SeriesSeasonReducerducer->addEpisodes] try to add episode to season ${episode.seasonKey}, but no season found. Episode:`, episode);
+        return;
+    }
+
+    season.episodes = addToArrayIfNotExists(season.episodes, episode.key);
+}
+
 const seriesSeasonsReducer = createSlice({
     name: 'seriesSeasons',
     initialState,
@@ -68,6 +92,10 @@ const seriesSeasonsReducer = createSlice({
             addLinks(state, action.payload));
         builder.addCase(updateOrAddLinkAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel>) =>
             addLink(state, action.payload));
+        builder.addCase(updateOrAddMultipleSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode[]>) =>
+            addMultipleEpisodes(state, action.payload));
+        builder.addCase(updateOrAddSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode>) =>
+            addEpisode(state, action.payload));
     }
 });
 

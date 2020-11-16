@@ -2,6 +2,7 @@ import SeriesEpisode from './series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { LinkModel } from './link.model';
 import { LANGUAGE } from '../enums/language.enum';
+import { SeriesSeason } from './series-season.model';
 
 export default interface Series {
     key: string;
@@ -13,7 +14,8 @@ export default interface Series {
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
     posterHref?: string;
-    portalLinks: LinkModel['key'][]
+    portalLinks: LinkModel['key'][];
+    seasons: SeriesSeason['key'][];
     scipStartTime?: number;
     scipEndTime?: number;
 }

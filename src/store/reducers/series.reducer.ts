@@ -11,6 +11,8 @@ import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
 import { LANGUAGE } from '../enums/language.enum';
+import { updateOrAddMutlipleSeriesSeasonAction, updateOrAddSeriesSeasonAction } from './series-season.reducer';
+import { SeriesSeason } from '../models/series-season.model';
 
 const initialState: StateModel['series'] = {};
 
@@ -52,14 +54,27 @@ const setEndTimeForSeries = (state: { [key: string]: Series }, key: Series['key'
 };
 
 function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): void {
-    const {key} = seriesInfo;
+    const { key } = seriesInfo;
 
-    const portalLinks = state[key]?.portalLinks || [];
-    state[key] = {
-        ...state[key],
-        ...seriesInfo,
-        portalLinks
-    };
+    const oldSeries = state[key];
+
+    if (oldSeries) {
+        state[key] = {
+            ...oldSeries,
+            ...seriesInfo,
+            portalLinks: [
+                ...oldSeries.portalLinks,
+                ...seriesInfo.portalLinks
+            ],
+            seasons: [
+                ...oldSeries.seasons,
+                ...seriesInfo.seasons
+
+            ]
+        };
+    } else {
+        state[key] = seriesInfo;
+    }
 }
 
 function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos: Series[]): void {
@@ -121,6 +136,20 @@ function setLastUsedLanguageForSeries(state: { [key: string]: Series }, { series
     series.lastUsedLanguage = language;
 }
 
+function addMultipleSeasons(state: Record<string, Series>, seasons: SeriesSeason[]) {
+    seasons.forEach(season => addSeasons(state, season));
+}
+
+function addSeasons(state: Record<string, Series>, season: SeriesSeason) {
+    const series = state[season.seriesKey];
+    if (!series) {
+        Logger.error(`[SeriesReducerducer->addSeasons] try to add link to season ${season.key}, but no series found for key ${season.seriesKey}`);
+        return;
+    }
+
+    series.seasons = addToArrayIfNotExists(series.seasons, season.key);
+}
+
 const seriesSlice = createSlice({
     name: 'series',
     initialState,
@@ -148,6 +177,10 @@ const seriesSlice = createSlice({
             deleteSeries(state, action.payload));
         builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
             addMultipleLinks(state, action.payload));
+        builder.addCase(updateOrAddMutlipleSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason[]>) =>
+            addMultipleSeasons(state, action.payload));
+        builder.addCase(updateOrAddSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason>) =>
+            addSeasons(state, action.payload));
     },
 });
 

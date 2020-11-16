@@ -5,11 +5,23 @@ import { sortArrayForKey } from '../../utils/array.utils';
 import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from './app-control-state.selector';
 import { getActiveOrLastUsedPortalForSeries } from './series.selector';
 import { getPortalLinksForSeriesEpisodePortalAndLanguage } from './línk.selector';
+import { getSeriesSeasonByKey } from './series-season.selector';
+import { Logger } from '../../shared/services/logger';
+
+export const getMultipleSeriesEpisodeByKeys = (state: StateModel, keys: SeriesEpisode['key'][]): SeriesEpisode[] => {
+    return keys.map(key => getSeriesEpisodeByKey(state, key));
+};
 
 export const getSeriesEpisodeByKey = (state: StateModel, key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
 
 export const getSeriesEpisodesForSeason = (state: StateModel, seasonKey: SeriesEpisode['seasonKey']): SeriesEpisode[] => {
-    return Object.values(state.seriesEpisodes).filter(episode => episode.seasonKey === seasonKey);
+    const season = getSeriesSeasonByKey(state, seasonKey);
+    if (!season) {
+        Logger.error(`[getSeriesEpisodesForSeason] no season found for key ${seasonKey}`);
+        return [];
+    }
+
+    return getMultipleSeriesEpisodeByKeys(state, season.episodes);
 };
 
 export const getNextEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => {

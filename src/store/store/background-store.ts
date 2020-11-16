@@ -11,18 +11,18 @@ import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
-import { watcherSaga } from '../saga/watcher.saga';
+import { sagaErrorHandler, watcherSaga } from '../saga/watcher.saga';
 import linkSlice from '../reducers/link.reducer';
 import { providorsSlice } from '../reducers/providors.reducer';
 
 const preloadedState = getStorageData();
-const sagaMiddleware = createSagaMiddleware();
+const sagaMiddleware = createSagaMiddleware({ onError: sagaErrorHandler });
 const middleware = [
     triggerAlias,
     sagaMiddleware,
     StorageMiddlerware,
     forwardToRenderer
-]
+];
 
 const backgroundStore = configureStore<StateModel>({
     reducer: {

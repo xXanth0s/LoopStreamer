@@ -37,13 +37,15 @@ export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
             posterHref,
             description,
             portalLinks: [],
+            seasons: [],
         };
     }
 
     return {
         key,
         title,
-        portalLinks: []
+        portalLinks: [],
+        seasons: [],
     };
 }
 
@@ -57,7 +59,8 @@ export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): Seri
             key,
             seriesKey,
             seasonNumber: seasonNumber,
-            portalLinks: []
+            portalLinks: [],
+            episodes: [],
         };
     });
 }
@@ -72,7 +75,8 @@ export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: SeriesSeasonDto): Se
         key,
         seriesKey,
         seasonNumber: seasonNumber,
-        portalLinks: []
+        portalLinks: [],
+        episodes: [],
     };
 }
 
