@@ -1,47 +1,43 @@
 <template>
     <card-tile :title="'Hoster'">
-        <div class="row">
+        <div>
             <span>Verwende Drag & Drop um die Hoster zu sortieren</span>
         </div>
-        <div class="row">
+        <div>
             <p class="title">Verwendete Hoster:</p>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="prov-row drop-area drop-area-not-used">
-                    <draggable :list="usedProvidors"
-                               :options="dragableConfig"
-                               class="dragable">
-                        <div :key="providor.key"
-                             class="drag-item"
-                             v-for="providor in usedProvidors">
-                            <div class="drop-item text-center">
-                                <span class="item-name">{{providor.key}}</span>
-                            </div>
+        <div>
+            <div class="prov-row drop-area drop-area-not-used">
+                <draggable :list="usedProvidors"
+                           :options="dragableConfig"
+                           class="dragable">
+                    <div :key="providor.key"
+                         class="drag-item"
+                         v-for="providor in usedProvidors">
+                        <div class="drop-item text-center">
+                            <span class="item-name">{{providor.key}}</span>
                         </div>
-                    </draggable>
-                </div>
+                    </div>
+                </draggable>
             </div>
         </div>
-        <div class="row">
+        <div>
             <p class="title">Nicht zu verwendende Hoster:</p>
         </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="prov-row drop-area drop-area-not-used">
-                    <draggable :list="unusedProvidors"
-                               :options="dragableConfig"
-                               class="dragable">
-                        <div :key="providor.key"
-                             class="drag-item"
-                             v-for="providor in unusedProvidors">
-                            <div class="drop-item text-center">
-                                <span class="item-name">{{providor.key}}</span>
-                            </div>
+        <div>
+            <div class="prov-row drop-area drop-area-not-used">
+                <draggable :list="unusedProvidors"
+                           :options="dragableConfig"
+                           class="dragable">
+                    <div :key="providor.key"
+                         class="drag-item"
+                         v-for="providor in unusedProvidors">
+                        <div class="drop-item text-center">
+                            <span class="item-name">{{providor.key}}</span>
                         </div>
-                    </draggable>
-                </div>
+                    </div>
+                </draggable>
             </div>
         </div>
         <div class="row col-row" style="">
