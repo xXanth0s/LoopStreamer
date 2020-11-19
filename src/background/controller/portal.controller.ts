@@ -3,7 +3,7 @@ import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { catchError, debounceTime, filter, first, takeUntil, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, first, takeUntil } from 'rxjs/operators';
 import {
     createGetAllProvidorLinksForEpisodeMessage,
     createGetAllSeriesFromPortalMessage,
@@ -19,7 +19,6 @@ import {
     addAsyncInteractionAction,
     removeAsyncInteractionAction,
     resetControlStateAction,
-    setActivePortalAction,
     setWindowIdForWindowTypeAction
 } from '../../store/reducers/control-state.reducer';
 import { SeriesInfoDto } from '../../dto/series-info.dto';
@@ -59,7 +58,7 @@ export class PortalController {
         return this.openPageAndGetDataForMessage(
             portal.seriesListUrl,
             portalKey,
-            createGetAllSeriesFromPortalMessage(),
+            createGetAllSeriesFromPortalMessage(portalKey),
             asyncInteractionModel
         );
     }
@@ -79,7 +78,7 @@ export class PortalController {
         return this.openPageAndGetDataForMessage(
             link.href,
             portalKey,
-            createGetDetailedSeriesInformationMessage(),
+            createGetDetailedSeriesInformationMessage(portalKey),
             asyncInteractionModel
         );
     }
@@ -93,7 +92,7 @@ export class PortalController {
         return this.openPageAndGetDataForMessage(
             link.href,
             link.portal,
-            createGetSeasonInfoMessage(seasonNumber),
+            createGetSeasonInfoMessage(seasonNumber, link.portal),
             asyncInteractionModel
         );
     }
@@ -114,7 +113,12 @@ export class PortalController {
             portalKey
         });
 
-        return this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetAllProvidorLinksForEpisodeMessage(language), asyncInteractionModel);
+        return this.openPageAndGetDataForMessage(
+            portalLink.href,
+            portalKey,
+            createGetAllProvidorLinksForEpisodeMessage(language, portalKey),
+            asyncInteractionModel
+        );
     }
 
     public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS, language: LANGUAGE): Promise<ProvidorLink> {
@@ -135,8 +139,7 @@ export class PortalController {
             portalKey
         });
 
-        const link = await this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetResolvedProvidorLinkForEpisodeMessage(episode, providor), asyncInteractionModel);
-
+        const link = await this.openPageAndGetDataForMessage(portalLink.href, portalKey, createGetResolvedProvidorLinkForEpisodeMessage(episode, providor, portalKey), asyncInteractionModel);
         return {
             providor,
             link
@@ -148,9 +151,11 @@ export class PortalController {
         return this.windowController.openLinkForWebsite(portal, url).pipe(
             takeUntil(this.store.playerHasStopped()),
             waitTillPageLoadFinished(),
-            tap(() => this.store.dispatch(setActivePortalAction(portalKey))),
             debounceTime(1000),
-            finalizeWithValue((window: BrowserWindow) => this.windowService.closeWindow(window.id, true)),
+            finalizeWithValue((window: BrowserWindow) => {
+                console.log('finalizeWithValue and url', url);
+                this.windowService.closeWindow(window.id, true);
+            }),
         );
     }
 
@@ -167,23 +172,28 @@ export class PortalController {
                 filter<BrowserWindow>(Boolean),
             ).subscribe(async (window) => {
                 const closeSub = fromEvent(window, 'close').pipe(
-                    first()
-                ).subscribe(() => this.store.dispatch(resetControlStateAction()));
+                    first(),
+                    takeUntil(this.store.playerHasStopped()),
+                ).subscribe(() => {
+                    console.log('close event triggered with url,', portalUrl);
+                    this.store.dispatch(resetControlStateAction());
+                });
 
                 try {
                     const result = await this.messageService.sendMessageToBrowserWindow(window.id, message);
+                    closeSub.unsubscribe();
+                    console.log('closeSub unsbubscribed, with url', portalUrl);
                     resolve(result);
                 } catch (err) {
                     Logger.error(`[PortalController->openPageAndGetDataForMessage] error while sending message ${message}`, err);
-                } finally {
-                    this.store.dispatch(setWindowIdForWindowTypeAction({
-                        windowId: null,
-                        windowType: WindowType.PORTAL
-                    }));
-                    this.store.dispatch(removeAsyncInteractionAction(asyncInteraction.key));
-                    sub.unsubscribe();
-                    closeSub.unsubscribe();
                 }
+                console.log('in finally');
+                this.store.dispatch(setWindowIdForWindowTypeAction({
+                    windowId: null,
+                    windowType: WindowType.PORTAL
+                }));
+                this.store.dispatch(removeAsyncInteractionAction(asyncInteraction.key));
+                sub.unsubscribe();
             });
         });
     }

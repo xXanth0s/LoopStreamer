@@ -69,29 +69,32 @@ export class RootContentController {
     }
 
     private async getResolvedProvidorLinkHandler(event: IpcRendererEvent, message: GetResolvedProvidorLinkForEpisode): Promise<void> {
-        const { providor, episodeInfo } = message.payload;
-        const result = await this.portalService.getPortalController().getResolvedProvidorLinkForEpisode(episodeInfo, providor);
+        const { providor, episodeInfo, portal } = message.payload;
+        const result = await this.portalService.getPortalController(portal).getResolvedProvidorLinkForEpisode(episodeInfo, providor);
         this.messageService.replyToSender(message, event.sender, result);
     }
 
     private getAllProvidorLinksForEpisode(event: IpcRendererEvent, message: GetAllProvidorLinksForEpisodeMessage): void {
-        const { language } = message.payload;
-        const result = this.portalService.getPortalController().getAllPortalProviderLinksForEpisode(language);
+        const { language, portal } = message.payload;
+        const result = this.portalService.getPortalController(portal).getAllPortalProviderLinksForEpisode(language);
         this.messageService.replyToSender(message, event.sender, result);
     }
 
     private async getAllSeriesFromPortalHandler(event: IpcRendererEvent, message: GetAllSeriesFromPortalMessage): Promise<void> {
-        const seriesInfo = await this.portalService.getPortalController()?.getAllSeriesInfo();
+        const { portal } = message.payload;
+        const seriesInfo = await this.portalService.getPortalController(portal)?.getAllSeriesInfo();
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
     private async getDetailedSeriesInformationHandler(event: IpcRendererEvent, message: GetDetailedSeriesInformationMessage): Promise<void> {
-        const seriesInfo = await this.portalService.getPortalController()?.getSeriesMetaInformation();
+        const { portal } = message.payload;
+        const seriesInfo = await this.portalService.getPortalController(portal)?.getSeriesMetaInformation();
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
     private async getSeasonsEpisodeInformationHandler(event: IpcRendererEvent, message: GetSeasonInfoMessage): Promise<void> {
-        const seasonInfo = await this.portalService.getPortalController()?.getSeasonInfo(message.payload.seasonNumber);
+        const { portal, seasonNumber } = message.payload;
+        const seasonInfo = await this.portalService.getPortalController(portal)?.getSeasonInfo(seasonNumber);
         this.messageService.replyToSender(message, event.sender, seasonInfo);
     }
 

@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ControlState } from '../models/control-state.model';
-import Portal from '../models/portal.model';
 import Providor from '../models/providor.model';
-import { PORTALS } from '../enums/portals.enum';
 import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
 import { StateModel } from '../models/state.model';
@@ -12,7 +10,6 @@ import { Windows } from 'webextension-polyfill-ts';
 import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
-    activePortal: PORTALS.BS,
     activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
     controllerWindowState: {},
@@ -26,12 +23,6 @@ const updateControlState = function (state: ControlState, newControlState: Parti
     };
 };
 
-const setActivePortal = function (state: ControlState, activePortal: Portal['key']): ControlState {
-    return {
-        ...state,
-        activePortal
-    };
-};
 const setActiveProvidor = function (state: ControlState, activeProvidor: Providor['key']): ControlState {
     return {
         ...state,
@@ -45,7 +36,6 @@ const resetControlState = (state: ControlState): ControlState => {
         asyncInteractions: {},
         activeEpisode: '',
         playedEpisodes: 0,
-        activePortal: null,
         activeProvidor: null,
     };
 };
@@ -112,8 +102,6 @@ export const controlStateSlice = createSlice({
     reducers: {
         updateControlStateAction: (state: ControlState, action: PayloadAction<Partial<ControlState>>) =>
             updateControlState(state, action.payload),
-        setActivePortalAction: (state: ControlState, action: PayloadAction<Portal['key']>) =>
-            setActivePortal(state, action.payload),
         setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) =>
             setActiveProvidor(state, action.payload),
         resetControlStateAction: (state: ControlState) =>
@@ -141,7 +129,6 @@ export const controlStateSlice = createSlice({
 
 export const {
     updateControlStateAction,
-    setActivePortalAction,
     setActiveProvidorAction,
     resetControlStateAction,
     setWindowIdForWindowTypeAction,

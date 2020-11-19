@@ -11,7 +11,7 @@ import { addSeriesSaga } from '../add-data/add-series.saga';
 export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelectedSeriesForAppAction>) {
     const state: StateModel = yield select();
     const seriesKey = action.payload;
-    if (!seriesKey) {
+    if (!seriesKey || !state.appControlState.selectedSeriesKey) {
         return;
     }
 

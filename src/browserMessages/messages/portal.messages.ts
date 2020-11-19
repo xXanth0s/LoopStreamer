@@ -7,20 +7,25 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { PORTALS } from '../../store/enums/portals.enum';
 
-export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS): Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode }, string> => ({
+export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS, portal: PORTALS):
+    Message<{ providor: PROVIDORS, episodeInfo: SeriesEpisode, portal: PORTALS }, string> => ({
     type: MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
-    payload: { providor, episodeInfo }
+    payload: { providor, episodeInfo, portal }
 });
 export type GetResolvedProvidorLinkForEpisode = ReturnType<typeof createGetResolvedProvidorLinkForEpisodeMessage>;
 
-export const createGetAllProvidorLinksForEpisodeMessage = (language: LANGUAGE): Message<{ language: LANGUAGE }, ProvidorLink[]> => ({
+export const createGetAllProvidorLinksForEpisodeMessage = (language: LANGUAGE, portal: PORTALS): Message<{ language: LANGUAGE, portal: PORTALS }, ProvidorLink[]> => ({
     type: MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
-    payload: { language }
+    payload: {
+        language,
+        portal,
+    }
 });
 export type GetAllProvidorLinksForEpisodeMessage = ReturnType<typeof createGetAllProvidorLinksForEpisodeMessage>;
 
@@ -41,24 +46,33 @@ export const createGetPreviousVideoLinkMessage = (): Message<undefined, string> 
 export type GetPreviousVideoLinkMessage = ReturnType<typeof createGetPreviousVideoLinkMessage>;
 
 
-export const createGetAllSeriesFromPortalMessage = (): Message<undefined, SeriesInfoDto[]> => ({
+export const createGetAllSeriesFromPortalMessage = (portal: PORTALS): Message<{ portal: PORTALS }, SeriesInfoDto[]> => ({
     type: MessageType.PORTAL_GET_ALL_SERIES,
     destinationController: ControllerType.PORTAL,
+    payload: {
+        portal
+    },
     hasReply: true,
 });
 export type GetAllSeriesFromPortalMessage = ReturnType<typeof createGetAllSeriesFromPortalMessage>;
 
-export const createGetDetailedSeriesInformationMessage = (): Message<undefined, SeriesInfoDto> => ({
+export const createGetDetailedSeriesInformationMessage = (portal: PORTALS): Message<{ portal: PORTALS }, SeriesInfoDto> => ({
     type: MessageType.PORTAL_GET_SERIES_META_INFORMATION,
     destinationController: ControllerType.PORTAL,
+    payload: {
+        portal
+    },
     hasReply: true,
 });
 export type GetDetailedSeriesInformationMessage = ReturnType<typeof createGetDetailedSeriesInformationMessage>;
 
-export const createGetSeasonInfoMessage = (seasonNumber: string): Message<{ seasonNumber: string }, SeriesSeasonDto> => ({
+export const createGetSeasonInfoMessage = (seasonNumber: string, portal: PORTALS): Message<{ seasonNumber: string, portal: PORTALS }, SeriesSeasonDto> => ({
     type: MessageType.PORTAL_GET_SEASON_INFO,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
-    payload: { seasonNumber },
+    payload: {
+        seasonNumber,
+        portal,
+    },
 });
 export type GetSeasonInfoMessage = ReturnType<typeof createGetSeasonInfoMessage>;

@@ -24,13 +24,13 @@ export type loadSeasonInformationOptions = {
 
 export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
     const seasonKey = action.payload;
-    if (!seasonKey) {
+    const state: StateModel = yield select();
+    if (!seasonKey || !state.appControlState.selectedSeason) {
         return;
     }
 
     yield setActiveLanguageForSeasonAndPortal(seasonKey);
 
-    const state: StateModel = yield select();
     let portal = state.appControlState.activePortal;
     const season = getSeriesSeasonByKey(state, seasonKey);
     const series = getSeriesByKey(state, season.seriesKey);

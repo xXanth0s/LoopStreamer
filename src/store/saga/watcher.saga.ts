@@ -4,7 +4,7 @@ import {
     toggleSelectedSeriesForAppAction
 } from '../reducers/app-control-state.reducer';
 import { loadSeriesInformationSaga } from './load-series-data/load-series.saga';
-import { takeEvery, takeLatest } from 'redux-saga/effects';
+import { takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
@@ -27,12 +27,12 @@ import { loadSeriesSeasonForLanguageSaga } from './load-series-data/load-series-
 export function* watcherSaga() {
     try {
         yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortal);
-        yield takeEvery(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
-        yield takeEvery(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
+        yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
+        yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 
         // episode state controlling
         yield takeLatest(setSeriesEpisodeTimeStampAction.type, episodeTimeUpdateSaga);
-        yield takeEvery(seriesEpisodeStartedAction.type, episodeStartedSaga);
+        yield takeLatest(seriesEpisodeStartedAction.type, episodeStartedSaga);
 
         // control actions from app
         yield takeLatest(startEpisodeAction.type, startEpisodeSaga);

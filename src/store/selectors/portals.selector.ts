@@ -13,12 +13,3 @@ export const getPortalForKey = (state: StateModel, portalKey: Portal['key']): Po
 
     return portal;
 };
-
-export const getActivePortal = (state: StateModel): Portal | null => {
-    if (!state.controlState.activePortal) {
-        Logger.error(`[PortalsSelector->getActivePortal]  No active Portal found`);
-        return null;
-    }
-
-    return getPortalForKey(state, state.controlState.activePortal);
-};
