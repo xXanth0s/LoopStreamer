@@ -8,6 +8,11 @@ export const LABGUAGE_FLAG_DATA_MAP: Partial<Record<LANGUAGE, LanguageFlag>> = {
         title: 'Deutsch',
         src: path.join(process.env.BASE_URL, 'flags', 'germany.svg'),
     },
+    [LANGUAGE.ENGLISH_GERMAN_SUB]: {
+        language: LANGUAGE.ENGLISH_GERMAN_SUB,
+        title: 'Deutsch mit Untertitel',
+        src: path.join(process.env.BASE_URL, 'flags', 'germany.svg'),
+    },
     [LANGUAGE.ENGLISH]: {
         language: LANGUAGE.ENGLISH,
         title: 'Englisch',
