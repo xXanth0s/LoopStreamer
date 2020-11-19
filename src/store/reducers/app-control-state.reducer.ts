@@ -53,9 +53,9 @@ export const appControlStateSlice = createSlice({
         resetAppControlStateAction: () =>
             reset(),
     }, extraReducers: (builder) => {
-        builder.addCase(deleteSeriesAction, (state: StateModel['controlState']) =>
+        builder.addCase(deleteSeriesAction, (state: StateModel['appControlState']) =>
             toggleSelectedSeries(state, null));
-        builder.addCase(userChangedLanguageAction, (state: StateModel['controlState'], action: PayloadAction<{ selectedLanguage: LANGUAGE }>) =>
+        builder.addCase(userChangedLanguageAction, (state: StateModel['appControlState'], action: PayloadAction<{ selectedLanguage: LANGUAGE }>) =>
             setSelectedLanguage(state, action.payload));
     }
 });
