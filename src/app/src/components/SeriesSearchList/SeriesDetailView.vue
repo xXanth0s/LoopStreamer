@@ -58,7 +58,7 @@
     import Vue from 'vue';
     import { Prop, Watch } from 'vue-property-decorator';
     import Component from 'vue-class-component';
-    import { debounceTime, takeUntil } from 'rxjs/operators';
+    import { takeUntil } from 'rxjs/operators';
     import { merge, Subject } from 'rxjs';
     import Series from '../../../../store/models/series.model';
     import { optionsContainer } from '../../container/container';
@@ -70,12 +70,11 @@
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getLastWatchedEpisode, getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
-    import { hasAsyncInteractionForType, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
+    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
     import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
-    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
     import LanguageSelection from '../LanguageSelection.vue';
 
     @Component({
@@ -184,9 +183,8 @@
         }
 
         private fetchSeasonLoadingStateFromStore(): void {
-            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_SEASON_EPISODES).pipe(
+            this.store.selectBehaviour(isLoadingSeason).pipe(
                 takeUntil(this.takeUntil$),
-                debounceTime(100),
             ).subscribe(isLoading => this.isSeasonLoading = isLoading);
         }
 

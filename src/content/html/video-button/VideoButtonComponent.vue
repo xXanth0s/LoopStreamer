@@ -7,7 +7,8 @@
             <transition name="fade">
                 <div v-if="showButtons">
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                        <label :disabled="!episodeInfo.hasPreviousEpisode || isLoading" class="btn btn-primary btn-lg"
+                        <label :disabled="!episodeInfo.hasPreviousEpisode || isPreparingVideo"
+                               class="btn btn-primary btn-lg"
                                @click.stop.prevent="previous" title="Vorherige Episode">
                             <div class="spinner-border video-button" v-if="isStartingPrevious"
                                  role="status">
@@ -24,7 +25,8 @@
                             <i class="fas fa-compress-alt" v-if="isFullscreen"/>
                             <i class="fas fa-expand-alt" v-else/>
                         </label>
-                        <label :disabled="!episodeInfo.hasNextEpisode || isLoading" class="btn btn-primary btn-lg"
+                        <label :disabled="!episodeInfo.hasNextEpisode || isPreparingVideo"
+                               class="btn btn-primary btn-lg"
                                @click.stop.prevent="next">
                             <div class="spinner-border video-button" v-if="isStartingNext"
                                  role="status">
@@ -57,7 +59,7 @@
     import { inversifyContentContainer } from '../../container/container';
     import SeriesEpisode from '../../../store/models/series-episode.model';
     import { createToggleWindowFullscreenMessage } from '../../../browserMessages/messages/background.messages';
-    import { getWindowStateForWindowId } from '../../../store/selectors/control-state.selector';
+    import { getWindowStateForWindowId, isPreparingVideo } from '../../../store/selectors/control-state.selector';
     import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';
     import { PopupController } from '../../controller/popup.controller';
     import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
@@ -84,10 +86,6 @@
             return this.fullscreen;
         }
 
-        public get isLoading() {
-            return this.isStartingNext || this.isStartingPrevious;
-        }
-
         private episodeInfo: SeriesEpisode = null;
 
         private windowId: number;
@@ -96,6 +94,7 @@
         private isPictureInPicture = false;
         private isStartingNext = false;
         private isStartingPrevious = false;
+        private isPreparingVideo = false;
 
         public showButtons = true;
         public fullscreenTitle = this.openFullscreenTitle;
@@ -130,6 +129,7 @@
             this.fetchFullscreenModeFromStore();
             this.fetchEpisodeInfoFromStore();
             this.fetchPictureInPictureStateFromStore();
+            this.fetchVideoLoadingState();
         }
 
         @Watch('fullscreen')
@@ -184,6 +184,11 @@
 
         private togglePictureInPicture(): void {
             this.store.dispatch(setPictureInPictureAction(!this.isPictureInPicture));
+        }
+
+        private fetchVideoLoadingState(): void {
+            this.store.selectBehaviour(isPreparingVideo)
+                .subscribe(isPreparingVideoVal => this.isPreparingVideo = isPreparingVideoVal);
         }
     }
 </script>

@@ -8,19 +8,13 @@ import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowController } from './window.controller';
 import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
 import { createStartVideoMessage } from '../../browserMessages/messages/providor.messages';
-import {
-    addAsyncInteractionAction,
-    removeAsyncInteractionAction,
-    setWindowIdForWindowTypeAction
-} from '../../store/reducers/control-state.reducer';
+import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { getProvidorForKey } from '../../store/selectors/providors.selector';
 import { BrowserWindow } from 'electron';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
-import { generateAsyncInteraction } from '../../store/store/async-interaction.util';
-import { AsyncInteractionType } from '../../store/enums/async-interaction-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { ProvidorLink } from '../models/providor-link.model';
 
@@ -39,9 +33,6 @@ export class VideoController {
     public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorLink: ProvidorLink): Promise<boolean> {
         const oldWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
 
-        const asyncInteractionModel = generateAsyncInteraction(AsyncInteractionType.VIDEO_OPEN_VIDEO, { seriesEpisode: seriesEpisodeKey });
-        this.store.dispatch(addAsyncInteractionAction(asyncInteractionModel));
-
         return new Promise<boolean>(resolve => {
             this.openVideoUrl(providorLink).pipe(
                 takeUntil(this.takeUntil$),
@@ -51,9 +42,7 @@ export class VideoController {
                 try {
                     hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorLink.providor));
                 } catch (e) {
-                    Logger.error('[VideoController->startVideo] Exception occured', e);
-                } finally {
-                    this.store.dispatch(removeAsyncInteractionAction(asyncInteractionModel.key));
+                    Logger.error('[VideoController->startVideo] Exception occurred', e);
                 }
 
                 this.windowService.closeWindow(oldWindowId, true);

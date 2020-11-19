@@ -34,6 +34,16 @@ export const hasAsyncInteractionForType = (state: StateModel, type: AsyncInterac
 };
 
 export const isPreparingVideo = (state: StateModel): boolean => {
-    return hasAsyncInteractionForType(state, AsyncInteractionType.PORTAL_GET_EPISODE_INFO)
-        || hasAsyncInteractionForType(state, AsyncInteractionType.VIDEO_OPEN_VIDEO);
+    return hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_START_EPISODE)
+        || hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_START_PREVIOUS_EPISODE)
+        || hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_START_NEXT_EPISODE)
+        || hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_START_CONTINUE_AUTOPLAY);
+};
+
+export const isLoadingSeason = (state: StateModel): boolean => {
+    return hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_LOADING_SEASON);
+};
+
+export const isLoadingSeries = (state: StateModel): boolean => {
+    return hasAsyncInteractionForType(state, AsyncInteractionType.SAGA_LOADING_SERIES);
 };

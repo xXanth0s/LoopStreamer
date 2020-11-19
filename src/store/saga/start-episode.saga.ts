@@ -11,7 +11,9 @@ import { ProvidorLink } from '../../background/models/providor-link.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { setLastUsedLanguageForSeriesAction, setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
 import {
+    addAsyncInteractionAction,
     raisePlayedEpisodesAction,
+    removeAsyncInteractionAction,
     resetPlayedEpisodesAction,
     setActiveEpisodeAction
 } from '../reducers/control-state.reducer';
@@ -23,6 +25,9 @@ import { generateLinkForProvidorLink } from '../utils/link.utils';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { updateOrAddLinkAction } from '../reducers/link.reducer';
 import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from '../selectors/app-control-state.selector';
+import { generateAsyncInteraction } from '../store/async-interaction.util';
+import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
+import { Logger } from '../../shared/services/logger';
 
 export type StartEpisodeOptions = {
     episodeKey: SeriesEpisode['key'];
@@ -39,15 +44,22 @@ const defaultConfig: StartEpisodeOptions = {
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
     stopPlayer();
     const episodeKey = action.payload;
+    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_START_EPISODE, { episodeKey });
+    yield put(addAsyncInteractionAction(asyncInteraction));
 
-    yield put(resetPlayedEpisodesAction());
+    try {
+        yield put(resetPlayedEpisodesAction());
+        const language = getSelectedLanguageOrLastUsedSeriesLanguageForEpisode(yield select(), episodeKey);
 
-    const language = getSelectedLanguageOrLastUsedSeriesLanguageForEpisode(yield select(), episodeKey);
+        const episodeStartSuccessful: boolean = yield startEpisode({ episodeKey, language });
 
-    const episodeStartSuccessful: boolean = yield startEpisode({ episodeKey, language });
-
-    if (episodeStartSuccessful) {
-        yield put(raisePlayedEpisodesAction());
+        if (episodeStartSuccessful) {
+            yield put(raisePlayedEpisodesAction());
+        }
+    } catch (error) {
+        Logger.error('[loadSeasonInformationSaga] error occurred', error);
+    } finally {
+        yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
 }
 

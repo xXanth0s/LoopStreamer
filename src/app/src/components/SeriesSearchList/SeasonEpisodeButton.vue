@@ -21,8 +21,7 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { hasAsyncInteractionForType } from '../../../../store/selectors/control-state.selector';
-    import { AsyncInteractionType } from '../../../../store/enums/async-interaction-type.enum';
+    import { isLoadingSeason } from '../../../../store/selectors/control-state.selector';
     import { SeriesSeason } from '../../../../store/models/series-season.model';
     import ButtonTile from '../ButtonTile.vue';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
@@ -68,7 +67,7 @@
         }
 
         private fetchEpisodeLoadingStateFromStore(): void {
-            this.store.selectBehaviour(hasAsyncInteractionForType, AsyncInteractionType.PORTAL_GET_SEASON_EPISODES).pipe(
+            this.store.selectBehaviour(isLoadingSeason).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(isLoading => {
                 const hasSeasonEpisodes = Boolean(this.store.selectSync(getSeriesEpisodesForSeason, this.seasonInfo.key).length);

@@ -15,9 +15,9 @@ import {
     userChangedLanguageAction
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
-import { loadAllSeriesForPortal } from './load-series-data/load-all-series.saga';
+import { loadAllSeriesForPortalSaga } from './load-series-data/load-all-series.saga';
 import { loadSeasonInformationSaga } from './load-series-data/load-season.saga';
-import { startNextEpisode } from './start-next-episode.saga';
+import { startNextEpisodeSaga } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
 import { continueAutoplaySaga } from './continue-autoplay.saga';
@@ -26,7 +26,7 @@ import { loadSeriesSeasonForLanguageSaga } from './load-series-data/load-series-
 
 export function* watcherSaga() {
     try {
-        yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortal);
+        yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortalSaga);
         yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
         yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 
@@ -39,7 +39,7 @@ export function* watcherSaga() {
         yield takeLatest(userChangedLanguageAction.type, loadSeriesSeasonForLanguageSaga);
 
         // control actions from video
-        yield takeLatest(startNextEpisodeAction.type, startNextEpisode);
+        yield takeLatest(startNextEpisodeAction.type, startNextEpisodeSaga);
         yield takeLatest(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
         yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
     } catch (e) {
@@ -50,5 +50,5 @@ export function* watcherSaga() {
 
 
 export function sagaErrorHandler(error: Error, errorInfo) {
-    Logger.error(`[WatcherSage] error occured`, error, errorInfo);
+    Logger.error(`[WatcherSage] error occurred`, error, errorInfo);
 }

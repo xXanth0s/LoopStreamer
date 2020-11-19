@@ -6,21 +6,26 @@ import {
 import { getNeighbourEpisode } from './load-series-data/load-neighbour-series-episode.saga';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { put, select } from 'redux-saga/effects';
+import { Logger } from '../../shared/services/logger';
 
 export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStartedAction>) {
     const { seriesEpisodeKey } = action.payload;
 
     const series = getSeriesForEpisode(yield select(), seriesEpisodeKey);
 
-    const nextEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, true);
-    yield put(setSeriesEpisodeNextEpisodeStateAction({
-        seriesEpisodeKey,
-        hasNextEpisode: Boolean(nextEpisode)
-    }));
+    try {
+        const nextEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, true);
+        yield put(setSeriesEpisodeNextEpisodeStateAction({
+            seriesEpisodeKey,
+            hasNextEpisode: Boolean(nextEpisode)
+        }));
 
-    const previousEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, false);
-    yield put(setSeriesEpisodePreviousEpisodeStateAction({
-        seriesEpisodeKey,
-        hasPreviousEpisode: Boolean(previousEpisode)
-    }));
+        const previousEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, false);
+        yield put(setSeriesEpisodePreviousEpisodeStateAction({
+            seriesEpisodeKey,
+            hasPreviousEpisode: Boolean(previousEpisode)
+        }));
+    } catch (error) {
+        Logger.error('[episodeStartedSaga] error occurred', error);
+    }
 }
