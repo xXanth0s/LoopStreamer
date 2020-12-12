@@ -61,13 +61,11 @@
             this.movieDBService = optionsContainer.get<MovieDBService>(SHARED_TYPES.MovieDBService);
         }
 
-        public async mounted(): Promise<void> {
-            const result = await this.movieDBService.getPopularSeries();
+        public async mounted() {
+            await this.loadSeriesData();
+        }
 
-            console.log(result);
-            this.seriesArray = result.results;
-            this.dataReady = true;
-            console.log(this.seriesArray.length);
+        private async loadSeriesData(): Promise<void> {
         }
     }
 </script>

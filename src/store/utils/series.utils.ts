@@ -1,7 +1,6 @@
 import SeriesEpisode from '../models/series-episode.model';
 import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
 import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from './key.utils';
-import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
@@ -24,44 +23,6 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: PortalSerie
         portalLinks: [],
         providorLinks: [],
     };
-}
-
-
-export function mapSeriesInfoDtoToSeries(seriesInfo: PortalSeriesInfoDto): Series {
-    const { title, posterHref } = seriesInfo;
-    const key = getKeyForSeriesTitle(seriesInfo.title);
-    if (posterHref) {
-        return {
-            key,
-            title,
-            posterHref,
-            portalLinks: [],
-            seasons: [],
-        };
-    }
-
-    return {
-        key,
-        title,
-        portalLinks: [],
-        seasons: [],
-    };
-}
-
-export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: PortalSeriesInfoDto): SeriesSeason[] {
-    const seriesKey = getKeyForSeriesTitle(seriesInfo.title);
-    return Object.keys(seriesInfo.seasonsLinks).map(seasonNumber => {
-
-        const key = getKeyForSeriesSeason(seriesKey, seasonNumber);
-
-        return {
-            key,
-            seriesKey,
-            seasonNumber: seasonNumber,
-            portalLinks: [],
-            episodes: [],
-        };
-    });
 }
 
 export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: PortalSeriesSeasonDto): SeriesSeason {

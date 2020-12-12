@@ -1,13 +1,10 @@
-import {
-    setActivePortalForAppAction,
-    setSelectedSeasonForAppAction,
-    toggleSelectedSeriesForAppAction
-} from '../reducers/app-control-state.reducer';
-import { loadSeriesInformationSaga } from './load-series-data/load-series.saga';
+import { setSelectedSeasonForAppAction, toggleSelectedSeriesForAppAction } from '../reducers/app-control-state.reducer';
+import { loadSeriesInformationSaga } from './portal-load-series-data/load-series.saga';
 import { takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
+    appStartedAction,
     continueAutoplayAction,
     startEpisodeAction,
     startNextEpisodeAction,
@@ -15,18 +12,19 @@ import {
     userChangedLanguageAction
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
-import { loadAllSeriesForPortalSaga } from './load-series-data/load-all-series.saga';
-import { loadSeasonInformationSaga } from './load-series-data/load-season.saga';
+import { loadSeasonInformationSaga } from './portal-load-series-data/load-season.saga';
 import { startNextEpisodeSaga } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
 import { continueAutoplaySaga } from './continue-autoplay.saga';
 import { Logger } from '../../shared/services/logger';
-import { loadSeriesSeasonForLanguageSaga } from './load-series-data/load-series-season-for-language.saga';
+import { loadSeriesSeasonForLanguageSaga } from './portal-load-series-data/load-series-season-for-language.saga';
+import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
 
 export function* watcherSaga() {
     try {
-        yield takeLatest(setActivePortalForAppAction.type, loadAllSeriesForPortalSaga);
+        yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
+
         yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
         yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 

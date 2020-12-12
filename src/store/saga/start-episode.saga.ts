@@ -19,7 +19,7 @@ import {
 } from '../reducers/control-state.reducer';
 import { stopPlayer } from '../utils/stop-player.util';
 import { getLinksByKeys } from '../selectors/línk.selector';
-import { loadAllProvidorLinksForEpisode } from './load-series-data/load-all-providors-for-episode.saga';
+import { loadAllProvidorLinksForEpisode } from './portal-load-series-data/load-all-providors-for-episode.saga';
 import { LANGUAGE } from '../enums/language.enum';
 import { generateLinkForProvidorLink } from '../utils/link.utils';
 import { LINK_TYPE } from '../enums/link-type.enum';

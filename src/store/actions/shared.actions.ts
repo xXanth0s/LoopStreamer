@@ -2,6 +2,8 @@ import { createAction } from '@reduxjs/toolkit';
 import { LANGUAGE } from '../enums/language.enum';
 import { SeriesSeason } from '../models/series-season.model';
 
+export const appStartedAction = createAction<string>('global/AppStarted');
+
 export const deleteSeriesAction = createAction<string>('series/deleteSeries');
 
 export const startEpisodeAction = createAction<string>('app/startEpisode');

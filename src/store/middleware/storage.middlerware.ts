@@ -15,7 +15,7 @@ export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => (
     const state = removeControlStates(getState());
 
     try {
-        store.set(stateKey, state);
+        store.set(stateKey, {});
     } catch (e) {
         console.error('BrowserStorageMiddlerware: data could not be saved to chrome local storage');
         console.error(e);

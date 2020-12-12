@@ -63,6 +63,7 @@
         resetAppControlStateAction,
         setActivePortalForAppAction
     } from '../../../store/reducers/app-control-state.reducer';
+    import { LANGUAGE } from '../../../store/enums/language.enum';
 
     @Component({
         name: 'series-overview',
@@ -108,12 +109,12 @@
         public filterSeries(): void {
             let filteredSeries: Series[];
             if (this.searchText) {
-                filteredSeries = this.series.filter(serie => serie.title.toLowerCase().includes(this.searchText.toLowerCase()));
+                filteredSeries = this.series.filter(serie => serie.titles[LANGUAGE.GERMAN].toLowerCase().includes(this.searchText.toLowerCase()));
             } else {
                 filteredSeries = this.series;
             }
 
-            const sortedArray = sortArrayForKey(filteredSeries, (val: Series) => val.title.toLowerCase());
+            const sortedArray = sortArrayForKey(filteredSeries, (val: Series) => val.titles[LANGUAGE.GERMAN].toLowerCase());
 
             this.filteredSeries = convertArrayToChunks(sortedArray, this.seriesTilesPerRow).slice(0, 100);
         }

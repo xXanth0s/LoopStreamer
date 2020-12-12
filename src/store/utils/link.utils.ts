@@ -25,11 +25,10 @@ export function generateLinkForSeries(seriesInfo: PortalSeriesInfoDto): LinkMode
     };
 }
 
-export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeriesInfoDto): LinkModel[] {
-    const { title, portal } = seriesInfo;
+export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeriesInfoDto, seriesKey: string): LinkModel[] {
+    const { portal, seasonsLinks } = seriesInfo;
 
-    const seriesKey = getKeyForSeriesTitle(title);
-    return Object.entries(seriesInfo.seasonsLinks).reduce((accumulator, value) => {
+    return Object.entries(seasonsLinks).reduce((accumulator, value) => {
         const seasonNumber = value[0];
         const parentKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
 

@@ -6,7 +6,7 @@ import { getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
 import { getSeriesByKey } from '../selectors/series.selector';
 import { getPopupEndTimeForSeriesEpisode } from '../utils/series.utils';
 import { put, select } from 'redux-saga/effects';
-import { getNeighbourEpisode } from './load-series-data/load-neighbour-series-episode.saga';
+import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import { setLastWatchedEpisodeAction } from '../reducers/series.reducer';
 
 export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisodeTimeStampAction>) {

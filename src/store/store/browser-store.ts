@@ -3,21 +3,18 @@ import { controlStateSlice } from '../reducers/control-state.reducer';
 import { optionsSlice } from '../reducers/options.reducer';
 import seriesSlice from '../reducers/series.reducer';
 import portalsSlice from '../reducers/portals.reducer';
-import {
-    forwardToMainWithParams,
-    getInitialStateRenderer,
-    replayActionRenderer,
-} from 'electron-redux';
+import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer, } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';
 import { appControlStateSlice } from '../reducers/app-control-state.reducer';
 import linkSlice from '../reducers/link.reducer';
 import { providorsSlice } from '../reducers/providors.reducer';
+import { StateModel } from '../models/state.model';
 
 const initialState = getInitialStateRenderer();
 
-const browserStore = configureStore<any>({
+const browserStore = configureStore<StateModel>({
     reducer: {
         controlState: controlStateSlice.reducer,
         appControlState: appControlStateSlice.reducer,

@@ -49,7 +49,7 @@ export function* loadSeriesInformationForPortal(seriesKey: Series['key'], portal
         return false;
     }
 
-    yield addSeriesSaga(seriesInfo);
+    yield addSeriesSaga(seriesInfo, seriesKey);
 
     return true;
 }

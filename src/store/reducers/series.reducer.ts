@@ -62,6 +62,22 @@ function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series)
         state[key] = {
             ...oldSeries,
             ...seriesInfo,
+            titles: {
+                ...oldSeries.titles,
+                ...seriesInfo.titles,
+            },
+            previewVideos: {
+                ...oldSeries.previewVideos,
+                ...seriesInfo.previewVideos,
+            },
+            apiKeys: {
+                ...oldSeries.apiKeys,
+                ...seriesInfo.apiKeys,
+            },
+            descriptions: {
+                ...oldSeries.descriptions,
+                ...seriesInfo.descriptions,
+            },
             portalLinks: [
                 ...oldSeries.portalLinks,
                 ...seriesInfo.portalLinks

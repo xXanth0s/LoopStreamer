@@ -16,6 +16,7 @@ import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
 import { fromEvent } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
+import { appStartedAction } from '../../store/actions/shared.actions';
 
 @injectable()
 export class RootBackgroundController {
@@ -54,6 +55,8 @@ export class RootBackgroundController {
             window.webContents.openDevTools();
             this.windowService.addReduxDevTools();
         }
+
+        this.store.dispatch(appStartedAction());
     }
 
     public initializeHandler(): void {

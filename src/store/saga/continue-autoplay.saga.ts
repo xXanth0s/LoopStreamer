@@ -4,7 +4,7 @@ import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
-import { getNeighbourEpisode } from './load-series-data/load-neighbour-series-episode.saga';
+import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,

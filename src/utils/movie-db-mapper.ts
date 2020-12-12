@@ -1,21 +1,29 @@
 import MovieDB from 'node-themoviedb';
 import { getKeyForSeriesTitle } from '../store/utils/key.utils';
-import { SeriesDto } from '../app/src/data/series-dto.model';
+import { LANGUAGE } from '../store/enums/language.enum';
+import Series from '../store/models/series.model';
+import { mapLanguage } from './language-mapper';
+import { MovieApi } from '../store/enums/movie-api.enum';
 
-export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow): SeriesDto {
-    const { original_name, backdrop_path, id, overview, popularity, name, poster_path, genre_ids } = series;
-
+export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow, activeLanguage: LANGUAGE): Series {
+    const { original_name, id, overview, name, poster_path, original_language } = series;
+    const seriesLanguage = mapLanguage(original_language);
     const key = getKeyForSeriesTitle(original_name);
     return {
-        title: name,
-        description: overview,
-        actors: [],
-        poster: `https://image.tmdb.org/t/p/w330_and_h440_face/${poster_path}`,
-        backdropUrl: `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/${backdrop_path}`,
-        movieDBKey: id,
-        originalTitle: original_name,
-        rating: popularity,
-        genres: [],
+        portalLinks: [],
+        previewVideos: {},
+        seasons: [],
+        titles: {
+            [activeLanguage]: name,
+            [seriesLanguage]: original_name
+        },
+        descriptions: {
+            [activeLanguage]: overview
+        },
+        posterHref: `https://image.tmdb.org/t/p/w330_and_h440_face/${poster_path}`,
+        apiKeys: {
+            [MovieApi.TMDB]: `${id}`,
+        },
         key
     };
 
