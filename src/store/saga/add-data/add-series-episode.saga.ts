@@ -1,4 +1,4 @@
-import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
+import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
 import { mapSeriesEpisodeDtoToSeriesEpisode } from '../../utils/series.utils';
 import { put } from 'redux-saga/effects';
 import { updateOrAddMultipleSeriesEpisodeAction } from '../../reducers/series-episode.reducer';
@@ -11,7 +11,7 @@ import { PORTALS } from '../../enums/portals.enum';
 import { LANGUAGE } from '../../enums/language.enum';
 import { Logger } from '../../../shared/services/logger';
 
-export function* addMultipleEpisodesSaga(episodes: SeriesEpisodeDto[]) {
+export function* addMultipleEpisodesSaga(episodes: PortalSeriesEpisodeDto[]) {
     if (!episodes || episodes.length === 0) {
         Logger.error(`[addMultipleEpisodesSaga] tried to add empty SeriesEpisodeDto array`);
         return;

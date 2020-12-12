@@ -1,11 +1,11 @@
 import Providor from '../../../store/models/providor.model';
 import SeriesEpisode from '../../../store/models/series-episode.model';
-import { SeriesInfoDto } from '../../../dto/series-info.dto';
-import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
+import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
+import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
-import { SeriesSeasonDto } from '../../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 
 export interface IPortalController {
 
@@ -15,11 +15,11 @@ export interface IPortalController {
 
     isVideoOpenWithProvidor(): Providor | null;
 
-    getAllSeriesInfo(): SeriesInfoDto[];
+    getAllSeriesInfo(): PortalSeriesInfoDto[];
 
-    getSeasonInfo(seasonNumber: string): SeriesSeasonDto;
+    getSeasonInfo(seasonNumber: string): PortalSeriesSeasonDto;
 
-    getSeriesMetaInformation(): SeriesInfoDto;
+    getSeriesMetaInformation(): PortalSeriesInfoDto;
 
-    getSeasonEpisodes(seasonNumber: string): SeriesEpisodeDto[];
+    getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[];
 }

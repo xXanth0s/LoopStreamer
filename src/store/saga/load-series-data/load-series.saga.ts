@@ -3,7 +3,7 @@ import { getPortalController } from '../../../background/container/container.uti
 import { call, put, select } from 'redux-saga/effects';
 import { StateModel } from '../../models/state.model';
 import { getSeriesByKey } from '../../selectors/series.selector';
-import { SeriesInfoDto } from '../../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PORTALS } from '../../enums/portals.enum';
 import Series from '../../models/series.model';
 import { addSeriesSaga } from '../add-data/add-series.saga';
@@ -44,7 +44,7 @@ export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelec
 
 export function* loadSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
     const portalController = getPortalController();
-    const seriesInfo: SeriesInfoDto = yield call([ portalController, portalController.getDetailedSeriesInformation ], seriesKey, portalKey);
+    const seriesInfo: PortalSeriesInfoDto = yield call([ portalController, portalController.getDetailedSeriesInformation ], seriesKey, portalKey);
     if (!seriesInfo) {
         return false;
     }

@@ -16,7 +16,7 @@ import { WindowService } from '../services/window.service';
 import { fromEvent, Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { resetControlStateAction, setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
-import { SeriesInfoDto } from '../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { ProvidorLink } from '../models/providor-link.model';
@@ -30,7 +30,7 @@ import { Logger } from '../../shared/services/logger';
 import { getLinkForSeriesAndPortal, getLinksByKeys } from '../../store/selectors/línk.selector';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
-import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { LinkModel } from '../../store/models/link.model';
 
 @injectable()
@@ -42,7 +42,7 @@ export class PortalController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
-    public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<SeriesInfoDto[]> {
+    public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<PortalSeriesInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
 
 
@@ -53,7 +53,7 @@ export class PortalController {
         );
     }
 
-    public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<SeriesInfoDto> {
+    public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<PortalSeriesInfoDto> {
         const link = this.store.selectSync(getLinkForSeriesAndPortal, seriesKey, portalKey);
         if (!link) {
             Logger.error(`[PortalController->getDetailedSeriesInformation] tried to load link info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`);
@@ -66,7 +66,7 @@ export class PortalController {
         );
     }
 
-    public async getSeasonInfoForLink(link: LinkModel, seasonNumber: string): Promise<SeriesSeasonDto> {
+    public async getSeasonInfoForLink(link: LinkModel, seasonNumber: string): Promise<PortalSeriesSeasonDto> {
         return this.openPageAndGetDataForMessage(
             link.href,
             link.portal,

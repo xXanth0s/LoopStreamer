@@ -6,7 +6,7 @@ import { getSeriesByKey } from '../../selectors/series.selector';
 import { PORTALS } from '../../enums/portals.enum';
 import { getPortalController } from '../../../background/container/container.utils';
 import { SeriesSeason } from '../../models/series-season.model';
-import { SeriesSeasonDto } from '../../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { LANGUAGE } from '../../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal } from '../../selectors/línk.selector';
 import { loadSeriesInformationForPortal } from './load-series.saga';
@@ -93,7 +93,7 @@ export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptio
 function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkModel) {
     const season = getSeriesSeasonByKey(yield select(), seasonKey);
     const portalController = getPortalController();
-    const seasonData: SeriesSeasonDto = yield call([ portalController, portalController.getSeasonInfoForLink ], link, season.seasonNumber);
+    const seasonData: PortalSeriesSeasonDto = yield call([ portalController, portalController.getSeasonInfoForLink ], link, season.seasonNumber);
 
     yield addSeriesSeasonSaga(seasonData);
 }

@@ -7,7 +7,6 @@ import { SeriesSeason } from './series-season.model';
 export default interface Series {
     key: string;
     title: string;
-    description?: string;
     lastEpisodeWatched?: SeriesEpisode['key'];
     lastUsedPortal?: PORTALS;
     lastUsedLanguage?: LANGUAGE;

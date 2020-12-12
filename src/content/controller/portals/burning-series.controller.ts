@@ -2,8 +2,8 @@ import { IPortalController } from './portal.controller.interface';
 import { inject, injectable } from 'inversify';
 import Providor from '../../../store/models/providor.model';
 import { PORTALS } from '../../../store/enums/portals.enum';
-import { SeriesEpisodeDto } from '../../../dto/series-episode.dto';
-import { SeriesInfoDto } from '../../../dto/series-info.dto';
+import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
+import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors, getProvidorForName } from '../../../store/selectors/providors.selector';
@@ -13,7 +13,7 @@ import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
 import { getLinksForProviders } from '../../ustils/dom.utils';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
-import { SeriesSeasonDto } from '../../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { MessageService } from '../../../shared/services/message.service';
 import { createExecuteScriptMessage } from '../../../browserMessages/messages/background.messages';
 
@@ -31,7 +31,6 @@ export class BurningSeriesController implements IPortalController {
 
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
-    private readonly seriesDescriptionSelector = (): string => document.querySelector('#sp_left > p')?.textContent || '';
     private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
     private readonly languagesSelector = (): Array<HTMLLIElement> => Array.from(document.querySelectorAll('div.language > div > ul > li'));
     private readonly videoUrlSelector = (): HTMLLinkElement => document.querySelector('section > div.hoster-player > a');
@@ -96,13 +95,12 @@ export class BurningSeriesController implements IPortalController {
         return getLinksForProviders(usedProvidors, providorContainer);
     }
 
-    public getSeriesMetaInformation(): SeriesInfoDto {
+    public getSeriesMetaInformation(): PortalSeriesInfoDto {
         const title = this.seriesTitleSelector();
-        const description = this.seriesDescriptionSelector();
         const posterHref = this.seriesImageSelector();
         const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
-        const seasonsLinks: SeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
+        const seasonsLinks: PortalSeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
             const language = this.getLanguageForLink(link.href);
             return {
                 ...obj,
@@ -114,7 +112,6 @@ export class BurningSeriesController implements IPortalController {
 
         return {
             title,
-            description,
             posterHref,
             seasonsLinks,
             link,
@@ -122,7 +119,7 @@ export class BurningSeriesController implements IPortalController {
         };
     }
 
-    public getSeasonInfo(seasonNumber: string): SeriesSeasonDto {
+    public getSeasonInfo(seasonNumber: string): PortalSeriesSeasonDto {
         const activeSeason = this.activeSeriesSeasonSelector();
         if (activeSeason.innerText.trim() !== seasonNumber) {
             return null;
@@ -144,7 +141,7 @@ export class BurningSeriesController implements IPortalController {
         };
     }
 
-    public getSeasonEpisodes(seasonNumber: string): SeriesEpisodeDto[] {
+    public getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[] {
         const seriesTitle = this.seriesTitleSelector();
         const providors = this.store.selectSync(getAllUsedProvidors);
         const activeLanguage = this.getActiveLanguage();
@@ -165,7 +162,7 @@ export class BurningSeriesController implements IPortalController {
         });
     }
 
-    public getAllSeriesInfo(): SeriesInfoDto[] {
+    public getAllSeriesInfo(): PortalSeriesInfoDto[] {
         const links = this.seriesOverviewListLinkSelector() || [];
         const collection = [ ...links ];
         return collection.map((linkInfo: HTMLAnchorElement) => {

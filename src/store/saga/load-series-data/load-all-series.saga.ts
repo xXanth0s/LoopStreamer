@@ -1,6 +1,6 @@
 import { setActivePortalForAppAction } from '../../reducers/app-control-state.reducer';
 import { getPortalController } from '../../../background/container/container.utils';
-import { SeriesInfoDto } from '../../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { call, put } from 'redux-saga/effects';
 import { addMultipleSeriesSaga } from '../add-data/add-series.saga';
 import { generateAsyncInteraction } from '../../store/async-interaction.util';
@@ -19,7 +19,7 @@ export function* loadAllSeriesForPortalSaga(action: ReturnType<typeof setActiveP
         try {
             const portalController = getPortalController();
 
-            const seriesMetaInfo: SeriesInfoDto[] = yield call([ portalController, portalController.getAllSeriesFromPortal ], action.payload);
+            const seriesMetaInfo: PortalSeriesInfoDto[] = yield call([ portalController, portalController.getAllSeriesFromPortal ], action.payload);
 
             yield addMultipleSeriesSaga(seriesMetaInfo);
         } catch (error) {

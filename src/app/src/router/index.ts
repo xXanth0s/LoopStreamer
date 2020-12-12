@@ -7,12 +7,17 @@ import InfoPage from '../views/InfoPage.vue';
 import MySeriesPage from '../views/MySeriesPage.vue';
 import TestPage from '../views/TestPage.vue';
 import { environment } from '../../../environments/environment';
+import HomePage from '../views/Home.vue';
 
 Vue.use(VueRouter);
 
 let routes = [
     {
         path: `/${globalRoutes.HOME_PAGE}`,
+        component: HomePage
+    },
+    {
+        path: `/${globalRoutes.SERIES_LIST}`,
         component: SeriesOverview
     },
     {

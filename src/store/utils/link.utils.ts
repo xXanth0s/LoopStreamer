@@ -1,16 +1,16 @@
-import { SeriesInfoDto } from '../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import { LinkModel } from '../models/link.model';
 import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from './key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { LINK_TYPE } from '../enums/link-type.enum';
-import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
+import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
 import SeriesEpisode from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
-import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { Logger } from '../../shared/services/logger';
 
-export function generateLinkForSeries(seriesInfo: SeriesInfoDto): LinkModel {
+export function generateLinkForSeries(seriesInfo: PortalSeriesInfoDto): LinkModel {
     const { title, link, portal } = seriesInfo;
     const parentKey = getKeyForSeriesTitle(title);
     const key = getKeyForLink({ parentKey, portal, language: LANGUAGE.NONE });
@@ -25,7 +25,7 @@ export function generateLinkForSeries(seriesInfo: SeriesInfoDto): LinkModel {
     };
 }
 
-export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: SeriesInfoDto): LinkModel[] {
+export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeriesInfoDto): LinkModel[] {
     const { title, portal } = seriesInfo;
 
     const seriesKey = getKeyForSeriesTitle(title);
@@ -52,7 +52,7 @@ export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: SeriesInfo
     }, []);
 }
 
-export function generateLinksForSeriesSeasonDto(seriesSeasonDto: SeriesSeasonDto): LinkModel[] {
+export function generateLinksForSeriesSeasonDto(seriesSeasonDto: PortalSeriesSeasonDto): LinkModel[] {
     const { seriesTitle, seasonNumber, seasonLinks, portal } = seriesSeasonDto;
     if (!seasonLinks) {
         Logger.error(`[generateLinksForSeriesSeasonDto] no season links found in seriesSeasonDto`, seasonLinks);
@@ -76,7 +76,7 @@ export function generateLinksForSeriesSeasonDto(seriesSeasonDto: SeriesSeasonDto
     });
 }
 
-export function generateLinkForSeriesEpisodeDto(seriesEpisode: SeriesEpisodeDto, type: LINK_TYPE): LinkModel[] {
+export function generateLinkForSeriesEpisodeDto(seriesEpisode: PortalSeriesEpisodeDto, type: LINK_TYPE): LinkModel[] {
     const { seriesTitle, episodeNumber, seasonNumber, portalLinks, portal } = seriesEpisode;
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
     const parentKey = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);

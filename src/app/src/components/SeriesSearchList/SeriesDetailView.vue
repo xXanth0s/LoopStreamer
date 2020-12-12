@@ -9,7 +9,6 @@
             </div>
             <div class="full-height flex-container" v-else>
                 <div class="content-container container">
-                    <div class="content-description py-3">{{seriesData.description}}</div>
                     <continue-series-button :series-episode-key="episodeToContinue.key" class="my-3"
                                             v-if="episodeToContinue"/>
 

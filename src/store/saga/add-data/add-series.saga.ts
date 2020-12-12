@@ -3,11 +3,11 @@ import { put } from 'redux-saga/effects';
 import { updateOrAddMultipleSeriesAction, updateOrAddSeriesAction } from '../../reducers/series.reducer';
 import { generateLinkForSeries, generateLinksForSeriesSeasonFromSeriesDto } from '../../utils/link.utils';
 import { updateOrAddMultipleLinksAction } from '../../reducers/link.reducer';
-import { SeriesInfoDto } from '../../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { updateOrAddMutlipleSeriesSeasonAction } from '../../reducers/series-season.reducer';
 import { Logger } from '../../../shared/services/logger';
 
-export function* addMultipleSeriesSaga(seriesInfo: SeriesInfoDto[]) {
+export function* addMultipleSeriesSaga(seriesInfo: PortalSeriesInfoDto[]) {
     if (!seriesInfo || seriesInfo.length === 0) {
         Logger.error(`[addMultipleSeriesSaga] tried to add empty SeriesInfoDto`);
         return;
@@ -20,7 +20,7 @@ export function* addMultipleSeriesSaga(seriesInfo: SeriesInfoDto[]) {
     yield put(updateOrAddMultipleLinksAction(links));
 }
 
-export function* addSeriesSaga(seriesInfo: SeriesInfoDto) {
+export function* addSeriesSaga(seriesInfo: PortalSeriesInfoDto) {
     if (!seriesInfo) {
         Logger.error(`[addSeriesSaga] tried to add empty SeriesInfoDto`);
         return;

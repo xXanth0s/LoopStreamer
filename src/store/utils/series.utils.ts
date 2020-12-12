@@ -1,13 +1,13 @@
 import SeriesEpisode from '../models/series-episode.model';
-import { SeriesEpisodeDto } from '../../dto/series-episode.dto';
+import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
 import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from './key.utils';
-import { SeriesInfoDto } from '../../dto/series-info.dto';
+import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import Series from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
-import { SeriesSeasonDto } from '../../dto/series-season.dto';
+import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 
-export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpisodeDto): SeriesEpisode {
+export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: PortalSeriesEpisodeDto): SeriesEpisode {
     const { seriesTitle, episodeNumber, seasonNumber } = seriesEpisodeDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
@@ -27,15 +27,14 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: SeriesEpiso
 }
 
 
-export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
-    const { title, posterHref, description } = seriesInfo;
+export function mapSeriesInfoDtoToSeries(seriesInfo: PortalSeriesInfoDto): Series {
+    const { title, posterHref } = seriesInfo;
     const key = getKeyForSeriesTitle(seriesInfo.title);
-    if (posterHref || description) {
+    if (posterHref) {
         return {
             key,
             title,
             posterHref,
-            description,
             portalLinks: [],
             seasons: [],
         };
@@ -49,7 +48,7 @@ export function mapSeriesInfoDtoToSeries(seriesInfo: SeriesInfoDto): Series {
     };
 }
 
-export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): SeriesSeason[] {
+export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: PortalSeriesInfoDto): SeriesSeason[] {
     const seriesKey = getKeyForSeriesTitle(seriesInfo.title);
     return Object.keys(seriesInfo.seasonsLinks).map(seasonNumber => {
 
@@ -65,7 +64,7 @@ export function mapSeriesInfoDtoToSeriesSeasons(seriesInfo: SeriesInfoDto): Seri
     });
 }
 
-export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: SeriesSeasonDto): SeriesSeason {
+export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: PortalSeriesSeasonDto): SeriesSeason {
     const { seasonNumber, seriesTitle } = seasonDto;
 
     const seriesKey = getKeyForSeriesTitle(seriesTitle);
