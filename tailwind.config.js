@@ -6,7 +6,7 @@ module.exports = {
     purge: { content: ['./public/**/*.html', './src/**/*.vue'] },
     target: 'relaxed',
     prefix: '',
-    important: false,
+    important: true,
     separator: ':',
     presets: [],
     theme: {

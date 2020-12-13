@@ -1,14 +1,14 @@
 <template>
 
-    <div v-if="series" class="relative header-container">
-        <div v-if="showVideo" class="absolute">
-            <youtube :video-id="youtubeUrl" player-width="900" @ended="onVideoFinished"/>
+    <div v-if="series" class="relative header-height">
+        <div v-if="showVideo" class="absolute overflow-hidden header-height">
+            <youtube :video-id="youtubeUrl" player-width="900" player-height="507" @ended="onVideoFinished"/>
         </div>
         <div v-else class="w-full absolute">
             <img :src="series.backgroundHref" class="w-full">
         </div>
-        <div class="absolute text ">
-            <span class="text-4xl font-mono font-black">{{series.titles[language]}}</span>
+        <div class="absolute text">
+            <span class="text-4xl font-mono text-white font-extrabold">{{series.titles[language]}}</span>
         </div>
     </div>
 </template>
@@ -36,7 +36,7 @@
         private get youtubeUrl(): string {
             const id = this.series?.previewVideos[Hoster.YOUTUBE];
             if (id) {
-                return `${id}?autoplay=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&showinfo=0'`;
+                return `${id}?autoplay=1&controls=1&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&showinfo=0`;
             }
             return '';
         }
@@ -63,8 +63,8 @@
         background: linear-gradient(to top, #181818, transparent 50%);
     }
 
-    .header-container {
-        height: 300px;
+    .header-height {
+        height: 374px;
     }
 
     .text {
