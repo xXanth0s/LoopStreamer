@@ -7,7 +7,7 @@
                 <img :src="imageUrl" alt="Avatar">
             </div>
             <div class="flex flex-grow-0 text-lg justify-center items-center h-10 whitespace-nowrap">
-                {{seriesName}}
+                <span class="truncate mx-1">{{seriesName}}</span>
             </div>
         </div>
     </div>
@@ -26,17 +26,13 @@
     export default class SeriesPanelFront extends Vue {
 
         @Prop(String)
-        imageUrlEnding: string;
+        imageUrl: string;
 
         @Prop(String)
         seriesName: string;
 
         @Prop(Boolean)
         showSettingsIcon: string;
-
-        public get imageUrl(): string {
-            return `https://image.tmdb.org/t/p/w440_and_h660_face/${this.imageUrlEnding}`;
-        }
     }
 </script>
 

@@ -7,7 +7,8 @@ import { Collapse, CollapseItem, Menu, MenuItem } from 'element-ui';
 import BootstrapVue from 'bootstrap-vue';
 import VueCarousel from 'vue-carousel';
 import { ToggleButton } from 'vue-js-toggle-button';
-import VueAwesomeSwiper from 'vue-awesome-swiper';
+import { Autoplay, Mousewheel, Navigation, Pagination, Swiper as SwiperClass } from 'swiper/swiper.esm';
+import getAwesomeSwiper from 'vue-awesome-swiper/dist/exporter';
 
 Vue.config.productionTip = false;
 
@@ -18,7 +19,9 @@ Vue.use(Menu);
 Vue.use(MenuItem);
 Vue.use(BootstrapVue);
 Vue.use(VueCarousel);
-Vue.use(VueAwesomeSwiper);
+
+SwiperClass.use([ Pagination, Mousewheel, Navigation, Autoplay ]);
+Vue.use(getAwesomeSwiper(SwiperClass));
 
 new Vue({
     router,
