@@ -46,7 +46,7 @@ export class WindowService {
             const windowConfig = this.getConfig(finalConfig);
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
-            this.addDefaultHandlingForNewWindow(window);
+            this.addDefaultHandlingForNewWindow(window, finalConfig.mutePage);
             if (finalConfig.manipulateSession) {
                 this.addDefaultHandlingForSession(window.webContents.session);
             }
@@ -112,9 +112,9 @@ export class WindowService {
         }
     }
 
-    public addDefaultHandlingForNewWindow(window: BrowserWindow): void {
+    public addDefaultHandlingForNewWindow(window: BrowserWindow, mutePage: boolean = true): void {
         window.removeMenu();
-        window.webContents.setAudioMuted(true);
+        window.webContents.setAudioMuted(mutePage);
         this.hideNewWindows(window);
         this.stopPlayerWhenActiveWindowClosed(window);
         this.listenToWindowSizeChanges(window);

@@ -70,17 +70,13 @@ export class MovieDBService {
         let videoUrl: string;
         let series: Responses.TV.GetDetails;
         try {
-            const [ seriesResponse, videoResponse ]: [ MovieDbResponse<Responses.TV.GetDetails>, MovieDbResponse<Responses.TV.GetVideos> ] = await Promise.all([
+            const [ seriesResponse, video ]: [ MovieDbResponse<Responses.TV.GetDetails>, string ] = await Promise.all([
                 client.tv.getDetails({ pathParameters: { tv_id: movieDbId } }),
-                client.tv.getVideos({ pathParameters: { tv_id: movieDbId } }),
+                MovieDBService.getVideo(movieDbId, language)
             ]);
 
-            const video = videoResponse.data.results
-                .filter(video => video.site.toLowerCase() === 'youtube')
-                .find(video => video.type === 'Trailer' || video.type === 'Teaser');
-            videoUrl = video?.key;
-
             series = seriesResponse.data;
+            videoUrl = video;
         } catch (error) {
             Logger.error('[MovieDDService->getDetailedSeriesInformation] error occurred', error);
             return null;
@@ -122,6 +118,28 @@ export class MovieDBService {
         const mappedSeason = mapSeasonFromMovieDB(season, series.key);
         const mappedEpisodes = mapSeasonEpisodesFromMovieDB(season, series.key, language);
         return [ mappedSeason, mappedEpisodes ];
+    }
+
+    private static async getVideo(movieDbId: string, language: LANGUAGE): Promise<string> {
+        const client = MovieDBService.getClient(language);
+        let videoUrl = '';
+        try {
+            const videoResponse = await client.tv.getVideos({ pathParameters: { tv_id: movieDbId } });
+
+            const video = videoResponse.data.results
+                .filter(video => video.site.toLowerCase() === 'youtube')
+                .find(video => video.type === 'Trailer' || video.type === 'Teaser');
+            videoUrl = video?.key;
+        } catch (error) {
+            Logger.error('[MovieDDService->getVideo] error occurred', error);
+            return '';
+        }
+
+        if (!videoUrl && language !== LANGUAGE.ENGLISH) {
+            return MovieDBService.getVideo(movieDbId, LANGUAGE.ENGLISH);
+        }
+
+        return videoUrl;
     }
 
     private static getClient(usedLanguage: LANGUAGE): MovieDB {

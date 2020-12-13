@@ -18,6 +18,7 @@ export default interface Series extends KeyModel<string> {
     isStartTimeConfigured?: boolean;
     isEndTimeConfigured?: boolean;
     posterHref?: string;
+    backgroundHref?: string;
     portalLinks: LinkModel['key'][];
     seasons: SeriesSeason['key'][];
     scipStartTime?: number;

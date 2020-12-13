@@ -22,6 +22,7 @@ import { appStartedAction } from '../../store/actions/shared.actions';
 export class RootBackgroundController {
 
     private readonly appWindowConfig: OpenWindowConfig = {
+        mutePage: false,
         nodeIntegration: true,
         visible: true,
         preloadScript: false,

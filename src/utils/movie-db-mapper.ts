@@ -9,7 +9,7 @@ import SeriesEpisode, { getEmptySeriesEpisode } from '../store/models/series-epi
 import { Hoster } from '../store/enums/hoster.enum';
 
 export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow | Responses.TV.GetDetails, activeLanguage: LANGUAGE, videoKey?: string): Series {
-    const { original_name, id, overview, name, poster_path, original_language } = series;
+    const { original_name, id, overview, name, poster_path, original_language, backdrop_path } = series;
 
     const seriesLanguage = mapLanguage(original_language);
     const key = getKeyForSeriesTitle(original_name);
@@ -29,6 +29,7 @@ export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow | Responses.
             [activeLanguage]: overview
         },
         posterHref: `https://image.tmdb.org/t/p/w440_and_h660_face/${poster_path}`,
+        backgroundHref: `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/${backdrop_path}`,
         apiKeys: {
             [MovieApi.TMDB]: `${id}`,
         },

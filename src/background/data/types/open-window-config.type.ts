@@ -1,6 +1,7 @@
 import { Referrer } from 'electron';
 
 export type OpenWindowConfig = {
+    mutePage?: boolean;
     nodeIntegration?: boolean;
     visible?: boolean;
     httpReferrer?: string | Referrer;

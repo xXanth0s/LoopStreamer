@@ -23,7 +23,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Inject, Prop, Watch } from 'vue-property-decorator';
+    import { Emit, Inject, Prop, Watch } from 'vue-property-decorator';
     import { takeUntil } from 'rxjs/operators';
     import { Swiper, SwiperSlide } from 'vue-awesome-swiper';
     import { Subject } from 'rxjs';
@@ -36,7 +36,6 @@
     import { getMultipleSeriesByKey } from '../../../../store/selectors/series.selector';
     import SeriesPanelFront from '../MySeries/SeriesPanelFront.vue';
     import { LANGUAGE } from '../../../../store/enums/language.enum';
-    import { toggleSelectedSeriesForAppAction } from '../../../../store/reducers/app-control-state.reducer';
 
     @Component({
         name: 'series-carousel',
@@ -95,10 +94,6 @@
                     slidesPerGroup: 10,
                 },
             },
-            // pagination: {
-            //     el: '.swiper-pagination',
-            //     type: 'progressbar',
-            // },
             navigation: {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
@@ -128,8 +123,9 @@
             ).subscribe(series => this.series = series);
         }
 
-        private seriesSelected(seriesKey: Series['key']): void {
-            this.store.dispatch(toggleSelectedSeriesForAppAction(seriesKey));
+        @Emit('seriesClicked')
+        private seriesSelected(selectedSeriesKey: Series['key']): Series['key'] {
+            return selectedSeriesKey;
         }
     }
 </script>

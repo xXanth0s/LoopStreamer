@@ -17,6 +17,8 @@ export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['
     return seriesKeys.some(key => key === state.appControlState.selectedSeriesKey);
 };
 
+export const getSelectedSeason = (state: StateModel): SeriesSeason['key'] => state.appControlState.selectedSeason;
+
 export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => {
     return state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
 };

@@ -9,6 +9,7 @@ import VueCarousel from 'vue-carousel';
 import { ToggleButton } from 'vue-js-toggle-button';
 import { Autoplay, Mousewheel, Navigation, Pagination, Swiper as SwiperClass } from 'swiper/swiper.esm';
 import getAwesomeSwiper from 'vue-awesome-swiper/dist/exporter';
+import VueYouTubeEmbed from 'vue-youtube-embed';
 
 Vue.config.productionTip = false;
 
@@ -19,6 +20,7 @@ Vue.use(Menu);
 Vue.use(MenuItem);
 Vue.use(BootstrapVue);
 Vue.use(VueCarousel);
+Vue.use(VueYouTubeEmbed);
 
 SwiperClass.use([ Pagination, Mousewheel, Navigation, Autoplay ]);
 Vue.use(getAwesomeSwiper(SwiperClass));
