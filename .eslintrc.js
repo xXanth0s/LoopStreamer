@@ -42,5 +42,12 @@ module.exports = {
                 'max-len': ['error', { code: 140 }],
             },
         },
+        {
+            files: ['*.js'],
+            rules: {
+                'no-unresolved': 'off',
+                'no-var-requires': 'off',
+            },
+        },
     ],
 };
