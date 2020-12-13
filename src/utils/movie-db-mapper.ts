@@ -55,6 +55,7 @@ export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDeta
     const { season_number, episodes } = season;
 
     const seasonNumber = `${season_number}`;
+    const seasonKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
 
     return episodes.map(episode => {
         const { episode_number, overview, name, still_path } = episode;
@@ -63,6 +64,7 @@ export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDeta
             ...getEmptySeriesEpisode(),
             key,
             seriesKey,
+            seasonKey,
             season: seasonNumber,
             episodeNumber: episode_number,
             posterHref: still_path ? `https://image.tmdb.org/t/p/w227_and_h127_bestv2${still_path}` : '',

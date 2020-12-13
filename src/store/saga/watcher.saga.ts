@@ -1,4 +1,8 @@
-import { setSelectedSeasonForAppAction, toggleSelectedSeriesForAppAction } from '../reducers/app-control-state.reducer';
+import {
+    setSelectedSeasonForAppAction,
+    setSelectedSeriesAction,
+    toggleSelectedSeriesForAppAction
+} from '../reducers/app-control-state.reducer';
 import { loadSeriesInformationSaga } from './portal-load-series-data/load-series.saga';
 import { takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
@@ -20,12 +24,14 @@ import { continueAutoplaySaga } from './continue-autoplay.saga';
 import { Logger } from '../../shared/services/logger';
 import { loadSeriesSeasonForLanguageSaga } from './portal-load-series-data/load-series-season-for-language.saga';
 import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
+import { loadDetailedSeriesInformationSaga } from './series-api/load-detailed-series-information.saga';
 
 export function* watcherSaga() {
     try {
         yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
 
         yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
+        yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationSaga);
         yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
 
         // episode state controlling

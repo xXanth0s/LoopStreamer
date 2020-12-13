@@ -9,7 +9,7 @@ type linkKeyData = {
 }
 
 export const getKeyForSeriesTitle = (seriesTitle: string): string => {
-    return seriesTitle?.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s/g, '-');
+    return seriesTitle?.toLowerCase().replace(/\s/g, '-');
 }
 
 export const getKeyForSeriesSeason = (seriesKey: Series['key'], season: string): string => {

@@ -23,3 +23,16 @@ export default interface Series extends KeyModel<string> {
     scipStartTime?: number;
     scipEndTime?: number;
 }
+
+
+export function getEmptySeries(): Series {
+    return {
+        key: '',
+        titles: {},
+        apiKeys: {},
+        previewVideos: {},
+        descriptions: {},
+        portalLinks: [],
+        seasons: [],
+    };
+}

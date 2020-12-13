@@ -42,11 +42,19 @@ function reset(): AppControlStateModel {
     };
 }
 
+function addOrReplaceMultipleSeriesCollection(state: AppControlStateModel, { collections }: { collections: NamedCollection<Series>[] }) {
+    collections.forEach(collection => addOrReplaceSeriesCollection(state, { collection }));
+}
+
 function addOrReplaceSeriesCollection(state: AppControlStateModel, { collection }: { collection: NamedCollection<Series> }) {
     state.seriesCollections = {
         ...state.seriesCollections,
         [collection.key]: collection
     };
+}
+
+function setSelectedSeries(state: AppControlStateModel, { selectedSeriesKey }: { selectedSeriesKey: Series['key'] }): void {
+    state.selectedSeriesKey = selectedSeriesKey;
 }
 
 export const appControlStateSlice = createSlice({
@@ -57,12 +65,16 @@ export const appControlStateSlice = createSlice({
             setActivePortal(state, action.payload),
         toggleSelectedSeriesForAppAction: (state: AppControlStateModel, action: PayloadAction<Series['key']>) =>
             toggleSelectedSeries(state, action.payload),
+        setSelectedSeriesAction: (state: AppControlStateModel, action: PayloadAction<{ selectedSeriesKey: Series['key'] }>) =>
+            setSelectedSeries(state, action.payload),
         setSelectedSeasonForAppAction: (state: AppControlStateModel, action: PayloadAction<SeriesSeason['key']>) =>
             setSelectedSeason(state, action.payload),
         setSelectedLanguageAction: (state: AppControlStateModel, action: PayloadAction<{ selectedLanguage: LANGUAGE }>) =>
             setSelectedLanguage(state, action.payload),
         addOrReplaceSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collection: NamedCollection<Series> }>) =>
             addOrReplaceSeriesCollection(state, action.payload),
+        addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<Series>[] }>) =>
+            addOrReplaceMultipleSeriesCollection(state, action.payload),
         resetAppControlStateAction: () =>
             reset(),
     }, extraReducers: (builder) => {
@@ -80,4 +92,6 @@ export const {
     setSelectedLanguageAction,
     resetAppControlStateAction,
     addOrReplaceSeriesCollectionAction,
+    addOrReplaceMultipleSeriesCollectionAction,
+    setSelectedSeriesAction
 } = appControlStateSlice.actions;

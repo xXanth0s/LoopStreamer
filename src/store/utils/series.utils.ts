@@ -1,4 +1,4 @@
-import SeriesEpisode from '../models/series-episode.model';
+import SeriesEpisode, { getEmptySeriesEpisode } from '../models/series-episode.model';
 import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
 import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from './key.utils';
 import Series from '../models/series.model';
@@ -15,6 +15,7 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: PortalSerie
 
 
     return {
+        ...getEmptySeriesEpisode(),
         key,
         seriesKey,
         seasonKey,
