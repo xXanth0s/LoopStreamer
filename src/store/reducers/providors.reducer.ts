@@ -36,17 +36,14 @@ const initialState: Partial<Record<PROVIDORS, Providor>> = {
     },
 };
 
-const updateProvidors = (providors: Providor[]): {[key: string]: Providor} => {
-    return mapArrayToObject(providors, 'key');
-};
+const updateProvidors = (providors: Providor[]): { [key: string]: Providor } => mapArrayToObject(providors, 'key');
 
 export const providorsSlice = createSlice({
     name: 'providors',
     initialState,
     reducers: {
-        updateProvidorsAction: (state: { [key: string]: Providor }, action: PayloadAction<Providor[]>) => updateProvidors(action.payload)
-    }
+        updateProvidorsAction: (state: { [key: string]: Providor }, action: PayloadAction<Providor[]>) => updateProvidors(action.payload),
+    },
 });
 
-
-export const {updateProvidorsAction} = providorsSlice.actions;
+export const { updateProvidorsAction } = providorsSlice.actions;

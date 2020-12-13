@@ -61,7 +61,7 @@
     import { convertArrayToChunks, sortArrayForKey } from '../../../utils/array.utils';
     import {
         resetAppControlStateAction,
-        setActivePortalForAppAction
+        setActivePortalForAppAction,
     } from '../../../store/reducers/app-control-state.reducer';
     import { LANGUAGE } from '../../../store/enums/language.enum';
 

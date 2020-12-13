@@ -13,7 +13,6 @@ export function mapSeriesEpisodeDtoToSeriesEpisode(seriesEpisodeDto: PortalSerie
     const seasonKey = getKeyForSeriesSeason(seriesKey, `${seasonNumber}`);
     const key = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);
 
-
     return {
         ...getEmptySeriesEpisode(),
         key,
@@ -35,7 +34,7 @@ export function mapSeriesSeasonDtoToSeriesSeason(seasonDto: PortalSeriesSeasonDt
     return {
         key,
         seriesKey,
-        seasonNumber: seasonNumber,
+        seasonNumber,
         portalLinks: [],
         episodes: [],
     };

@@ -1,6 +1,6 @@
+import { put } from 'redux-saga/effects';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { mapSeriesSeasonDtoToSeriesSeason } from '../../utils/series.utils';
-import { put } from 'redux-saga/effects';
 import { updateOrAddSeriesSeasonAction } from '../../reducers/series-season.reducer';
 import { generateLinksForSeriesSeasonDto } from '../../utils/link.utils';
 import { updateOrAddMultipleLinksAction } from '../../reducers/link.reducer';
@@ -9,7 +9,7 @@ import { Logger } from '../../../shared/services/logger';
 
 export function* addSeriesSeasonSaga(seasonData: PortalSeriesSeasonDto) {
     if (!seasonData) {
-        Logger.error(`[addSeriesSeasonSaga] tried to add empty SeriesSeasonDto`);
+        Logger.error('[addSeriesSeasonSaga] tried to add empty SeriesSeasonDto');
         return;
     }
 

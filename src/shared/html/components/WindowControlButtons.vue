@@ -45,7 +45,6 @@
         name: 'WindowControlButtons',
     })
     export default class WindowControlButtons extends Vue {
-
         private readonly buttonsVisibilityTime = 5000;
 
         @Prop(Boolean)

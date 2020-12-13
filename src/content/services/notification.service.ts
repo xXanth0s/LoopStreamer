@@ -4,12 +4,11 @@ import iziToast, {
     IziToastPosition,
     IziToastSettings,
     IziToastTransitionIn,
-    IziToastTransitionOut
+    IziToastTransitionOut,
 } from '../../../custom_frameworks/izitoast/1.4.0';
 
 @injectable()
 export class NotificationService {
-
     private readonly defaultConfig: IziToastSettings = {
         transitionIn: 'fadeInLeft' as IziToastTransitionIn,
         transitionOut: 'fadeOutRight' as IziToastTransitionOut,
@@ -43,8 +42,8 @@ export class NotificationService {
                 [ '<button>Nicht überspringen</button>', (instance, toast) => {
                     doNotSetStarttime();
                     this.closeToast(instance, toast);
-                }, false ]
-            ]
+                }, false ],
+            ],
         });
     }
 
@@ -64,8 +63,8 @@ export class NotificationService {
                 [ '<button>Nicht überspringen</button>', (instance, toast) => {
                     doNotSetStarttime();
                     this.closeToast(instance, toast);
-                }, false ]
-            ]
+                }, false ],
+            ],
         });
     }
 
@@ -85,11 +84,10 @@ export class NotificationService {
                 }, false ],
                 [ '<button>Abbrechen</button>', (instance, toast) => {
                     this.closeToast(instance, toast);
-                }, false ]
-            ]
+                }, false ],
+            ],
         });
     }
-
 
     public openEpisodeLimitReachedPopup(continueFn: () => void): void {
         iziToast.show({
@@ -106,8 +104,8 @@ export class NotificationService {
                 }, false ],
                 [ '<button>Abbrechen</button>', (instance, toast) => {
                     this.closeToast(instance, toast);
-                }, false ]
-            ]
+                }, false ],
+            ],
         });
     }
 
@@ -117,7 +115,7 @@ export class NotificationService {
             timeout: 0,
             progressBar: false,
             title: 'Video wird vorbereitet',
-            message: 'Das nächste Video wird Vorbereitet.'
+            message: 'Das nächste Video wird Vorbereitet.',
         });
     }
 
@@ -127,14 +125,15 @@ export class NotificationService {
             timeout: 0,
             progressBar: false,
             title: 'Serie fortsetzen',
-            message: 'Wollen Sie die Serie fortsetzen?'
+            message: 'Wollen Sie die Serie fortsetzen?',
         });
     }
 
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
         instance.hide({
-            transitionOut: 'fadeOut', onClosed: () => {
-            }
+            transitionOut: 'fadeOut',
+            onClosed: () => {
+            },
         }, htmlElement, 'button');
     }
 }

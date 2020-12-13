@@ -56,7 +56,6 @@
         },
     })
     export default class OptionsPanel extends Vue {
-
         private readonly context = Context;
         private readonly toggleButtonColor = DEFAULT_COLOR;
         private readonly deadEpisodeTooltipText = DEAD_EPISODES_TOOLTIP;

@@ -1,3 +1,3 @@
 export type KeyObject = {
-    key: string
+    key: string;
 }

@@ -78,5 +78,4 @@ export const getActiveOrLastUsedPortalForSeries = (state: StateModel, seriesKey:
 
     const series = getSeriesByKey(state, seriesKey);
     return series?.lastUsedPortal;
-
 };

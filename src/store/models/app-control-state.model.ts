@@ -9,5 +9,5 @@ export default interface AppControlStateModel {
     selectedSeriesKey?: Series['key'];
     selectedSeason?: SeriesSeason['key'];
     selectedLanguage?: LANGUAGE;
-    seriesCollections: Record<string, NamedCollection<Series>>
+    seriesCollections: Record<string, NamedCollection<Series>>;
 }

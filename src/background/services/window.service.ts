@@ -6,19 +6,19 @@ import {
     BrowserWindowConstructorOptions,
     OnBeforeSendHeadersListenerDetails,
     session,
-    Session
+    Session,
 } from 'electron';
-import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { StoreService } from '../../shared/services/store.service';
 import * as path from 'path';
-import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { ElectronBlocker } from '@cliqz/adblocker-electron';
 import fetch from 'cross-fetch';
 import { fromEvent, merge } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
+import { Windows } from 'webextension-polyfill-ts';
 import { getWindowStateForWindowId, getWindowStateForWindowType } from '../../store/selectors/control-state.selector';
 import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/control-state.reducer';
-import { Windows } from 'webextension-polyfill-ts';
+import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
+import { StoreService } from '../../shared/services/store.service';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
@@ -28,7 +28,6 @@ import WindowState = Windows.WindowState;
 
 @injectable()
 export class WindowService {
-
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
@@ -36,13 +35,13 @@ export class WindowService {
 
     public addReduxDevTools(): void {
         BrowserWindow.addDevToolsExtension(
-            path.join(__dirname, 'extensions', 'redux-dev-tools', environment.reduxDevToolsVersion)
-        )
+            path.join(__dirname, 'extensions', 'redux-dev-tools', environment.reduxDevToolsVersion),
+        );
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {
         try {
-            let finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
+            const finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
             const windowConfig = this.getConfig(finalConfig);
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
@@ -54,9 +53,8 @@ export class WindowService {
             return window;
         } catch (e) {
             Logger.error('[WindowService->openWindow]', e);
-            throw(e);
+            throw (e);
         }
-
     }
 
     public closeWindow(windowId?: number, closeParentWindows = false): void {
@@ -112,7 +110,7 @@ export class WindowService {
         }
     }
 
-    public addDefaultHandlingForNewWindow(window: BrowserWindow, mutePage: boolean = true): void {
+    public addDefaultHandlingForNewWindow(window: BrowserWindow, mutePage = true): void {
         window.removeMenu();
         window.webContents.setAudioMuted(mutePage);
         this.hideNewWindows(window);
@@ -160,7 +158,7 @@ export class WindowService {
 
     private stopPlayerWhenActiveWindowClosed(window: BrowserWindow): void {
         fromEvent(window, 'close').pipe(
-            first()
+            first(),
         ).subscribe(() => {
             const windowState = this.store.selectSync(getWindowStateForWindowId, window.id);
             if (windowState) {
@@ -172,11 +170,11 @@ export class WindowService {
 
     private manipulateSession(newSession: Session): void {
         newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
-            if (details.requestHeaders['Referer']?.includes('localhost')) {
+            if (details.requestHeaders.Referer?.includes('localhost')) {
                 const { host } = new URL(details.url);
 
                 // adding host as referer, to bypass ddos protection
-                details.requestHeaders['Referer'] = host;
+                details.requestHeaders.Referer = host;
             }
 
             // set user agent for recaptcha

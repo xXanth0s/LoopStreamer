@@ -1,6 +1,6 @@
+import { put, select } from 'redux-saga/effects';
 import { SeriesSeason } from '../models/series-season.model';
 import { StateModel } from '../models/state.model';
-import { put, select } from 'redux-saga/effects';
 import { getAvailableLanguagesForSeasonAndActivePortal } from '../selectors/series-season.selector';
 import { getSeriesForSeason } from '../selectors/series.selector';
 import { setSelectedLanguageAction } from '../reducers/app-control-state.reducer';

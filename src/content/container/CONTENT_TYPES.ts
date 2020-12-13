@@ -17,9 +17,6 @@ const CONTENT_TYPES = {
     Vivo: Symbol.for('Vivo'),
     MIXDrop: Symbol.for('MIXDrop'),
 
-
 };
 
 export { CONTENT_TYPES };
-
-

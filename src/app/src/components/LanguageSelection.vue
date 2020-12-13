@@ -33,7 +33,6 @@
         },
     })
     export default class LanguageSelection extends Vue {
-
         private readonly languageFlagMap = LABGUAGE_FLAG_DATA_MAP;
         private readonly takeUntil$ = new Subject();
 

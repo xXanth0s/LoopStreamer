@@ -1,8 +1,7 @@
+import { Container } from 'inversify';
 import { MessageService } from './message.service';
 import { StoreService } from './store.service';
-import { Container } from 'inversify';
 import { SHARED_TYPES } from '../constants/SHARED_TYPES';
-
 
 describe('MessageService', () => {
     let service: MessageService;
@@ -26,5 +25,4 @@ describe('MessageService', () => {
     describe('sendMessageToBackground', () => {
 
     });
-
 });

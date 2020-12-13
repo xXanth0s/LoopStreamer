@@ -1,6 +1,6 @@
+import { call, put, select } from 'redux-saga/effects';
 import { setSelectedSeasonForAppAction } from '../../reducers/app-control-state.reducer';
 import { StateModel } from '../../models/state.model';
-import { call, put, select } from 'redux-saga/effects';
 import { getSeriesSeasonByKey } from '../../selectors/series-season.selector';
 import { getSeriesByKey } from '../../selectors/series.selector';
 import { PORTALS } from '../../enums/portals.enum';
@@ -19,9 +19,9 @@ import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../r
 import { Logger } from '../../../shared/services/logger';
 
 export type loadSeasonInformationOptions = {
-    seasonKey: SeriesSeason['key'],
-    portalKey: PORTALS,
-    language?: LANGUAGE,
+    seasonKey: SeriesSeason['key'];
+    portalKey: PORTALS;
+    language?: LANGUAGE;
     isSeriesUpToDate?: boolean;
     isSeasonUpToData?: boolean;
 }
@@ -52,7 +52,7 @@ export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelected
         yield updateSeriesSeasonForPortal({
             seasonKey: action.payload,
             portalKey: portal,
-            language
+            language,
         });
     } catch (error) {
         Logger.error('[loadSeasonInformationSaga] error occurred', error);
@@ -64,11 +64,13 @@ export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelected
 }
 
 export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptions) {
-    const { isSeasonUpToData, isSeriesUpToDate, language, portalKey, seasonKey } = options;
+    const {
+        isSeasonUpToData, isSeriesUpToDate, language, portalKey, seasonKey,
+    } = options;
     const state: StateModel = yield select();
     const finalLanguage = language || state.options.defaultLanguage;
     const season = getSeriesSeasonByKey(state, seasonKey);
-    let links = getLinksForSeriesSeasonAndPortal(state, seasonKey, portalKey);
+    const links = getLinksForSeriesSeasonAndPortal(state, seasonKey, portalKey);
     if (links.length === 0) {
         if (isSeriesUpToDate) {
             return false;
@@ -77,7 +79,7 @@ export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptio
         return yield updateSeriesSeasonForPortal({ ...options, isSeriesUpToDate: true });
     }
 
-    let linkForLanguage = links.find(link => link.language === finalLanguage);
+    const linkForLanguage = links.find(link => link.language === finalLanguage);
 
     if (!linkForLanguage || language === LANGUAGE.NONE) {
         if (isSeasonUpToData) {
@@ -97,5 +99,3 @@ function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkMo
 
     yield addSeriesSeasonSaga(seasonData);
 }
-
-

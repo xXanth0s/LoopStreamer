@@ -23,7 +23,6 @@
         name: 'toast',
     })
     export default class Toast extends Vue {
-
         @Prop(String)
         public title;
         @Prop(String)

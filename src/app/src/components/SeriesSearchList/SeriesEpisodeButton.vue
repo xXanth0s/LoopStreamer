@@ -35,7 +35,6 @@
         },
     })
     export default class SeriesEpisodeButton extends Vue {
-
         private readonly takeUntil$ = new Subject();
 
         @Prop(Object)

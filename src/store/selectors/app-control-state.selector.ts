@@ -9,19 +9,13 @@ import { NamedCollection } from '../models/collection.model';
 
 export const getExpandedSeries = (state: StateModel): Series['key'] => state.appControlState.selectedSeriesKey;
 
-export const isSeriesExpandedOnApp = (state: StateModel, seriesKey: Series['key']): boolean => {
-    return state.appControlState.selectedSeriesKey === seriesKey;
-};
+export const isSeriesExpandedOnApp = (state: StateModel, seriesKey: Series['key']): boolean => state.appControlState.selectedSeriesKey === seriesKey;
 
-export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['key'][]): boolean => {
-    return seriesKeys.some(key => key === state.appControlState.selectedSeriesKey);
-};
+export const isAnySeriesExpandedOnApp = (state: StateModel, seriesKeys: Series['key'][]): boolean => seriesKeys.some(key => key === state.appControlState.selectedSeriesKey);
 
 export const getSelectedSeason = (state: StateModel): SeriesSeason['key'] => state.appControlState.selectedSeason;
 
-export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => {
-    return state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
-};
+export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
 
 export const getSelectedLanguageOrLastUsedSeriesLanguageForSeason = (state: StateModel, seriesSeasonKey: SeriesSeason['key']): LANGUAGE => {
     const series = getSeriesForSeason(state, seriesSeasonKey);
@@ -45,7 +39,4 @@ export const getSelectedLanguageOrLastUsedSeriesLanguage = (state: StateModel, s
 
 export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);
 
-
-export const getSeriesCollections = (state: StateModel): NamedCollection<Series>[] => {
-    return Object.values(state.appControlState.seriesCollections);
-};
+export const getSeriesCollections = (state: StateModel): NamedCollection<Series>[] => Object.values(state.appControlState.seriesCollections);

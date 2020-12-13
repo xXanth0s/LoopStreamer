@@ -1,12 +1,12 @@
+import { Observable, Subject } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { DomElementSize } from '../../dto/dom-element-size.model';
 import {
     FULL_SCREEN_VIDEO_CSS_CLASS,
     HIDE_ELMENT_CSS_CLASS,
     LS_CONTENT_CONTAINER,
-    VIDEO_IN_VIDEO_CSS_CLASS
+    VIDEO_IN_VIDEO_CSS_CLASS,
 } from '../constants/class-names';
-import { Observable, Subject } from 'rxjs';
-import { finalize } from 'rxjs/operators';
 import Providor from '../../store/models/providor.model';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 
@@ -17,7 +17,6 @@ export function isDomElementVisible(domElement: HTMLElement): boolean {
     return size.width && size.height && elemntStyles.visibility === 'visible';
 }
 
-
 export function getDomElementSize(domElement: HTMLElement): DomElementSize {
     const elemntStyles = window.getComputedStyle(domElement);
 
@@ -26,13 +25,13 @@ export function getDomElementSize(domElement: HTMLElement): DomElementSize {
 
     return {
         width,
-        height
+        height,
     };
 }
 
 function getNumberFromPixelString(pixelString: string): number {
     const pixelRegex = /px/g;
-    let value = +pixelString.replace(pixelRegex, '');
+    const value = +pixelString.replace(pixelRegex, '');
 
     return isNaN(value) ? 0 : value;
 }
@@ -70,7 +69,7 @@ export function checkForMutations<T extends Element>(container: Node, selector: 
     observer.observe(container, mutationObserverConfig);
 
     return sub$.asObservable().pipe(
-        finalize(() => observer.disconnect())
+        finalize(() => observer.disconnect()),
     );
 }
 

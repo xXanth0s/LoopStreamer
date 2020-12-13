@@ -1,20 +1,18 @@
 import { inject, injectable } from 'inversify';
+import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents, } from 'electron';
 import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getWindowIdForWindowType } from '../../store/selectors/control-state.selector';
-import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents } from 'electron';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { Logger } from './logger';
 
 @injectable()
 export class MessageService {
-
     constructor(@inject(SHARED_TYPES.StoreService) private storeService: StoreService,
                 @inject(SHARED_TYPES.ControllerType) private controllerType: ControllerType) {
     }
-
 
     public async sendMessageToBackground<T, R>(message: Message<T, R>): Promise<R> {
         Logger.info('[MessageService->sendMessageToBackground] sending message to Background:', message);
@@ -31,7 +29,7 @@ export class MessageService {
 
     public setControllerType(controllerType: ControllerType): void {
         this.controllerType = controllerType;
-        console.info(controllerType)
+        console.info(controllerType);
     }
 
     public replyToSender<T, R>(message: Message<T, R>, sender: WebContents | IpcRenderer, args: R): void {
@@ -49,8 +47,8 @@ export class MessageService {
     private updateMessage<T>(message: Message<T>): Message<T> {
         return {
             ...message,
-            sourceController: this.controllerType
-        }
+            sourceController: this.controllerType,
+        };
     }
 
     private getReply<T, R>(message: Message<T, R>): Promise<R> {
@@ -58,9 +56,9 @@ export class MessageService {
             if (message.hasReply) {
                 this.getIpcHandler().once(this.getReplyChannel(message), (event, args) => {
                     resolve(args);
-                })
+                });
             }
-        })
+        });
     }
 
     private getReplyChannel<T, R>(message: Message<T, R>): string {

@@ -1,12 +1,11 @@
-import { IProvidorController } from './providor.controller.interface';
 import { inject, injectable } from 'inversify';
+import { IProvidorController } from './providor.controller.interface';
 import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
 import { VideoController } from '../video.controller';
 import SeriesEpisode from '../../../store/models/series-episode.model';
 
 @injectable()
 export class MIXDropController implements IProvidorController {
-
     constructor(@inject(CONTENT_TYPES.VideoController) private readonly videoController: VideoController) {
     }
 
@@ -16,9 +15,8 @@ export class MIXDropController implements IProvidorController {
             this.playButton().click();
             this.videoController.startVideo(videoElement, seriesEpisodeKey);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     private readonly videoSelector = (): HTMLVideoElement => document.querySelector('video');

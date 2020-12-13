@@ -10,5 +10,5 @@ export type OpenWindowConfig = {
     preloadScript?: boolean;
     width?: number;
     height?: number;
-    resizable?: boolean
+    resizable?: boolean;
 }

@@ -23,7 +23,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Emit, Inject, Prop, Watch } from 'vue-property-decorator';
+    import { Emit, Inject, Prop, Watch, } from 'vue-property-decorator';
     import { takeUntil } from 'rxjs/operators';
     import { Swiper, SwiperSlide } from 'vue-awesome-swiper';
     import { Subject } from 'rxjs';
@@ -46,7 +46,6 @@
         },
     })
     export default class SeriesCarousel extends Vue {
-
         private readonly takeUntil$ = new Subject();
 
         private readonly swiperOption: SwiperOptions = {

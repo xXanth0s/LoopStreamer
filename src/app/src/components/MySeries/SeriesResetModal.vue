@@ -23,7 +23,6 @@
         name: 'series-delete-modal',
     })
     export default class SeriesResetModal extends Vue {
-
         @Prop(String)
         public title;
 

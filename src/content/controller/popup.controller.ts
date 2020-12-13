@@ -1,4 +1,6 @@
 import { inject, injectable } from 'inversify';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { NotificationService } from '../services/notification.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
@@ -13,13 +15,10 @@ import { isMaximumPlayedEpisodesLimitReached } from '../../store/selectors/contr
 import { PopupService } from '../services/popup.service';
 import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
 import { continueAutoplayAction, startNextEpisodeAction } from '../../store/actions/shared.actions';
 
 @injectable()
 export class PopupController {
-
     private videoOnTimeUpdate$: Observable<number>;
     private popupFinallyClosed$ = new Subject<Popup>();
 
@@ -90,14 +89,14 @@ export class PopupController {
             () => {
                 this.store.dispatch(setStartTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
-                    scipStartTime: video.currentTime
+                    scipStartTime: video.currentTime,
                 }));
                 this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
             },
             () => {
                 this.store.dispatch(setStartTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
-                    scipStartTime: undefined
+                    scipStartTime: undefined,
                 }));
                 this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
             }, () => {
@@ -114,7 +113,7 @@ export class PopupController {
                 const timeFromEnd = video.duration - video.currentTime;
                 await this.store.dispatch(setEndTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
-                    scipEndTime: timeFromEnd
+                    scipEndTime: timeFromEnd,
                 }));
                 this.videoEnded(episodeInfo.key);
                 this.popupFinallyClosed$.next(Popup.SET_ENDTIME);
@@ -122,7 +121,7 @@ export class PopupController {
             async () => {
                 await this.store.dispatch(setEndTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
-                    scipEndTime: undefined
+                    scipEndTime: undefined,
                 }));
                 this.popupFinallyClosed$.next(Popup.SET_ENDTIME);
             }, () => {
@@ -142,7 +141,6 @@ export class PopupController {
             this.openEpisodeLimitReachedPopup(seriesEpisodeKey);
             return;
         }
-
 
         const popupCountdown = this.getTimeTillForNextEpisodeCountdown(video);
 

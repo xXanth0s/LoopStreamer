@@ -8,7 +8,6 @@ import { addVideoButtons } from '../html/video-button/video-buttons.component';
 
 @injectable()
 export class TestController {
-
     private readonly inivisibleButtonSelector = (): HTMLElement => document.getElementById('invisible_button');
 
     constructor(@inject(CONTENT_TYPES.NotificationService) private readonly notificationService: NotificationService) {

@@ -8,7 +8,7 @@ const stateKey = environment.isDev ? 'state-dev' : 'state';
 
 // store.reset(stateKey)
 export const StorageMiddlerware: Middleware = ({ getState }: MiddlewareAPI) => ((
-    next: Dispatch
+    next: Dispatch,
 ) => async action => {
     const returnValue = next(action);
 

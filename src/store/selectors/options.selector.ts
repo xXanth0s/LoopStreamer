@@ -4,5 +4,4 @@ import { LANGUAGE } from '../enums/language.enum';
 
 export const getOptions = (state: StateModel): Options => state.options;
 
-
 export const getDefaultLanguage = (state: StateModel): LANGUAGE => state.options.defaultLanguage;

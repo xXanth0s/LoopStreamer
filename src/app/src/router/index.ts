@@ -14,31 +14,31 @@ Vue.use(VueRouter);
 let routes = [
     {
         path: `/${globalRoutes.HOME_PAGE}`,
-        component: HomePage
+        component: HomePage,
     },
     {
         path: `/${globalRoutes.SERIES_LIST}`,
-        component: SeriesOverview
+        component: SeriesOverview,
     },
     {
         path: `/${globalRoutes.SETTINGS_PAGE}`,
-        component: SettingsPage
+        component: SettingsPage,
     },
     {
         path: `/${globalRoutes.SERIES_PAGE}`,
-        component: MySeriesPage
+        component: MySeriesPage,
     },
     {
         path: `/${globalRoutes.FAQ_PAGE}`,
-        component: InfoPage
+        component: InfoPage,
     },
     {
         path: `/${globalRoutes.TEST_PAGE}`,
-        component: TestPage
+        component: TestPage,
     },
     {
         path: '/',
-        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`
+        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`,
     },
 ];
 
@@ -47,7 +47,7 @@ if (!environment.isDev) {
 }
 
 const router = new VueRouter({
-    routes
+    routes,
 });
 
 export default router;

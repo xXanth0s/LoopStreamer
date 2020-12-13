@@ -5,7 +5,6 @@ import browserStore from '../../store/store/browser-store';
 
 @injectable()
 export class BrowserStoreService implements IStoreService<StateModel> {
-
     dispatch(data: any): Promise<void> {
         return browserStore.dispatch(data);
     }

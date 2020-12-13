@@ -1,6 +1,6 @@
+import { call, put, select } from 'redux-saga/effects';
 import { startEpisodeAction } from '../actions/shared.actions';
 import { getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
-import { call, put, select } from 'redux-saga/effects';
 import { StateModel } from '../models/state.model';
 import { getPortalController, getVideoController } from '../../background/container/container.utils';
 import SeriesEpisode from '../models/series-episode.model';
@@ -15,7 +15,7 @@ import {
     raisePlayedEpisodesAction,
     removeAsyncInteractionAction,
     resetPlayedEpisodesAction,
-    setActiveEpisodeAction
+    setActiveEpisodeAction,
 } from '../reducers/control-state.reducer';
 import { stopPlayer } from '../utils/stop-player.util';
 import { getLinksByKeys } from '../selectors/línk.selector';
@@ -38,7 +38,7 @@ export type StartEpisodeOptions = {
 const defaultConfig: StartEpisodeOptions = {
     episodeKey: '',
     fetchPortalLinks: true,
-    language: LANGUAGE.NONE
+    language: LANGUAGE.NONE,
 };
 
 export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>) {
@@ -123,7 +123,7 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
         if (providorLink) {
             const result: ProvidorLink = {
                 link: providorLink.href,
-                providor: provider.key
+                providor: provider.key,
             };
 
             return result;

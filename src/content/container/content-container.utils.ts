@@ -9,7 +9,6 @@ export function getProvidorController(providorKey: PROVIDORS): IProvidorControll
     return inversifyContentContainer.get<IProvidorController>(symbol);
 }
 
-
 export const getContentTypeForPortal = (portal: PORTALS): symbol => {
     switch (portal) {
         case PORTALS.BS:

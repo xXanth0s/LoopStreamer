@@ -32,7 +32,6 @@
         components: { ButtonTile },
     })
     export default class SeriesSeasonButton extends Vue {
-
         private readonly takeUntil$ = new Subject();
 
         @Prop(Object)

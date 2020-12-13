@@ -24,7 +24,6 @@
         components: {},
     })
     export default class SeriesPanelFront extends Vue {
-
         @Prop(String)
         imageUrl: string;
 

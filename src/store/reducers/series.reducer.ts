@@ -28,7 +28,7 @@ const resetSeries = (state: { [key: string]: Series }, key: Series['key']): { [k
         isEndTimeConfigured: false,
         isStartTimeConfigured: false,
         scipEndTime: 0,
-        scipStartTime: 0
+        scipStartTime: 0,
     };
     return state;
 };
@@ -80,13 +80,13 @@ function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series)
             },
             portalLinks: [
                 ...oldSeries.portalLinks,
-                ...seriesInfo.portalLinks
+                ...seriesInfo.portalLinks,
             ],
             seasons: [
                 ...oldSeries.seasons,
-                ...seriesInfo.seasons
+                ...seriesInfo.seasons,
 
-            ]
+            ],
         };
     } else {
         state[key] = seriesInfo;
@@ -99,8 +99,8 @@ function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos
     }
 }
 
-function setLastWatchedEpisode(state: StateModel['series'], actionData: { seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }): void {
-    const {seriesEpisodeKey, seriesKey} = actionData;
+function setLastWatchedEpisode(state: StateModel['series'], actionData: { seriesKey: Series['key']; seriesEpisodeKey: SeriesEpisode['key'] }): void {
+    const { seriesEpisodeKey, seriesKey } = actionData;
     if (!state[seriesKey]) {
         console.error(`[SeriesReducer->seriesStarted] tried to update series ${seriesKey} but no series found`);
         return;
@@ -109,7 +109,7 @@ function setLastWatchedEpisode(state: StateModel['series'], actionData: { series
     state[seriesKey].lastEpisodeWatched = seriesEpisodeKey;
 }
 
-function setLastUsedPortalForSeries(state: StateModel['series'], {seriesKey, portal}: { seriesKey: Series['key']; portal: PORTALS }): void {
+function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, portal }: { seriesKey: Series['key']; portal: PORTALS }): void {
     if (!state[seriesKey]) {
         Logger.error(`[SeriesReducer->setLastUsedPortalForSeries] tried to update series ${seriesKey} but no series found`);
         return;
@@ -130,7 +130,7 @@ function addMultipleLinks(state: StateModel['series'], links: LinkModel[]) {
 
 function addLink(state: StateModel['series'], link: LinkModel): void {
     if (link.type !== LINK_TYPE.PORTAL_SERIES_LINK) {
-        return
+        return;
     }
 
     const series = state[link.parentKey];
@@ -170,33 +170,21 @@ const seriesSlice = createSlice({
     name: 'series',
     initialState,
     reducers: {
-        removeSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) =>
-            removeSeries(state, action.payload),
-        setStartTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key'], scipStartTime?: Series['scipStartTime'] }>) =>
-            setStartTimeForSeries(state, action.payload.key, action.payload.scipStartTime),
-        setEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key'], scipEndTime?: Series['scipStartTime'] }>) =>
-            setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
-        resetSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) =>
-            resetSeries(state, action.payload),
-        updateOrAddSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series>) =>
-            updateOrAddSeries(state, action.payload),
-        updateOrAddMultipleSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series[]>) =>
-            updateOrAddMultipleSeries(state, action.payload),
-        setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], portal: PORTALS }>) =>
-            setLastUsedPortalForSeries(state, action.payload),
-        setLastUsedLanguageForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], language: LANGUAGE }>) =>
-            setLastUsedLanguageForSeries(state, action.payload),
-        setLastWatchedEpisodeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'], seriesEpisodeKey: SeriesEpisode['key'] }>) =>
-            setLastWatchedEpisode(state, action.payload),
-    }, extraReducers: (builder) => {
-        builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) =>
-            deleteSeries(state, action.payload));
-        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) =>
-            addMultipleLinks(state, action.payload));
-        builder.addCase(updateOrAddMutlipleSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason[]>) =>
-            addMultipleSeasons(state, action.payload));
-        builder.addCase(updateOrAddSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason>) =>
-            addSeasons(state, action.payload));
+        removeSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => removeSeries(state, action.payload),
+        setStartTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipStartTime?: Series['scipStartTime'] }>) => setStartTimeForSeries(state, action.payload.key, action.payload.scipStartTime),
+        setEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipEndTime?: Series['scipStartTime'] }>) => setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
+        resetSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => resetSeries(state, action.payload),
+        updateOrAddSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series>) => updateOrAddSeries(state, action.payload),
+        updateOrAddMultipleSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series[]>) => updateOrAddMultipleSeries(state, action.payload),
+        setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key']; portal: PORTALS }>) => setLastUsedPortalForSeries(state, action.payload),
+        setLastUsedLanguageForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key']; language: LANGUAGE }>) => setLastUsedLanguageForSeries(state, action.payload),
+        setLastWatchedEpisodeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key']; seriesEpisodeKey: SeriesEpisode['key'] }>) => setLastWatchedEpisode(state, action.payload),
+    },
+    extraReducers: (builder) => {
+        builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) => deleteSeries(state, action.payload));
+        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) => addMultipleLinks(state, action.payload));
+        builder.addCase(updateOrAddMutlipleSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason[]>) => addMultipleSeasons(state, action.payload));
+        builder.addCase(updateOrAddSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason>) => addSeasons(state, action.payload));
     },
 });
 

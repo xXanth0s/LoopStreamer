@@ -28,11 +28,11 @@ inversifyContainer.bind(SHARED_TYPES.Store).to(BackgroundStoreService).inSinglet
 // services
 inversifyContainer.bind(BACKGROUND_TYPES.WindowService).to(WindowService).inSingletonScope();
 
-//controller
+// controller
 inversifyContainer.bind(BACKGROUND_TYPES.VideoController).to(VideoController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.PortalController).to(PortalController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.WindowController).to(WindowController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.RootController).to(RootBackgroundController).inSingletonScope();
 inversifyContainer.bind(BACKGROUND_TYPES.TestController).to(TestController).inSingletonScope();
 
-export {inversifyContainer};
+export { inversifyContainer };

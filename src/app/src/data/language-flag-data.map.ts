@@ -1,6 +1,6 @@
+import path from 'path';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageFlag } from '../models/language-flag.model';
-import path from 'path';
 
 export const LABGUAGE_FLAG_DATA_MAP: Partial<Record<LANGUAGE, LanguageFlag>> = {
     [LANGUAGE.GERMAN]: {
@@ -17,5 +17,5 @@ export const LABGUAGE_FLAG_DATA_MAP: Partial<Record<LANGUAGE, LanguageFlag>> = {
         language: LANGUAGE.ENGLISH,
         title: 'Englisch',
         src: path.join(process.env.BASE_URL, 'flags', 'united-states-of-america.svg'),
-    }
+    },
 };

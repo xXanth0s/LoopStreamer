@@ -1,5 +1,5 @@
-import { startPreviousEpisodeAction } from '../actions/shared.actions';
 import { put, select } from 'redux-saga/effects';
+import { startPreviousEpisodeAction } from '../actions/shared.actions';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
@@ -9,7 +9,6 @@ import { generateAsyncInteraction } from '../store/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../reducers/control-state.reducer';
 import { Logger } from '../../shared/services/logger';
-
 
 export function* startPreviousEpisodeSaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();

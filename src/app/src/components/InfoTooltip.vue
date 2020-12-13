@@ -17,7 +17,6 @@
         name: 'info-tooltip',
     })
     export default class InfoTooltip extends Vue {
-
         isMounted = false;
 
         @Prop({

@@ -20,7 +20,6 @@ export default interface SeriesEpisode {
     isFinished?: boolean;
 }
 
-
 export function getEmptySeriesEpisode(): SeriesEpisode {
     return {
         key: '',

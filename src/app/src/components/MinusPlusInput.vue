@@ -21,7 +21,6 @@
         name: 'minus-plus-input',
     })
     export default class MinusPlusInput extends Vue {
-
         @Prop(Number)
         public value: number;
         private lastValidatedValue: number;

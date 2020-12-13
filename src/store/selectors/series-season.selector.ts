@@ -8,9 +8,7 @@ import { getLinksForSeriesSeasonAndPortal } from './línk.selector';
 import { getSeriesByKey, getSeriesForSeason } from './series.selector';
 import { Logger } from '../../shared/services/logger';
 
-export const getMultipleSeriesSeasonByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => {
-    return keys.map(key => getSeriesSeasonByKey(state, key));
-};
+export const getMultipleSeriesSeasonByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => keys.map(key => getSeriesSeasonByKey(state, key));
 
 export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
@@ -31,9 +29,7 @@ export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: S
     return getSeriesSeasonByKey(state, seasonKey);
 };
 
-export const getNextSeason = (state: StateModel, seasonKey: SeriesSeason['key']): SeriesSeason => {
-    return getSeasonWithOffset(state, seasonKey, 1);
-};
+export const getNextSeason = (state: StateModel, seasonKey: SeriesSeason['key']): SeriesSeason => getSeasonWithOffset(state, seasonKey, 1);
 
 export const getSeasonWithOffset = (state: StateModel, seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
     const currentSeason = getSeriesSeasonByKey(state, seasonKey);

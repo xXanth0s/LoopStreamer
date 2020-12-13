@@ -1,5 +1,5 @@
 export const mockService = <T>(constructor: new (...args: any[]) => T, spyObject?: jest.Mocked<T>): jest.Mocked<T> => {
-    const prototype = constructor.prototype;
+    const { prototype } = constructor;
 
     const spyObj = spyObject || {} as jest.Mocked<T>;
     Object.keys(prototype).forEach(property => {
@@ -10,14 +10,12 @@ export const mockService = <T>(constructor: new (...args: any[]) => T, spyObject
         if (isSpy(descriptor)) {
             // @ts-ignore
             spyObj[property] = prototype[property];
-        }
-        else if (descriptor.value !== undefined) {
+        } else if (descriptor.value !== undefined) {
             const spy = jest.spyOn(prototype, property);
             spy.mockReturnValue(undefined);
             // @ts-ignore
             spyObj[property] = spy;
-        }
-        else if (descriptor.get !== undefined) {
+        } else if (descriptor.get !== undefined) {
             // @ts-ignore
             spyObj[property] = jest.spyOn(prototype, property, 'get');
         }
@@ -38,4 +36,3 @@ export const isSpy = (descriptor: PropertyDescriptor): boolean => {
         .find(spyField => Object.getOwnPropertyDescriptor(descriptor.value, spyField) === undefined);
     return missingField === undefined;
 };
-

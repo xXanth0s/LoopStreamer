@@ -25,7 +25,6 @@ export default interface Series extends KeyModel<string> {
     scipEndTime?: number;
 }
 
-
 export function getEmptySeries(): Series {
     return {
         key: '',

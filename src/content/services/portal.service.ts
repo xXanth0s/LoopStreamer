@@ -8,7 +8,6 @@ import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
 export class PortalService {
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 

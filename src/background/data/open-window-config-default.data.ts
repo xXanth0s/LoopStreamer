@@ -12,4 +12,4 @@ export const DefaultOpenWindowConfig: Required<OpenWindowConfig> = {
     width: 1600,
     height: 900,
     resizable: true,
-}
+};

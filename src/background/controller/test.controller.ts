@@ -1,9 +1,11 @@
 import { inject, injectable } from 'inversify';
+import { BrowserWindow, ipcMain } from 'electron';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowService } from '../services/window.service';
-import { BrowserWindow, ipcMain } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { MessageService } from '../../shared/services/message.service';
 import { RootBackgroundController } from './root-background.controller';
@@ -11,21 +13,16 @@ import {
     createStartTestRecaptchaMessage,
     createTestNotificationMessage,
     OpenTestPageMessage,
-    StartTestEpisodeOverBSMessage
+    StartTestEpisodeOverBSMessage,
 } from '../../browserMessages/messages/test.messages';
 import { WindowController } from './window.controller';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import Website from '../../store/models/website';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowType } from '../../store/enums/window-type.enum';
 
-
 @injectable()
 export class TestController {
-
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.RootController) private readonly rootController: RootBackgroundController,
@@ -43,7 +40,7 @@ export class TestController {
             (event, message: StartTestEpisodeOverBSMessage): void => {
                 this.startTestPage().subscribe(window => {
                     this.messageService.sendMessageToBrowserWindow(window.id, createStartTestRecaptchaMessage());
-                })
+                });
             });
 
         ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
@@ -51,7 +48,7 @@ export class TestController {
                 this.startTestPage().subscribe(window => {
                     this.store.dispatch(setWindowIdForWindowTypeAction({
                         windowId: window.id,
-                        windowType: WindowType.VIDEO
+                        windowType: WindowType.VIDEO,
                     }));
                     this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
                 });
@@ -71,7 +68,7 @@ export class TestController {
 
         return this.windowController.openLinkForWebsite(testWebsite, 'http://localhost:4200/').pipe(
             waitTillPageLoadFinished(),
-            tap(window => window.show())
+            tap(window => window.show()),
         );
     }
 }

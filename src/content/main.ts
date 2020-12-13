@@ -8,8 +8,8 @@ const contentController = inversifyContentContainer.get<RootContentController>(C
 
 contentController.init();
 
-if(environment.isDev) {
+if (environment.isDev) {
     inversifyContentContainer.get<TestController>(CONTENT_TYPES.TestController).initialize();
 }
 
-console.log('content script loaded')
+console.log('content script loaded');

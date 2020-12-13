@@ -7,11 +7,9 @@ import { updateOrAddMultipleLinksAction } from './link.reducer';
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 
-const updatePortals = (portals: Portal[]): { [key in PORTALS]: Portal } => {
-    // @ts-ignore
-    return mapArrayToObject(portals, 'key');
-};
-
+const updatePortals = (portals: Portal[]): { [key in PORTALS]: Portal } =>
+// @ts-ignore
+    mapArrayToObject(portals, 'key');
 const initialPortalsData: { [key in PORTALS]?: Portal } = {
     [PORTALS.BS]: {
         key: PORTALS.BS,
@@ -22,7 +20,7 @@ const initialPortalsData: { [key in PORTALS]?: Portal } = {
         seriesListUrl: 'https://burningseries.co/andere-serien',
         name: 'Burning Series',
         series: [],
-    }
+    },
 };
 
 function addMultipleLinks(state: Partial<Record<PORTALS, Portal>>, links: LinkModel[]) {
@@ -38,17 +36,13 @@ const portalsSlice = createSlice({
     name: 'portals',
     initialState: initialPortalsData,
     reducers: {
-        updatePortalsAction: (state: { [key in PORTALS]: Portal }, action: PayloadAction<Portal[]>) => updatePortals(action.payload)
-    }, extraReducers: (builder) => {
-        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['portals'], action: PayloadAction<LinkModel[]>) =>
-            addMultipleLinks(state, action.payload));
+        updatePortalsAction: (state: { [key in PORTALS]: Portal }, action: PayloadAction<Portal[]>) => updatePortals(action.payload),
+    },
+    extraReducers: (builder) => {
+        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['portals'], action: PayloadAction<LinkModel[]>) => addMultipleLinks(state, action.payload));
     },
 });
 
-
-export const {updatePortalsAction} = portalsSlice.actions;
+export const { updatePortalsAction } = portalsSlice.actions;
 
 export default portalsSlice;
-
-
-

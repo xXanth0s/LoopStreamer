@@ -5,7 +5,7 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 
 export const createStartVideoMessage = (episodeKey: SeriesEpisode['key'],
-                                        providor: PROVIDORS): Message<{episodeKey: SeriesEpisode['key'], providor: PROVIDORS}, boolean> => ({
+                                        providor: PROVIDORS): Message<{ episodeKey: SeriesEpisode['key']; providor: PROVIDORS }, boolean> => ({
     type: MessageType.PROVIDOR_START_VIDEO,
     destinationController: ControllerType.PROVIDOR,
     payload: { episodeKey, providor },

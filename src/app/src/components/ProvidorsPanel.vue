@@ -80,7 +80,6 @@
         },
     })
     export default class ProvidorsPanel extends Vue {
-
         private readonly dragableConfig = {
             group: {
                 name: 'providor',

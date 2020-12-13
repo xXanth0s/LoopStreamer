@@ -17,4 +17,3 @@ optionsContainer.bind(SHARED_TYPES.MovieDBService).to(MovieDBService).inSingleto
 
 // shared
 optionsContainer.bind(SHARED_TYPES.MessageService).to(MessageService).inSingletonScope();
-

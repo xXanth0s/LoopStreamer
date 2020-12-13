@@ -1,5 +1,5 @@
-import { IPortalController } from './portal.controller.interface';
 import { inject, injectable } from 'inversify';
+import { IPortalController } from './portal.controller.interface';
 import Providor from '../../../store/models/providor.model';
 import { PORTALS } from '../../../store/enums/portals.enum';
 import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
@@ -17,10 +17,8 @@ import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { MessageService } from '../../../shared/services/message.service';
 import { createExecuteScriptMessage } from '../../../browserMessages/messages/background.messages';
 
-
 @injectable()
 export class BurningSeriesController implements IPortalController {
-
     private readonly portalKey = PORTALS.BS;
     private readonly languageMap: Partial<{ [key in LANGUAGE]: string }> = {
         [LANGUAGE.GERMAN]: 'de',
@@ -55,8 +53,7 @@ export class BurningSeriesController implements IPortalController {
             if (this.isVideoOpenWithProvidor()) {
                 const playButtonElement = this.videoContainerSelector() as HTMLElement;
                 this.videoContainerSelector.toString();
-                const scriptToBeExecuted =
-                    `window.simulateEvent((${this.videoContainerSelector.toString()})(),
+                const scriptToBeExecuted = `window.simulateEvent((${this.videoContainerSelector.toString()})(),
                     'click',
                     { pointerX: ${playButtonElement.clientLeft}, pointerY: ${playButtonElement.clientTop} }
                 )`;
@@ -105,8 +102,8 @@ export class BurningSeriesController implements IPortalController {
             return {
                 ...obj,
                 [link.innerHTML]: {
-                    [language]: link.href
-                }
+                    [language]: link.href,
+                },
             };
         }, {});
 
@@ -137,7 +134,7 @@ export class BurningSeriesController implements IPortalController {
             seriesTitle,
             seasonNumber,
             episodes,
-            seasonLinks
+            seasonLinks,
         };
     }
 
@@ -148,7 +145,7 @@ export class BurningSeriesController implements IPortalController {
         const episodesHtmlContainer = [ ...this.episodesSelector() ];
 
         return episodesHtmlContainer.map((episodeHtmlContainer, index) => {
-            const portalLinks = getLinksForProviders(providors, episodeHtmlContainer,);
+            const portalLinks = getLinksForProviders(providors, episodeHtmlContainer);
 
             return {
                 seriesTitle,
@@ -176,7 +173,6 @@ export class BurningSeriesController implements IPortalController {
             };
         });
     }
-
 
     public isVideoOpenWithProvidor(): Providor | null {
         return this.videoContainerSelector() ? this.getActiveProvidor() : null;

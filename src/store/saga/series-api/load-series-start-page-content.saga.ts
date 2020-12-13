@@ -1,4 +1,4 @@
-import { all, call, put, select } from 'redux-saga/effects';
+import { all, call, put, select, } from 'redux-saga/effects';
 import { MovieDBService } from '../../../shared/services/movie-db.service';
 import { StateModel } from '../../models/state.model';
 import { NamedCollection } from '../../models/collection.model';
@@ -37,15 +37,15 @@ export function* loadSeriesStartPageContentSaga() {
         yield put(updateOrAddMultipleSeriesAction([
             ...popularSeries,
             ...topRatedSeries,
-            ...airingTodaySeries
+            ...airingTodaySeries,
         ]));
 
         yield put(addOrReplaceMultipleSeriesCollectionAction({
             collections: [
                 popularSeriesCollection,
                 topRatedSeriesCollection,
-                airingTodaySeriesCollection
-            ]
+                airingTodaySeriesCollection,
+            ],
         }));
     } catch (error) {
         Logger.error('[loadSeriesStartPageContentSaga] error occurred', error);

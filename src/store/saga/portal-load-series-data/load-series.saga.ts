@@ -1,6 +1,6 @@
+import { call, put, select } from 'redux-saga/effects';
 import { toggleSelectedSeriesForAppAction } from '../../reducers/app-control-state.reducer';
 import { getPortalController } from '../../../background/container/container.utils';
-import { call, put, select } from 'redux-saga/effects';
 import { StateModel } from '../../models/state.model';
 import { getSeriesByKey } from '../../selectors/series.selector';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
@@ -13,7 +13,6 @@ import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../r
 import { Logger } from '../../../shared/services/logger';
 
 export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelectedSeriesForAppAction>) {
-
     const state: StateModel = yield select();
     const seriesKey = action.payload;
     if (!seriesKey || !state.appControlState.selectedSeriesKey) {
@@ -24,7 +23,7 @@ export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelec
 
     const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SERIES, {
         seriesKey,
-        portalKey
+        portalKey,
     });
     yield put(addAsyncInteractionAction(asyncInteraction));
 

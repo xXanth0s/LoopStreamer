@@ -4,5 +4,5 @@ export const globalRoutes = {
     SETTINGS_PAGE: 'settings',
     FAQ_PAGE: 'faq',
     SERIES_PAGE: 'series',
-    TEST_PAGE: 'test'
+    TEST_PAGE: 'test',
 };

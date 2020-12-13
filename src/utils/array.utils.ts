@@ -4,7 +4,7 @@ export function convertArrayToChunks<T>(data: Array<T>, length: number): T[][] {
         const previous = result[index] || [];
         result[index] = [
             ...previous,
-            value
+            value,
         ];
         return result;
     }, []);

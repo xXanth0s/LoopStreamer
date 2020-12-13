@@ -1,6 +1,6 @@
+import { call } from 'redux-saga/effects';
 import SeriesEpisode from '../../models/series-episode.model';
 import { LANGUAGE } from '../../enums/language.enum';
-import { call } from 'redux-saga/effects';
 import { getPortalController } from '../../../background/container/container.utils';
 import { PORTALS } from '../../enums/portals.enum';
 import { ProvidorLink } from '../../../background/models/providor-link.model';

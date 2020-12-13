@@ -1,4 +1,8 @@
 import { inject, injectable } from 'inversify';
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
+import { fromEvent } from 'rxjs';
+import { first, takeUntil } from 'rxjs/operators';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
@@ -6,21 +10,16 @@ import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { ExecuteScriptMessage, RecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { environment } from '../../environments/environment';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
-import { fromEvent } from 'rxjs';
-import { first, takeUntil } from 'rxjs/operators';
 import { appStartedAction } from '../../store/actions/shared.actions';
 
 @injectable()
 export class RootBackgroundController {
-
     private readonly appWindowConfig: OpenWindowConfig = {
         mutePage: false,
         nodeIntegration: true,
@@ -49,7 +48,7 @@ export class RootBackgroundController {
 
         this.store.dispatch(setWindowIdForWindowTypeAction({
             windowId: window.id,
-            windowType: WindowType.APP
+            windowType: WindowType.APP,
         }));
 
         if (openAppDevTools) {

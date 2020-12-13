@@ -20,5 +20,5 @@ export interface StateModel {
     series: Record<Series['key'], Series>;
     seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;
     seriesSeasons: Record<SeriesSeason['key'], SeriesSeason>;
-    links: KeyRecord<LinkModel>
+    links: KeyRecord<LinkModel>;
 }

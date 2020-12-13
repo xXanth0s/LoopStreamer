@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer } from 'electron-redux';
 import { controlStateSlice } from '../reducers/control-state.reducer';
 import { optionsSlice } from '../reducers/options.reducer';
 import seriesSlice from '../reducers/series.reducer';
 import portalsSlice from '../reducers/portals.reducer';
-import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer, } from 'electron-redux';
 import seriesSeasonsReducer from '../reducers/series-season.reducer';
 import seriesEpisodesReducer from '../reducers/series-episode.reducer';
 import { environment } from '../../environments/environment';

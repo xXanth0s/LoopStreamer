@@ -1,15 +1,14 @@
 import { inject, injectable } from 'inversify';
-import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-import { MessageService } from '../../shared/services/message.service';
 import { asyncScheduler, fromEvent, Observable } from 'rxjs';
 import { first, switchMap, throttleTime } from 'rxjs/operators';
-import { checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement } from '../ustils/dom.utils';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+import { MessageService } from '../../shared/services/message.service';
+import { checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement, } from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
 
 @injectable()
 export class RecaptchaService {
-
     private readonly recaptchaContainerSelector = 'iframe[title="recaptcha challenge"]';
 
     constructor(@inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
@@ -17,7 +16,7 @@ export class RecaptchaService {
 
     public checkForRecaptcha(): void {
         this.checkForRecaptchaContainer().pipe(
-            switchMap(container => this.checkForRecaptchaChallenge(container))
+            switchMap(container => this.checkForRecaptchaChallenge(container)),
         ).subscribe(async recaptchaElement => {
             this.hideNeighbourElementsWhenParentIsBody(recaptchaElement);
 
@@ -43,15 +42,14 @@ export class RecaptchaService {
 
     private hideNeighbourElementsWhenParentIsBody(htmlElement: HTMLElement): void {
         const parent = htmlElement.parentElement;
-        if(isBodyElement(parent)) {
+        if (isBodyElement(parent)) {
             parent.childNodes.forEach(childElement => {
-                if(childElement !== htmlElement
+                if (childElement !== htmlElement
                     && childElement.nodeType === NodeTypes.ELEMENT_NODE) {
                     hideNotLsElement((childElement as HTMLElement));
                 }
-            })
-        }
-        else {
+            });
+        } else {
             this.hideNeighbourElementsWhenParentIsBody(parent);
         }
     }

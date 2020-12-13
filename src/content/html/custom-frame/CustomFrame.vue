@@ -26,7 +26,6 @@
         },
     })
     export default class CustomFrame extends Vue {
-
         private readonly buttonsVisibilityTime = 5000;
 
         private showButtons = true;

@@ -1,10 +1,10 @@
+import { takeLatest } from 'redux-saga/effects';
 import {
     setSelectedSeasonForAppAction,
     setSelectedSeriesAction,
-    toggleSelectedSeriesForAppAction
+    toggleSelectedSeriesForAppAction,
 } from '../reducers/app-control-state.reducer';
 import { loadSeriesInformationSaga } from './portal-load-series-data/load-series.saga';
-import { takeLatest } from 'redux-saga/effects';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
@@ -13,7 +13,7 @@ import {
     startEpisodeAction,
     startNextEpisodeAction,
     startPreviousEpisodeAction,
-    userChangedLanguageAction
+    userChangedLanguageAction,
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
 import { loadSeasonInformationSaga } from './portal-load-series-data/load-season.saga';
@@ -52,7 +52,6 @@ export function* watcherSaga() {
     }
 }
 
-
 export function sagaErrorHandler(error: Error, errorInfo) {
-    Logger.error(`[WatcherSage] error occurred`, error, errorInfo);
+    Logger.error('[WatcherSage] error occurred', error, errorInfo);
 }

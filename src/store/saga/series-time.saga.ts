@@ -1,11 +1,11 @@
+import { put, select } from 'redux-saga/effects';
 import {
     setSeriesEpisodeFinishedStateAction,
-    setSeriesEpisodeTimeStampAction
+    setSeriesEpisodeTimeStampAction,
 } from '../reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
 import { getSeriesByKey } from '../selectors/series.selector';
 import { getPopupEndTimeForSeriesEpisode } from '../utils/series.utils';
-import { put, select } from 'redux-saga/effects';
 import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import { setLastWatchedEpisodeAction } from '../reducers/series.reducer';
 
@@ -21,7 +21,7 @@ export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisod
     const isFinished = timeLeft <= timeWhenSeriesIsFinished;
 
     if (!isFinished && series.lastEpisodeWatched !== seriesEpisodeKey) {
-        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: seriesEpisodeKey }));
+        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey }));
         return;
     }
 
@@ -33,7 +33,6 @@ export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisod
         seriesEpisodeKey,
         isFinished,
     }));
-
 
     const nextEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, true);
     if (nextEpisode) {

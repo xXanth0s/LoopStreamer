@@ -7,10 +7,9 @@ export const createRecaptchaRecognizedMessage = (domElementSize: DomElementSize)
     type: MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: domElementSize
+    payload: domElementSize,
 });
 export type RecaptchaRecognizedMessage = ReturnType<typeof createRecaptchaRecognizedMessage>;
-
 
 export const createStartVideoInVideoMessage = (): Message => ({
     type: MessageType.BACKGROUND_START_VIDEO_IN_VIDEO,
@@ -19,14 +18,12 @@ export const createStartVideoInVideoMessage = (): Message => ({
 });
 export type StartVideoInVideoMessage = ReturnType<typeof createStartVideoInVideoMessage>;
 
-
 export const createMinimizeWindowMessage = (): Message => ({
     type: MessageType.BACKGROUND_MINIMIZE_WINDOW,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
 });
 export type MinimizeWindowMessage = ReturnType<typeof createMinimizeWindowMessage>;
-
 
 export const createToggleWindowFullscreenMessage = (): Message => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
@@ -35,14 +32,12 @@ export const createToggleWindowFullscreenMessage = (): Message => ({
 });
 export type ToggleWindowFullscreenMessage = ReturnType<typeof createToggleWindowFullscreenMessage>;
 
-
 export const createToggleWindowMaximizationMessage = (): Message => ({
     type: MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
 });
 export type ToggleWindowMaximizationMessage = ReturnType<typeof createToggleWindowMaximizationMessage>;
-
 
 export const createCloseWindowMessage = (): Message => ({
     type: MessageType.BACKGROUND_CLOSE_WINDOW,
@@ -51,13 +46,10 @@ export const createCloseWindowMessage = (): Message => ({
 });
 export type CloseWindowMessage = ReturnType<typeof createCloseWindowMessage>;
 
-
 export const createExecuteScriptMessage = (script: string): Message<{ script: string }> => ({
     type: MessageType.BACKGROUND_EXECUTE_SCRIPT,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
-    payload: { script }
+    payload: { script },
 });
 export type ExecuteScriptMessage = ReturnType<typeof createExecuteScriptMessage>;
-
-

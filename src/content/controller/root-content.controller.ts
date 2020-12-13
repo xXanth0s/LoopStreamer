@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { PortalService } from '../services/portal.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
@@ -9,9 +10,8 @@ import {
     GetAllSeriesFromPortalMessage,
     GetDetailedSeriesInformationMessage,
     GetResolvedProvidorLinkForEpisode,
-    GetSeasonInfoMessage
+    GetSeasonInfoMessage,
 } from '../../browserMessages/messages/portal.messages';
-import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { RecaptchaService } from '../services/recaptcha.service';
 // @ts-ignore
@@ -23,7 +23,6 @@ import { addGlobalFunctions } from '../ustils/global.utils';
 
 @injectable()
 export class RootContentController {
-
     constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalService,
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
@@ -65,7 +64,6 @@ export class RootContentController {
             console.log(message);
             this.getAllProvidorLinksForEpisode(event, message);
         });
-
     }
 
     private async getResolvedProvidorLinkHandler(event: IpcRendererEvent, message: GetResolvedProvidorLinkForEpisode): Promise<void> {

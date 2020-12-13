@@ -9,7 +9,6 @@ import { getPopupEndTimeForSeriesEpisode } from '../../store/utils/series.utils'
 
 @injectable()
 export class PopupService {
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
@@ -18,14 +17,14 @@ export class PopupService {
             this.getConfigForSetStartTimePopup(episodeInfo),
             this.getNextEpisodeCountdownConfig(episodeInfo),
             this.getConfigForSetEndTimePopup(episodeInfo),
-        ]
+        ];
         return configs.filter(config => config.mustBeOpened);
     }
 
     private getConfigForSetStartTimePopup(episodeInfo: SeriesEpisode): PopupConfig {
         const { isStartTimeConfigured } = this.store.selectSync(getSeriesByKey, episodeInfo.seriesKey);
 
-        const hasTimeStamp = Boolean(episodeInfo.timestamp)
+        const hasTimeStamp = Boolean(episodeInfo.timestamp);
 
         const mustBeOpened = !(isStartTimeConfigured || hasTimeStamp);
 
@@ -33,7 +32,7 @@ export class PopupService {
             pupupKey: Popup.SET_STARTTIME,
             openFromStart: true,
             timeToOpen: 0,
-            mustBeOpened
+            mustBeOpened,
         };
     }
 
@@ -60,8 +59,8 @@ export class PopupService {
             pupupKey: Popup.NEXT_EPISODE_COUNTDOWN,
             openFromStart: false,
             timeToOpen,
-            mustBeOpened: isEndTimeConfigured
-        }
+            mustBeOpened: isEndTimeConfigured,
+        };
     }
 
     private getEndTimeForConfiguredSeries(seriesKey: string): number {

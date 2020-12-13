@@ -1,11 +1,11 @@
+import { select } from 'redux-saga/effects';
 import SeriesEpisode from '../../models/series-episode.model';
 import { PORTALS } from '../../enums/portals.enum';
-import { select } from 'redux-saga/effects';
 import {
     getEpisodeWithOffset,
     getFirstEpisodeForSeason,
     getLastEpisodeForSeason,
-    getSeriesEpisodeByKey
+    getSeriesEpisodeByKey,
 } from '../../selectors/series-episode.selector';
 import { updateSeriesSeasonForPortal } from './load-season.saga';
 import { SeriesSeason } from '../../models/series-season.model';
@@ -46,14 +46,14 @@ function* getNeighbourEpisodeForSameSeason(startEpisode: SeriesEpisode, portalKe
     yield updateSeriesSeasonForPortal({
         seasonKey,
         portalKey,
-        language: series.lastUsedLanguage
+        language: series.lastUsedLanguage,
     });
 
     return getEpisodeWithOffset(yield select(), key, offset);
 }
 
 function* getNextEpisodeForNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey: PORTALS, higherNeighbour: boolean) {
-    let neighbourSeason: SeriesSeason = yield getAndUpdateNeighbourSeason(seasonKey, portalKey, higherNeighbour);
+    const neighbourSeason: SeriesSeason = yield getAndUpdateNeighbourSeason(seasonKey, portalKey, higherNeighbour);
     if (!neighbourSeason) {
         return null;
     }
@@ -72,7 +72,7 @@ function* getAndUpdateNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey:
     const currentSeason = getSeriesSeasonByKey(state, seasonKey);
     const series = getSeriesByKey(state, currentSeason.seriesKey);
 
-    let neighbourSeason = getSeasonWithOffset(state, seasonKey, offset);
+    const neighbourSeason = getSeasonWithOffset(state, seasonKey, offset);
     if (neighbourSeason) {
         yield updateSeriesSeasonForPortal({
             seasonKey: neighbourSeason.key,
@@ -95,5 +95,4 @@ function* getAndUpdateNeighbourSeason(seasonKey: SeriesSeason['key'], portalKey:
         portalKey,
     });
     return getSeasonWithOffset(yield select(), seasonKey, offset);
-
 }

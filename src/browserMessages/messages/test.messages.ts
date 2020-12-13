@@ -23,14 +23,12 @@ export const createOpenTestPageMessage = (): Message => ({
 });
 export type OpenTestPageMessage = ReturnType<typeof createOpenTestPageMessage>;
 
-
 export const createStartTestEpisodeOverBSMessage = (): Message => ({
     type: MessageType.TEST_BACKGROUND_START_TEST_EPISODE_OVER_BS,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
 });
 export type StartTestEpisodeOverBSMessage = ReturnType<typeof createStartTestEpisodeOverBSMessage>;
-
 
 export const createStartTestRecaptchaBackgroundMessage = (): Message => ({
     type: MessageType.TEST_BACKGROUND_START_RECAPTCHA,
@@ -39,11 +37,9 @@ export const createStartTestRecaptchaBackgroundMessage = (): Message => ({
 });
 export type StartTestRecaptchaBackgroundMessage = ReturnType<typeof createStartTestRecaptchaBackgroundMessage>;
 
-
 export const createShowAllWindowsMessage = (): Message => ({
     type: MessageType.TEST_BACKGROUND_SHOW_ALL_WINDOWS,
     destinationController: ControllerType.BACKGROUND,
     hasReply: false,
 });
 export type ShowAllWindowsMessage = ReturnType<typeof createShowAllWindowsMessage>;
-

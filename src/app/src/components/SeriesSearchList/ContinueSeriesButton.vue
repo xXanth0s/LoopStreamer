@@ -36,7 +36,7 @@
     import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import {
         getSeriesEpisodeByKey,
-        hasEpisodeLinksForSelectedLanguageAndPortal
+        hasEpisodeLinksForSelectedLanguageAndPortal,
     } from '../../../../store/selectors/series-episode.selector';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
 
@@ -44,7 +44,6 @@
         name: 'continue-series-button',
     })
     export default class ContinueSeriesButton extends Vue {
-
         @Prop(String)
         public seriesEpisodeKey: SeriesEpisode['key'];
 

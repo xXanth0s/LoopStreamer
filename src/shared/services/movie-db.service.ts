@@ -1,19 +1,18 @@
 import { injectable } from 'inversify';
 import MovieDB, { Responses } from 'node-themoviedb';
+import { IncomingHttpHeaders } from 'http';
 import { Logger } from './logger';
 import { mapSeasonEpisodesFromMovieDB, mapSeasonFromMovieDB, mapSeriesFromMovieDB } from '../../utils/movie-db-mapper';
 import Series from '../../store/models/series.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
-import { IncomingHttpHeaders } from 'http';
 import { SeriesSeason } from '../../store/models/series-season.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { MovieApi } from '../../store/enums/movie-api.enum';
 
-type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders; }
+type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders }
 
 @injectable()
 export class MovieDBService {
-
     public static async getPopularSeries(language: LANGUAGE): Promise<Series[]> {
         let series: MovieDB.Objects.TVShow[] = [];
         const client = MovieDBService.getClient(language);
@@ -21,7 +20,7 @@ export class MovieDBService {
             const results = await Promise.all<MovieDbResponse<Responses.TV.GetPopular>>([
                 client.tv.getPopular({ query: { page: 1 } }),
                 client.tv.getPopular({ query: { page: 2 } }),
-                client.tv.getPopular({ query: { page: 3 } })
+                client.tv.getPopular({ query: { page: 3 } }),
             ]);
             series = results.flatMap(data => data.data.results);
         } catch (error) {
@@ -38,7 +37,7 @@ export class MovieDBService {
             const results = await Promise.all<MovieDbResponse<Responses.TV.GetTopRated>>([
                 client.tv.getTopRated({ query: { page: 1 } }),
                 client.tv.getTopRated({ query: { page: 2 } }),
-                client.tv.getTopRated({ query: { page: 3 } })
+                client.tv.getTopRated({ query: { page: 3 } }),
             ]);
             series = results.flatMap(data => data.data.results);
         } catch (error) {
@@ -55,7 +54,7 @@ export class MovieDBService {
             const results = await Promise.all<MovieDbResponse<Responses.TV.GetAiringToday>>([
                 client.tv.getAiringToday({ query: { page: 1 } }),
                 client.tv.getAiringToday({ query: { page: 2 } }),
-                client.tv.getAiringToday({ query: { page: 3 } })
+                client.tv.getAiringToday({ query: { page: 3 } }),
             ]);
             series = results.flatMap(data => data.data.results);
         } catch (error) {
@@ -72,7 +71,7 @@ export class MovieDBService {
         try {
             const [ seriesResponse, video ]: [ MovieDbResponse<Responses.TV.GetDetails>, string ] = await Promise.all([
                 client.tv.getDetails({ pathParameters: { tv_id: movieDbId } }),
-                MovieDBService.getVideo(movieDbId, language)
+                MovieDBService.getVideo(movieDbId, language),
             ]);
 
             series = seriesResponse.data;
@@ -89,7 +88,7 @@ export class MovieDBService {
         const mappedSeries = mapSeriesFromMovieDB(series, language, videoUrl);
 
         const seasonData = await Promise.all(
-            series.seasons.map(season => MovieDBService.getSeasonInfo(mappedSeries, `${season.season_number}`, language))
+            series.seasons.map(season => MovieDBService.getSeasonInfo(mappedSeries, `${season.season_number}`, language)),
         );
 
         const mappedSeasons = seasonData.map(([ season, episodes ]) => season);
@@ -98,7 +97,6 @@ export class MovieDBService {
         return [ mappedSeries, mappedSeasons, mappedEpisodes ];
     }
 
-
     private static async getSeasonInfo(series: Series, seasonNumber: string, language: LANGUAGE): Promise<[ SeriesSeason, SeriesEpisode[] ]> {
         const client = MovieDBService.getClient(language);
         let season: Responses.TV.Season.GetDetails;
@@ -106,8 +104,8 @@ export class MovieDBService {
             const seasonResponse = await client.tv.season.getDetails({
                 pathParameters: {
                     tv_id: series.apiKeys[MovieApi.TMDB],
-                    season_number: seasonNumber
-                }
+                    season_number: seasonNumber,
+                },
             });
             season = seasonResponse.data;
         } catch (error) {

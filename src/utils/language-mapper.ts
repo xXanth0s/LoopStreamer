@@ -1,7 +1,6 @@
 import { LANGUAGE } from '../store/enums/language.enum';
 
 export function mapLanguage(language: string): LANGUAGE {
-
     switch (language.toLowerCase().trim()) {
         case 'de':
         case 'de-de':

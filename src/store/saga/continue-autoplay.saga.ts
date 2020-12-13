@@ -1,5 +1,5 @@
-import { startPreviousEpisodeAction } from '../actions/shared.actions';
 import { put, select } from 'redux-saga/effects';
+import { startPreviousEpisodeAction } from '../actions/shared.actions';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
@@ -9,12 +9,11 @@ import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
     removeAsyncInteractionAction,
-    resetPlayedEpisodesAction
+    resetPlayedEpisodesAction,
 } from '../reducers/control-state.reducer';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { generateAsyncInteraction } from '../store/async-interaction.util';
 import { Logger } from '../../shared/services/logger';
-
 
 export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();
@@ -35,7 +34,7 @@ export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpi
 
         const episodeStartSuccessful: boolean = yield startEpisode({
             episodeKey: nextEpisode.key,
-            language: series.lastUsedLanguage
+            language: series.lastUsedLanguage,
         });
 
         if (episodeStartSuccessful) {
@@ -46,5 +45,4 @@ export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpi
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
-
 }

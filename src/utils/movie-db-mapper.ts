@@ -9,13 +9,15 @@ import SeriesEpisode, { getEmptySeriesEpisode } from '../store/models/series-epi
 import { Hoster } from '../store/enums/hoster.enum';
 
 export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow | Responses.TV.GetDetails, activeLanguage: LANGUAGE, videoKey?: string): Series {
-    const { original_name, id, overview, name, poster_path, original_language, backdrop_path } = series;
+    const {
+        original_name, id, overview, name, poster_path, original_language, backdrop_path,
+    } = series;
 
     const seriesLanguage = mapLanguage(original_language);
     const key = getKeyForSeriesTitle(original_name);
 
     const previewVideos = !videoKey ? {} : {
-        [Hoster.YOUTUBE]: videoKey
+        [Hoster.YOUTUBE]: videoKey,
     };
     return {
         ...getEmptySeries(),
@@ -23,10 +25,10 @@ export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow | Responses.
         previewVideos,
         titles: {
             [activeLanguage]: name,
-            [seriesLanguage]: original_name
+            [seriesLanguage]: original_name,
         },
         descriptions: {
-            [activeLanguage]: overview
+            [activeLanguage]: overview,
         },
         posterHref: `https://image.tmdb.org/t/p/w440_and_h660_face/${poster_path}`,
         backgroundHref: `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/${backdrop_path}`,
@@ -47,10 +49,9 @@ export function mapSeasonFromMovieDB(season: Responses.TV.Season.GetDetails, ser
         seriesKey,
         seasonNumber,
         portalLinks: [],
-        episodes: []
+        episodes: [],
     };
 }
-
 
 export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDetails, seriesKey: string, language: LANGUAGE): SeriesEpisode[] {
     const { season_number, episodes } = season;
@@ -59,7 +60,9 @@ export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDeta
     const seasonKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
 
     return episodes.map(episode => {
-        const { episode_number, overview, name, still_path } = episode;
+        const {
+            episode_number, overview, name, still_path,
+        } = episode;
         const key = getKeyForSeriesEpisode(seriesKey, seasonNumber, episode_number);
         return {
             ...getEmptySeriesEpisode(),
@@ -70,11 +73,11 @@ export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDeta
             episodeNumber: episode_number,
             posterHref: still_path ? `https://image.tmdb.org/t/p/w227_and_h127_bestv2${still_path}` : '',
             description: {
-                [language]: overview
+                [language]: overview,
             },
             title: {
-                [language]: name
-            }
+                [language]: name,
+            },
         };
     });
 }

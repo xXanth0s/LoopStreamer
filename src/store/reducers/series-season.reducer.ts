@@ -12,7 +12,6 @@ import { addToArrayIfNotExists } from '../../utils/array.utils';
 import SeriesEpisode from '../models/series-episode.model';
 import { updateOrAddMultipleSeriesEpisodeAction, updateOrAddSeriesEpisodeAction } from './series-episode.reducer';
 
-
 const initialState: StateModel['seriesSeasons'] = {};
 
 const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): void {
@@ -29,12 +28,11 @@ const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], se
             episodes: [
                 ...oldSeasonObject.episodes,
                 ...seriesSeason.episodes,
-            ]
+            ],
         };
     } else {
         state[seriesSeason.key] = seriesSeason;
     }
-
 };
 
 const updateOrAddMultipleSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeasons: SeriesSeason[]): void {
@@ -85,24 +83,19 @@ const seriesSeasonsReducer = createSlice({
     reducers: {
         updateOrAddSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason>) => updateOrAddSeriesSeason(state, action.payload),
         updateOrAddMutlipleSeriesSeasonAction: (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesSeason[]>) => updateOrAddMultipleSeriesSeason(state, action.payload),
-    }, extraReducers: (builder) => {
-        builder.addCase(deleteSeriesAction, (state: StateModel['seriesSeasons'], action: PayloadAction<Series['key']>) =>
-            deleteAllSeasonsForSeries(state, action.payload));
-        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel[]>) =>
-            addLinks(state, action.payload));
-        builder.addCase(updateOrAddLinkAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel>) =>
-            addLink(state, action.payload));
-        builder.addCase(updateOrAddMultipleSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode[]>) =>
-            addMultipleEpisodes(state, action.payload));
-        builder.addCase(updateOrAddSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode>) =>
-            addEpisode(state, action.payload));
-    }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(deleteSeriesAction, (state: StateModel['seriesSeasons'], action: PayloadAction<Series['key']>) => deleteAllSeasonsForSeries(state, action.payload));
+        builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel[]>) => addLinks(state, action.payload));
+        builder.addCase(updateOrAddLinkAction, (state: StateModel['seriesSeasons'], action: PayloadAction<LinkModel>) => addLink(state, action.payload));
+        builder.addCase(updateOrAddMultipleSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode[]>) => addMultipleEpisodes(state, action.payload));
+        builder.addCase(updateOrAddSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode>) => addEpisode(state, action.payload));
+    },
 });
 
 export const {
     updateOrAddSeriesSeasonAction,
-    updateOrAddMutlipleSeriesSeasonAction
+    updateOrAddMutlipleSeriesSeasonAction,
 } = seriesSeasonsReducer.actions;
-
 
 export default seriesSeasonsReducer;

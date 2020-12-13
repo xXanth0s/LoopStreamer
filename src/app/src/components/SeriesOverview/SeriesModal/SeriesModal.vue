@@ -7,17 +7,9 @@
              hide-header
              title="Using Component Methods">
         <div v-if="series" class="modal-container">
-            <div class="relative h-80">
-                <div v-if="false" class="absolute">
-                    <youtube :video-id="youtubeUrl" player-width="900" @ended="onVideoFinished"/>
-                </div>
-                <div v-else class="w-full absolute">
-                    <img :src="series.backgroundHref" class="w-full">
-                </div>
-                <div class="absolute bottom-5 left-5">
-                    <h1>{{series.titles[activeLanguage]}}</h1>
-                </div>
-            </div>
+            <series-modal-header
+                    :series="series"
+                    :language="activeLanguage"/>
         </div>
     </b-modal>
 </template>
@@ -28,7 +20,7 @@
     import { Inject } from 'vue-property-decorator';
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
-    import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
+    import { filter, switchMap, takeUntil, tap, } from 'rxjs/operators';
     import Series from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
@@ -39,15 +31,17 @@
     import { getSelectedSeason } from '../../../../../store/selectors/app-control-state.selector';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
-    import { Hoster } from '../../../../../store/enums/hoster.enum';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
     import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
+    import SeriesModalHeader from './SeriesModalHeader.vue';
 
     @Component({
         name: 'series-modal',
+        components: {
+            SeriesModalHeader,
+        },
     })
     export default class SeriesModal extends Vue {
-
         private readonly seriesChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();
 
@@ -56,22 +50,6 @@
         private episodes: SeriesEpisode[] = [];
         private selectedSeason: SeriesSeason['key'] = null;
         private activeLanguage: LANGUAGE = LANGUAGE.ENGLISH;
-
-        private videoFinished = false;
-
-        private get youtubeUrl(): string {
-            const id = this.series?.previewVideos[Hoster.YOUTUBE];
-            if (id) {
-                const config = '?autoplay=1&controls=1&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&showinfo=0';
-                // return `https://www.youtube.com/embed/${id}${config}`;
-                return `${id}${config}`;
-            }
-            return '';
-        }
-
-        private get showVideo(): boolean {
-            return Boolean(this.series?.previewVideos[Hoster.YOUTUBE]) && !this.videoFinished;
-        }
 
         $refs!: {
             modalRef: BvComponent;
@@ -115,12 +93,8 @@
                     this.episodes = [];
                 }),
                 filter<SeriesSeason['key']>(Boolean),
-                switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason))
+                switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason)),
             ).subscribe(episodes => this.episodes = episodes);
-        }
-
-        public onVideoFinished(): void {
-            this.videoFinished = true;
         }
 
         private reset(): void {
@@ -128,7 +102,6 @@
             this.episodes = [];
             this.selectedSeason = null;
             this.series = null;
-            this.videoFinished = false;
         }
     }
 </script>
@@ -151,7 +124,4 @@
 
 <style lang="scss" scoped>
 
-    .video-overlay {
-        background: linear-gradient(to top, #181818, transparent 50%);
-    }
 </style>

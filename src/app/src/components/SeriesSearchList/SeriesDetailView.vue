@@ -86,7 +86,6 @@
         },
     })
     export default class SeriesDetailView extends Vue {
-
         private readonly seriesChanged$ = new Subject();
         private readonly seasonChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();

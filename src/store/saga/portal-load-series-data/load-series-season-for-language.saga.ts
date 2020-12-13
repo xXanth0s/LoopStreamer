@@ -1,6 +1,6 @@
+import { put, select } from 'redux-saga/effects';
 import { userChangedLanguageAction } from '../../actions/shared.actions';
 import { getSeriesForSeason } from '../../selectors/series.selector';
-import { put, select } from 'redux-saga/effects';
 import { StateModel } from '../../models/state.model';
 import { Logger } from '../../../shared/services/logger';
 import { updateSeriesSeasonForPortal } from './load-season.saga';
@@ -34,6 +34,4 @@ export function* loadSeriesSeasonForLanguageSaga(action: ReturnType<typeof userC
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
-
 }
-

@@ -8,9 +8,7 @@ import { getPortalLinksForSeriesEpisodePortalAndLanguage } from './línk.selecto
 import { getSeriesSeasonByKey } from './series-season.selector';
 import { Logger } from '../../shared/services/logger';
 
-export const getMultipleSeriesEpisodeByKeys = (state: StateModel, keys: SeriesEpisode['key'][]): SeriesEpisode[] => {
-    return keys.map(key => getSeriesEpisodeByKey(state, key));
-};
+export const getMultipleSeriesEpisodeByKeys = (state: StateModel, keys: SeriesEpisode['key'][]): SeriesEpisode[] => keys.map(key => getSeriesEpisodeByKey(state, key));
 
 export const getSeriesEpisodeByKey = (state: StateModel, key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
 
@@ -24,21 +22,13 @@ export const getSeriesEpisodesForSeason = (state: StateModel, seasonKey: SeriesE
     return getMultipleSeriesEpisodeByKeys(state, season.episodes);
 };
 
-export const getNextEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => {
-    return getEpisodeWithOffset(state, episodeKey, 1);
-};
+export const getNextEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => getEpisodeWithOffset(state, episodeKey, 1);
 
-export const hasSeriesEpisodeNextEpisode = (state: StateModel, key: SeriesEpisode['key']): boolean => {
-    return Boolean(getNextEpisode(state, key));
-};
+export const hasSeriesEpisodeNextEpisode = (state: StateModel, key: SeriesEpisode['key']): boolean => Boolean(getNextEpisode(state, key));
 
-export const getPreviousEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => {
-    return getEpisodeWithOffset(state, episodeKey, -1);
-};
+export const getPreviousEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): SeriesEpisode => getEpisodeWithOffset(state, episodeKey, -1);
 
-export const hasSeriesEpisodePreviousEpisode = (state: StateModel, key: SeriesEpisode['key']): boolean => {
-    return Boolean(getPreviousEpisode(state, key));
-};
+export const hasSeriesEpisodePreviousEpisode = (state: StateModel, key: SeriesEpisode['key']): boolean => Boolean(getPreviousEpisode(state, key));
 
 export const getFirstEpisodeForSeason = (state: StateModel, key: SeriesSeason['key']): SeriesEpisode => {
     const seasonEpisodes = getSeriesEpisodesForSeason(state, key);

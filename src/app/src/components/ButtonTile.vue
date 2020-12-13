@@ -23,7 +23,6 @@
         name: 'button-tile',
     })
     export default class ButtonTile extends Vue {
-
         @Prop({ default: false })
         private isActive: boolean;
 

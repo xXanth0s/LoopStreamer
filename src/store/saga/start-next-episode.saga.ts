@@ -1,5 +1,5 @@
-import { startNextEpisodeAction } from '../actions/shared.actions';
 import { put, select } from 'redux-saga/effects';
+import { startNextEpisodeAction } from '../actions/shared.actions';
 import { StateModel } from '../models/state.model';
 import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
@@ -10,13 +10,12 @@ import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-se
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
-    removeAsyncInteractionAction
+    removeAsyncInteractionAction,
 } from '../reducers/control-state.reducer';
 import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { Logger } from '../../shared/services/logger';
 import { generateAsyncInteraction } from '../store/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
-
 
 export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisodeAction>) {
     stopPlayer();
@@ -45,7 +44,7 @@ export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisode
 
         const episodeStartSuccessful: boolean = yield startEpisode({
             episodeKey: nextEpisode.key,
-            language: series.lastUsedLanguage
+            language: series.lastUsedLanguage,
         });
 
         if (episodeStartSuccessful && !userAction) {
@@ -56,5 +55,4 @@ export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisode
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
-
 }

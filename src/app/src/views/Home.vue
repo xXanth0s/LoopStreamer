@@ -34,7 +34,6 @@
         },
     })
     export default class HomePage extends Vue {
-
         private readonly seriesModalId = 'series-modal';
 
         private language: LANGUAGE = LANGUAGE.GERMAN;

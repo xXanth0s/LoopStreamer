@@ -4,7 +4,6 @@ import { environment } from '../../environments/environment';
 
 @injectable()
 export class Logger {
-
     public static log(message, ...args: any[]): void {
         this.execute(message, logType.log, ...args);
     }
@@ -32,7 +31,6 @@ export class Logger {
     public static silly(message, ...args: any[]): void {
         this.execute(message, logType.silly, ...args);
     }
-
 
     private static execute(message: string, type: logType, ...args: any[]): void {
         switch (type) {

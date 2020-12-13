@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { fromEvent, merge, Observable, Subject, timer } from 'rxjs';
+import { fromEvent, merge, Observable, Subject, timer, } from 'rxjs';
 import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
@@ -12,7 +12,7 @@ import SeriesEpisode from '../../store/models/series-episode.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import {
     seriesEpisodeStartedAction,
-    setSeriesEpisodeTimeStampAction
+    setSeriesEpisodeTimeStampAction,
 } from '../../store/reducers/series-episode.reducer';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { isVideoPictureInPicture } from '../../store/selectors/app-control-state.selector';
@@ -20,12 +20,11 @@ import { setPictureInPictureAction } from '../../store/reducers/control-state.re
 import { addClassForVideoInVideoClass, isPictureInPicture } from '../ustils/dom.utils';
 import {
     createStartVideoInVideoMessage,
-    createToggleWindowFullscreenMessage
+    createToggleWindowFullscreenMessage,
 } from '../../browserMessages/messages/background.messages';
 
 @injectable()
 export class VideoController {
-
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
         @inject(CONTENT_TYPES.PopupController) private readonly popupController: PopupController,
@@ -53,12 +52,12 @@ export class VideoController {
     private async onVideoStarted(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
         this.videoStarted$.next();
         await this.store.dispatch(seriesEpisodeStartedAction({
-            seriesEpisodeKey: seriesEpisodeKey,
+            seriesEpisodeKey,
             duration: video.duration,
         }));
 
         this.store.select(getSeriesEpisodeByKey, seriesEpisodeKey).pipe(
-            first()
+            first(),
         ).subscribe(episodeData => {
             const videoTimeUpdate$ = this.getVideoTimeChanges(video);
 
@@ -81,7 +80,7 @@ export class VideoController {
 
     private startErrorTimer(timeout: number): void {
         timer(timeout).pipe(
-            takeUntil(this.videoStarted$)
+            takeUntil(this.videoStarted$),
         ).subscribe(() => {
             console.error('VivoController: Problem with starting the video');
         });

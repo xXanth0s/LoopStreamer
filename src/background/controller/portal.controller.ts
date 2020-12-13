@@ -1,26 +1,26 @@
 import { inject, injectable } from 'inversify';
+import { catchError, debounceTime, filter, first, takeUntil, } from 'rxjs/operators';
+import { fromEvent, Observable } from 'rxjs';
+import { BrowserWindow } from 'electron';
 import { StoreService } from '../../shared/services/store.service';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { catchError, debounceTime, filter, first, takeUntil } from 'rxjs/operators';
 import {
     createGetAllProvidorLinksForEpisodeMessage,
     createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
     createGetResolvedProvidorLinkForEpisodeMessage,
-    createGetSeasonInfoMessage
+    createGetSeasonInfoMessage,
 } from '../../browserMessages/messages/portal.messages';
 import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
-import { fromEvent, Observable } from 'rxjs';
 import { PORTALS } from '../../store/enums/portals.enum';
 import { resetControlStateAction, setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import { Message } from '../../browserMessages/messages/message.interface';
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { ProvidorLink } from '../models/providor-link.model';
-import { BrowserWindow } from 'electron';
 import { WindowController } from './window.controller';
 import { finalizeWithValue, waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
@@ -35,7 +35,6 @@ import { LinkModel } from '../../store/models/link.model';
 
 @injectable()
 export class PortalController {
-
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
                 @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService,
@@ -44,7 +43,6 @@ export class PortalController {
 
     public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<PortalSeriesInfoDto[]> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
-
 
         return this.openPageAndGetDataForMessage(
             portal.seriesListUrl,
@@ -95,11 +93,9 @@ export class PortalController {
     public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS, language: LANGUAGE): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const links = this.store.selectSync(getLinksByKeys, episode.portalLinks);
-        const portalLink = links.find(link => {
-            return link.portal === portalKey
-                && link.providor === providor
-                && link.language === language;
-        });
+        const portalLink = links.find(link => link.portal === portalKey
+            && link.providor === providor
+            && link.language === language);
 
         if (!portalLink) {
             return null;
@@ -108,11 +104,11 @@ export class PortalController {
         const link = await this.openPageAndGetDataForMessage(
             portalLink.href,
             portalKey,
-            createGetResolvedProvidorLinkForEpisodeMessage(episode, providor, portalKey)
+            createGetResolvedProvidorLinkForEpisodeMessage(episode, providor, portalKey),
         );
         return {
             providor,
-            link
+            link,
         };
     }
 
@@ -130,7 +126,6 @@ export class PortalController {
     }
 
     private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portalKey: PORTALS, message: Message<T, R>): Promise<R> {
-
         return new Promise<R>(resolve => {
             const sub = this.openPortalUrl(portalUrl, portalKey).pipe(
                 catchError(err => {
@@ -156,7 +151,7 @@ export class PortalController {
                 } finally {
                     this.store.dispatch(setWindowIdForWindowTypeAction({
                         windowId: null,
-                        windowType: WindowType.PORTAL
+                        windowType: WindowType.PORTAL,
                     }));
                     sub.unsubscribe();
                 }

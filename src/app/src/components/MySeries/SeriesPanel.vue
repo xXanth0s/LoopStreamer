@@ -70,7 +70,6 @@
                 @approved="reset"
                 v-model="showResetModal"/>
 
-
     </div>
 </template>
 
@@ -89,7 +88,7 @@
     import {
         resetSeriesAction,
         setEndTimeForSeriesAction,
-        setStartTimeForSeriesAction
+        setStartTimeForSeriesAction,
     } from '../../../../store/reducers/series.reducer';
     import InfoTooltip from '../InfoTooltip.vue';
     import { SERIES_PANEL_SCIP_END_TIME, SERIES_PANEL_SCIP_START_TIME } from '../../constants/tooltip-texts';
@@ -113,7 +112,6 @@
         },
     })
     export default class SeriesPanel extends Vue {
-
         private readonly context = Context;
         private readonly takeUntil$ = new Subject();
         private readonly scipStartTimeTooltipText = SERIES_PANEL_SCIP_START_TIME;
