@@ -11,6 +11,7 @@ import AppControlStateModel from './app-control-state.model';
 import { LinkModel } from './link.model';
 import { KeyRecord } from '../types/key.record.type';
 import { Genre } from './genre.model';
+import { SeriesMetaInfo } from './series-meta-info.model';
 
 export interface StateModel {
     controlState: ControlState;
@@ -22,5 +23,6 @@ export interface StateModel {
     seriesEpisodes: KeyRecord<SeriesEpisode>;
     seriesSeasons: KeyRecord<SeriesSeason>;
     links: KeyRecord<LinkModel>;
-    genres: KeyRecord<Genre>
+    genres: KeyRecord<Genre>;
+    seriesMetaInfos: KeyRecord<SeriesMetaInfo>;
 }

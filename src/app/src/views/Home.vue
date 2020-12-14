@@ -24,6 +24,7 @@
     import { LANGUAGE } from '../../../store/enums/language.enum';
     import { setSelectedSeriesAction } from '../../../store/reducers/app-control-state.reducer';
     import SeriesModal from '../components/SeriesOverview/SeriesModal/SeriesModal.vue';
+    import { SeriesMetaInfo } from '../../../store/models/series-meta-info.model';
 
     @Component({
         name: 'test-page',
@@ -34,10 +35,9 @@
         },
     })
     export default class HomePage extends Vue {
-        private readonly seriesModalId = 'series-modal';
 
         private language: LANGUAGE = LANGUAGE.GERMAN;
-        private collections: NamedCollection<Series>[] = [];
+        private collections: NamedCollection<SeriesMetaInfo>[] = [];
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;

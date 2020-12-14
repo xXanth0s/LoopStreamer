@@ -6,7 +6,8 @@ import {
     mapGenreFromMovieDB,
     mapSeasonEpisodesFromMovieDB,
     mapSeasonFromMovieDB,
-    mapSeriesFromMovieDB
+    mapSeriesFromMovieDB,
+    mapSeriesMetaInfoFromMovieDB
 } from '../../utils/movie-db-mapper';
 import Series from '../../store/models/series.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
@@ -14,12 +15,13 @@ import { SeriesSeason } from '../../store/models/series-season.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { MovieApi } from '../../store/enums/movie-api.enum';
 import { Genre } from '../../store/models/genre.model';
+import { SeriesMetaInfo } from '../../store/models/series-meta-info.model';
 
 type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders }
 
 @injectable()
 export class MovieDBService {
-    public static async getPopularSeries(language: LANGUAGE): Promise<Series[]> {
+    public static async getPopularSeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
         let series: MovieDB.Objects.TVShow[] = [];
         const client = MovieDBService.getClient(language);
         try {
@@ -33,10 +35,10 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getPopularSeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesFromMovieDB(series, language));
+        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
     }
 
-    public static async getTopRatedSeries(language: LANGUAGE): Promise<Series[]> {
+    public static async getTopRatedSeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
         let series: MovieDB.Objects.TVShow[] = [];
         const client = MovieDBService.getClient(language);
         try {
@@ -50,10 +52,10 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getTopRatedSeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesFromMovieDB(series, language));
+        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
     }
 
-    public static async getAiringTodaySeries(language: LANGUAGE): Promise<Series[]> {
+    public static async getAiringTodaySeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
         let series: MovieDB.Objects.TVShow[] = [];
         const client = MovieDBService.getClient(language);
         try {
@@ -67,7 +69,7 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getAiringTodaySeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesFromMovieDB(series, language));
+        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
     }
 
     public static async getDetailedSeriesInformation(movieDbId: string, language: LANGUAGE): Promise<[ Series, SeriesSeason[], SeriesEpisode[] ]> {

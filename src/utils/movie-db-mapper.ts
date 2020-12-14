@@ -9,49 +9,60 @@ import SeriesEpisode, { getEmptySeriesEpisode } from '../store/models/series-epi
 import { Hoster } from '../store/enums/hoster.enum';
 import { Genre } from '../store/models/genre.model';
 import { getYearFromDateString } from './date.utils';
+import { SeriesMetaInfo } from '../store/models/series-meta-info.model';
 
-export function mapSeriesFromMovieDB(series: MovieDB.Objects.TVShow | Responses.TV.GetDetails, activeLanguage: LANGUAGE, videoKey?: string): Series {
+export function mapSeriesMetaInfoFromMovieDB(series: MovieDB.Objects.TVShow | Responses.TV.GetDetails, activeLanguage: LANGUAGE): SeriesMetaInfo {
     const {
-        original_name,
         id,
-        overview,
         name,
-        poster_path,
         original_language,
+        original_name,
+        poster_path
+    } = series;
+
+
+    const seriesLanguage = mapLanguage(original_language);
+    const key = getKeyForSeriesTitle(original_name);
+
+    return {
+        key,
+        posterHref: `https://image.tmdb.org/t/p/w220_and_h330_face/${poster_path}`,
+
+        titles: {
+            [activeLanguage]: name,
+            [seriesLanguage]: original_name,
+        },
+        apiKeys: {
+            [MovieApi.TMDB]: `${id}`,
+        },
+    };
+}
+
+
+export function mapSeriesFromMovieDB(series: Responses.TV.GetDetails, activeLanguage: LANGUAGE, videoKey?: string): Series {
+    const {
+        overview,
         backdrop_path,
         first_air_date
     } = series;
 
-    const seriesLanguage = mapLanguage(original_language);
-    const key = getKeyForSeriesTitle(original_name);
 
     const previewVideos = !videoKey ? {} : {
         [Hoster.YOUTUBE]: videoKey,
     };
 
-    let genres = [];
-    if ('genres' in series) {
-        genres = series.genres.map(genre => genre.id);
-    }
+    const genres = series.genres.map(genre => `${genre.id}`);
 
     return {
         ...getEmptySeries(),
-        key,
+        ...mapSeriesMetaInfoFromMovieDB(series, activeLanguage),
         previewVideos,
         genres,
-        posterHref: `https://image.tmdb.org/t/p/w440_and_h660_face/${poster_path}`,
         backgroundHref: `https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/${backdrop_path}`,
         startYear: getYearFromDateString(first_air_date),
-        titles: {
-            [activeLanguage]: name,
-            [seriesLanguage]: original_name,
-        },
         descriptions: {
             [activeLanguage]: overview,
-        },
-        apiKeys: {
-            [MovieApi.TMDB]: `${id}`,
-        },
+        }
     };
 }
 

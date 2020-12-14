@@ -6,6 +6,7 @@ import { getSeriesByKey, getSeriesForEpisode, getSeriesForSeason } from './serie
 import { LANGUAGE } from '../enums/language.enum';
 import { SeriesSeason } from '../models/series-season.model';
 import { NamedCollection } from '../models/collection.model';
+import { SeriesMetaInfo } from '../models/series-meta-info.model';
 
 export const getExpandedSeries = (state: StateModel): Series['key'] => state.appControlState.selectedSeriesKey;
 
@@ -41,4 +42,4 @@ export const getSelectedLanguageOrLastUsedSeriesLanguage = (state: StateModel, s
 
 export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);
 
-export const getSeriesCollections = (state: StateModel): NamedCollection<Series>[] => Object.values(state.appControlState.seriesCollections);
+export const getSeriesCollections = (state: StateModel): NamedCollection<SeriesMetaInfo>[] => Object.values(state.appControlState.seriesCollections);

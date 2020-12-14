@@ -8,6 +8,7 @@ import seriesSeasonsReducer from './series-season.reducer';
 import seriesEpisodesReducer from './series-episode.reducer';
 import linkSlice from './link.reducer';
 import { genreReducer } from './genre.reducer';
+import { seriesMetaInfoReducer } from './series-meta-info.reducer';
 
 export const storeReducers = {
     controlState: controlStateSlice.reducer,
@@ -20,4 +21,5 @@ export const storeReducers = {
     seriesEpisodes: seriesEpisodesReducer.reducer,
     links: linkSlice.reducer,
     genres: genreReducer,
+    seriesMetaInfos: seriesMetaInfoReducer,
 };

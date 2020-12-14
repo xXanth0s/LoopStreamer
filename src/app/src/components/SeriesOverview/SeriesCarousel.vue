@@ -33,9 +33,10 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../shared/services/store.service';
     import { MessageService } from '../../../../shared/services/message.service';
-    import { getMultipleSeriesByKey } from '../../../../store/selectors/series.selector';
     import SeriesPanelFront from '../MySeries/SeriesPanelFront.vue';
     import { LANGUAGE } from '../../../../store/enums/language.enum';
+    import { getMultipleSeriesMetaInfos } from '../../../../store/selectors/series-meta-info.selector';
+    import { SeriesMetaInfo } from '../../../../store/models/series-meta-info.model';
 
     @Component({
         name: 'series-carousel',
@@ -100,7 +101,7 @@
             loop: true,
         };
 
-        private series: Series[];
+        private series: SeriesMetaInfo[];
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
@@ -117,7 +118,7 @@
         @Watch('seriesCollection', { immediate: true })
         private selectionChanged(seriesCollection: NamedCollection<Series>): void {
             this.takeUntil$.next();
-            this.store.selectBehaviour(getMultipleSeriesByKey, seriesCollection.data).pipe(
+            this.store.selectBehaviour(getMultipleSeriesMetaInfos, seriesCollection.data).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(series => this.series = series);
         }
