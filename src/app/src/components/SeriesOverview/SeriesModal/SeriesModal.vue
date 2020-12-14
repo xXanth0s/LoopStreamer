@@ -6,7 +6,7 @@
              hide-footer
              hide-header
              title="Using Component Methods">
-        <div class="modal-container bg-gray-900 text-white pb-5 font-mono ">
+        <div class="modal-container bg-gray-900 text-white pb-5 font-mono relative">
             <div v-if="series">
                 <series-modal-header
                         :series="series"
@@ -14,9 +14,15 @@
                         @close-modal="closeModal"/>
 
                 <series-modal-description
-                        class="mt-5"
+                        class="mt-3"
                         :series="series"
                         :language="activeLanguage"/>
+            </div>
+            <div v-else class="absolute flex flex-column items-center justify-content-center w-100 h-100">
+                <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="sr-only"></span>
+                </div>
+                <span>Serie wird geladen...</span>
             </div>
         </div>
     </b-modal>
@@ -139,4 +145,7 @@
 
 <style lang="scss" scoped>
 
+    .modal-container {
+        min-height: 500px;
+    }
 </style>
