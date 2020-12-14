@@ -17,6 +17,8 @@ export const getSelectedSeason = (state: StateModel): SeriesSeason['key'] => sta
 
 export const getActivePortalOnAppOrSeries = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): PORTALS => state.appControlState.activePortal || getSeriesForEpisode(state, seriesEpisodeKey).lastUsedPortal;
 
+export const getMutePreviewVideoState = (state: StateModel): boolean => state.appControlState.mutePreviewVideo;
+
 export const getSelectedLanguageOrLastUsedSeriesLanguageForSeason = (state: StateModel, seriesSeasonKey: SeriesSeason['key']): LANGUAGE => {
     const series = getSeriesForSeason(state, seriesSeasonKey);
     return getSelectedLanguageOrLastUsedSeriesLanguage(state, series.key);

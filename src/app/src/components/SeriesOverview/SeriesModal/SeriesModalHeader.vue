@@ -2,13 +2,37 @@
 
     <div v-if="series" class="relative header-height">
         <div v-if="showVideo" class="absolute overflow-hidden header-height">
-            <youtube :video-id="youtubeUrl" player-width="900" player-height="507" @ended="onVideoFinished"/>
+            <youtube :video-id="youtubeUrl"
+                     player-width="895"
+                     player-height="507"
+                     :mute="muteVideo"
+                     @ended="onVideoFinished"
+                     @error="onVideoFinished"/>
         </div>
         <div v-else class="w-full absolute">
             <img :src="series.backgroundHref" class="w-full">
         </div>
+        <div class="absolute w-full h-full video-overlay">
+        </div>
         <div class="absolute text">
-            <span class="text-4xl font-mono text-white font-extrabold">{{series.titles[language]}}</span>
+            <span class="text-4xl text-white font-extrabold">
+                {{series.titles[language]}}
+            </span>
+        </div>
+        <div class="absolute close-button">
+            <button type="button"
+                    class="btn btn-outline-primary rounded-full h-12 w-12"
+                    @click.stop="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="absolute mute-button" v-if="showVideo">
+            <button type="button"
+                    class="btn btn-outline-primary rounded-full h-12 w-12"
+                    @click.stop="toggleMuteState">
+                <i v-if="muteVideo" class="fas fa-volume-mute"></i>
+                <i v-else class="fas fa-volume-up"></i>
+            </button>
         </div>
     </div>
 </template>
@@ -16,10 +40,16 @@
 <script lang="ts">
     import Component from 'vue-class-component';
     import Vue from 'vue';
-    import { Prop, Watch } from 'vue-property-decorator';
+    import { Emit, Inject, Prop, Watch } from 'vue-property-decorator';
+    import { takeUntil } from 'rxjs/operators';
     import Series from '../../../../../store/models/series.model';
     import { Hoster } from '../../../../../store/enums/hoster.enum';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
+    import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
+    import { StoreService } from '../../../../../shared/services/store.service';
+    import { Subject } from 'rxjs';
+    import { getMutePreviewVideoState } from '../../../../../store/selectors/app-control-state.selector';
+    import { toggleMutePreviewVideoStateAction } from '../../../../../store/reducers/app-control-state.reducer';
 
     @Component({
         name: 'series-modal-header',
@@ -31,7 +61,13 @@
         @Prop(String)
         private language: LANGUAGE;
 
+        @Inject(SHARED_TYPES.StoreService)
+        private store: StoreService;
+
+        private readonly takeUntil$ = new Subject();
+
         private videoFinished = false;
+        private muteVideo = false;
 
         private get youtubeUrl(): string {
             const id = this.series?.previewVideos[Hoster.YOUTUBE];
@@ -45,14 +81,40 @@
             return Boolean(this.series?.previewVideos[Hoster.YOUTUBE]) && !this.videoFinished;
         }
 
+        public mounted(): void {
+            this.fetchPreviewVideoMuteState();
+        }
+
+        public destroyed(): void {
+            this.takeUntil$.next();
+        }
+
         @Watch('series')
         private reset(): void {
             this.videoFinished = false;
         }
 
-        public onVideoFinished(): void {
+        @Emit('close-modal')
+        private closeModal(): void {
+        }
+
+        private onVideoFinished(): void {
             this.videoFinished = true;
         }
+
+        private toggleMuteState(event: Event): void {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+            // @ts-ignore
+            event.target.blur();
+            this.store.dispatch(toggleMutePreviewVideoStateAction());
+        }
+
+        private fetchPreviewVideoMuteState(): void {
+            this.store.selectBehaviour(getMutePreviewVideoState).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(muteState => this.muteVideo = muteState);
+        }
+
     }
 </script>
 
@@ -60,7 +122,7 @@
     @import 'src/styles/variables';
 
     .video-overlay {
-        background: linear-gradient(to top, #181818, transparent 50%);
+        background: linear-gradient(to top, #1a202c, transparent 30%);
     }
 
     .header-height {
@@ -68,7 +130,17 @@
     }
 
     .text {
-        bottom: 3rem;
+        bottom: 2rem;
         left: 3rem;
+    }
+
+    .close-button {
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .mute-button {
+        right: 5rem;
+        top: 1rem;
     }
 </style>

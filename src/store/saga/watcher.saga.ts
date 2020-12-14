@@ -25,10 +25,12 @@ import { Logger } from '../../shared/services/logger';
 import { loadSeriesSeasonForLanguageSaga } from './portal-load-series-data/load-series-season-for-language.saga';
 import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
 import { loadDetailedSeriesInformationSaga } from './series-api/load-detailed-series-information.saga';
+import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
 
 export function* watcherSaga() {
     try {
         yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
+        yield takeLatest(appStartedAction.type, loadSeriesGenresSaga);
 
         yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
         yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationSaga);

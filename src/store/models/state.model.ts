@@ -10,6 +10,7 @@ import { PORTALS } from '../enums/portals.enum';
 import AppControlStateModel from './app-control-state.model';
 import { LinkModel } from './link.model';
 import { KeyRecord } from '../types/key.record.type';
+import { Genre } from './genre.model';
 
 export interface StateModel {
     controlState: ControlState;
@@ -17,8 +18,9 @@ export interface StateModel {
     options: Options;
     portals: Partial<Record<PORTALS, Portal>>;
     providors: Partial<Record<PROVIDORS, Providor>>;
-    series: Record<Series['key'], Series>;
-    seriesEpisodes: Record<SeriesEpisode['key'], SeriesEpisode>;
-    seriesSeasons: Record<SeriesSeason['key'], SeriesSeason>;
+    series: KeyRecord<Series>;
+    seriesEpisodes: KeyRecord<SeriesEpisode>;
+    seriesSeasons: KeyRecord<SeriesSeason>;
     links: KeyRecord<LinkModel>;
+    genres: KeyRecord<Genre>
 }

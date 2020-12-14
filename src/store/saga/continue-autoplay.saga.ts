@@ -12,7 +12,7 @@ import {
     resetPlayedEpisodesAction,
 } from '../reducers/control-state.reducer';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
-import { generateAsyncInteraction } from '../store/async-interaction.util';
+import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { Logger } from '../../shared/services/logger';
 
 export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpisodeAction>) {

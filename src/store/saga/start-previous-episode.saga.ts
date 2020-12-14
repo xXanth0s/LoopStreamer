@@ -5,7 +5,7 @@ import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
 import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
-import { generateAsyncInteraction } from '../store/async-interaction.util';
+import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../reducers/control-state.reducer';
 import { Logger } from '../../shared/services/logger';

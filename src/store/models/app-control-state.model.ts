@@ -9,5 +9,6 @@ export default interface AppControlStateModel {
     selectedSeriesKey?: Series['key'];
     selectedSeason?: SeriesSeason['key'];
     selectedLanguage?: LANGUAGE;
+    mutePreviewVideo: boolean;
     seriesCollections: Record<string, NamedCollection<Series>>;
 }

@@ -1,5 +1,8 @@
 @import "variables";
 $blue: $primary-color;
+$input-btn-focus-box-shadow: none;
+$input-btn-focus-width: 0;
+$btn-focus-box-shadow: none;
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 
@@ -8,3 +11,4 @@ $theme-colors: (
         info: $light-blue-color,
         danger: $red
 );
+

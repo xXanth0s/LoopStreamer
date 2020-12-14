@@ -10,6 +10,7 @@ import { NamedCollection } from '../models/collection.model';
 
 const initialState: AppControlStateModel = {
     seriesCollections: {},
+    mutePreviewVideo: false
 };
 
 function setActivePortal(state: AppControlStateModel, payload: PORTALS): void {
@@ -38,6 +39,7 @@ function reset(): AppControlStateModel {
         selectedSeriesKey: null,
         selectedLanguage: LANGUAGE.NONE,
         seriesCollections: {},
+        mutePreviewVideo: false,
     };
 }
 
@@ -56,6 +58,10 @@ function setSelectedSeries(state: AppControlStateModel, { selectedSeriesKey }: {
     state.selectedSeriesKey = selectedSeriesKey;
 }
 
+function toggleMutePreviewVideoState(state: AppControlStateModel): void {
+    state.mutePreviewVideo = !state.mutePreviewVideo;
+}
+
 export const appControlStateSlice = createSlice({
     name: 'appControlState',
     initialState,
@@ -67,6 +73,7 @@ export const appControlStateSlice = createSlice({
         setSelectedLanguageAction: (state: AppControlStateModel, action: PayloadAction<{ selectedLanguage: LANGUAGE }>) => setSelectedLanguage(state, action.payload),
         addOrReplaceSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collection: NamedCollection<Series> }>) => addOrReplaceSeriesCollection(state, action.payload),
         addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<Series>[] }>) => addOrReplaceMultipleSeriesCollection(state, action.payload),
+        toggleMutePreviewVideoStateAction: (state: AppControlStateModel) => toggleMutePreviewVideoState(state),
         resetAppControlStateAction: () => reset(),
     },
     extraReducers: (builder) => {
@@ -84,4 +91,5 @@ export const {
     addOrReplaceSeriesCollectionAction,
     addOrReplaceMultipleSeriesCollectionAction,
     setSelectedSeriesAction,
+    toggleMutePreviewVideoStateAction
 } = appControlStateSlice.actions;

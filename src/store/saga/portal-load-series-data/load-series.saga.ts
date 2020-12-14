@@ -7,7 +7,7 @@ import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PORTALS } from '../../enums/portals.enum';
 import Series from '../../models/series.model';
 import { addSeriesSaga } from '../add-data/add-series.saga';
-import { generateAsyncInteraction } from '../../store/async-interaction.util';
+import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';

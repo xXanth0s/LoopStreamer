@@ -6,6 +6,7 @@ import { SeriesSeason } from './series-season.model';
 import { KeyModel } from './key-model.interface';
 import { MovieApi } from '../enums/movie-api.enum';
 import { Hoster } from '../enums/hoster.enum';
+import { Genre } from './genre.model';
 
 export default interface Series extends KeyModel<string> {
     titles: Partial<Record<LANGUAGE, string>>;
@@ -21,8 +22,11 @@ export default interface Series extends KeyModel<string> {
     backgroundHref?: string;
     portalLinks: LinkModel['key'][];
     seasons: SeriesSeason['key'][];
+    genres: Genre['key'][];
     scipStartTime?: number;
     scipEndTime?: number;
+    startYear?: string;
+    endYear?: string;
 }
 
 export function getEmptySeries(): Series {
@@ -34,5 +38,6 @@ export function getEmptySeries(): Series {
         descriptions: {},
         portalLinks: [],
         seasons: [],
+        genres: [],
     };
 }

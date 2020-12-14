@@ -6,10 +6,18 @@
              hide-footer
              hide-header
              title="Using Component Methods">
-        <div v-if="series" class="modal-container">
-            <series-modal-header
-                    :series="series"
-                    :language="activeLanguage"/>
+        <div class="modal-container bg-gray-900 text-white pb-5 font-mono ">
+            <div v-if="series">
+                <series-modal-header
+                        :series="series"
+                        :language="activeLanguage"
+                        @close-modal="closeModal"/>
+
+                <series-modal-description
+                        class="mt-5"
+                        :series="series"
+                        :language="activeLanguage"/>
+            </div>
         </div>
     </b-modal>
 </template>
@@ -34,10 +42,12 @@
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
     import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
     import SeriesModalHeader from './SeriesModalHeader.vue';
+    import SeriesModalDescription from './SeriesModalDescription.vue';
 
     @Component({
         name: 'series-modal',
         components: {
+            SeriesModalDescription,
             SeriesModalHeader,
         },
     })
@@ -71,6 +81,11 @@
             this.loadSeriesData(seriesKey);
             this.loadSeriesSeason(seriesKey);
             this.loadActiveSeason();
+        }
+
+        public closeModal(): void {
+            this.$refs.modalRef.hide();
+            this.reset();
         }
 
         public loadSeriesData(seriesKey: Series['key']): void {

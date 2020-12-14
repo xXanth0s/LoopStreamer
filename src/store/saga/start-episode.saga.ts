@@ -25,7 +25,7 @@ import { generateLinkForProvidorLink } from '../utils/link.utils';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { updateOrAddLinkAction } from '../reducers/link.reducer';
 import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from '../selectors/app-control-state.selector';
-import { generateAsyncInteraction } from '../store/async-interaction.util';
+import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { Logger } from '../../shared/services/logger';
 

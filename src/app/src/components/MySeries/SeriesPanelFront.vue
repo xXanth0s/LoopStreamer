@@ -1,10 +1,10 @@
 <template>
-    <div class="h-full">
+    <div class="">
 
         <div class="flex-column bordered">
-            <div>
+            <div class="image-container relative">
                 <i v-if="showSettingsIcon" class="fas fa-cog spin-icon absolute top-0 right-0 mt-2 mr-2 icon"></i>
-                <img :src="imageUrl" alt="Avatar">
+                <img class="absolute top-0" :src="imageUrl">
             </div>
             <div class="flex flex-grow-0 text-lg justify-center items-center h-10 whitespace-nowrap">
                 <span class="truncate mx-1">{{seriesName}}</span>
@@ -45,5 +45,9 @@
 
         box-shadow: $shadow-light;
         transition: 0.3s;
+    }
+
+    .image-container {
+        padding: 75% 0;
     }
 </style>

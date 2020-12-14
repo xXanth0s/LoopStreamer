@@ -4,7 +4,7 @@ import { getSeriesForSeason } from '../../selectors/series.selector';
 import { StateModel } from '../../models/state.model';
 import { Logger } from '../../../shared/services/logger';
 import { updateSeriesSeasonForPortal } from './load-season.saga';
-import { generateAsyncInteraction } from '../../store/async-interaction.util';
+import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 

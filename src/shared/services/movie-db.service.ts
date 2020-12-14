@@ -2,12 +2,18 @@ import { injectable } from 'inversify';
 import MovieDB, { Responses } from 'node-themoviedb';
 import { IncomingHttpHeaders } from 'http';
 import { Logger } from './logger';
-import { mapSeasonEpisodesFromMovieDB, mapSeasonFromMovieDB, mapSeriesFromMovieDB } from '../../utils/movie-db-mapper';
+import {
+    mapGenreFromMovieDB,
+    mapSeasonEpisodesFromMovieDB,
+    mapSeasonFromMovieDB,
+    mapSeriesFromMovieDB
+} from '../../utils/movie-db-mapper';
 import Series from '../../store/models/series.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
 import { SeriesSeason } from '../../store/models/series-season.model';
 import SeriesEpisode from '../../store/models/series-episode.model';
 import { MovieApi } from '../../store/enums/movie-api.enum';
+import { Genre } from '../../store/models/genre.model';
 
 type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders }
 
@@ -97,7 +103,7 @@ export class MovieDBService {
         return [ mappedSeries, mappedSeasons, mappedEpisodes ];
     }
 
-    private static async getSeasonInfo(series: Series, seasonNumber: string, language: LANGUAGE): Promise<[ SeriesSeason, SeriesEpisode[] ]> {
+    public static async getSeasonInfo(series: Series, seasonNumber: string, language: LANGUAGE): Promise<[ SeriesSeason, SeriesEpisode[] ]> {
         const client = MovieDBService.getClient(language);
         let season: Responses.TV.Season.GetDetails;
         try {
@@ -116,6 +122,19 @@ export class MovieDBService {
         const mappedSeason = mapSeasonFromMovieDB(season, series.key);
         const mappedEpisodes = mapSeasonEpisodesFromMovieDB(season, series.key, language);
         return [ mappedSeason, mappedEpisodes ];
+    }
+
+    public static async loadGenres(language: LANGUAGE): Promise<Genre[]> {
+        const client = MovieDBService.getClient(language);
+        let genres = [];
+        try {
+            const apiGenres = await client.genre.getTVList();
+            genres = apiGenres.data.genres.map(genre => mapGenreFromMovieDB(genre, language));
+        } catch (error) {
+            Logger.error('[MovieDDService->loadGenres] error occurred', error);
+        }
+
+        return genres;
     }
 
     private static async getVideo(movieDbId: string, language: LANGUAGE): Promise<string> {

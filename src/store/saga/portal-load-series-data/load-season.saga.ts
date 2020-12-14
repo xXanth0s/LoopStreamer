@@ -13,7 +13,7 @@ import { loadSeriesInformationForPortal } from './load-series.saga';
 import { LinkModel } from '../../models/link.model';
 import { addSeriesSeasonSaga } from '../add-data/add-series-season.saga';
 import { setActiveLanguageForSeasonAndPortal } from '../set-active-language.saga';
-import { generateAsyncInteraction } from '../../store/async-interaction.util';
+import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';

@@ -14,7 +14,7 @@ import {
 } from '../reducers/control-state.reducer';
 import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { Logger } from '../../shared/services/logger';
-import { generateAsyncInteraction } from '../store/async-interaction.util';
+import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 
 export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisodeAction>) {
