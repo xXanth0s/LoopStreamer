@@ -8,6 +8,7 @@ import { LANGUAGE } from '../../store/enums/language.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { PORTALS } from '../../store/enums/portals.enum';
+import Series from '../../store/models/series.model';
 
 export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode, providor: PROVIDORS, portal: PORTALS):
     Message<{ providor: PROVIDORS; episodeInfo: SeriesEpisode; portal: PORTALS }, string> => ({
@@ -52,6 +53,17 @@ export const createGetAllSeriesFromPortalMessage = (portal: PORTALS): Message<{ 
     hasReply: true,
 });
 export type GetAllSeriesFromPortalMessage = ReturnType<typeof createGetAllSeriesFromPortalMessage>;
+
+export const createGetSeriesLinkForPortalMessage = (seriesKey: Series['key'], portal: PORTALS): Message<{ portal: PORTALS, seriesKey: Series['key'] }, string> => ({
+    type: MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL,
+    destinationController: ControllerType.PORTAL,
+    payload: {
+        portal,
+        seriesKey
+    },
+    hasReply: true,
+});
+export type GetSeriesLinkForPortal = ReturnType<typeof createGetSeriesLinkForPortalMessage>;
 
 export const createGetDetailedSeriesInformationMessage = (portal: PORTALS): Message<{ portal: PORTALS }, PortalSeriesInfoDto> => ({
     type: MessageType.PORTAL_GET_SERIES_META_INFORMATION,

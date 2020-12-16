@@ -1,10 +1,9 @@
 import { put, select } from 'redux-saga/effects';
 import { startPreviousEpisodeAction } from '../actions/shared.actions';
-import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
-import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import { getPortalLinkForNextEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
@@ -14,6 +13,7 @@ import {
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { Logger } from '../../shared/services/logger';
+import { LinkModel } from '../models/link.model';
 
 export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();
@@ -27,13 +27,13 @@ export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpi
 
         const series = getSeriesForEpisode(yield select(), episodeKey);
 
-        const nextEpisode: SeriesEpisode = yield getNeighbourEpisode(episodeKey, series.lastUsedPortal, true);
-        if (!nextEpisode) {
+        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(episodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        if (!nextEpisodeLink) {
             return;
         }
 
         const episodeStartSuccessful: boolean = yield startEpisode({
-            episodeKey: nextEpisode.key,
+            episodeKey: nextEpisodeLink.parentKey,
             language: series.lastUsedLanguage,
         });
 

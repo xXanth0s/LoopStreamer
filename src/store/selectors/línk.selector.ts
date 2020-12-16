@@ -11,7 +11,6 @@ import SeriesEpisode from '../models/series-episode.model';
 
 export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['key'], portal: PORTALS): LinkModel {
     const series = getSeriesByKey(state, seriesKey);
-
     return getLinksByKeys(state, series.portalLinks).find(link => link.portal === portal);
 }
 

@@ -122,7 +122,7 @@
     @import 'src/styles/variables';
 
     .video-overlay {
-        background: linear-gradient(to top, #1a202c, transparent 30%);
+        background: linear-gradient(to top, $gray, transparent 30%);
     }
 
     .header-height {

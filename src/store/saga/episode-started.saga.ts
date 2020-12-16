@@ -4,9 +4,13 @@ import {
     setSeriesEpisodeNextEpisodeStateAction,
     setSeriesEpisodePreviousEpisodeStateAction,
 } from '../reducers/series-episode.reducer';
-import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import {
+    getPortalLinkForNextEpisode,
+    getPortalLinkForPreviousEpisode
+} from './portal-load-series-data/load-neighbour-series-episode.saga';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { Logger } from '../../shared/services/logger';
+import { LinkModel } from '../models/link.model';
 
 export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStartedAction>) {
     const { seriesEpisodeKey } = action.payload;
@@ -14,16 +18,16 @@ export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStart
     const series = getSeriesForEpisode(yield select(), seriesEpisodeKey);
 
     try {
-        const nextEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, true);
+        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
         yield put(setSeriesEpisodeNextEpisodeStateAction({
             seriesEpisodeKey,
-            hasNextEpisode: Boolean(nextEpisode),
+            hasNextEpisode: Boolean(nextEpisodeLink),
         }));
 
-        const previousEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, false);
+        const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
         yield put(setSeriesEpisodePreviousEpisodeStateAction({
             seriesEpisodeKey,
-            hasPreviousEpisode: Boolean(previousEpisode),
+            hasPreviousEpisode: Boolean(previousEpisodeLink),
         }));
     } catch (error) {
         Logger.error('[episodeStartedSaga] error occurred', error);

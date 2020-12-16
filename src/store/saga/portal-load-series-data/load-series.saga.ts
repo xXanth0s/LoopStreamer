@@ -1,25 +1,29 @@
 import { call, put, select } from 'redux-saga/effects';
-import { toggleSelectedSeriesForAppAction } from '../../reducers/app-control-state.reducer';
 import { getPortalController } from '../../../background/container/container.utils';
-import { StateModel } from '../../models/state.model';
-import { getSeriesByKey } from '../../selectors/series.selector';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PORTALS } from '../../enums/portals.enum';
 import Series from '../../models/series.model';
-import { addSeriesSaga } from '../add-data/add-series.saga';
+import { addSeriesLinksToStoreSaga } from '../add-data/add-series-links-to-store.saga';
 import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
+import { getLinkForSeriesAndPortal } from '../../selectors/línk.selector';
+import { LinkModel } from '../../models/link.model';
+import { generateLinkForSeries } from '../../utils/link.utils';
+import { updateOrAddLinkAction } from '../../reducers/link.reducer';
 
-export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelectedSeriesForAppAction>) {
-    const state: StateModel = yield select();
-    const seriesKey = action.payload;
-    if (!seriesKey || !state.appControlState.selectedSeriesKey) {
-        return;
+
+/*
+    Loads and stores all Links for Series with Seasons
+    @return: Boolean, if series could be loaded successfully
+ */
+export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey: PORTALS) {
+    const link: LinkModel = yield getSeriesLinkForPortal(seriesKey, portalKey);
+
+    if (!link) {
+        return false;
     }
-
-    let portalKey = state.appControlState.activePortal;
 
     const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SERIES, {
         seriesKey,
@@ -28,27 +32,54 @@ export function* loadSeriesInformationSaga(action: ReturnType<typeof toggleSelec
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {
-        if (!portalKey) {
-            const series = getSeriesByKey(state, seriesKey);
-            portalKey = series.lastUsedPortal;
-        }
-
-        yield loadSeriesInformationForPortal(seriesKey, portalKey);
+        return yield loadFullSeriesInformationForPortal(seriesKey, portalKey);
     } catch (error) {
-        Logger.error('[loadSeriesInformationSaga] error occurred', error);
+        Logger.error('[loadSeriesInformationForPortalSaga] error occurred', error);
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
+
+    return false;
 }
 
-export function* loadSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
+export function* loadFullSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
     const portalController = getPortalController();
     const seriesInfo: PortalSeriesInfoDto = yield call([ portalController, portalController.getDetailedSeriesInformation ], seriesKey, portalKey);
     if (!seriesInfo) {
         return false;
     }
 
-    yield addSeriesSaga(seriesInfo, seriesKey);
+    yield addSeriesLinksToStoreSaga(seriesInfo, seriesKey);
 
     return true;
 }
+
+/*
+    Loads and stores main link for Series
+    @return: LinkModel | null
+ */
+function* getSeriesLinkForPortal(seriesKey: string, portalKey: PORTALS) {
+    const state = yield select();
+    const link = getLinkForSeriesAndPortal(state, seriesKey, portalKey);
+    if (link) {
+        return link;
+    }
+
+    const portalController = getPortalController();
+    try {
+        const seriesLink: string = yield call([ portalController, portalController.getSeriesLinkForPortal ], seriesKey, portalKey);
+
+        if (seriesLink) {
+            const link = generateLinkForSeries(seriesKey, portalKey, seriesLink);
+
+            yield put(updateOrAddLinkAction(link));
+            return link;
+        }
+
+        return null;
+    } catch (error) {
+        Logger.error('[getSeriesLinkForPortal] error occurred', error);
+    }
+}
+
+

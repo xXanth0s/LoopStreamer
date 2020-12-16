@@ -8,10 +8,10 @@ import { MessageService } from '../../shared/services/message.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import {
     createGetAllProvidorLinksForEpisodeMessage,
-    createGetAllSeriesFromPortalMessage,
     createGetDetailedSeriesInformationMessage,
     createGetResolvedProvidorLinkForEpisodeMessage,
     createGetSeasonInfoMessage,
+    createGetSeriesLinkForPortalMessage,
 } from '../../browserMessages/messages/portal.messages';
 import { getPortalForKey } from '../../store/selectors/portals.selector';
 import { WindowService } from '../services/window.service';
@@ -41,13 +41,13 @@ export class PortalController {
                 @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
-    public async getAllSeriesFromPortal(portalKey: PORTALS): Promise<PortalSeriesInfoDto[]> {
+    public async getSeriesLinkForPortal(seriesKey: Series['key'], portalKey: PORTALS): Promise<string> {
         const portal = this.store.selectSync(getPortalForKey, portalKey);
 
         return this.openPageAndGetDataForMessage(
             portal.seriesListUrl,
             portalKey,
-            createGetAllSeriesFromPortalMessage(portalKey),
+            createGetSeriesLinkForPortalMessage(seriesKey, portalKey),
         );
     }
 
@@ -55,6 +55,7 @@ export class PortalController {
         const link = this.store.selectSync(getLinkForSeriesAndPortal, seriesKey, portalKey);
         if (!link) {
             Logger.error(`[PortalController->getDetailedSeriesInformation] tried to load link info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`);
+            return null;
         }
 
         return this.openPageAndGetDataForMessage(

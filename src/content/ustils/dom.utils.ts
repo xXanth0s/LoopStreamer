@@ -102,9 +102,19 @@ export function getLinksForProviders(providers: Providor[], providorContainer?: 
 
 export function getLinkWithText(containerElement: Element, textPossibilities: string[]): HTMLAnchorElement {
     const links: HTMLAnchorElement[] = Array.from(containerElement.querySelectorAll('a'));
-
-    return links.find(link => {
+    const lowerCaseTextPossibilities = textPossibilities.map(text => text.toLowerCase());
+    const filteredLinks = links.filter(link => {
         const content = link.textContent.toLowerCase();
-        return textPossibilities.some(text => content.includes(text.toLowerCase()));
+        return lowerCaseTextPossibilities.some(text => content.includes(text));
     });
+
+    if (filteredLinks.length > 1) {
+        return links.find(link => {
+            const content = link.textContent.toLowerCase();
+            return lowerCaseTextPossibilities.some(text => content === text);
+        });
+    }
+
+    return filteredLinks[0];
+
 }

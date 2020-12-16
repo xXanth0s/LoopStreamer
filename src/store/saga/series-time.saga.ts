@@ -6,8 +6,9 @@ import {
 import { getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
 import { getSeriesByKey } from '../selectors/series.selector';
 import { getPopupEndTimeForSeriesEpisode } from '../utils/series.utils';
-import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import { getPortalLinkForNextEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import { setLastWatchedEpisodeAction } from '../reducers/series.reducer';
+import { LinkModel } from '../models/link.model';
 
 export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisodeTimeStampAction>) {
     const { seriesEpisodeKey, timestamp } = action.payload;
@@ -34,8 +35,8 @@ export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisod
         isFinished,
     }));
 
-    const nextEpisode = yield getNeighbourEpisode(seriesEpisodeKey, series.lastUsedPortal, true);
-    if (nextEpisode) {
-        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: nextEpisode.key }));
+    const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+    if (nextEpisodeLink) {
+        yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: nextEpisodeLink.parentKey }));
     }
 }

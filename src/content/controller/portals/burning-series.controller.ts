@@ -11,11 +11,12 @@ import SeriesEpisode from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
-import { getLinksForProviders } from '../../ustils/dom.utils';
+import { getLinksForProviders, getLinkWithText } from '../../ustils/dom.utils';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { MessageService } from '../../../shared/services/message.service';
 import { createExecuteScriptMessage } from '../../../browserMessages/messages/background.messages';
+import { getSeriesByKey } from '../../../store/selectors/series.selector';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -172,6 +173,13 @@ export class BurningSeriesController implements IPortalController {
                 portal: this.portalKey,
             };
         });
+    }
+
+    public getLinkForSeries(seriesKey: string): string {
+        const series = this.store.selectSync(getSeriesByKey, seriesKey);
+        const titles = Object.values(series.titles);
+        const link = getLinkWithText(document.body, titles);
+        return link?.href;
     }
 
     public isVideoOpenWithProvidor(): Providor | null {

@@ -1,10 +1,5 @@
 import { takeLatest } from 'redux-saga/effects';
-import {
-    setSelectedSeasonForAppAction,
-    setSelectedSeriesAction,
-    toggleSelectedSeriesForAppAction,
-} from '../reducers/app-control-state.reducer';
-import { loadSeriesInformationSaga } from './portal-load-series-data/load-series.saga';
+import { setSelectedSeasonForAppAction, setSelectedSeriesAction, } from '../reducers/app-control-state.reducer';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
@@ -13,28 +8,25 @@ import {
     startEpisodeAction,
     startNextEpisodeAction,
     startPreviousEpisodeAction,
-    userChangedLanguageAction,
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
-import { loadSeasonInformationSaga } from './portal-load-series-data/load-season.saga';
+import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
 import { startNextEpisodeSaga } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
 import { continueAutoplaySaga } from './continue-autoplay.saga';
 import { Logger } from '../../shared/services/logger';
-import { loadSeriesSeasonForLanguageSaga } from './portal-load-series-data/load-series-season-for-language.saga';
 import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
-import { loadDetailedSeriesInformationSaga } from './series-api/load-detailed-series-information.saga';
+import { loadDetailedSeriesInformationFromApiSaga } from './series-api/load-detailed-series-information-from-api.saga';
 import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
 
 export function* watcherSaga() {
     try {
-        yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
         yield takeLatest(appStartedAction.type, loadSeriesGenresSaga);
+        yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
 
-        yield takeLatest(toggleSelectedSeriesForAppAction.type, loadSeriesInformationSaga);
-        yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationSaga);
-        yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationSaga);
+        yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationFromApiSaga);
+        yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationFromPortalSaga);
 
         // episode state controlling
         yield takeLatest(setSeriesEpisodeTimeStampAction.type, episodeTimeUpdateSaga);
@@ -42,7 +34,6 @@ export function* watcherSaga() {
 
         // control actions from app
         yield takeLatest(startEpisodeAction.type, startEpisodeSaga);
-        yield takeLatest(userChangedLanguageAction.type, loadSeriesSeasonForLanguageSaga);
 
         // control actions from video
         yield takeLatest(startNextEpisodeAction.type, startNextEpisodeSaga);

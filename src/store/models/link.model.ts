@@ -12,3 +12,13 @@ export interface LinkModel {
     language: LANGUAGE;
     type: LINK_TYPE;
 }
+
+export function getEmptyLinkModel(): LinkModel {
+    return {
+        key: '',
+        href: '',
+        parentKey: '',
+        language: LANGUAGE.NONE,
+        type: LINK_TYPE.NONE,
+    };
+}

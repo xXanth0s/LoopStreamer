@@ -11,7 +11,7 @@ import { SeriesMetaInfo } from '../models/series-meta-info.model';
 
 const initialState: AppControlStateModel = {
     seriesCollections: {},
-    mutePreviewVideo: false
+    mutePreviewVideo: true
 };
 
 function setActivePortal(state: AppControlStateModel, payload: PORTALS): void {

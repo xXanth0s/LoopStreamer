@@ -11,6 +11,7 @@ import {
     GetDetailedSeriesInformationMessage,
     GetResolvedProvidorLinkForEpisode,
     GetSeasonInfoMessage,
+    GetSeriesLinkForPortal,
 } from '../../browserMessages/messages/portal.messages';
 import { StartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { RecaptchaService } from '../services/recaptcha.service';
@@ -43,6 +44,11 @@ export class RootContentController {
         ipcRenderer.on(MessageType.PORTAL_GET_ALL_SERIES, (event, message: GetAllSeriesFromPortalMessage) => {
             console.log(message);
             this.getAllSeriesFromPortalHandler(event, message);
+        });
+
+        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL, (event, message: GetSeriesLinkForPortal) => {
+            console.log(message);
+            this.getLinkForSeriesFromPortalHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION, (event, message: GetDetailedSeriesInformationMessage) => {
@@ -82,6 +88,12 @@ export class RootContentController {
         const { portal } = message.payload;
         const seriesInfo = await this.portalService.getPortalController(portal)?.getAllSeriesInfo();
         this.messageService.replyToSender(message, event.sender, seriesInfo);
+    }
+
+    private async getLinkForSeriesFromPortalHandler(event: IpcRendererEvent, message: GetSeriesLinkForPortal): Promise<void> {
+        const { portal, seriesKey } = message.payload;
+        const seriesLink = await this.portalService.getPortalController(portal)?.getLinkForSeries(seriesKey);
+        this.messageService.replyToSender(message, event.sender, seriesLink);
     }
 
     private async getDetailedSeriesInformationHandler(event: IpcRendererEvent, message: GetDetailedSeriesInformationMessage): Promise<void> {

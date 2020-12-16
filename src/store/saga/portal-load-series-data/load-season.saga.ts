@@ -1,95 +1,80 @@
-import { call, put, select } from 'redux-saga/effects';
+import { all, call, put, select } from 'redux-saga/effects';
 import { setSelectedSeasonForAppAction } from '../../reducers/app-control-state.reducer';
-import { StateModel } from '../../models/state.model';
 import { getSeriesSeasonByKey } from '../../selectors/series-season.selector';
-import { getSeriesByKey } from '../../selectors/series.selector';
+import { getSeriesForSeason } from '../../selectors/series.selector';
 import { PORTALS } from '../../enums/portals.enum';
 import { getPortalController } from '../../../background/container/container.utils';
 import { SeriesSeason } from '../../models/series-season.model';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { LANGUAGE } from '../../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal } from '../../selectors/línk.selector';
-import { loadSeriesInformationForPortal } from './load-series.saga';
+import { loadSeriesInformationForPortalSaga } from './load-series.saga';
 import { LinkModel } from '../../models/link.model';
 import { addSeriesSeasonSaga } from '../add-data/add-series-season.saga';
-import { setActiveLanguageForSeasonAndPortal } from '../set-active-language.saga';
 import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
+import { getDefaultLanguage } from '../../selectors/options.selector';
 
-export type loadSeasonInformationOptions = {
-    seasonKey: SeriesSeason['key'];
-    portalKey: PORTALS;
-    language?: LANGUAGE;
-    isSeriesUpToDate?: boolean;
-    isSeasonUpToData?: boolean;
-}
-
-export function* loadSeasonInformationSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
+export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
     const seasonKey = action.payload;
-    const state: StateModel = yield select();
-    if (!seasonKey || !state.appControlState.selectedSeason) {
-        return;
-    }
+    const portal = PORTALS.BS;
 
-    yield setActiveLanguageForSeasonAndPortal(seasonKey);
-
-    let portal = state.appControlState.activePortal;
-    const season = getSeriesSeasonByKey(state, seasonKey);
-    const series = getSeriesByKey(state, season.seriesKey);
-    if (!portal) {
-        portal = series.lastUsedPortal;
-    }
-
-    const lastUsedLanguage = series.lastUsedLanguage || LANGUAGE.NONE;
-    const language = state.appControlState.selectedLanguage === LANGUAGE.NONE ? lastUsedLanguage : LANGUAGE.NONE;
-
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SEASON, { season });
+    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SEASON, { seasonKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {
-        yield updateSeriesSeasonForPortal({
-            seasonKey: action.payload,
-            portalKey: portal,
-            language,
+        const defaultLanguage = getDefaultLanguage(yield select());
+        const previousLanguages = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portal).map(link => link.language);
+
+        yield updateSeriesSeasonForPortal(seasonKey, portal, defaultLanguage);
+
+        const newLanguages = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portal).map(link => link.language);
+
+        const languageDifferenece = newLanguages.filter(language => {
+            return !previousLanguages.includes(language) || language !== defaultLanguage;
         });
+
+        yield all(languageDifferenece.map(language => updateSeriesSeasonForPortal(seasonKey, portal, language)));
     } catch (error) {
         Logger.error('[loadSeasonInformationSaga] error occurred', error);
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
-
-    yield setActiveLanguageForSeasonAndPortal(seasonKey);
 }
 
-export function* updateSeriesSeasonForPortal(options: loadSeasonInformationOptions) {
-    const {
-        isSeasonUpToData, isSeriesUpToDate, language, portalKey, seasonKey,
-    } = options;
-    const state: StateModel = yield select();
-    const finalLanguage = language || state.options.defaultLanguage;
-    const season = getSeriesSeasonByKey(state, seasonKey);
-    const links = getLinksForSeriesSeasonAndPortal(state, seasonKey, portalKey);
+/*
+    Loads and stores season information. It also checks, if series is available and updates series, if necessary
+    @return boolean, if update was successfull
+ */
+export function* updateSeriesSeasonForPortal(seasonKey: SeriesSeason['key'], portalKey: PORTALS, language: LANGUAGE) {
+    const series = getSeriesForSeason(yield select(), seasonKey);
+    let links = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portalKey);
     if (links.length === 0) {
-        if (isSeriesUpToDate) {
+
+        yield loadSeriesInformationForPortalSaga(series.key, portalKey);
+
+        links = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portalKey);
+
+        if (links.length === 0) {
             return false;
         }
-        yield loadSeriesInformationForPortal(season.seriesKey, portalKey);
-        return yield updateSeriesSeasonForPortal({ ...options, isSeriesUpToDate: true });
     }
 
-    const linkForLanguage = links.find(link => link.language === finalLanguage);
+    let linkForLanguage = links.find(link => link.language === language);
 
     if (!linkForLanguage || language === LANGUAGE.NONE) {
-        if (isSeasonUpToData) {
+        yield updateSeriesSeasonForLink(seasonKey, links[0]);
+        links = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portalKey);
+        linkForLanguage = links.find(link => link.language === language);
+        if (!linkForLanguage) {
             return false;
         }
-        yield updateSeriesSeasonForLink(seasonKey, links[0]);
-        return yield updateSeriesSeasonForPortal({ ...options, isSeasonUpToData: true });
     }
 
-    return yield updateSeriesSeasonForLink(seasonKey, linkForLanguage);
+    yield updateSeriesSeasonForLink(seasonKey, linkForLanguage);
+    return true;
 }
 
 function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkModel) {

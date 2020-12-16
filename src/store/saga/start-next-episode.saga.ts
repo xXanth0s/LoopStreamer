@@ -1,12 +1,11 @@
 import { put, select } from 'redux-saga/effects';
 import { startNextEpisodeAction } from '../actions/shared.actions';
 import { StateModel } from '../models/state.model';
-import SeriesEpisode from '../models/series-episode.model';
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { isMaximumPlayedEpisodesLimitReached } from '../selectors/control-state.selector';
 import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
-import { getNeighbourEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import { getPortalLinkForNextEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
@@ -16,6 +15,7 @@ import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.redu
 import { Logger } from '../../shared/services/logger';
 import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
+import { LinkModel } from '../models/link.model';
 
 export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisodeAction>) {
     stopPlayer();
@@ -34,16 +34,19 @@ export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisode
 
         const series = getSeriesForEpisode(state, episodeKey);
 
-        const nextEpisode: SeriesEpisode = yield getNeighbourEpisode(episodeKey, series.lastUsedPortal, true);
-        if (!nextEpisode) {
+        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(episodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        if (!nextEpisodeLink) {
             return;
         }
         if (!userAction) {
-            yield put(setSeriesEpisodeTimeStampAction({ seriesEpisodeKey: nextEpisode.key, timestamp: null }));
+            yield put(setSeriesEpisodeTimeStampAction({
+                seriesEpisodeKey: nextEpisodeLink.parentKey,
+                timestamp: null
+            }));
         }
 
         const episodeStartSuccessful: boolean = yield startEpisode({
-            episodeKey: nextEpisode.key,
+            episodeKey: nextEpisodeLink.parentKey,
             language: series.lastUsedLanguage,
         });
 

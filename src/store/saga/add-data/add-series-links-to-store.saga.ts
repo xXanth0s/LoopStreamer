@@ -4,7 +4,7 @@ import { updateOrAddMultipleLinksAction } from '../../reducers/link.reducer';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { Logger } from '../../../shared/services/logger';
 
-export function* addSeriesSaga(seriesInfo: PortalSeriesInfoDto, seriesKey: string) {
+export function* addSeriesLinksToStoreSaga(seriesInfo: PortalSeriesInfoDto, seriesKey: string) {
     if (!seriesInfo) {
         Logger.error('[addSeriesSaga] tried to add empty SeriesInfoDto');
         return;

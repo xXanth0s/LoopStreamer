@@ -119,13 +119,8 @@ function addLinks(state: Record<string, SeriesEpisode>, links: LinkModel[]): Rec
 }
 
 function addLink(state: Record<string, SeriesEpisode>, link: LinkModel): Record<string, SeriesEpisode> {
-    const episode = state[link.parentKey];
-    if (!episode) {
-        console.error(`[SeriesEpisodeReducer->addLink]: no episode found for key: ${link.parentKey}`);
-        return;
-    }
-
     if (link.type === LINK_TYPE.PORTAL_EPISODE_LINK) {
+        const episode = state[link.parentKey];
         return {
             ...state,
             [episode.key]: {
@@ -133,8 +128,8 @@ function addLink(state: Record<string, SeriesEpisode>, link: LinkModel): Record<
                 portalLinks: addToArrayIfNotExists(episode.portalLinks, link.key),
             },
         };
-    }
-    if (link.type === LINK_TYPE.PROVIDER_LINK) {
+    } else if (link.type === LINK_TYPE.PROVIDER_LINK) {
+        const episode = state[link.parentKey];
         return {
             ...state,
             [episode.key]: {

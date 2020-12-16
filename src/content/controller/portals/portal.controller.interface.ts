@@ -6,6 +6,7 @@ import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
+import Series from '../../../store/models/series.model';
 
 export interface IPortalController {
 
@@ -16,6 +17,8 @@ export interface IPortalController {
     isVideoOpenWithProvidor(): Providor | null;
 
     getAllSeriesInfo(): PortalSeriesInfoDto[];
+
+    getLinkForSeries(seriesKey: Series['key']): string;
 
     getSeasonInfo(seasonNumber: string): PortalSeriesSeasonDto;
 

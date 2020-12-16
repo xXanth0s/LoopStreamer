@@ -1,5 +1,5 @@
 import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
-import { LinkModel } from '../models/link.model';
+import { getEmptyLinkModel, LinkModel } from '../models/link.model';
 import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle, } from './key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { LINK_TYPE } from '../enums/link-type.enum';
@@ -10,17 +10,15 @@ import { ProvidorLink } from '../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { Logger } from '../../shared/services/logger';
 
-export function generateLinkForSeries(seriesInfo: PortalSeriesInfoDto): LinkModel {
-    const { title, link, portal } = seriesInfo;
-    const parentKey = getKeyForSeriesTitle(title);
-    const key = getKeyForLink({ parentKey, portal, language: LANGUAGE.NONE });
+export function generateLinkForSeries(seriesKey: string, portal: PORTALS, href: string): LinkModel {
+    const key = getKeyForLink({ parentKey: seriesKey, portal, language: LANGUAGE.NONE });
 
     return {
+        ...getEmptyLinkModel(),
         key,
-        parentKey,
+        href,
         portal,
-        language: LANGUAGE.NONE,
-        href: link,
+        parentKey: seriesKey,
         type: LINK_TYPE.PORTAL_SERIES_LINK,
     };
 }
@@ -111,6 +109,7 @@ export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key
     const key = getKeyForLink({
         parentKey: seriesEpisodeKey, portal, providor, language,
     });
+
     return {
         providor,
         portal,

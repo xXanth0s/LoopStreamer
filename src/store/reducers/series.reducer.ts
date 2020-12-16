@@ -6,7 +6,7 @@ import { PORTALS } from '../enums/portals.enum';
 import { Logger } from '../../shared/services/logger';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { filterObject } from '../utils/selector.utils';
-import { updateOrAddMultipleLinksAction } from './link.reducer';
+import { updateOrAddLinkAction, updateOrAddMultipleLinksAction } from './link.reducer';
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
@@ -183,6 +183,7 @@ const seriesSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['series'], action: PayloadAction<Series['key']>) => deleteSeries(state, action.payload));
         builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['series'], action: PayloadAction<LinkModel[]>) => addMultipleLinks(state, action.payload));
+        builder.addCase(updateOrAddLinkAction, (state: StateModel['series'], action: PayloadAction<LinkModel>) => addLink(state, action.payload));
         builder.addCase(updateOrAddMutlipleSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason[]>) => addMultipleSeasons(state, action.payload));
         builder.addCase(updateOrAddSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason>) => addSeasons(state, action.payload));
     },
