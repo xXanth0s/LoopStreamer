@@ -96,7 +96,8 @@ export class MovieDBService {
         const mappedSeries = mapSeriesFromMovieDB(series, language, videoUrl);
 
         const seasonData = await Promise.all(
-            series.seasons.map(season => MovieDBService.getSeasonInfo(mappedSeries, `${season.season_number}`, language)),
+            series.seasons.filter(season => season.season_number !== 0)
+                .map(season => MovieDBService.getSeasonInfo(mappedSeries, `${season.season_number}`, language)),
         );
 
         const mappedSeasons = seasonData.map(([ season, episodes ]) => season);

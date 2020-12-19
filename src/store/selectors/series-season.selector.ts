@@ -7,6 +7,7 @@ import { LANGUAGE } from '../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal } from './línk.selector';
 import { getSeriesByKey, getSeriesForSeason } from './series.selector';
 import { Logger } from '../../shared/services/logger';
+import Series from '../models/series.model';
 
 export const getMultipleSeriesSeasonByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => keys.map(key => getSeriesSeasonByKey(state, key));
 
@@ -60,4 +61,8 @@ export function getAvailableLanguagesForSeasonAndActivePortal(state: StateModel,
         .filter(language => language !== LANGUAGE.NONE);
 
     return [ ...new Set(languages) ];
+}
+
+export function getFirstSeasonForSeries(state: StateModel, seriesKey: Series['key']): SeriesSeason {
+    return getSeasonsForSeries(state, seriesKey)[0];
 }

@@ -7,14 +7,14 @@
                   :disabled="!hasValidLinks" :title="title">
             <span v-if="isLoading">
                 <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;">
-                    <span class="sr-only"></span>
+                    <span classeries-modal-descriptions="sr-only"></span>
                 </div>
             </span>
             <span v-else>
                 {{buttonText}}
             </span>
         </b-button>
-        <div>
+        <div v-if="hasValidLinks">
             <b-progress :max="100" :value="progress" class="w-full h-1" variant="info">
             </b-progress>
         </div>
@@ -24,8 +24,8 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Prop, Watch } from 'vue-property-decorator';
-    import { merge, Subject } from 'rxjs';
+    import { Prop } from 'vue-property-decorator';
+    import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import { MessageService } from '../../../../shared/services/message.service';
@@ -33,19 +33,17 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../store/utils/series.utils';
     import { StoreService } from '../../../../shared/services/store.service';
-    import { isPreparingVideo } from '../../../../store/selectors/control-state.selector';
-    import {
-        getSeriesEpisodeByKey,
-        hasEpisodeLinksForSelectedLanguageAndPortal,
-    } from '../../../../store/selectors/series-episode.selector';
+    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
     import { startEpisodeAction } from '../../../../store/actions/shared.actions';
+    import Series from '../../../../store/models/series.model';
+    import { getLastWatchedOrFirstEpisodeForSeries } from '../../../../store/selectors/series.selector';
 
     @Component({
         name: 'continue-series-button',
     })
     export default class ContinueSeriesButton extends Vue {
         @Prop(String)
-        public seriesEpisodeKey: SeriesEpisode['key'];
+        public seriesKey: Series['key'];
 
         private readonly takeUntil$ = new Subject();
         private readonly episodeChanged$ = new Subject();
@@ -54,11 +52,28 @@
         private store: StoreService;
 
         private seriesEpisode: SeriesEpisode = null;
-        private isLoading = false;
-        private hasValidLinks = false;
+        private isVideoLoading = false;
+        private isSeasonLoading = false;
+
+        public get hasValidLinks(): boolean {
+            return Boolean(this.seriesEpisode?.providorLinks.length);
+        }
 
         public get buttonText(): string {
+            const { season, episodeNumber, timestamp } = this.seriesEpisode;
+            if (!this.hasValidLinks) {
+                return 'Keine Streams gefunden';
+            }
+
+            if (+season === 1 && episodeNumber === 1 && !timestamp) {
+                return 'Starten';
+            }
+
             return `${getSeriesEpisodeTitle(this.seriesEpisode)} Fortsetzen`;
+        }
+
+        public get isLoading(): boolean {
+            return this.isVideoLoading || (this.isSeasonLoading && !this.hasValidLinks);
         }
 
         public get progress(): number {
@@ -67,7 +82,7 @@
 
         public get title(): string {
             if (!this.hasValidLinks) {
-                return 'Für die ausgwählte Sprache wurde kein verfügbarer Stream gefunden.';
+                return 'Es wurden keine validen Links gefunden';
             }
 
             return '';
@@ -79,7 +94,9 @@
         }
 
         public mounted(): void {
-            this.fetchLoadingStateFromStore();
+            this.fetchLastWatchedOrFirstEpisode();
+            this.fetchSeasonLoadingStateFromStore();
+            this.fetchVideoLoadingStateFromStore();
         }
 
         public destroyed(): void {
@@ -90,32 +107,22 @@
             this.store.dispatch(startEpisodeAction(this.seriesEpisode.key));
         }
 
-        @Watch('seriesEpisodeKey', { immediate: true })
-        private episodeChanged(): void {
-            this.episodeChanged$.next();
-            this.fetchSeriesEpisodeFromStore();
-            this.fetchEpisoeLinkStatusFromStore();
+        private fetchSeasonLoadingStateFromStore(): void {
+            this.store.selectBehaviour(isLoadingSeason).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(isLoading => this.isSeasonLoading = isLoading);
         }
 
-        private fetchLoadingStateFromStore(): void {
+        private fetchVideoLoadingStateFromStore(): void {
             this.store.selectBehaviour(isPreparingVideo).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(isLoading => this.isLoading = isLoading);
+            ).subscribe(isLoading => this.isVideoLoading = isLoading);
         }
 
-        private fetchSeriesEpisodeFromStore(): void {
-            this.store.selectBehaviour(getSeriesEpisodeByKey, this.seriesEpisodeKey).pipe(
-                takeUntil(merge(this.takeUntil$, this.episodeChanged$)),
-            ).subscribe(seriesEpisode => {
-                this.seriesEpisode = seriesEpisode;
-                this.$forceUpdate();
-            });
-        }
-
-        private fetchEpisoeLinkStatusFromStore(): void {
-            this.store.selectBehaviour(hasEpisodeLinksForSelectedLanguageAndPortal, this.seriesEpisodeKey).pipe(
-                takeUntil(merge(this.takeUntil$, this.episodeChanged$)),
-            ).subscribe(hasEpisodeLinks => this.hasValidLinks = hasEpisodeLinks);
+        private fetchLastWatchedOrFirstEpisode(): void {
+            this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForSeries, this.seriesKey).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(episode => this.seriesEpisode = episode);
         }
     }
 </script>

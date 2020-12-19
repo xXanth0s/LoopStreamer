@@ -50,6 +50,7 @@
     import { StoreService } from '../../../../../shared/services/store.service';
     import { getMutePreviewVideoState } from '../../../../../store/selectors/app-control-state.selector';
     import { toggleMutePreviewVideoStateAction } from '../../../../../store/reducers/app-control-state.reducer';
+    import { environment } from '../../../../../environments/environment';
 
     @Component({
         name: 'series-modal-header',
@@ -71,10 +72,11 @@
 
         private get youtubeUrl(): string {
             const id = this.series?.previewVideos[Hoster.YOUTUBE];
-            if (id) {
-                return `${id}?autoplay=1&controls=1&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&showinfo=0`;
+            if (!id) {
+                return '';
             }
-            return '';
+            const autoplay = +environment.autoPlayPreviewVideos;
+            return `${id}?autoplay=${autoplay}&controls=1&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0`;
         }
 
         private get showVideo(): boolean {

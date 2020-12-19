@@ -22,9 +22,10 @@ export const getSeriesEpisodesForSeason = (state: StateModel, seasonKey: SeriesE
     return getMultipleSeriesEpisodeByKeys(state, season.episodes);
 };
 
-export const getFirstEpisodeForSeason = (state: StateModel, key: SeriesSeason['key']): SeriesEpisode => {
-    const seasonEpisodes = getSeriesEpisodesForSeason(state, key);
+export const getFirstEpisodeForSeason = (state: StateModel, seasonKey: SeriesSeason['key']): SeriesEpisode => {
+    const seasonEpisodes = getSeriesEpisodesForSeason(state, seasonKey);
     if (!seasonEpisodes.length) {
+        Logger.error(`[getFirstEpisodeForSeason] no episode found for season key ${seasonKey}`);
         return null;
     }
 

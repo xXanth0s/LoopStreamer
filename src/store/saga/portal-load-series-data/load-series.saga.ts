@@ -8,7 +8,7 @@ import { generateAsyncInteraction } from '../../utils/async-interaction.util';
 import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
-import { getLinkForSeriesAndPortal } from '../../selectors/línk.selector';
+import { getLinkForSeriesAndPortal, isSeriesUpToDate } from '../../selectors/línk.selector';
 import { LinkModel } from '../../models/link.model';
 import { generateLinkForSeries } from '../../utils/link.utils';
 import { updateOrAddLinkAction } from '../../reducers/link.reducer';
@@ -19,8 +19,11 @@ import { updateOrAddLinkAction } from '../../reducers/link.reducer';
     @return: Boolean, if series could be loaded successfully
  */
 export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey: PORTALS) {
-    const link: LinkModel = yield getSeriesLinkForPortal(seriesKey, portalKey);
+    if (isSeriesUpToDate(yield select(), seriesKey, portalKey)) {
+        return true;
+    }
 
+    const link: LinkModel = yield getSeriesLinkForPortalSaga(seriesKey, portalKey);
     if (!link) {
         return false;
     }
@@ -32,7 +35,7 @@ export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {
-        return yield loadFullSeriesInformationForPortal(seriesKey, portalKey);
+        return yield loadCompleteSeriesInformationForPortal(seriesKey, portalKey);
     } catch (error) {
         Logger.error('[loadSeriesInformationForPortalSaga] error occurred', error);
     } finally {
@@ -42,7 +45,7 @@ export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey
     return false;
 }
 
-export function* loadFullSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
+export function* loadCompleteSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
     const portalController = getPortalController();
     const seriesInfo: PortalSeriesInfoDto = yield call([ portalController, portalController.getDetailedSeriesInformation ], seriesKey, portalKey);
     if (!seriesInfo) {
@@ -58,7 +61,7 @@ export function* loadFullSeriesInformationForPortal(seriesKey: Series['key'], po
     Loads and stores main link for Series
     @return: LinkModel | null
  */
-function* getSeriesLinkForPortal(seriesKey: string, portalKey: PORTALS) {
+function* getSeriesLinkForPortalSaga(seriesKey: string, portalKey: PORTALS) {
     const state = yield select();
     const link = getLinkForSeriesAndPortal(state, seriesKey, portalKey);
     if (link) {

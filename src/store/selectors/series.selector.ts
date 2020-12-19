@@ -1,9 +1,9 @@
 import { StateModel } from '../models/state.model';
 import Series from '../models/series.model';
 import { PORTALS } from '../enums/portals.enum';
-import { getNextEpisode, getSeriesEpisodeByKey } from './series-episode.selector';
+import { getFirstEpisodeForSeason, getNextEpisode, getSeriesEpisodeByKey } from './series-episode.selector';
 import SeriesEpisode from '../models/series-episode.model';
-import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
+import { getFirstSeasonForSeries, getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
 import { SeriesSeason } from '../models/series-season.model';
 import { Logger } from '../../shared/services/logger';
 
@@ -25,17 +25,20 @@ export const getSeriesForPortal = (state: StateModel, portalKey: PORTALS): Serie
     return getMultipleSeriesByKey(state, portal.series);
 };
 
-export const getLastWatchedEpisode = (state: StateModel, seriesKey: Series['key']): SeriesEpisode => {
+export const getLastWatchedOrFirstEpisodeForSeries = (state: StateModel, seriesKey: Series['key']): SeriesEpisode => {
     const lastWatchedEpisodeKey = state.series[seriesKey]?.lastEpisodeWatched;
-    if (!lastWatchedEpisodeKey) {
-        return null;
+    if (lastWatchedEpisodeKey) {
+        return getSeriesEpisodeByKey(state, lastWatchedEpisodeKey);
     }
 
-    return getSeriesEpisodeByKey(state, lastWatchedEpisodeKey);
+    const firstSeason = getFirstSeasonForSeries(state, seriesKey);
+
+    return getFirstEpisodeForSeason(state, firstSeason?.key);
+
 };
 
 export const isSeriesContinuable = (state: StateModel, seriesKey: Series['key']): boolean => {
-    const lastWatchedEpisode = getLastWatchedEpisode(state, seriesKey);
+    const lastWatchedEpisode = getLastWatchedOrFirstEpisodeForSeries(state, seriesKey);
 
     if (!lastWatchedEpisode) {
         return false;

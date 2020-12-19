@@ -9,6 +9,9 @@ import { PORTALS } from '../enums/portals.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { Logger } from '../../shared/services/logger';
+import { environment } from '../../environments/environment';
+import differenceInMinutes from 'date-fns/differenceInMinutes';
+
 
 export function generateLinkForSeries(seriesKey: string, portal: PORTALS, href: string): LinkModel {
     const key = getKeyForLink({ parentKey: seriesKey, portal, language: LANGUAGE.NONE });
@@ -37,6 +40,7 @@ export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeri
             return [
                 ...accumulator,
                 {
+                    ...getEmptyLinkModel(),
                     key,
                     parentKey,
                     language,
@@ -64,6 +68,7 @@ export function generateLinksForSeriesSeasonDto(seriesSeasonDto: PortalSeriesSea
         const key = getKeyForLink({ parentKey, portal, language });
 
         return {
+            ...getEmptyLinkModel(),
             language,
             portal,
             href: seasonLinks[language],
@@ -89,6 +94,7 @@ export function generateLinkForSeriesEpisodeDto(seriesEpisode: PortalSeriesEpiso
             parentKey, portal, providor, language,
         });
         return {
+            ...getEmptyLinkModel(),
             key,
             parentKey,
             language,
@@ -111,6 +117,7 @@ export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key
     });
 
     return {
+        ...getEmptyLinkModel(),
         providor,
         portal,
         key,
@@ -119,4 +126,10 @@ export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key
         parentKey: seriesEpisodeKey,
         href: link,
     };
+}
+
+export function isLinkOutdated(link: LinkModel): boolean {
+    const { dateUpdated } = link;
+
+    return differenceInMinutes(dateUpdated, Date.now()) > environment.linkCacheTimeInMinutes;
 }

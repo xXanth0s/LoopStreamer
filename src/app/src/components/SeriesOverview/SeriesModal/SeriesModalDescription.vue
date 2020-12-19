@@ -3,9 +3,13 @@
         <div v-if="description" class="w-3/5">
             {{description}}
         </div>
-        <div :class="{'w-2/5': Boolean(description), 'pl-3': Boolean(description)}">
-            <div v-if="genres.length">
-                Genres: <span v-for="genre in genres" :key="genre.key">{{genre.translations[language]}}</span>
+        <div :class="{'w-2/5': Boolean(description), 'pl-3': Boolean(description)}" class="flex flex-column">
+            <div>
+                <continue-series-button :series-key="series.key"></continue-series-button>
+            </div>
+            <div v-if="genres.length" class="mt-2">
+                Genres: <span v-for="genre in genres" :key="genre.key"
+                              class="mr-2">{{genre.translations[language]}}</span>
             </div>
         </div>
     </div>
@@ -21,12 +25,13 @@
     import { StoreService } from '../../../../../shared/services/store.service';
     import { Genre } from '../../../../../store/models/genre.model';
     import { getMultipleGenres } from '../../../../../store/selectors/genre.selector';
+    import ContinueSeriesButton from '../../SeriesSearchList/ContinueSeriesButton.vue';
 
     @Component({
         name: 'series-modal-description',
+        components: { ContinueSeriesButton },
     })
     export default class SeriesModalDescription extends Vue {
-
         @Prop({
             required: true,
             type: Object,
@@ -40,7 +45,6 @@
 
         private language: LANGUAGE;
         private genres: Genre[] = [];
-
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;

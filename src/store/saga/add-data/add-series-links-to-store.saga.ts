@@ -9,7 +9,6 @@ export function* addSeriesLinksToStoreSaga(seriesInfo: PortalSeriesInfoDto, seri
         Logger.error('[addSeriesSaga] tried to add empty SeriesInfoDto');
         return;
     }
-
     const links = generateLinksForSeriesSeasonFromSeriesDto(seriesInfo, seriesKey);
     yield put(updateOrAddMultipleLinksAction(links));
 }
