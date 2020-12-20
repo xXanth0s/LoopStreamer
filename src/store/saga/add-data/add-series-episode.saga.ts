@@ -8,14 +8,15 @@ import SeriesEpisode from '../../models/series-episode.model';
 import { PORTALS } from '../../enums/portals.enum';
 import { LANGUAGE } from '../../enums/language.enum';
 import { Logger } from '../../../shared/services/logger';
+import Series from '../../models/series.model';
 
-export function* addMultipleEpisodesSaga(episodes: PortalSeriesEpisodeDto[]) {
+export function* addMultipleEpisodesSaga(seriesKey: Series['key'], episodes: PortalSeriesEpisodeDto[]) {
     if (!episodes || episodes.length === 0) {
         Logger.error('[addMultipleEpisodesSaga] tried to add empty SeriesEpisodeDto array');
         return;
     }
 
-    const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
+    const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(seriesKey, episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
     yield put(updateOrAddMultipleLinksAction(episodeLinks));
 }
 

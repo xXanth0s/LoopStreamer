@@ -7,6 +7,7 @@ import { getStorageData, StorageMiddlerware } from '../middleware/storage.middle
 import { sagaErrorHandler, watcherSaga } from '../saga/watcher.saga';
 import { storeReducers } from '../reducers/reducer.collection';
 import { composeWithDevTools } from 'remote-redux-devtools';
+import { environment } from '../../environments/environment';
 
 const preloadedState = getStorageData();
 const sagaMiddleware = createSagaMiddleware({ onError: sagaErrorHandler });
@@ -20,8 +21,8 @@ const composeEnhancer = composeWithDevTools({ hostname: 'localhost', port: 8800 
 
 const backgroundStore = configureStore<StateModel>({
     reducer: storeReducers,
-    // @ts-ignore
     preloadedState,
+    devTools: environment.isDev,
     enhancers: [ composeEnhancer ]
 });
 

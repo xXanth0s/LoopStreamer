@@ -52,6 +52,7 @@
         private readonly swiperOption: SwiperOptions = {
             slidesPerView: 7,
             spaceBetween: 8,
+            allowTouchMove: false,
             breakpoints: {
                 320: {
                     slidesPerView: 2,

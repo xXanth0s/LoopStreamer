@@ -72,7 +72,7 @@ function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkMo
 
     const season = getSeriesSeasonByKey(state, seasonKey);
     const portalController = getPortalController();
-    const seasonData: PortalSeriesSeasonDto = yield call([ portalController, portalController.getSeasonInfoForLink ], link, season.seasonNumber);
+    const portalDataData: PortalSeriesSeasonDto = yield call([ portalController, portalController.getSeasonInfoForLink ], link, season.seasonNumber);
 
-    yield addSeriesSeasonSaga(seasonData);
+    yield addSeriesSeasonSaga(season, portalDataData);
 }

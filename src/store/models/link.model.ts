@@ -11,7 +11,7 @@ export interface LinkModel {
     providor?: PROVIDORS;
     language: LANGUAGE;
     type: LINK_TYPE;
-    dateUpdated: Date;
+    dateTimestamp: number;
 }
 
 export function getEmptyLinkModel(): LinkModel {
@@ -21,6 +21,6 @@ export function getEmptyLinkModel(): LinkModel {
         parentKey: '',
         language: LANGUAGE.NONE,
         type: LINK_TYPE.NONE,
-        dateUpdated: new Date(),
+        dateTimestamp: Date.now(),
     };
 }

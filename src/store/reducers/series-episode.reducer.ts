@@ -8,6 +8,7 @@ import { updateOrAddLinkAction, updateOrAddMultipleLinksAction } from './link.re
 import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
+import { Logger } from '../../shared/services/logger';
 
 const initialState: StateModel['seriesEpisodes'] = {};
 
@@ -121,6 +122,11 @@ function addLinks(state: Record<string, SeriesEpisode>, links: LinkModel[]): Rec
 function addLink(state: Record<string, SeriesEpisode>, link: LinkModel): Record<string, SeriesEpisode> {
     if (link.type === LINK_TYPE.PORTAL_EPISODE_LINK) {
         const episode = state[link.parentKey];
+        if (!episode) {
+            Logger.error('[SeriesEpisodeReducer->addLink] tried to add link, but no episode found, link:', link);
+            return state;
+        }
+
         return {
             ...state,
             [episode.key]: {

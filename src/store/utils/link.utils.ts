@@ -1,6 +1,6 @@
 import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import { getEmptyLinkModel, LinkModel } from '../models/link.model';
-import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle, } from './key.utils';
+import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason, } from './key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
@@ -11,6 +11,8 @@ import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
+import { SeriesSeason } from '../models/series-season.model';
+import Series from '../models/series.model';
 
 
 export function generateLinkForSeries(seriesKey: string, portal: PORTALS, href: string): LinkModel {
@@ -53,15 +55,20 @@ export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeri
     }, []);
 }
 
-export function generateLinksForSeriesSeasonDto(seriesSeasonDto: PortalSeriesSeasonDto): LinkModel[] {
+export function generateLinksForSeriesSeasonDto(season: SeriesSeason, seriesSeasonDto: PortalSeriesSeasonDto): LinkModel[] {
     const {
-        seriesTitle, seasonNumber, seasonLinks, portal,
+        seasonLinks, portal,
     } = seriesSeasonDto;
+
+    const {
+        seriesKey, seasonNumber
+    } = season;
+
     if (!seasonLinks) {
         Logger.error('[generateLinksForSeriesSeasonDto] no season links found in seriesSeasonDto', seasonLinks);
         return [];
     }
-    const seriesKey = getKeyForSeriesTitle(seriesTitle);
+
     const parentKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
 
     return Object.keys(seasonLinks).map((language: LANGUAGE) => {
@@ -79,11 +86,10 @@ export function generateLinksForSeriesSeasonDto(seriesSeasonDto: PortalSeriesSea
     });
 }
 
-export function generateLinkForSeriesEpisodeDto(seriesEpisode: PortalSeriesEpisodeDto, type: LINK_TYPE): LinkModel[] {
+export function generateLinkForSeriesEpisodeDto(seriesKey: Series['key'], seriesEpisode: PortalSeriesEpisodeDto, type: LINK_TYPE): LinkModel[] {
     const {
-        seriesTitle, episodeNumber, seasonNumber, portalLinks, portal,
+        episodeNumber, seasonNumber, portalLinks, portal,
     } = seriesEpisode;
-    const seriesKey = getKeyForSeriesTitle(seriesTitle);
     const parentKey = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);
 
     return Object.keys(portalLinks).map((language: LANGUAGE) => portalLinks[language].map(({ link, providor }: ProvidorLink) => {
@@ -129,7 +135,7 @@ export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key
 }
 
 export function isLinkOutdated(link: LinkModel): boolean {
-    const { dateUpdated } = link;
+    const { dateTimestamp } = link;
 
-    return differenceInMinutes(dateUpdated, Date.now()) > environment.linkCacheTimeInMinutes;
+    return differenceInMinutes(dateTimestamp, Date.now()) > environment.linkCacheTimeInMinutes;
 }
