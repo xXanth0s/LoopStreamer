@@ -6,17 +6,23 @@
              hide-footer
              hide-header
              title="Using Component Methods">
-        <div class="modal-container bg-gray-900 text-white pb-5 font-mono relative">
+        <div class="modal-container bg-gray-900 text-white pb-5 relative">
             <div v-if="series">
                 <series-modal-header
+                        class="font-mono"
                         :series="series"
                         :language="activeLanguage"
                         @close-modal="closeModal"/>
 
-                <series-modal-description
-                        class="mt-3"
-                        :series="series"
-                        :language="activeLanguage"/>
+                <div class="px-4 mt-4">
+                    <series-modal-description
+                            :series="series"
+                            :language="activeLanguage"/>
+
+                    <seasons-list class="mt-4" :seasons="seasons"/>
+                    <hr>
+                    <series-episode-list :episodes="episodes" :language="activeLanguage"/>
+                </div>
             </div>
             <div v-else class="absolute flex flex-column items-center justify-content-center w-100 h-100">
                 <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
@@ -49,10 +55,18 @@
     import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
     import SeriesModalHeader from './SeriesModalHeader.vue';
     import SeriesModalDescription from './SeriesModalDescription.vue';
+    import SeriesListRow from '../../SeriesSearchList/SeriesListRow.vue';
+    import SeasonsList from './SeasonsList.vue';
+    import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
+    import SeriesEpisodeList from './SeriesEpisodeList.vue';
 
     @Component({
         name: 'series-modal',
         components: {
+            SeriesEpisodeList,
+            SeriesEpisodeTile,
+            SeasonsList,
+            SeriesListRow,
             SeriesModalDescription,
             SeriesModalHeader,
         },

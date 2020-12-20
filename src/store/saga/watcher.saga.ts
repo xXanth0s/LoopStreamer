@@ -1,5 +1,5 @@
 import { takeLatest } from 'redux-saga/effects';
-import { setSelectedSeasonForAppAction, setSelectedSeriesAction, } from '../reducers/app-control-state.reducer';
+import { setSelectedSeasonForAppAction, setSelectedSeriesAction } from '../reducers/app-control-state.reducer';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
@@ -10,7 +10,6 @@ import {
     startPreviousEpisodeAction,
 } from '../actions/shared.actions';
 import { startEpisodeSaga } from './start-episode.saga';
-import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
 import { startNextEpisodeSaga } from './start-next-episode.saga';
 import { startPreviousEpisodeSaga } from './start-previous-episode.saga';
 import { episodeStartedSaga } from './episode-started.saga';
@@ -19,6 +18,7 @@ import { Logger } from '../../shared/services/logger';
 import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
 import { loadDetailedSeriesInformationFromApiSaga } from './series-api/load-detailed-series-information-from-api.saga';
 import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
+import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
 
 export function* watcherSaga() {
     try {

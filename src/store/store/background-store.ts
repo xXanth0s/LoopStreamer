@@ -20,6 +20,7 @@ const backgroundStore = configureStore<StateModel>({
     reducer: storeReducers,
     // @ts-ignore
     middleware,
+    devTools: true,
     preloadedState,
 });
 

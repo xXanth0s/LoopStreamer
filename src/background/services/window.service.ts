@@ -34,9 +34,9 @@ export class WindowService {
     }
 
     public addReduxDevTools(): void {
-        BrowserWindow.addDevToolsExtension(
-            path.join(__dirname, 'extensions', 'redux-dev-tools', environment.reduxDevToolsVersion),
-        );
+        // BrowserWindow.addDevToolsExtension(
+        //     path.join(__dirname, 'extensions', 'redux-dev-tools', environment.reduxDevToolsVersion),
+        // );
     }
 
     public openWindow(href: string, config?: OpenWindowConfig): BrowserWindow {

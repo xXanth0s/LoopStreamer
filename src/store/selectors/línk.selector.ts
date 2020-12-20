@@ -10,6 +10,11 @@ import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-epis
 import SeriesEpisode from '../models/series-episode.model';
 import { isLinkOutdated } from '../utils/link.utils';
 
+export function getLinksForEpisode(state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): LinkModel[] {
+    const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
+    return getLinksByKeys(state, episode.portalLinks);
+}
+
 export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['key'], portal: PORTALS): LinkModel {
     const series = getSeriesByKey(state, seriesKey);
     return getLinksByKeys(state, series.portalLinks).find(link => link.portal === portal);

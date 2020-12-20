@@ -1,7 +1,5 @@
 import { put } from 'redux-saga/effects';
 import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
-import { mapSeriesEpisodeDtoToSeriesEpisode } from '../../utils/series.utils';
-import { updateOrAddMultipleSeriesEpisodeAction } from '../../reducers/series-episode.reducer';
 import { generateLinkForProvidorLink, generateLinkForSeriesEpisodeDto } from '../../utils/link.utils';
 import { LINK_TYPE } from '../../enums/link-type.enum';
 import { updateOrAddMultipleLinksAction } from '../../reducers/link.reducer';
@@ -16,9 +14,6 @@ export function* addMultipleEpisodesSaga(episodes: PortalSeriesEpisodeDto[]) {
         Logger.error('[addMultipleEpisodesSaga] tried to add empty SeriesEpisodeDto array');
         return;
     }
-
-    const convertedEpisodes = episodes.map(mapSeriesEpisodeDtoToSeriesEpisode);
-    yield put(updateOrAddMultipleSeriesEpisodeAction(convertedEpisodes));
 
     const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
     yield put(updateOrAddMultipleLinksAction(episodeLinks));

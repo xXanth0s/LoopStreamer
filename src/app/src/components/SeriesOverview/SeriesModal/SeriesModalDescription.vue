@@ -1,5 +1,5 @@
 <template>
-    <div class="px-4 text-left flex">
+    <div class="text-left flex">
         <div v-if="description" class="w-3/5">
             {{description}}
         </div>

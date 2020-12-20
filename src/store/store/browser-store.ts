@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { forwardToMainWithParams, getInitialStateRenderer, replayActionRenderer } from 'electron-redux';
-import { environment } from '../../environments/environment';
 import { StateModel } from '../models/state.model';
 import { storeReducers } from '../reducers/reducer.collection';
 
@@ -13,7 +12,7 @@ const browserStore = configureStore<StateModel>({
     middleware: [
         forwardToMainWithParams(),
     ],
-    devTools: environment.isDev,
+    devTools: true,
 });
 
 replayActionRenderer(browserStore);
