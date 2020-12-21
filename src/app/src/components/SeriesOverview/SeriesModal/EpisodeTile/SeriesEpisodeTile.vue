@@ -1,7 +1,7 @@
 <template>
     <div class="flex" v-if="episode">
-        <div class="h-20">
-            <img class="h-full" :src="episode.posterHref">
+        <div class="relative preview-image rounded-sm overflow-hidden">
+            <img class="top-0 h-full absolute" :src="episode.posterHref">
         </div>
         <div class="flex-grow-1 flex flex-column justify-center">
             <div class="pl-3 items-start flex">
@@ -43,6 +43,9 @@
     }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+    .preview-image {
+        flex: 0 0 17%;
+        padding: 5% 0;
+    }
 </style>

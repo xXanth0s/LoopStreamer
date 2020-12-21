@@ -36,8 +36,8 @@
     @import "src/styles/variables";
 
     .episode-tile {
-        padding-bottom: 4px;
-        padding-top: 4px;
+        padding-bottom: 8px;
+        padding-top: 8px;
 
         &:not(:last-child) {
             border-bottom-color: lighten($gray, 10%) !important;

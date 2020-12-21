@@ -19,7 +19,7 @@
                             :series="series"
                             :language="activeLanguage"/>
 
-                    <seasons-list class="mt-4" :seasons="seasons"/>
+                    <seasons-list class="mt-4" :seasons="seasons" @seasonClicked="seasonSelected"/>
                     <hr>
                     <series-episode-list :episodes="episodes" :language="activeLanguage"/>
                 </div>
@@ -59,6 +59,7 @@
     import SeasonsList from './SeasonsList.vue';
     import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
     import SeriesEpisodeList from './SeriesEpisodeList.vue';
+    import { setSelectedSeasonForAppAction } from '../../../../../store/reducers/app-control-state.reducer';
 
     @Component({
         name: 'series-modal',
@@ -130,6 +131,10 @@
                 filter<SeriesSeason['key']>(Boolean),
                 switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason)),
             ).subscribe(episodes => this.episodes = episodes);
+        }
+
+        public seasonSelected(seasonKey: SeriesSeason['key']): void {
+            this.store.dispatch(setSelectedSeasonForAppAction(seasonKey));
         }
 
         private reset(): void {
