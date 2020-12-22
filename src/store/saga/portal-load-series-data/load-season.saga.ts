@@ -9,17 +9,16 @@ import { LANGUAGE } from '../../enums/language.enum';
 import { getLinksForSeriesSeasonAndPortal, isSeasonUpToDate } from '../../selectors/línk.selector';
 import { LinkModel } from '../../models/link.model';
 import { addSeriesSeasonSaga } from '../add-data/add-series-season.saga';
-import { generateAsyncInteraction } from '../../utils/async-interaction.util';
-import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
 import { loadSeriesInformationForPortalSaga } from './load-series.saga';
 import { getSeriesForSeason } from '../../selectors/series.selector';
+import { loadingSeasonAsyncInteraction } from '../../actions/async-interactions';
 
 export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
     const seasonKey = action.payload;
     const portal = PORTALS.BS;
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SEASON, { seasonKey });
+    const asyncInteraction = loadingSeasonAsyncInteraction({ seasonKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {

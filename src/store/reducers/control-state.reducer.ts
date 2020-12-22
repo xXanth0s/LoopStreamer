@@ -58,7 +58,7 @@ function setActiveEpisode(state: ControlState, activeEpsidoeKey: string): void {
     state.activeEpisode = activeEpsidoeKey;
 }
 
-function addAsyncInteraction(state: ControlState, asyncInteraction: AsyncInteraction): void {
+function addAsyncInteraction(state: ControlState, asyncInteraction: AsyncInteraction<any>): void {
     state.asyncInteractions[asyncInteraction.key] = asyncInteraction;
 }
 
@@ -105,8 +105,8 @@ export const controlStateSlice = createSlice({
         resetPlayedEpisodesAction: (state: ControlState) => resetPlayedEpisodes(state),
         setWindowIdForWindowTypeAction: (state: ControlState, action: PayloadAction<{ windowType: WindowType; windowId: number }>) => setWindowIdForWindowType(state, action.payload),
         setActiveEpisodeAction: (state: ControlState, action: PayloadAction<ControlState['activeEpisode']>) => setActiveEpisode(state, action.payload),
-        addAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction>) => addAsyncInteraction(state, action.payload),
-        removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction['key']>) => removeAsyncInteraction(state, action.payload),
+        addAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction<any>>) => addAsyncInteraction(state, action.payload),
+        removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction<any>['key']>) => removeAsyncInteraction(state, action.payload),
         setWindowStateAction: (state: ControlState, action: PayloadAction<{ windowId: number; windowState: WindowState }>) => setWindowState(state, action.payload),
         setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number; height: number; width: number }>) => setWindowSize(state, action.payload),
         setPictureInPictureAction: (state: ControlState, action: PayloadAction<boolean>) => setPictureInPictureState(state, action.payload),

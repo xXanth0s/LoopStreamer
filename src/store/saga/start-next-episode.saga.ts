@@ -13,15 +13,14 @@ import {
 } from '../reducers/control-state.reducer';
 import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { Logger } from '../../shared/services/logger';
-import { generateAsyncInteraction } from '../utils/async-interaction.util';
-import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { LinkModel } from '../models/link.model';
+import { startNextEpisodeAsyncInteraction } from '../actions/async-interactions';
 
 export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisodeAction>) {
     stopPlayer();
     const { episodeKey, userAction } = action.payload;
 
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_START_NEXT_EPISODE, { episodeKey });
+    const asyncInteraction = startNextEpisodeAsyncInteraction({ episodeKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {

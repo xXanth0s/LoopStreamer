@@ -8,7 +8,7 @@ export interface ControlState {
     playedEpisodes: number;
     activeProvidor?: Providor['key'];
     activeEpisode?: SeriesEpisode['key'];
-    asyncInteractions: Record<AsyncInteraction['key'], AsyncInteraction>;
+    asyncInteractions: Record<AsyncInteraction<any>['key'], AsyncInteraction<any>>;
     controllerWindowState: Partial<Record<WindowType, BrowserWindowStateModel>>;
     isVideoPictureInPicture?: boolean;
 }

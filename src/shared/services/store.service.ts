@@ -10,6 +10,8 @@ import { thunkConfig } from '../../store/types/thunk-config.type';
 
 type SelectorArguments<T, P> = P extends (state: T, ...args: infer A) => any ? A : never;
 
+type Selector = (state: StateModel, ...args: any[]) => any;
+
 @injectable()
 export class StoreService {
     constructor(@inject(SHARED_TYPES.Store) private readonly store: IStoreService<StateModel>) {
@@ -17,16 +19,16 @@ export class StoreService {
 
     private playerHasStopped$ = new Subject();
 
-    public selectSync<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): ReturnType<P> {
+    public selectSync<P extends Selector>(selector: P, ...args: SelectorArguments<StateModel, P>): ReturnType<P> {
         return selector(this.store.getState(), ...args);
     }
 
-    public select<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
+    public select<P extends Selector>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
         const subject = new Subject<StateModel>();
         return this.selectHelper(subject, selector, ...args);
     }
 
-    public selectBehaviour<P extends (state: StateModel, ...args: any[]) => any>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
+    public selectBehaviour<P extends Selector>(selector: P, ...args: SelectorArguments<StateModel, P>): Observable<ReturnType<P>> {
         const subject = new BehaviorSubject<P>(selector(this.store.getState(), ...args));
         return this.selectHelper(subject, selector, ...args);
     }

@@ -59,7 +59,7 @@
     import { inversifyContentContainer } from '../../container/container';
     import SeriesEpisode from '../../../store/models/series-episode.model';
     import { createToggleWindowFullscreenMessage } from '../../../browserMessages/messages/background.messages';
-    import { getWindowStateForWindowId, isPreparingVideo } from '../../../store/selectors/control-state.selector';
+    import { getWindowStateForWindowId } from '../../../store/selectors/control-state.selector';
     import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';
     import { PopupController } from '../../controller/popup.controller';
     import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
@@ -67,6 +67,7 @@
     import { getSeriesEpisodeByKey } from '../../../store/selectors/series-episode.selector';
     import { setPictureInPictureAction } from '../../../store/reducers/control-state.reducer';
     import { isVideoPictureInPicture } from '../../../store/selectors/app-control-state.selector';
+    import { isPreparingVideo } from '../../../store/selectors/async-interaction.selector';
 
     @Component({
         name: 'ls-video-buttons',

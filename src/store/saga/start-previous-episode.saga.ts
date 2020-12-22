@@ -4,16 +4,15 @@ import { getSeriesForEpisode } from '../selectors/series.selector';
 import { stopPlayer } from '../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
 import { getPortalLinkForPreviousEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
-import { generateAsyncInteraction } from '../utils/async-interaction.util';
-import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../reducers/control-state.reducer';
 import { Logger } from '../../shared/services/logger';
 import { LinkModel } from '../models/link.model';
+import { startPreviousEpisodeAsyncInteraction } from '../actions/async-interactions';
 
 export function* startPreviousEpisodeSaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();
     const seriesEpisodeKey = action.payload;
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_START_PREVIOUS_EPISODE, { episodeKey: seriesEpisodeKey });
+    const asyncInteraction = startPreviousEpisodeAsyncInteraction({ episodeKey: seriesEpisodeKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
     try {
         const series = getSeriesForEpisode(yield select(), seriesEpisodeKey);

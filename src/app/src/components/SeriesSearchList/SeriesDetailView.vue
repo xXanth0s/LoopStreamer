@@ -69,10 +69,9 @@
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import { getLastWatchedOrFirstEpisodeForSeries, getSeriesByKey } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
-    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
+    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import ContinueSeriesButton from './ContinueSeriesButton.vue';
-    import { startEpisodeAction } from '../../../../store/actions/shared.actions';
     import { setSelectedSeasonForAppAction } from '../../../../store/reducers/app-control-state.reducer';
     import LanguageSelection from '../LanguageSelection.vue';
 
@@ -162,7 +161,7 @@
 
         public episodeClicked(episodeKey: SeriesEpisode['key']): void {
             if (episodeKey) {
-                this.store.dispatch(startEpisodeAction(episodeKey));
+                // this.store.dispatch(startEpisodeAction(episodeKey));
             }
         }
 

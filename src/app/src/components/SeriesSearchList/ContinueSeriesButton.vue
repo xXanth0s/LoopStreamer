@@ -33,10 +33,9 @@
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../store/utils/series.utils';
     import { StoreService } from '../../../../shared/services/store.service';
-    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
-    import { startEpisodeAction } from '../../../../store/actions/shared.actions';
     import Series from '../../../../store/models/series.model';
     import { getLastWatchedOrFirstEpisodeForSeries } from '../../../../store/selectors/series.selector';
+    import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';
 
     @Component({
         name: 'continue-series-button',
@@ -104,7 +103,7 @@
         }
 
         public continueEpisode(): void {
-            this.store.dispatch(startEpisodeAction(this.seriesEpisode.key));
+            // this.store.dispatch(startEpisodeAction(this.seriesEpisode.key));
         }
 
         private fetchSeasonLoadingStateFromStore(): void {

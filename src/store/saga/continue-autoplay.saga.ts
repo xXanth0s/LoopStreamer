@@ -10,16 +10,15 @@ import {
     removeAsyncInteractionAction,
     resetPlayedEpisodesAction,
 } from '../reducers/control-state.reducer';
-import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
-import { generateAsyncInteraction } from '../utils/async-interaction.util';
 import { Logger } from '../../shared/services/logger';
 import { LinkModel } from '../models/link.model';
+import { continueAutoplayAsyncInteraction } from '../actions/async-interactions';
 
 export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();
     const episodeKey = action.payload;
 
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_START_CONTINUE_AUTOPLAY, { episodeKey });
+    const asyncInteraction = continueAutoplayAsyncInteraction({ episodeKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {

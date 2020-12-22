@@ -4,14 +4,13 @@ import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PORTALS } from '../../enums/portals.enum';
 import Series from '../../models/series.model';
 import { addSeriesLinksToStoreSaga } from '../add-data/add-series-links-to-store.saga';
-import { generateAsyncInteraction } from '../../utils/async-interaction.util';
-import { AsyncInteractionType } from '../../enums/async-interaction-type.enum';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
 import { getLinkForSeriesAndPortal, isSeriesUpToDate } from '../../selectors/línk.selector';
 import { LinkModel } from '../../models/link.model';
 import { generateLinkForSeries } from '../../utils/link.utils';
 import { updateOrAddLinkAction } from '../../reducers/link.reducer';
+import { loadingSeriesAsyncInteraction } from '../../actions/async-interactions';
 
 
 /*
@@ -28,7 +27,7 @@ export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey
         return false;
     }
 
-    const asyncInteraction = generateAsyncInteraction(AsyncInteractionType.SAGA_LOADING_SERIES, {
+    const asyncInteraction = loadingSeriesAsyncInteraction({
         seriesKey,
         portalKey,
     });

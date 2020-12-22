@@ -21,12 +21,13 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { optionsContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { getActiveEpisode, isPreparingVideo } from '../../../../store/selectors/control-state.selector';
+    import { getActiveEpisode } from '../../../../store/selectors/control-state.selector';
     import ButtonTile from '../ButtonTile.vue';
     import { getProgressForEpisode } from '../../../../store/utils/series.utils';
     import { PORTALS } from '../../../../store/enums/portals.enum';
     import { getActivePortalOnAppOrSeries } from '../../../../store/selectors/app-control-state.selector';
     import { hasEpisodeLinksForSelectedLanguageAndPortal } from '../../../../store/selectors/series-episode.selector';
+    import { isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';
 
     @Component({
         name: 'series-episode-button',

@@ -9,7 +9,19 @@
                            :title="languageFlagMap[language].title"
                            :is-active="language === selectedLanguage"/>
         </div>
-        <button type="button" :disabled="links.length === 0" class="btn btn-primary btn-sm w-30">Abspielen</button>
+        <button type="button"
+                class="btn btn-primary btn-sm w-30"
+                :disabled="isButtonDisabled"
+                @click="startEpisode">
+             <span v-if="isEpisodeLoading">
+                <div class="spinner-border" role="status" style="width: 1rem; height: 1rem;">
+                    <span classeries-modal-descriptions="sr-only"></span>
+                </div>
+            </span>
+            <span v-else>
+                Abspielen
+            </span>
+        </button>
     </div>
 </template>
 
@@ -26,9 +38,10 @@
     import { LinkModel } from '../../../../../../store/models/link.model';
     import { LANGUAGE } from '../../../../../../store/enums/language.enum';
     import { getLinksForEpisode } from '../../../../../../store/selectors/línk.selector';
-    import { isLoadingSeason, isPreparingVideo } from '../../../../../../store/selectors/control-state.selector';
+    import { isPreparingEpisode } from '../../../../../../store/selectors/async-interaction.selector';
     import LanguageIcon from '../../../LanguageIcon.vue';
     import { LABGUAGE_FLAG_DATA_MAP } from '../../../../data/language-flag-data.map';
+    import { startEpisodeAction } from '../../../../../../store/actions/shared.actions';
 
     @Component({
         name: 'episode-play-button',
@@ -41,8 +54,7 @@
         private readonly languageFlagMap = LABGUAGE_FLAG_DATA_MAP;
 
         private links: LinkModel[] = [];
-        private isLoadingEpisode = false;
-        private isSeasonLoading = false;
+        private isEpisodeLoading = false;
         private selectedLanguage: LANGUAGE = LANGUAGE.GERMAN;
 
         @Prop(String)
@@ -58,10 +70,13 @@
             return [ ...new Set(this.links.map(link => link.language)) ];
         }
 
+        private get isButtonDisabled(): boolean {
+            return this.links.length === 0 || this.isEpisodeLoading;
+        }
+
         private mounted(): void {
             this.fetchLinksFromStore();
-            this.fetchSeasonLoadingStateFromStore();
-            this.fetchLoadingStateFromStore();
+            this.fetchEpisodeLoadingStateFromStore();
         }
 
         private fetchLinksFromStore(): void {
@@ -70,20 +85,18 @@
             ).subscribe(links => this.links = links);
         }
 
-        private fetchSeasonLoadingStateFromStore(): void {
-            this.store.selectBehaviour(isLoadingSeason).pipe(
+        private fetchEpisodeLoadingStateFromStore(): void {
+            this.store.select(isPreparingEpisode, this.episodeKey).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(isLoading => this.isSeasonLoading = isLoading);
-        }
-
-        private fetchLoadingStateFromStore(): void {
-            this.store.selectBehaviour(isPreparingVideo).pipe(
-                takeUntil(this.takeUntil$),
-            ).subscribe(isLoading => this.isLoadingEpisode = isLoading);
+            ).subscribe(isLoading => this.isEpisodeLoading = isLoading);
         }
 
         private languageClicked(language: LANGUAGE): void {
             this.selectedLanguage = language;
+        }
+
+        private startEpisode(): void {
+            this.store.dispatch(startEpisodeAction({ episodeKey: this.episodeKey, language: this.selectedLanguage }));
         }
     }
 </script>

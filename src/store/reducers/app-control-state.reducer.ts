@@ -33,13 +33,13 @@ function setSelectedLanguage(state: AppControlStateModel, { selectedLanguage }: 
     state.selectedLanguage = selectedLanguage;
 }
 
-function reset(): AppControlStateModel {
+function reset(state: AppControlStateModel): AppControlStateModel {
     return {
+        ...state,
         selectedSeason: null,
         activePortal: null,
         selectedSeriesKey: null,
         selectedLanguage: LANGUAGE.NONE,
-        seriesCollections: {},
         mutePreviewVideo: false,
     };
 }
@@ -77,7 +77,7 @@ export const appControlStateSlice = createSlice({
         addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<SeriesMetaInfo>[] }>) =>
             addOrReplaceMultipleSeriesCollection(state, action.payload),
         toggleMutePreviewVideoStateAction: (state: AppControlStateModel) => toggleMutePreviewVideoState(state),
-        resetAppControlStateAction: () => reset(),
+        resetAppControlStateAction: (state: AppControlStateModel) => reset(state),
     },
     extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['appControlState']) => toggleSelectedSeries(state, null));
