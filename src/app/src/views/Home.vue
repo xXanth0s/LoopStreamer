@@ -1,5 +1,9 @@
 <template>
     <div>
+        <series-carousel v-if="watchedSeriesCollection"
+                         :language="language"
+                         :series-collection="watchedSeriesCollection"
+                         @seriesClicked="seriesSelected"/>
         <series-carousel v-for="collection in collections"
                          :key="collection.key"
                          :language="language"
@@ -14,6 +18,8 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Inject } from 'vue-property-decorator';
+    import { Subject } from 'rxjs';
+    import { takeUntil } from 'rxjs/operators';
     import { StoreService } from '../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
     import SeriesPanelFront from '../components/MySeries/SeriesPanelFront.vue';
@@ -25,6 +31,8 @@
     import { setSelectedSeriesAction } from '../../../store/reducers/app-control-state.reducer';
     import SeriesModal from '../components/SeriesOverview/SeriesModal/SeriesModal.vue';
     import { SeriesMetaInfo } from '../../../store/models/series-meta-info.model';
+    import { getWatchedSeries } from '../../../store/selectors/watched-series.selector';
+    import { CollectionKey } from '../../../store/enums/collection-key.enum';
 
     @Component({
         name: 'test-page',
@@ -35,9 +43,11 @@
         },
     })
     export default class HomePage extends Vue {
+        private readonly takeUntil$ = new Subject();
 
         private language: LANGUAGE = LANGUAGE.GERMAN;
         private collections: NamedCollection<SeriesMetaInfo>[] = [];
+        private watchedSeriesCollection: NamedCollection<Series> = null;
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
@@ -47,11 +57,36 @@
         };
 
         public mounted() {
-            this.loadSeriesData();
+            this.fetchCollectionsFromStore();
+            this.fetchWatchedSeriesFromStore();
         }
 
-        private loadSeriesData(): void {
-            this.store.selectBehaviour(getSeriesCollections).subscribe(data => this.collections = data);
+        public destroyed(): void {
+            this.takeUntil$.next();
+        }
+
+        private fetchCollectionsFromStore(): void {
+            this.store.selectBehaviour(getSeriesCollections).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(data => this.collections = data);
+        }
+
+        private fetchWatchedSeriesFromStore(): void {
+            this.store.selectBehaviour(getWatchedSeries).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(watchedSeries => this.setWatchedSeriesCollection(watchedSeries));
+        }
+
+        private setWatchedSeriesCollection(watchedSeries: Series['key'][]): void {
+            if (watchedSeries.length === 0) {
+                this.watchedSeriesCollection = null;
+            } else {
+                this.watchedSeriesCollection = {
+                    key: CollectionKey.LAST_WATCHED_SERIES,
+                    title: 'Zuletzt gesehene Serien',
+                    data: watchedSeries,
+                };
+            }
         }
 
         private seriesSelected(seriesKey: Series['key']): void {

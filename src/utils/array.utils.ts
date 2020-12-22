@@ -34,3 +34,7 @@ export function addToArrayIfNotExists<T>(array: T[] = [], elementToAdd: T): T[] 
         elementToAdd,
     ];
 }
+
+export function removeDuplicatesFromArray<T>(array: T[]): T[] {
+    return [ ...new Set(array) ];
+}

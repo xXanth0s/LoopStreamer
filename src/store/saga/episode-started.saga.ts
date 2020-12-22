@@ -11,11 +11,17 @@ import {
 import { getSeriesForEpisode } from '../selectors/series.selector';
 import { Logger } from '../../shared/services/logger';
 import { LinkModel } from '../models/link.model';
+import { addWatchedSeriesAction } from '../reducers/watchedSeries.reducer';
 
 export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStartedAction>) {
     const { seriesEpisodeKey } = action.payload;
 
     const series = getSeriesForEpisode(yield select(), seriesEpisodeKey);
+    if (!series) {
+        return;
+    }
+
+    yield put(addWatchedSeriesAction({ seriesKey: series.key }));
 
     try {
         const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);

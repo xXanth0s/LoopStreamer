@@ -6,6 +6,7 @@ import { addOrReplaceMultipleSeriesCollectionAction } from '../../reducers/app-c
 import { Logger } from '../../../shared/services/logger';
 import { SeriesMetaInfo } from '../../models/series-meta-info.model';
 import { addMultipleSeriesMetaInfosAction } from '../../reducers/series-meta-info.reducer';
+import { CollectionKey } from '../../enums/collection-key.enum';
 
 export function* loadSeriesStartPageContentSaga() {
     try {
@@ -18,19 +19,19 @@ export function* loadSeriesStartPageContentSaga() {
             ]);
 
         const popularSeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: 'Populärste Serien',
+            key: CollectionKey.MOST_POPULAR_SERIES,
             title: 'Populärste Serien',
             data: popularSeries.map(series => series.key),
         };
 
         const topRatedSeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: 'Best bewertete Serien',
+            key: CollectionKey.TOP_RATED_SERIES,
             title: 'Best bewertete Serien',
             data: topRatedSeries.map(series => series.key),
         };
 
         const airingTodaySeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: 'Aktuell im Fernsehen',
+            key: CollectionKey.IN_TV_SERIES,
             title: 'Aktuell im Fernsehen',
             data: airingTodaySeries.map(series => series.key),
         };

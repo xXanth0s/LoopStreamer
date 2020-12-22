@@ -14,10 +14,8 @@
                 {{buttonText}}
             </span>
         </b-button>
-        <div v-if="hasValidLinks">
-            <b-progress :max="100" :value="progress" class="w-full h-1" variant="info">
-            </b-progress>
-        </div>
+        <b-progress v-if="hasValidLinks" :max="100" :value="progress" class="w-full h-0.5" variant="info">
+        </b-progress>
     </div>
 </template>
 

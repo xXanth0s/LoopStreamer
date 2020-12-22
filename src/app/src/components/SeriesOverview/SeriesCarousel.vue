@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <h4>{{seriesCollection.title}}</h4>
-        <swiper class="swiper" :options="swiperOption" ref="mySwiperRef">
+        <swiper class="swiper w-full" :options="swiperOption" ref="mySwiperRef">
             <swiper-slide class="h-full"
                           v-for="singleSeries in series"
                           :key="singleSeries.id">
@@ -49,58 +49,70 @@
     export default class SeriesCarousel extends Vue {
         private readonly takeUntil$ = new Subject();
 
-        private readonly swiperOption: SwiperOptions = {
-            slidesPerView: 7,
-            spaceBetween: 8,
-            allowTouchMove: false,
-            breakpoints: {
-                320: {
-                    slidesPerView: 2,
-                    slidesPerGroup: 2,
+        private get swiperOption(): SwiperOptions {
+            return {
+                slidesPerView: 7,
+                spaceBetween: 8,
+                allowTouchMove: false,
+                breakpoints: {
+                    320: {
+                        slidesPerView: 2,
+                        slidesPerGroup: 2,
+                        loop: this.series.length > 2,
+                    },
+                    480: {
+                        slidesPerView: 3,
+                        slidesPerGroup: 3,
+                        loop: this.series.length > 3,
+                    },
+                    640: {
+                        slidesPerView: 4,
+                        slidesPerGroup: 4,
+                        loop: this.series.length > 4,
+                    },
+                    800: {
+                        slidesPerView: 5,
+                        slidesPerGroup: 5,
+                        loop: this.series.length > 5,
+                    },
+                    960: {
+                        slidesPerView: 6,
+                        slidesPerGroup: 6,
+                        loop: this.series.length > 6,
+                    },
+                    1120: {
+                        slidesPerView: 6,
+                        slidesPerGroup: 6,
+                        loop: this.series.length > 6,
+                    },
+                    1280: {
+                        slidesPerView: 7,
+                        slidesPerGroup: 7,
+                        loop: this.series.length > 7,
+                    },
+                    1440: {
+                        slidesPerView: 8,
+                        slidesPerGroup: 8,
+                        loop: this.series.length > 8,
+                    },
+                    1600: {
+                        slidesPerView: 9,
+                        slidesPerGroup: 9,
+                        loop: this.series.length > 9,
+                    },
+                    1760: {
+                        slidesPerView: 10,
+                        slidesPerGroup: 10,
+                        loop: this.series.length > 0,
+                    },
                 },
-                480: {
-                    slidesPerView: 3,
-                    slidesPerGroup: 3,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
                 },
-                640: {
-                    slidesPerView: 4,
-                    slidesPerGroup: 4,
-                },
-                800: {
-                    slidesPerView: 5,
-                    slidesPerGroup: 5,
-                },
-                960: {
-                    slidesPerView: 6,
-                    slidesPerGroup: 6,
-                },
-                1120: {
-                    slidesPerView: 6,
-                    slidesPerGroup: 6,
-                },
-                1280: {
-                    slidesPerView: 7,
-                    slidesPerGroup: 7,
-                },
-                1440: {
-                    slidesPerView: 8,
-                    slidesPerGroup: 8,
-                },
-                1600: {
-                    slidesPerView: 9,
-                    slidesPerGroup: 9,
-                },
-                1760: {
-                    slidesPerView: 10,
-                    slidesPerGroup: 10,
-                },
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            loop: true,
-        };
+                loop: false,
+            };
+        }
 
         private series: SeriesMetaInfo[];
 
@@ -145,6 +157,10 @@
         &:after {
             font-size: 1rem;
             font-weight: bold;
+        }
+
+        &.swiper-button-disabled {
+            visibility: hidden;
         }
 
     }

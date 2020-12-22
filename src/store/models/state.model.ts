@@ -22,6 +22,7 @@ export interface StateModel {
     series: KeyRecord<Series>;
     seriesEpisodes: KeyRecord<SeriesEpisode>;
     seriesSeasons: KeyRecord<SeriesSeason>;
+    watchedSeries: Series['key'][];
     links: KeyRecord<LinkModel>;
     genres: KeyRecord<Genre>;
     seriesMetaInfos: KeyRecord<SeriesMetaInfo>;
