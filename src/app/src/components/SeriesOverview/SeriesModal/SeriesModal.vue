@@ -14,10 +14,10 @@
                         :language="activeLanguage"
                         @close-modal="closeModal"/>
 
-                <div class="px-4 mt-4">
-                    <series-modal-description
-                            :series="series"
-                            :language="activeLanguage"/>
+                <div class="px-4">
+                    <series-modal-description class="mt-4"
+                                              :series="series"
+                                              :language="activeLanguage"/>
 
                     <seasons-list class="mt-4" :seasons="seasons" @seasonClicked="seasonSelected"/>
                     <hr>
@@ -48,7 +48,7 @@
     import { MessageService } from '../../../../../shared/services/message.service';
     import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
     import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
-    import { getSelectedSeason } from '../../../../../store/selectors/app-control-state.selector';
+    import { getSelectedSeasonKey } from '../../../../../store/selectors/app-control-state.selector';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
@@ -122,7 +122,7 @@
         }
 
         public loadActiveSeason(): void {
-            this.store.selectBehaviour(getSelectedSeason).pipe(
+            this.store.selectBehaviour(getSelectedSeasonKey).pipe(
                 takeUntil(this.takeUntil$),
                 tap(selectedSeason => {
                     this.selectedSeason = selectedSeason;

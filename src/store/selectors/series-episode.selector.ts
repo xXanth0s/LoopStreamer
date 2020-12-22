@@ -3,10 +3,12 @@ import SeriesEpisode from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { sortArrayForKey } from '../../utils/array.utils';
 import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from './app-control-state.selector';
-import { getActiveOrLastUsedPortalForSeries } from './series.selector';
-import { getPortalLinksForSeriesEpisodePortalAndLanguage } from './línk.selector';
+import { getActiveOrLastUsedPortalForSeries, getSeriesForEpisode } from './series.selector';
+import { getLinksForEpisode, getPortalLinksForSeriesEpisodePortalAndLanguage } from './línk.selector';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
 import { Logger } from '../../shared/services/logger';
+import { LANGUAGE } from '../enums/language.enum';
+import { getDefaultLanguage } from './options.selector';
 
 export const getMultipleSeriesEpisodeByKeys = (state: StateModel, keys: SeriesEpisode['key'][]): SeriesEpisode[] => keys.map(key => getSeriesEpisodeByKey(state, key));
 
@@ -99,4 +101,25 @@ export const hasEpisodeLinksForSelectedLanguageAndPortal = (state: StateModel, e
     const language = getSelectedLanguageOrLastUsedSeriesLanguageForEpisode(state, episodeKey);
 
     return getPortalLinksForSeriesEpisodePortalAndLanguage(state, episode.key, portal, language).length > 0;
+};
+
+export const getFallbackLanguageForEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): LANGUAGE => {
+    const episode = getSeriesEpisodeByKey(state, episodeKey);
+    const series = getSeriesForEpisode(state, episodeKey);
+    const availableLanguages = getLinksForEpisode(state, episodeKey).map(link => link.language);
+
+    if (!series || !episode || availableLanguages.length === 0) {
+        return LANGUAGE.NONE;
+    }
+
+    if (availableLanguages.some(language => language === series.lastUsedLanguage)) {
+        return series.lastUsedLanguage;
+    }
+
+    const defaultLanguage = getDefaultLanguage(state);
+    if (availableLanguages.some(language => language === defaultLanguage)) {
+        return defaultLanguage;
+    }
+
+    return availableLanguages[0];
 };

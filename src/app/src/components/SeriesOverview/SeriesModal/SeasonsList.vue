@@ -24,7 +24,7 @@
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';
     import { MessageService } from '../../../../../shared/services/message.service';
-    import { getSelectedSeason } from '../../../../../store/selectors/app-control-state.selector';
+    import { getSelectedSeasonKey } from '../../../../../store/selectors/app-control-state.selector';
 
     @Component({
         name: 'seasons-list',
@@ -55,7 +55,7 @@
         }
 
         private fetchSelectedSeason(): void {
-            this.store.select(getSelectedSeason).pipe(
+            this.store.select(getSelectedSeasonKey).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(season => this.selectedSeason = season);
         }

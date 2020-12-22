@@ -12,7 +12,7 @@ import { isLinkOutdated } from '../utils/link.utils';
 
 export function getLinksForEpisode(state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): LinkModel[] {
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
-    return getLinksByKeys(state, episode.portalLinks);
+    return getLinksByKeys(state, episode?.portalLinks) || [];
 }
 
 export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['key'], portal: PORTALS): LinkModel {
@@ -50,6 +50,6 @@ export function getPortalLinksForSeriesEpisodePortalAndLanguage(state: StateMode
     return links.filter(link => link.portal === portal && link.language === language);
 }
 
-export function getLinksByKeys(state: StateModel, linkKeys: LinkModel['key'][]): LinkModel[] {
+export function getLinksByKeys(state: StateModel, linkKeys: LinkModel['key'][] = []): LinkModel[] {
     return linkKeys.map(key => state.links[key]).filter(Boolean);
 }

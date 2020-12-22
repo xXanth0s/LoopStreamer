@@ -7,7 +7,7 @@ export const appStartedAction = createAction<string>('global/AppStarted');
 
 export const deleteSeriesAction = createAction<string>('series/deleteSeries');
 
-export const startEpisodeAction = createAction<{ episodeKey: SeriesEpisode['key'], language: LANGUAGE }>('app/startEpisode');
+export const startEpisodeAction = createAction<{ episodeKey: SeriesEpisode['key'], language?: LANGUAGE }>('app/startEpisode');
 
 export const userChangedLanguageAction = createAction<{ selectedLanguage: LANGUAGE; seriesSeasonKey: SeriesSeason['key'] }>('app/changedLanguage');
 

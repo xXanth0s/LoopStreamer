@@ -67,7 +67,10 @@
     import { getSeasonsForSeries } from '../../../../store/selectors/series-season.selector';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
-    import { getLastWatchedOrFirstEpisodeForSeries, getSeriesByKey } from '../../../../store/selectors/series.selector';
+    import {
+        getLastWatchedOrFirstEpisodeForActiveSeason,
+        getSeriesByKey
+    } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
     import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';
     import SeriesSeasonButton from './SeasonEpisodeButton.vue';
@@ -174,7 +177,7 @@
         }
 
         private async fetchEpisodeToContinueFromStore(): Promise<void> {
-            this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForSeries, this.seriesKey).pipe(
+            this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForActiveSeason, this.seriesKey).pipe(
                 takeUntil(merge(this.seriesChanged$, this.takeUntil$)),
             ).subscribe(episode => this.episodeToContinue = episode);
         }

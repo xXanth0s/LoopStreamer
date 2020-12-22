@@ -1,5 +1,5 @@
 <template>
-    <div v-if="seriesEpisode && !seriesEpisode.isFinished">
+    <div>
         <b-button block
                   class="float-right mb-2"
                   variant="primary"
@@ -34,8 +34,9 @@
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../store/utils/series.utils';
     import { StoreService } from '../../../../shared/services/store.service';
     import Series from '../../../../store/models/series.model';
-    import { getLastWatchedOrFirstEpisodeForSeries } from '../../../../store/selectors/series.selector';
+    import { getLastWatchedOrFirstEpisodeForActiveSeason } from '../../../../store/selectors/series.selector';
     import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';
+    import { startEpisodeAction } from '../../../../store/actions/shared.actions';
 
     @Component({
         name: 'continue-series-button',
@@ -45,7 +46,6 @@
         public seriesKey: Series['key'];
 
         private readonly takeUntil$ = new Subject();
-        private readonly episodeChanged$ = new Subject();
 
         private messageService: MessageService;
         private store: StoreService;
@@ -55,11 +55,11 @@
         private isSeasonLoading = false;
 
         public get hasValidLinks(): boolean {
-            return Boolean(this.seriesEpisode?.providorLinks.length);
+            return Boolean(this.seriesEpisode?.portalLinks.length);
         }
 
         public get buttonText(): string {
-            const { season, episodeNumber, timestamp } = this.seriesEpisode;
+            const { timestamp } = this.seriesEpisode;
             if (!this.hasValidLinks) {
                 return 'Keine Streams gefunden';
             }
@@ -103,7 +103,7 @@
         }
 
         public continueEpisode(): void {
-            // this.store.dispatch(startEpisodeAction(this.seriesEpisode.key));
+            this.store.dispatch(startEpisodeAction({ episodeKey: this.seriesEpisode.key }));
         }
 
         private fetchSeasonLoadingStateFromStore(): void {
@@ -119,7 +119,7 @@
         }
 
         private fetchLastWatchedOrFirstEpisode(): void {
-            this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForSeries, this.seriesKey).pipe(
+            this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForActiveSeason, this.seriesKey).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(episode => this.seriesEpisode = episode);
         }

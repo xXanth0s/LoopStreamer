@@ -1,6 +1,6 @@
 import { call, put, select } from 'redux-saga/effects';
 import { startEpisodeAction } from '../actions/shared.actions';
-import { getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
+import { getFallbackLanguageForEpisode, getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
 import { StateModel } from '../models/state.model';
 import { getPortalController, getVideoController } from '../../background/container/container.utils';
 import SeriesEpisode from '../models/series-episode.model';
@@ -43,8 +43,10 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
     stopPlayer();
     const { episodeKey, language } = action.payload;
 
+    const languageToPlay = language || getFallbackLanguageForEpisode(yield select(), episodeKey);
+
     yield put(resetPlayedEpisodesAction());
-    const episodeStartSuccessful: boolean = yield startEpisode({ episodeKey, language });
+    const episodeStartSuccessful: boolean = yield startEpisode({ episodeKey, language: languageToPlay });
 
     if (episodeStartSuccessful) {
         yield put(raisePlayedEpisodesAction());
