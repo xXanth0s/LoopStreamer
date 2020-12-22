@@ -65,10 +65,10 @@
             }
 
             if (+season === 1 && episodeNumber === 1 && !timestamp) {
-                return 'Starten';
+                return 'Serie abspielen';
             }
 
-            return `${getSeriesEpisodeTitle(this.seriesEpisode)} Fortsetzen`;
+            return `${getSeriesEpisodeTitle(this.seriesEpisode)} ${timestamp ? 'fortsetzen' : 'starten'}`;
         }
 
         public get isLoading(): boolean {
@@ -81,7 +81,7 @@
 
         public get title(): string {
             if (!this.hasValidLinks) {
-                return 'Es wurden keine validen Links gefunden';
+                return 'Es wurden keine validen Streams gefunden';
             }
 
             return '';
