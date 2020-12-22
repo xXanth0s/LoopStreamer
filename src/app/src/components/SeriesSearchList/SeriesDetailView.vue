@@ -69,7 +69,7 @@
     import SeriesEpisodeButton from './SeriesEpisodeButton.vue';
     import {
         getLastWatchedOrFirstEpisodeForActiveSeason,
-        getSeriesByKey
+        getSeriesByKey,
     } from '../../../../store/selectors/series.selector';
     import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
     import { isLoadingSeason, isPreparingVideo } from '../../../../store/selectors/async-interaction.selector';

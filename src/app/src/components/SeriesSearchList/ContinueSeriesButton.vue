@@ -59,7 +59,7 @@
         }
 
         public get buttonText(): string {
-            const { timestamp } = this.seriesEpisode;
+            const { timestamp, episodeNumber, season } = this.seriesEpisode;
             if (!this.hasValidLinks) {
                 return 'Keine Streams gefunden';
             }
