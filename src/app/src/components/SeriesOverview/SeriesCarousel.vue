@@ -50,62 +50,65 @@
         private readonly takeUntil$ = new Subject();
 
         private get swiperOption(): SwiperOptions {
+            const breakpoints = this.fixedSlidesCount ? null : {
+                320: {
+                    slidesPerView: 2,
+                    slidesPerGroup: 2,
+                    loop: this.series.length > 2,
+                },
+                480: {
+                    slidesPerView: 3,
+                    slidesPerGroup: 3,
+                    loop: this.series.length > 3,
+                },
+                640: {
+                    slidesPerView: 4,
+                    slidesPerGroup: 4,
+                    loop: this.series.length > 4,
+                },
+                800: {
+                    slidesPerView: 5,
+                    slidesPerGroup: 5,
+                    loop: this.series.length > 5,
+                },
+                960: {
+                    slidesPerView: 6,
+                    slidesPerGroup: 6,
+                    loop: this.series.length > 6,
+                },
+                1120: {
+                    slidesPerView: 7,
+                    slidesPerGroup: 7,
+                    loop: this.series.length > 7,
+                },
+                1280: {
+                    slidesPerView: 8,
+                    slidesPerGroup: 8,
+                    loop: this.series.length > 8,
+                },
+                1440: {
+                    slidesPerView: 9,
+                    slidesPerGroup: 9,
+                    loop: this.series.length > 9,
+                },
+                1600: {
+                    slidesPerView: 10,
+                    slidesPerGroup: 10,
+                    loop: this.series.length > 10,
+                },
+                1760: {
+                    slidesPerView: 11,
+                    slidesPerGroup: 11,
+                    loop: this.series.length > 11,
+                },
+            };
+
             return {
-                slidesPerView: 7,
+                slidesPerView: this.fixedSlidesCount,
+                slidesPerGroup: this.fixedSlidesCount,
                 spaceBetween: 8,
                 allowTouchMove: false,
-                breakpoints: {
-                    320: {
-                        slidesPerView: this.getSlidesCount(2),
-                        slidesPerGroup: this.getSlidesCount(2),
-                        loop: this.series.length > 2,
-                    },
-                    480: {
-                        slidesPerView: this.getSlidesCount(3),
-                        slidesPerGroup: this.getSlidesCount(3),
-                        loop: this.series.length > 3,
-                    },
-                    640: {
-                        slidesPerView: this.getSlidesCount(4),
-                        slidesPerGroup: this.getSlidesCount(4),
-                        loop: this.series.length > 4,
-                    },
-                    800: {
-                        slidesPerView: this.getSlidesCount(5),
-                        slidesPerGroup: this.getSlidesCount(5),
-                        loop: this.series.length > 5,
-                    },
-                    960: {
-                        slidesPerView: this.getSlidesCount(6),
-                        slidesPerGroup: this.getSlidesCount(6),
-                        loop: this.series.length > 6,
-                    },
-                    1120: {
-                        slidesPerView: this.getSlidesCount(7),
-                        slidesPerGroup: this.getSlidesCount(7),
-                        loop: this.series.length > 7,
-                    },
-                    1280: {
-                        slidesPerView: this.getSlidesCount(8),
-                        slidesPerGroup: this.getSlidesCount(8),
-                        loop: this.series.length > 8,
-                    },
-                    1440: {
-                        slidesPerView: this.getSlidesCount(9),
-                        slidesPerGroup: this.getSlidesCount(9),
-                        loop: this.series.length > 9,
-                    },
-                    1600: {
-                        slidesPerView: this.getSlidesCount(10),
-                        slidesPerGroup: this.getSlidesCount(10),
-                        loop: this.series.length > 10,
-                    },
-                    1760: {
-                        slidesPerView: this.getSlidesCount(11),
-                        slidesPerGroup: this.getSlidesCount(11),
-                        loop: this.series.length > 11,
-                    },
-                },
+                breakpoints,
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
@@ -142,10 +145,6 @@
         @Emit('seriesClicked')
         private seriesSelected(selectedSeriesKey: Series['key']): Series['key'] {
             return selectedSeriesKey;
-        }
-
-        private getSlidesCount(fallbackSlideCount: number): number {
-            return this.fixedSlidesCount ? this.fixedSlidesCount : fallbackSlideCount;
         }
     }
 </script>
