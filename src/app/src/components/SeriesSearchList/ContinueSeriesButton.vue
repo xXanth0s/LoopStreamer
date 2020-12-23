@@ -22,7 +22,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Prop } from 'vue-property-decorator';
+    import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
     import SeriesEpisode from '../../../../store/models/series-episode.model';
@@ -57,10 +57,11 @@
         }
 
         public get buttonText(): string {
-            const { timestamp, episodeNumber, season } = this.seriesEpisode;
             if (!this.hasValidLinks) {
                 return 'Keine Streams gefunden';
             }
+
+            const { timestamp, episodeNumber, season } = this.seriesEpisode;
 
             if (+season === 1 && episodeNumber === 1 && !timestamp) {
                 return 'Serie abspielen';
@@ -74,7 +75,7 @@
         }
 
         public get progress(): number {
-            return getProgressForEpisode(this.seriesEpisode);
+            return this.seriesEpisode ? getProgressForEpisode(this.seriesEpisode) : 0;
         }
 
         public get title(): string {
@@ -90,7 +91,9 @@
             this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
-        public mounted(): void {
+        @Watch('seriesKey', { immediate: true })
+        public seriesChanged(): void {
+            this.takeUntil$.next();
             this.fetchLastWatchedOrFirstEpisode();
             this.fetchSeasonLoadingStateFromStore();
             this.fetchVideoLoadingStateFromStore();

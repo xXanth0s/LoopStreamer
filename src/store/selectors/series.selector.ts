@@ -7,6 +7,7 @@ import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selec
 import { SeriesSeason } from '../models/series-season.model';
 import { Logger } from '../../shared/services/logger';
 import { getSelectedSeasonKey } from './app-control-state.selector';
+import { MovieApi } from '../enums/movie-api.enum';
 
 export const getAllWatchedSeries = (state: StateModel): Series[] => Object.values(state.series).filter(series => series.lastEpisodeWatched);
 
@@ -88,4 +89,9 @@ export const getActiveOrLastUsedPortalForSeries = (state: StateModel, seriesKey:
 
     const series = getSeriesByKey(state, seriesKey);
     return series?.lastUsedPortal;
+};
+
+export const getMovieDbApiKeysForSeries = (state: StateModel, seriesKeys: Series['key'][]): Series['apiKeys'][MovieApi.TMDB][] => {
+    const series = getMultipleSeriesByKey(state, seriesKeys);
+    return series.map(serie => serie.apiKeys[MovieApi.TMDB]);
 };

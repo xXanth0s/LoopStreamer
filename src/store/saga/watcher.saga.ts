@@ -19,6 +19,7 @@ import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-p
 import { loadDetailedSeriesInformationFromApiSaga } from './series-api/load-detailed-series-information-from-api.saga';
 import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
 import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
+import { loadSimilarSeriesSaga } from './series-api/load-similar-series.saga';
 
 export function* watcherSaga() {
     try {
@@ -26,6 +27,7 @@ export function* watcherSaga() {
         yield takeLatest(appStartedAction.type, loadSeriesStartPageContentSaga);
 
         yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationFromApiSaga);
+        yield takeLatest(setSelectedSeriesAction.type, loadSimilarSeriesSaga);
         yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationFromPortalSaga);
 
         // episode state controlling

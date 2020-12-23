@@ -1,16 +1,18 @@
 <template>
     <div>
         <series-carousel v-if="watchedSeriesCollection"
+                         class="-mx-4"
                          :language="language"
                          :series-collection="watchedSeriesCollection"
                          @seriesClicked="seriesSelected"/>
         <series-carousel v-for="collection in collections"
+                         class="-mx-4"
                          :key="collection.key"
                          :language="language"
                          :series-collection="collection"
                          @seriesClicked="seriesSelected"/>
 
-        <series-modal ref="seriesModal"/>
+        <series-modal ref="seriesModal" @similarSeriesSelected="seriesSelected"/>
     </div>
 </template>
 
@@ -25,7 +27,7 @@
     import SeriesPanelFront from '../components/MySeries/SeriesPanelFront.vue';
     import { NamedCollection } from '../../../store/models/collection.model';
     import Series from '../../../store/models/series.model';
-    import { getSeriesCollections } from '../../../store/selectors/app-control-state.selector';
+    import { getSeriesCollectionsForOverview } from '../../../store/selectors/app-control-state.selector';
     import SeriesCarousel from '../components/SeriesOverview/SeriesCarousel.vue';
     import { LANGUAGE } from '../../../store/enums/language.enum';
     import { setSelectedSeriesAction } from '../../../store/reducers/app-control-state.reducer';
@@ -66,7 +68,7 @@
         }
 
         private fetchCollectionsFromStore(): void {
-            this.store.selectBehaviour(getSeriesCollections).pipe(
+            this.store.selectBehaviour(getSeriesCollectionsForOverview).pipe(
                 takeUntil(this.takeUntil$),
             ).subscribe(data => this.collections = data);
         }

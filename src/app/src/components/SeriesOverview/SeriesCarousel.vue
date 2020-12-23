@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div v-if="series.length">
         <h4>{{seriesCollection.title}}</h4>
         <swiper class="swiper w-full" :options="swiperOption" ref="mySwiperRef">
             <swiper-slide class="h-full"

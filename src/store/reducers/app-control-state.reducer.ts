@@ -8,6 +8,7 @@ import { StateModel } from '../models/state.model';
 import { LANGUAGE } from '../enums/language.enum';
 import { NamedCollection } from '../models/collection.model';
 import { SeriesMetaInfo } from '../models/series-meta-info.model';
+import { CollectionKey } from '../enums/collection-key.enum';
 
 const initialState: AppControlStateModel = {
     seriesCollections: {},
@@ -57,6 +58,7 @@ function addOrReplaceSeriesCollection(state: AppControlStateModel, { collection 
 
 function setSelectedSeries(state: AppControlStateModel, { selectedSeriesKey }: { selectedSeriesKey: Series['key'] }): void {
     state.selectedSeriesKey = selectedSeriesKey;
+    delete state.seriesCollections[CollectionKey.SIMILAR_SERIES_MODAL];
 }
 
 function toggleMutePreviewVideoState(state: AppControlStateModel): void {

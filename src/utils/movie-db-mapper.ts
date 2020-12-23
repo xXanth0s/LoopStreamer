@@ -118,3 +118,7 @@ export function mapGenreFromMovieDB(genre: Responses.Genre.Common['genres'][numb
         },
     };
 }
+
+export function orderByMovieDBPopularity(series: MovieDB.Objects.TVShow[]): MovieDB.Objects.TVShow[] {
+    return series.sort((a, b) => b.popularity - a.popularity);
+}

@@ -38,3 +38,9 @@ export function addToArrayIfNotExists<T>(array: T[] = [], elementToAdd: T): T[] 
 export function removeDuplicatesFromArray<T>(array: T[]): T[] {
     return [ ...new Set(array) ];
 }
+
+export function reduceArraySize<T>(array: T[], size: number): T[] {
+    const copy = [ ...array ];
+    copy.length = size;
+    return copy.filter(Boolean);
+}

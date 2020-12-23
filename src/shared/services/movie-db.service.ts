@@ -7,7 +7,8 @@ import {
     mapSeasonEpisodesFromMovieDB,
     mapSeasonFromMovieDB,
     mapSeriesFromMovieDB,
-    mapSeriesMetaInfoFromMovieDB
+    mapSeriesMetaInfoFromMovieDB,
+    orderByMovieDBPopularity
 } from '../../utils/movie-db-mapper';
 import Series from '../../store/models/series.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
@@ -48,6 +49,7 @@ export class MovieDBService {
                 client.tv.getTopRated({ query: { page: 3 } }),
             ]);
             series = results.flatMap(data => data.data.results);
+            series = orderByMovieDBPopularity(series);
         } catch (error) {
             Logger.error('[MovieDDService->getTopRatedSeries] error occurred', error);
         }
@@ -65,8 +67,29 @@ export class MovieDBService {
                 client.tv.getAiringToday({ query: { page: 3 } }),
             ]);
             series = results.flatMap(data => data.data.results);
+            series = orderByMovieDBPopularity(series);
         } catch (error) {
             Logger.error('[MovieDDService->getAiringTodaySeries] error occurred', error);
+        }
+
+        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+    }
+
+    public static async getSimilarSeries(movieDbId: string, language: LANGUAGE): Promise<SeriesMetaInfo[]> {
+        let series: MovieDB.Objects.TVShow[] = [];
+        const client = MovieDBService.getClient(language);
+        try {
+            const results = await Promise.all<MovieDbResponse<Responses.TV.GetSimilarTVShows>>([
+                client.tv.getSimilarTVShows({ pathParameters: { tv_id: movieDbId }, query: { page: 1 } }),
+                client.tv.getSimilarTVShows({ pathParameters: { tv_id: movieDbId }, query: { page: 2 } }),
+                client.tv.getSimilarTVShows({ pathParameters: { tv_id: movieDbId }, query: { page: 3 } }),
+            ]);
+            // @ts-ignore
+            series = results.flatMap(data => data.data.results);
+            series = orderByMovieDBPopularity(series);
+            debugger
+        } catch (error) {
+            Logger.error('[MovieDDService->getSimilarSeries] error occurred', error);
         }
 
         return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));

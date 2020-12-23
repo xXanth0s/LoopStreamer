@@ -6,10 +6,10 @@
              hide-footer
              hide-header
              title="Using Component Methods">
-        <div class="modal-container bg-gray-900 text-white pb-5 relative">
+        <div class="modal-container bg-gray-900 text-white relative">
             <div v-if="series">
                 <series-modal-header
-                        class="font-mono"
+                        class="font-mono ls-modal-header"
                         :series="series"
                         :language="activeLanguage"
                         @close-modal="closeModal"/>
@@ -22,6 +22,12 @@
                     <seasons-list class="mt-4" :seasons="seasons" @seasonClicked="seasonSelected"/>
                     <hr>
                     <series-episode-list :episodes="episodes" :language="activeLanguage"/>
+                </div>
+                <div v-if="similarSeriesCollection" class="px-4 pt-4 relative">
+                    <series-carousel class="text-left"
+                                     :language="activeLanguage"
+                                     :seriesCollection="similarSeriesCollection"
+                                     @seriesClicked="similarSeriesSelected"/>
                 </div>
             </div>
             <div v-else class="absolute flex flex-column items-center justify-content-center w-100 h-100">
@@ -37,7 +43,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Inject } from 'vue-property-decorator';
+    import { Emit, Inject } from 'vue-property-decorator';
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
     import { filter, switchMap, takeUntil, tap, } from 'rxjs/operators';
@@ -48,7 +54,10 @@
     import { MessageService } from '../../../../../shared/services/message.service';
     import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
     import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
-    import { getSelectedSeasonKey } from '../../../../../store/selectors/app-control-state.selector';
+    import {
+        getSelectedSeasonKey,
+        getSeriesCollection,
+    } from '../../../../../store/selectors/app-control-state.selector';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
@@ -59,11 +68,16 @@
     import SeasonsList from './SeasonsList.vue';
     import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
     import SeriesEpisodeList from './SeriesEpisodeList.vue';
-    import { setSelectedSeasonForAppAction } from '../../../../../store/reducers/app-control-state.reducer';
+    import { setSelectedSeasonForAppAction, } from '../../../../../store/reducers/app-control-state.reducer';
+    import { CollectionKey } from '../../../../../store/enums/collection-key.enum';
+    import { NamedCollection } from '../../../../../store/models/collection.model';
+    import { SeriesMetaInfo } from '../../../../../store/models/series-meta-info.model';
+    import SeriesCarousel from '../SeriesCarousel.vue';
 
     @Component({
         name: 'series-modal',
         components: {
+            SeriesCarousel,
             SeriesEpisodeList,
             SeriesEpisodeTile,
             SeasonsList,
@@ -76,11 +90,12 @@
         private readonly seriesChanged$ = new Subject();
         private readonly takeUntil$ = new Subject();
 
-        private series: Series = null;
-        private seasons: SeriesSeason[] = [];
-        private episodes: SeriesEpisode[] = [];
-        private selectedSeason: SeriesSeason['key'] = null;
-        private activeLanguage: LANGUAGE = LANGUAGE.ENGLISH;
+        public series: Series = null;
+        public seasons: SeriesSeason[] = [];
+        public episodes: SeriesEpisode[] = [];
+        public selectedSeason: SeriesSeason['key'] = null;
+        public activeLanguage: LANGUAGE = LANGUAGE.ENGLISH;
+        public similarSeriesCollection: NamedCollection<SeriesMetaInfo> = null;
 
         $refs!: {
             modalRef: BvComponent;
@@ -102,6 +117,8 @@
             this.loadSeriesData(seriesKey);
             this.loadSeriesSeason(seriesKey);
             this.loadActiveSeason();
+            this.loadSimilarSeriesData();
+            this.scrollToTop();
         }
 
         public closeModal(): void {
@@ -133,8 +150,19 @@
             ).subscribe(episodes => this.episodes = episodes);
         }
 
+        public loadSimilarSeriesData(): void {
+            this.store.selectBehaviour(getSeriesCollection, CollectionKey.SIMILAR_SERIES_MODAL).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(collection => this.similarSeriesCollection = collection);
+        }
+
         public seasonSelected(seasonKey: SeriesSeason['key']): void {
             this.store.dispatch(setSelectedSeasonForAppAction(seasonKey));
+        }
+
+        @Emit('similarSeriesSelected')
+        public similarSeriesSelected(seriesKey: Series['key']): Series['key'] {
+            return seriesKey;
         }
 
         private reset(): void {
@@ -142,6 +170,14 @@
             this.episodes = [];
             this.selectedSeason = null;
             this.series = null;
+        }
+
+        private scrollToTop(): void {
+            this.$scrollTo('.ls-modal-header', {
+                container: '.modal',
+                easing: 'ease',
+                duration: 1000,
+            });
         }
     }
 </script>
