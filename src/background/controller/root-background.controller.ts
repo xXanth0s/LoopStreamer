@@ -14,7 +14,6 @@ import { WindowType } from '../../store/enums/window-type.enum';
 import { environment } from '../../environments/environment';
 import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
-import { APP_HEIGHT, APP_WIDTH } from '../../constants/electron-variables';
 import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
 import { appStartedAction } from '../../store/actions/shared.actions';
 
@@ -26,8 +25,8 @@ export class RootBackgroundController {
         visible: true,
         preloadScript: false,
         manipulateSession: true,
-        width: environment.openAppDevTools ? DefaultOpenWindowConfig.width : APP_WIDTH,
-        height: environment.openAppDevTools ? DefaultOpenWindowConfig.height : APP_HEIGHT,
+        width: DefaultOpenWindowConfig.width,
+        height: DefaultOpenWindowConfig.height,
     };
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,

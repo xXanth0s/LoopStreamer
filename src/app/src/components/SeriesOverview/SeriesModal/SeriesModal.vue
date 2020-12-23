@@ -25,6 +25,7 @@
                 </div>
                 <div v-if="similarSeriesCollection" class="px-4 pt-4 relative">
                     <series-carousel class="text-left"
+                                     :fixed-slides-count="5"
                                      :language="activeLanguage"
                                      :seriesCollection="similarSeriesCollection"
                                      @seriesClicked="similarSeriesSelected"/>
@@ -68,7 +69,7 @@
     import SeasonsList from './SeasonsList.vue';
     import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
     import SeriesEpisodeList from './SeriesEpisodeList.vue';
-    import { setSelectedSeasonForAppAction, } from '../../../../../store/reducers/app-control-state.reducer';
+    import { setSelectedSeasonForAppAction } from '../../../../../store/reducers/app-control-state.reducer';
     import { CollectionKey } from '../../../../../store/enums/collection-key.enum';
     import { NamedCollection } from '../../../../../store/models/collection.model';
     import { SeriesMetaInfo } from '../../../../../store/models/series-meta-info.model';

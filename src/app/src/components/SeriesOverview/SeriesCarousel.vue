@@ -56,54 +56,54 @@
                 allowTouchMove: false,
                 breakpoints: {
                     320: {
-                        slidesPerView: 2,
-                        slidesPerGroup: 2,
+                        slidesPerView: this.getSlidesCount(2),
+                        slidesPerGroup: this.getSlidesCount(2),
                         loop: this.series.length > 2,
                     },
                     480: {
-                        slidesPerView: 3,
-                        slidesPerGroup: 3,
+                        slidesPerView: this.getSlidesCount(3),
+                        slidesPerGroup: this.getSlidesCount(3),
                         loop: this.series.length > 3,
                     },
                     640: {
-                        slidesPerView: 4,
-                        slidesPerGroup: 4,
+                        slidesPerView: this.getSlidesCount(4),
+                        slidesPerGroup: this.getSlidesCount(4),
                         loop: this.series.length > 4,
                     },
                     800: {
-                        slidesPerView: 5,
-                        slidesPerGroup: 5,
+                        slidesPerView: this.getSlidesCount(5),
+                        slidesPerGroup: this.getSlidesCount(5),
                         loop: this.series.length > 5,
                     },
                     960: {
-                        slidesPerView: 6,
-                        slidesPerGroup: 6,
+                        slidesPerView: this.getSlidesCount(6),
+                        slidesPerGroup: this.getSlidesCount(6),
                         loop: this.series.length > 6,
                     },
                     1120: {
-                        slidesPerView: 6,
-                        slidesPerGroup: 6,
-                        loop: this.series.length > 6,
-                    },
-                    1280: {
-                        slidesPerView: 7,
-                        slidesPerGroup: 7,
+                        slidesPerView: this.getSlidesCount(7),
+                        slidesPerGroup: this.getSlidesCount(7),
                         loop: this.series.length > 7,
                     },
-                    1440: {
-                        slidesPerView: 8,
-                        slidesPerGroup: 8,
+                    1280: {
+                        slidesPerView: this.getSlidesCount(8),
+                        slidesPerGroup: this.getSlidesCount(8),
                         loop: this.series.length > 8,
                     },
-                    1600: {
-                        slidesPerView: 9,
-                        slidesPerGroup: 9,
+                    1440: {
+                        slidesPerView: this.getSlidesCount(9),
+                        slidesPerGroup: this.getSlidesCount(9),
                         loop: this.series.length > 9,
                     },
+                    1600: {
+                        slidesPerView: this.getSlidesCount(10),
+                        slidesPerGroup: this.getSlidesCount(10),
+                        loop: this.series.length > 10,
+                    },
                     1760: {
-                        slidesPerView: 10,
-                        slidesPerGroup: 10,
-                        loop: this.series.length > 0,
+                        slidesPerView: this.getSlidesCount(11),
+                        slidesPerGroup: this.getSlidesCount(11),
+                        loop: this.series.length > 11,
                     },
                 },
                 navigation: {
@@ -128,6 +128,9 @@
         @Prop(String)
         public language: LANGUAGE;
 
+        @Prop(Number)
+        public fixedSlidesCount: number;
+
         @Watch('seriesCollection', { immediate: true })
         private selectionChanged(seriesCollection: NamedCollection<Series>): void {
             this.takeUntil$.next();
@@ -139,6 +142,10 @@
         @Emit('seriesClicked')
         private seriesSelected(selectedSeriesKey: Series['key']): Series['key'] {
             return selectedSeriesKey;
+        }
+
+        private getSlidesCount(fallbackSlideCount: number): number {
+            return this.fixedSlidesCount ? this.fixedSlidesCount : fallbackSlideCount;
         }
     }
 </script>
