@@ -168,7 +168,5 @@
         &.swiper-button-disabled {
             visibility: hidden;
         }
-
     }
-
 </style>

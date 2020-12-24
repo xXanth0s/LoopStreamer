@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div class="relative">
+        <search-input class="absolute searchInput"></search-input>
         <series-carousel v-if="watchedSeriesCollection"
                          class="-mx-4"
                          :language="language"
@@ -35,10 +36,12 @@
     import { SeriesMetaInfo } from '../../../store/models/series-meta-info.model';
     import { getWatchedSeries } from '../../../store/selectors/watched-series.selector';
     import { CollectionKey } from '../../../store/enums/collection-key.enum';
+    import SearchInput from '../components/Shared/SearchInput.vue';
 
     @Component({
         name: 'test-page',
         components: {
+            SearchInput,
             SeriesModal,
             SeriesCarousel,
             SeriesPanelFront,
@@ -100,3 +103,11 @@
         }
     }
 </script>
+
+<style lang="scss">
+
+    .searchInput {
+        top: -1rem;
+        right: 0;
+    }
+</style>
