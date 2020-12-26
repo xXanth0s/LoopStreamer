@@ -95,13 +95,27 @@ export class MovieDBService {
         return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
     }
 
+    public static async searchSeries(searchString: string, language: LANGUAGE): Promise<SeriesMetaInfo[]> {
+        let series: MovieDB.Objects.TVShow[] = [];
+        const client = MovieDBService.getClient(language);
+        try {
+            const videoResponse = await client.search.TVShows({query: {query: searchString}})
+
+            series = orderByMovieDBPopularity(videoResponse.data.results);
+        } catch (error) {
+            Logger.error('[MovieDDService->getVideo] error occurred', error);
+            return [];
+        }
+        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+    }
+
     public static async getDetailedSeriesInformation(movieDbId: string, language: LANGUAGE): Promise<[ Series, SeriesSeason[], SeriesEpisode[] ]> {
         const client = MovieDBService.getClient(language);
         let videoUrl: string;
         let series: Responses.TV.GetDetails;
         try {
             const [ seriesResponse, video ]: [ MovieDbResponse<Responses.TV.GetDetails>, string ] = await Promise.all([
-                client.tv.getDetails({ pathParameters: { tv_id: movieDbId } }),
+                client.tv.getDetails({pathParameters: {tv_id: movieDbId}}),
                 MovieDBService.getVideo(movieDbId, language),
             ]);
 

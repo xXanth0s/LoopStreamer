@@ -1,5 +1,9 @@
-import MovieDB, { Responses } from 'node-themoviedb';
-import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from '../store/utils/key.utils';
+import { Responses } from 'node-themoviedb';
+import {
+    getKeyForSeriesEpisode,
+    getKeyForSeriesSeason,
+    getKeyForSeriesTitle
+} from '../store/utils/key.utils';
 import { LANGUAGE } from '../store/enums/language.enum';
 import Series, { getEmptySeries } from '../store/models/series.model';
 import { mapLanguage } from './language-mapper';
@@ -11,7 +15,20 @@ import { Genre } from '../store/models/genre.model';
 import { getYearFromDateString } from './date.utils';
 import { SeriesMetaInfo } from '../store/models/series-meta-info.model';
 
-export function mapSeriesMetaInfoFromMovieDB(series: MovieDB.Objects.TVShow | Responses.TV.GetDetails, activeLanguage: LANGUAGE): SeriesMetaInfo {
+export type MovieDbMetaInfo = {
+    poster_path: string | null;
+    popularity: number;
+    id: number;
+    name: string;
+    original_name: string;
+    backdrop_path: string | null;
+    overview: string;
+    first_air_date: string;
+    genre_ids: number[];
+    original_language: string;
+}
+
+export function mapSeriesMetaInfoFromMovieDB(series: MovieDbMetaInfo, activeLanguage: LANGUAGE): SeriesMetaInfo {
     const {
         id,
         name,
@@ -119,6 +136,6 @@ export function mapGenreFromMovieDB(genre: Responses.Genre.Common['genres'][numb
     };
 }
 
-export function orderByMovieDBPopularity(series: MovieDB.Objects.TVShow[]): MovieDB.Objects.TVShow[] {
+export function orderByMovieDBPopularity<T extends { popularity: number }>(series: T[]): T[] {
     return series.sort((a, b) => b.popularity - a.popularity);
 }

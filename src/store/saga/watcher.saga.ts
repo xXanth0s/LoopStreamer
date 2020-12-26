@@ -1,6 +1,13 @@
 import { takeLatest } from 'redux-saga/effects';
-import { setSelectedSeasonForAppAction, setSelectedSeriesAction } from '../reducers/app-control-state.reducer';
-import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
+import {
+    setSearchTextAction,
+    setSelectedSeasonForAppAction,
+    setSelectedSeriesAction
+} from '../reducers/app-control-state.reducer';
+import {
+    seriesEpisodeStartedAction,
+    setSeriesEpisodeTimeStampAction
+} from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './series-time.saga';
 import {
     appStartedAction,
@@ -20,6 +27,7 @@ import { loadDetailedSeriesInformationFromApiSaga } from './series-api/load-deta
 import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
 import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
 import { loadSimilarSeriesSaga } from './series-api/load-similar-series.saga';
+import { loadSeriesSearchResultSaga } from './series-api/load-series-search-result.saga';
 
 export function* watcherSaga() {
     try {
@@ -29,6 +37,7 @@ export function* watcherSaga() {
         yield takeLatest(setSelectedSeriesAction.type, loadDetailedSeriesInformationFromApiSaga);
         yield takeLatest(setSelectedSeriesAction.type, loadSimilarSeriesSaga);
         yield takeLatest(setSelectedSeasonForAppAction.type, loadSeasonInformationFromPortalSaga);
+        yield takeLatest(setSearchTextAction.type, loadSeriesSearchResultSaga);
 
         // episode state controlling
         yield takeLatest(setSeriesEpisodeTimeStampAction.type, episodeTimeUpdateSaga);

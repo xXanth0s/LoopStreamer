@@ -12,7 +12,8 @@ import { CollectionKey } from '../enums/collection-key.enum';
 
 const initialState: AppControlStateModel = {
     seriesCollections: {},
-    mutePreviewVideo: true
+    mutePreviewVideo: true,
+    searchText: '',
 };
 
 function setActivePortal(state: AppControlStateModel, payload: PORTALS): void {
@@ -56,13 +57,17 @@ function addOrReplaceSeriesCollection(state: AppControlStateModel, { collection 
     };
 }
 
-function setSelectedSeries(state: AppControlStateModel, { selectedSeriesKey }: { selectedSeriesKey: Series['key'] }): void {
+function setSelectedSeries(state: AppControlStateModel, {selectedSeriesKey}: { selectedSeriesKey: Series['key'] }): void {
     state.selectedSeriesKey = selectedSeriesKey;
     delete state.seriesCollections[CollectionKey.SIMILAR_SERIES_MODAL];
 }
 
 function toggleMutePreviewVideoState(state: AppControlStateModel): void {
     state.mutePreviewVideo = !state.mutePreviewVideo;
+}
+
+function setSearchText(state: AppControlStateModel, payload: { searchText: string }) {
+    state.searchText = payload.searchText;
 }
 
 export const appControlStateSlice = createSlice({
@@ -80,6 +85,7 @@ export const appControlStateSlice = createSlice({
             addOrReplaceMultipleSeriesCollection(state, action.payload),
         toggleMutePreviewVideoStateAction: (state: AppControlStateModel) => toggleMutePreviewVideoState(state),
         resetAppControlStateAction: (state: AppControlStateModel) => reset(state),
+        setSearchTextAction: (state: AppControlStateModel, action: PayloadAction<{ searchText: string }>) => setSearchText(state, action.payload)
     },
     extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['appControlState']) => toggleSelectedSeries(state, null));
@@ -96,5 +102,6 @@ export const {
     addOrReplaceSeriesCollectionAction,
     addOrReplaceMultipleSeriesCollectionAction,
     setSelectedSeriesAction,
-    toggleMutePreviewVideoStateAction
+    toggleMutePreviewVideoStateAction,
+    setSearchTextAction
 } = appControlStateSlice.actions;

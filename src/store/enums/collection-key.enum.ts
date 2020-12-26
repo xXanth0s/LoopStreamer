@@ -5,4 +5,5 @@ export enum CollectionKey {
     IN_TV_SERIES = 'in_tv_series',
     SIMILAR_SERIES_OVERVIEW = 'similar_series_overview',
     SIMILAR_SERIES_MODAL = 'similar_series_modal',
+    SEARCH_RESULT_SERIES = 'search_result_series',
 }
