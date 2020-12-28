@@ -39,7 +39,7 @@
     import { LANGUAGE } from '../../../../../../store/enums/language.enum';
     import { getLinksForEpisode } from '../../../../../../store/selectors/línk.selector';
     import { isPreparingEpisode } from '../../../../../../store/selectors/async-interaction.selector';
-    import LanguageIcon from '../../../LanguageIcon.vue';
+    import LanguageIcon from '../../../Shared/LanguageIcon.vue';
     import { LABGUAGE_FLAG_DATA_MAP } from '../../../../data/language-flag-data.map';
     import { startEpisodeAction } from '../../../../../../store/actions/shared.actions';
 

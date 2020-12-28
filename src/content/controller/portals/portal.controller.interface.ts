@@ -16,8 +16,6 @@ export interface IPortalController {
 
     isVideoOpenWithProvidor(): Providor | null;
 
-    getAllSeriesInfo(): PortalSeriesInfoDto[];
-
     getLinkForSeries(seriesKey: Series['key']): string;
 
     getSeasonInfo(seasonNumber: string): PortalSeriesSeasonDto;

@@ -35,10 +35,8 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
     private readonly activeSeriesSeasonSelector = (): HTMLAnchorElement => document.querySelector('#seasons').querySelector('.active > a');
     private readonly episodesSelector = (): NodeListOf<HTMLElement> => document.querySelector('.episodes').querySelectorAll('tr');
-    private readonly seriesTitleSelector = () => document.querySelector('#sp_left > h2')?.textContent?.trim().split('\n')[0];
-    private readonly seriesImageSelector = (): string => (document.querySelector('#sp_right > img') as HTMLImageElement)?.src;
     private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
-    private readonly providorContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
+    private readonly providerContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
@@ -86,15 +84,13 @@ export class BurningSeriesController implements IPortalController {
             return [];
         }
 
-        const providorContainer = this.providorContainerSelector();
+        const providorContainer = this.providerContainerSelector();
         const usedProvidors = this.store.selectSync(getAllUsedProvidors);
 
         return getLinksForProviders(usedProvidors, providorContainer);
     }
 
     public getSeriesMetaInformation(): PortalSeriesInfoDto {
-        const title = this.seriesTitleSelector();
-        const posterHref = this.seriesImageSelector();
         const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
         const seasonsLinks: PortalSeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
@@ -108,8 +104,6 @@ export class BurningSeriesController implements IPortalController {
         }, {});
 
         return {
-            title,
-            posterHref,
             seasonsLinks,
             link,
             portal: this.portalKey,
@@ -122,7 +116,6 @@ export class BurningSeriesController implements IPortalController {
             return null;
         }
 
-        const seriesTitle = this.seriesTitleSelector();
         const availableLanguages = this.getAvailableLanguages();
         const seasonLink = activeSeason.href;
 
@@ -131,7 +124,6 @@ export class BurningSeriesController implements IPortalController {
 
         return {
             portal: this.portalKey,
-            seriesTitle,
             seasonNumber,
             episodes,
             seasonLinks,
@@ -139,7 +131,6 @@ export class BurningSeriesController implements IPortalController {
     }
 
     public getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[] {
-        const seriesTitle = this.seriesTitleSelector();
         const providors = this.store.selectSync(getAllUsedProvidors);
         const activeLanguage = this.getActiveLanguage();
         const episodesHtmlContainer = [ ...this.episodesSelector() ];
@@ -148,27 +139,11 @@ export class BurningSeriesController implements IPortalController {
             const portalLinks = getLinksForProviders(providors, episodeHtmlContainer);
 
             return {
-                seriesTitle,
                 seasonNumber,
                 portalLinks: {
                     [activeLanguage]: portalLinks,
                 },
                 episodeNumber: ++index,
-                portal: this.portalKey,
-            };
-        });
-    }
-
-    public getAllSeriesInfo(): PortalSeriesInfoDto[] {
-        const links = this.seriesOverviewListLinkSelector() || [];
-        const collection = [ ...links ];
-        return collection.map((linkInfo: HTMLAnchorElement) => {
-            const title = linkInfo.text;
-            const link = linkInfo.href;
-
-            return {
-                link,
-                title,
                 portal: this.portalKey,
             };
         });

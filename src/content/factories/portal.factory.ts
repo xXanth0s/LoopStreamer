@@ -7,7 +7,7 @@ import { getContentTypeForPortal } from '../container/content-container.utils';
 import { PORTALS } from '../../store/enums/portals.enum';
 
 @injectable()
-export class PortalService {
+export class PortalFactory {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 

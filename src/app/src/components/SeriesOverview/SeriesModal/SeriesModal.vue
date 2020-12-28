@@ -62,7 +62,6 @@
     import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
     import SeriesModalHeader from './SeriesModalHeader.vue';
     import SeriesModalDescription from './SeriesModalDescription.vue';
-    import SeriesListRow from '../../SeriesSearchList/SeriesListRow.vue';
     import SeasonsList from './SeasonsList.vue';
     import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
     import SeriesEpisodeList from './SeriesEpisodeList.vue';
@@ -80,7 +79,6 @@
             SeriesEpisodeList,
             SeriesEpisodeTile,
             SeasonsList,
-            SeriesListRow,
             SeriesModalDescription,
             SeriesModalHeader,
             Spinner,

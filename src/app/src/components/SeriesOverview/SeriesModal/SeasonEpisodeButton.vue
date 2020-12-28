@@ -17,15 +17,15 @@
     import { Emit, Prop } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
-    import SeriesEpisode from '../../../../store/models/series-episode.model';
-    import { StoreService } from '../../../../shared/services/store.service';
-    import { optionsContainer } from '../../container/container';
-    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { isLoadingSeason } from '../../../../store/selectors/async-interaction.selector';
-    import { SeriesSeason } from '../../../../store/models/series-season.model';
-    import ButtonTile from '../ButtonTile.vue';
-    import { getSeriesEpisodesForSeason } from '../../../../store/selectors/series-episode.selector';
-    import { hasSeasonAlreadyPlayedEpisodes } from '../../../../store/selectors/series-season.selector';
+    import SeriesEpisode from '../../../../../store/models/series-episode.model';
+    import { StoreService } from '../../../../../shared/services/store.service';
+    import { optionsContainer } from '../../../container/container';
+    import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
+    import { isLoadingSeason } from '../../../../../store/selectors/async-interaction.selector';
+    import { SeriesSeason } from '../../../../../store/models/series-season.model';
+    import ButtonTile from '../../Shared/ButtonTile.vue';
+    import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
+    import { hasSeasonAlreadyPlayedEpisodes } from '../../../../../store/selectors/series-season.selector';
 
     @Component({
         name: 'series-season-button',

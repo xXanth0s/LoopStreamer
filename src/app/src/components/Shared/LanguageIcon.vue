@@ -12,7 +12,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Emit, Prop } from 'vue-property-decorator';
-    import { LANGUAGE } from '../../../store/enums/language.enum';
+    import { LANGUAGE } from '../../../../store/enums/language.enum';
 
     @Component({
         name: 'language-icon',

@@ -1,32 +1,22 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { globalRoutes } from '../constants/globalRoutes';
-import SeriesOverview from '../views/SeriesOverview.vue';
 import SettingsPage from '../views/SettingsPage.vue';
 import InfoPage from '../views/InfoPage.vue';
-import MySeriesPage from '../views/MySeriesPage.vue';
 import TestPage from '../views/TestPage.vue';
 import { environment } from '../../../environments/environment';
-import HomePage from '../views/Home.vue';
+import SeriesPage from '../views/SeriesPage.vue';
 
 Vue.use(VueRouter);
 
 let routes = [
     {
-        path: `/${globalRoutes.HOME_PAGE}`,
-        component: HomePage,
-    },
-    {
-        path: `/${globalRoutes.SERIES_LIST}`,
-        component: SeriesOverview,
+        path: `/${globalRoutes.SERIES_PAGE}`,
+        component: SeriesPage,
     },
     {
         path: `/${globalRoutes.SETTINGS_PAGE}`,
         component: SettingsPage,
-    },
-    {
-        path: `/${globalRoutes.SERIES_PAGE}`,
-        component: MySeriesPage,
     },
     {
         path: `/${globalRoutes.FAQ_PAGE}`,
@@ -38,7 +28,7 @@ let routes = [
     },
     {
         path: '/',
-        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.HOME_PAGE}`,
+        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.SERIES_PAGE}`,
     },
 ];
 

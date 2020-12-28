@@ -15,8 +15,8 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import ProvidorsPanel from '../components/ProvidorsPanel.vue';
-    import OptionsPanel from '../components/OptionsPanel.vue';
+    import ProvidorsPanel from '../components/OptionsPage/ProvidorsPanel.vue';
+    import OptionsPanel from '../components/OptionsPage/OptionsPanel.vue';
 
     @Component({
         components: {

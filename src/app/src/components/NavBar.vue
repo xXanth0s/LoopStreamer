@@ -2,9 +2,7 @@
     <div class="header">
         <div class="spacer-left control-buttons-size"></div>
         <b-nav tabs align="center">
-            <b-nav-item exact exact-active-class="active" :to="routesConst.HOME_PAGE">Home</b-nav-item>
-            <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_LIST">Alle Serien</b-nav-item>
-            <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_PAGE">Meine Serien</b-nav-item>
+            <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_PAGE">Serien</b-nav-item>
             <b-nav-item exact exact-active-class="active" :to="routesConst.SETTINGS_PAGE">Einstellungen</b-nav-item>
             <b-nav-item exact exact-active-class="active" :to="routesConst.FAQ_PAGE">FAQ</b-nav-item>
             <b-nav-item v-if="isDev" exact exact-active-class="active" :to="routesConst.TEST_PAGE">Test</b-nav-item>

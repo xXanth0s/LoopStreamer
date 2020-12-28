@@ -1,13 +1,12 @@
 import { inject, injectable } from 'inversify';
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
-import { PortalService } from '../services/portal.service';
+import { PortalFactory } from '../factories/portal.factory';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import {
     GetAllProvidorLinksForEpisodeMessage,
-    GetAllSeriesFromPortalMessage,
     GetDetailedSeriesInformationMessage,
     GetResolvedProvidorLinkForEpisode,
     GetSeasonInfoMessage,
@@ -24,7 +23,7 @@ import { addGlobalFunctions } from '../ustils/global.utils';
 
 @injectable()
 export class RootContentController {
-    constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalService,
+    constructor(@inject(CONTENT_TYPES.PortalService) private readonly portalService: PortalFactory,
                 @inject(CONTENT_TYPES.RecaptchaService) private readonly recaptchaService: RecaptchaService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
         document.addEventListener('DOMContentLoaded', () => {
@@ -39,11 +38,6 @@ export class RootContentController {
     public init(): void {
         ipcRenderer.on(MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE, (event, message: GetResolvedProvidorLinkForEpisode) => {
             this.getResolvedProvidorLinkHandler(event, message);
-        });
-
-        ipcRenderer.on(MessageType.PORTAL_GET_ALL_SERIES, (event, message: GetAllSeriesFromPortalMessage) => {
-            console.log(message);
-            this.getAllSeriesFromPortalHandler(event, message);
         });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL, (event, message: GetSeriesLinkForPortal) => {
@@ -82,12 +76,6 @@ export class RootContentController {
         const { language, portal } = message.payload;
         const result = this.portalService.getPortalController(portal).getAllPortalProviderLinksForEpisode(language);
         this.messageService.replyToSender(message, event.sender, result);
-    }
-
-    private async getAllSeriesFromPortalHandler(event: IpcRendererEvent, message: GetAllSeriesFromPortalMessage): Promise<void> {
-        const { portal } = message.payload;
-        const seriesInfo = await this.portalService.getPortalController(portal)?.getAllSeriesInfo();
-        this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
     private async getLinkForSeriesFromPortalHandler(event: IpcRendererEvent, message: GetSeriesLinkForPortal): Promise<void> {

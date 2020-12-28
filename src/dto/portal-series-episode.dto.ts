@@ -9,5 +9,4 @@ export interface PortalSeriesEpisodeDto {
         [key in LANGUAGE]?: ProvidorLink[]
     };
     portal: PORTALS;
-    seriesTitle: string;
 }

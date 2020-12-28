@@ -25,7 +25,7 @@
     import { StoreService } from '../../../../../shared/services/store.service';
     import { Genre } from '../../../../../store/models/genre.model';
     import { getMultipleGenres } from '../../../../../store/selectors/genre.selector';
-    import ContinueSeriesButton from '../../SeriesSearchList/ContinueSeriesButton.vue';
+    import ContinueSeriesButton from './ContinueSeriesButton.vue';
 
     @Component({
         name: 'series-modal-description',

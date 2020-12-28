@@ -30,30 +30,6 @@ export const createGetAllProvidorLinksForEpisodeMessage = (language: LANGUAGE, p
 });
 export type GetAllProvidorLinksForEpisodeMessage = ReturnType<typeof createGetAllProvidorLinksForEpisodeMessage>;
 
-export const createGetNextVideoLinkMessage = (): Message<undefined, string> => ({
-    type: MessageType.PORTAL_NEXT_EPISODE_LINK,
-    destinationController: ControllerType.PORTAL,
-    hasReply: true,
-});
-export type GetNextVideoLinkMessage = ReturnType<typeof createGetNextVideoLinkMessage>;
-
-export const createGetPreviousVideoLinkMessage = (): Message<undefined, string> => ({
-    type: MessageType.PORTAL_PREVIOUS_EPISODE_LINK,
-    destinationController: ControllerType.PORTAL,
-    hasReply: true,
-});
-export type GetPreviousVideoLinkMessage = ReturnType<typeof createGetPreviousVideoLinkMessage>;
-
-export const createGetAllSeriesFromPortalMessage = (portal: PORTALS): Message<{ portal: PORTALS }, PortalSeriesInfoDto[]> => ({
-    type: MessageType.PORTAL_GET_ALL_SERIES,
-    destinationController: ControllerType.PORTAL,
-    payload: {
-        portal,
-    },
-    hasReply: true,
-});
-export type GetAllSeriesFromPortalMessage = ReturnType<typeof createGetAllSeriesFromPortalMessage>;
-
 export const createGetSeriesLinkForPortalMessage = (seriesKey: Series['key'], portal: PORTALS): Message<{ portal: PORTALS, seriesKey: Series['key'] }, string> => ({
     type: MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL,
     destinationController: ControllerType.PORTAL,

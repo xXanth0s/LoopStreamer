@@ -34,7 +34,7 @@
     import Series from '../../../../store/models/series.model';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../shared/services/store.service';
-    import SeriesPanelFront from '../MySeries/SeriesPanelFront.vue';
+    import SeriesPanelFront from './SeriesPanelFront.vue';
     import { LANGUAGE } from '../../../../store/enums/language.enum';
     import { getMultipleSeriesMetaInfos } from '../../../../store/selectors/series-meta-info.selector';
     import { SeriesMetaInfo } from '../../../../store/models/series-meta-info.model';

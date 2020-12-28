@@ -27,7 +27,7 @@
     import { takeUntil } from 'rxjs/operators';
     import { StoreService } from '../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
-    import SeriesPanelFront from '../components/MySeries/SeriesPanelFront.vue';
+    import SeriesPanelFront from '../components/SeriesOverview/SeriesPanelFront.vue';
     import { NamedCollection } from '../../../store/models/collection.model';
     import Series from '../../../store/models/series.model';
     import { getCollectionsForTypes } from '../../../store/selectors/app-control-state.selector';
@@ -51,7 +51,7 @@
             SeriesPanelFront,
         },
     })
-    export default class HomePage extends Vue {
+    export default class SeriesPage extends Vue {
         $refs!: {
             seriesModal: SeriesModal;
         };

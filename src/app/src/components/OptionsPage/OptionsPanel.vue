@@ -31,20 +31,20 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import Options from '../../../store/models/options.model';
-    import { optionsContainer } from '../container/container';
-    import { StoreService } from '../../../shared/services/store.service';
-    import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
-    import { MessageService } from '../../../shared/services/message.service';
-    import { getOptions } from '../../../store/selectors/options.selector';
-    import { DEFAULT_COLOR } from '../../../constants/style-variables';
-    import InfoTooltip from './InfoTooltip.vue';
-    import { updateOptionsAction } from '../../../store/reducers/options.reducer';
-    import MinusPlusInput from './MinusPlusInput.vue';
-    import CardTile from './CardTile.vue';
-    import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../constants/tooltip-texts';
-    import { Context } from '../enums/context.enum';
-    import Toast from './Toast.vue';
+    import Options from '../../../../store/models/options.model';
+    import { optionsContainer } from '../../container/container';
+    import { StoreService } from '../../../../shared/services/store.service';
+    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
+    import { MessageService } from '../../../../shared/services/message.service';
+    import { getOptions } from '../../../../store/selectors/options.selector';
+    import { DEFAULT_COLOR } from '../../../../constants/style-variables';
+    import InfoTooltip from '../Shared/InfoTooltip.vue';
+    import { updateOptionsAction } from '../../../../store/reducers/options.reducer';
+    import MinusPlusInput from '../Shared/MinusPlusInput.vue';
+    import CardTile from '../Shared/CardTile.vue';
+    import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
+    import { Context } from '../../enums/context.enum';
+    import Toast from '../Shared/Toast.vue';
 
     @Component({
         name: 'options-panel',

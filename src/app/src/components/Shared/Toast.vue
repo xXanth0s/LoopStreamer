@@ -16,8 +16,8 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Prop } from 'vue-property-decorator';
-    import { Context } from '../enums/context.enum';
-    import { ContextIconMap } from '../data/context-icon.map';
+    import { Context } from '../../enums/context.enum';
+    import { ContextIconMap } from '../../data/context-icon.map';
 
     @Component({
         name: 'toast',

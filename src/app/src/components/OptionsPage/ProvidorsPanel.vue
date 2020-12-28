@@ -63,14 +63,14 @@
     import Draggable from 'vuedraggable';
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import Providor from '../../../store/models/providor.model';
-    import { StoreService } from '../../../shared/services/store.service';
-    import { MessageService } from '../../../shared/services/message.service';
-    import { optionsContainer } from '../container/container';
-    import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
-    import { getAllProvidors } from '../../../store/selectors/providors.selector';
-    import { updateProvidorsAction } from '../../../store/reducers/providors.reducer';
-    import CardTile from './CardTile.vue';
+    import Providor from '../../../../store/models/providor.model';
+    import { StoreService } from '../../../../shared/services/store.service';
+    import { MessageService } from '../../../../shared/services/message.service';
+    import { optionsContainer } from '../../container/container';
+    import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
+    import { getAllProvidors } from '../../../../store/selectors/providors.selector';
+    import { updateProvidorsAction } from '../../../../store/reducers/providors.reducer';
+    import CardTile from '../Shared/CardTile.vue';
 
     @Component({
         name: 'save-providors',

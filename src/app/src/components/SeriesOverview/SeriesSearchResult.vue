@@ -31,7 +31,7 @@
     import { StoreService } from '../../../../shared/services/store.service';
     import { getMultipleSeriesMetaInfos } from '../../../../store/selectors/series-meta-info.selector';
     import { isLoadingSearchResult } from '../../../../store/selectors/async-interaction.selector';
-    import SeriesPanelFront from '../MySeries/SeriesPanelFront.vue';
+    import SeriesPanelFront from './SeriesPanelFront.vue';
     import { LANGUAGE } from '../../../../store/enums/language.enum';
 
     @Component({

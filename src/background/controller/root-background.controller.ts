@@ -52,7 +52,6 @@ export class RootBackgroundController {
 
         if (openAppDevTools) {
             window.webContents.openDevTools();
-            this.windowService.addReduxDevTools();
         }
 
         this.store.dispatch(appStartedAction());

@@ -20,7 +20,7 @@
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
-    import SeriesSeasonButton from '../../SeriesSearchList/SeasonEpisodeButton.vue';
+    import SeriesSeasonButton from './SeasonEpisodeButton.vue';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';
     import { MessageService } from '../../../../../shared/services/message.service';
