@@ -1,20 +1,20 @@
 import { put, select } from 'redux-saga/effects';
-import { startNextEpisodeAction } from '../actions/shared.actions';
-import { StateModel } from '../models/state.model';
-import { getSeriesForEpisode } from '../selectors/series.selector';
-import { isMaximumPlayedEpisodesLimitReached } from '../selectors/control-state.selector';
-import { stopPlayer } from '../utils/stop-player.util';
+import { startNextEpisodeAction } from '../../actions/shared.actions';
+import { StateModel } from '../../models/state.model';
+import { getSeriesForEpisode } from '../../selectors/series.selector';
+import { isMaximumPlayedEpisodesLimitReached } from '../../selectors/control-state.selector';
+import { stopPlayer } from '../../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
-import { getPortalLinkForNextEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import { getPortalLinkForNextEpisode } from '../portal-load-series-data/load-neighbour-series-episode.saga';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
     removeAsyncInteractionAction,
-} from '../reducers/control-state.reducer';
-import { setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
-import { Logger } from '../../shared/services/logger';
-import { LinkModel } from '../models/link.model';
-import { startNextEpisodeAsyncInteraction } from '../actions/async-interactions';
+} from '../../reducers/control-state.reducer';
+import { setSeriesEpisodeTimeStampAction } from '../../reducers/series-episode.reducer';
+import { Logger } from '../../../shared/services/logger';
+import { LinkModel } from '../../models/link.model';
+import { startNextEpisodeAsyncInteraction } from '../../actions/async-interactions';
 
 export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisodeAction>) {
     stopPlayer();

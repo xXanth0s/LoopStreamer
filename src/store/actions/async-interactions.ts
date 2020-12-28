@@ -7,6 +7,8 @@ import { AsyncInteractionType } from '../enums/async-interaction-type.enum';
 
 export const continueAutoplayAsyncInteraction = createAsyncInteraction<{ episodeKey: SeriesEpisode['key'] }>(AsyncInteractionType.SAGA_START_CONTINUE_AUTOPLAY);
 
+export const loadingSeriesSearchResult = createAsyncInteraction<{ searchText: string }>(AsyncInteractionType.SAGA_LOADING_SERIES_SEARCH);
+
 export const loadingSeriesAsyncInteraction = createAsyncInteraction<{ seriesKey: Series['key'], portalKey: PORTALS }>(AsyncInteractionType.SAGA_LOADING_SERIES);
 
 export const loadingSeasonAsyncInteraction = createAsyncInteraction<{ seasonKey: SeriesSeason['key'] }>(AsyncInteractionType.SAGA_LOADING_SEASON);

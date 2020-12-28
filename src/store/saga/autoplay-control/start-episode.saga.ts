@@ -1,31 +1,31 @@
 import { call, put, select } from 'redux-saga/effects';
-import { startEpisodeAction } from '../actions/shared.actions';
-import { getFallbackLanguageForEpisode, getSeriesEpisodeByKey } from '../selectors/series-episode.selector';
-import { StateModel } from '../models/state.model';
-import { getPortalController, getVideoController } from '../../background/container/container.utils';
-import SeriesEpisode from '../models/series-episode.model';
-import { PORTALS } from '../enums/portals.enum';
-import { getAllUsedProvidors } from '../selectors/providors.selector';
-import { PROVIDORS } from '../enums/providors.enum';
-import { ProvidorLink } from '../../background/models/providor-link.model';
-import { getSeriesForEpisode } from '../selectors/series.selector';
-import { setLastUsedLanguageForSeriesAction, setLastUsedPortalForSeriesAction } from '../reducers/series.reducer';
+import { startEpisodeAction } from '../../actions/shared.actions';
+import { getFallbackLanguageForEpisode, getSeriesEpisodeByKey } from '../../selectors/series-episode.selector';
+import { StateModel } from '../../models/state.model';
+import { getPortalController, getVideoController } from '../../../background/container/container.utils';
+import SeriesEpisode from '../../models/series-episode.model';
+import { PORTALS } from '../../enums/portals.enum';
+import { getAllUsedProvidors } from '../../selectors/providors.selector';
+import { PROVIDORS } from '../../enums/providors.enum';
+import { ProvidorLink } from '../../../background/models/providor-link.model';
+import { getSeriesForEpisode } from '../../selectors/series.selector';
+import { setLastUsedLanguageForSeriesAction, setLastUsedPortalForSeriesAction } from '../../reducers/series.reducer';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
     removeAsyncInteractionAction,
     resetPlayedEpisodesAction,
     setActiveEpisodeAction,
-} from '../reducers/control-state.reducer';
-import { stopPlayer } from '../utils/stop-player.util';
-import { getLinksByKeys } from '../selectors/línk.selector';
-import { loadAllProvidorLinksForEpisode } from './portal-load-series-data/load-all-providors-for-episode.saga';
-import { LANGUAGE } from '../enums/language.enum';
-import { generateLinkForProvidorLink } from '../utils/link.utils';
-import { LINK_TYPE } from '../enums/link-type.enum';
-import { updateOrAddLinkAction } from '../reducers/link.reducer';
-import { Logger } from '../../shared/services/logger';
-import { startEpisodeAsyncInteraction } from '../actions/async-interactions';
+} from '../../reducers/control-state.reducer';
+import { stopPlayer } from '../../utils/stop-player.util';
+import { getLinksByKeys } from '../../selectors/línk.selector';
+import { loadAllProvidorLinksForEpisode } from '../portal-load-series-data/load-all-providors-for-episode.saga';
+import { LANGUAGE } from '../../enums/language.enum';
+import { generateLinkForProvidorLink } from '../../utils/link.utils';
+import { LINK_TYPE } from '../../enums/link-type.enum';
+import { updateOrAddLinkAction } from '../../reducers/link.reducer';
+import { Logger } from '../../../shared/services/logger';
+import { startEpisodeAsyncInteraction } from '../../actions/async-interactions';
 
 export type StartEpisodeOptions = {
     episodeKey: SeriesEpisode['key'];

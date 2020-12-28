@@ -1,7 +1,11 @@
 import { StateModel } from '../models/state.model';
 import { AsyncInteraction, AsyncInteractionCreator } from '../models/async-interaction.model';
 import SeriesEpisode from '../models/series-episode.model';
-import { loadingSeasonAsyncInteraction, startEpisodeAsyncInteraction } from '../actions/async-interactions';
+import {
+    loadingSeasonAsyncInteraction,
+    loadingSeriesSearchResult,
+    startEpisodeAsyncInteraction
+} from '../actions/async-interactions';
 
 export const getAsyncInteractions = <T>(state: StateModel, creator: AsyncInteractionCreator<T>): AsyncInteraction<T>[] => {
     return Object.values(state.controlState.asyncInteractions)
@@ -18,3 +22,5 @@ export const isPreparingEpisode = (state: StateModel, episodeKey: SeriesEpisode[
 export const isPreparingVideo = (state: StateModel): boolean => Boolean(getAsyncInteractions(state, startEpisodeAsyncInteraction).length);
 
 export const isLoadingSeason = (state: StateModel): boolean => Boolean(getAsyncInteractions(state, loadingSeasonAsyncInteraction).length);
+
+export const isLoadingSearchResult = (state: StateModel): boolean => Boolean(getAsyncInteractions(state, loadingSeriesSearchResult).length);

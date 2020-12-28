@@ -32,7 +32,6 @@
     import Series from '../../../../store/models/series.model';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../shared/services/store.service';
-    import { MessageService } from '../../../../shared/services/message.service';
     import SeriesPanelFront from '../MySeries/SeriesPanelFront.vue';
     import { LANGUAGE } from '../../../../store/enums/language.enum';
     import { getMultipleSeriesMetaInfos } from '../../../../store/selectors/series-meta-info.selector';
@@ -48,6 +47,20 @@
     })
     export default class SeriesCarousel extends Vue {
         private readonly takeUntil$ = new Subject();
+
+        private series: SeriesMetaInfo[];
+
+        @Inject(SHARED_TYPES.StoreService)
+        private store: StoreService;
+
+        @Prop(Object)
+        public seriesCollection: NamedCollection<Series>;
+
+        @Prop(String)
+        public language: LANGUAGE;
+
+        @Prop(Number)
+        public fixedSlidesCount: number;
 
         private get swiperOption(): SwiperOptions {
             const breakpoints = this.fixedSlidesCount ? null : {
@@ -116,23 +129,6 @@
                 loop: false,
             };
         }
-
-        private series: SeriesMetaInfo[];
-
-        @Inject(SHARED_TYPES.StoreService)
-        private store: StoreService;
-
-        @Inject(SHARED_TYPES.MessageService)
-        private messageService: MessageService;
-
-        @Prop(Object)
-        public seriesCollection: NamedCollection<Series>;
-
-        @Prop(String)
-        public language: LANGUAGE;
-
-        @Prop(Number)
-        public fixedSlidesCount: number;
 
         @Watch('seriesCollection', { immediate: true })
         private selectionChanged(seriesCollection: NamedCollection<Series>): void {

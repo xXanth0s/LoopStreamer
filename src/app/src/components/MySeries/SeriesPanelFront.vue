@@ -4,7 +4,7 @@
         <div class="flex-column bordered">
             <div class="image-container relative">
                 <i v-if="showSettingsIcon" class="fas fa-cog spin-icon absolute top-0 right-0 mt-2 mr-2 icon"></i>
-                <img class="absolute top-0" :src="imageUrl">
+                <img class="absolute top-0 w-full" :src="imageUrl">
             </div>
             <div class="flex flex-grow-0 text-lg justify-center items-center h-10 whitespace-nowrap">
                 <span class="truncate mx-1">{{seriesName}}</span>

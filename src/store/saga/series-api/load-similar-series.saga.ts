@@ -6,7 +6,7 @@ import { MovieDBService } from '../../../shared/services/movie-db.service';
 import { MovieApi } from '../../enums/movie-api.enum';
 import { NamedCollection } from '../../models/collection.model';
 import { SeriesMetaInfo } from '../../models/series-meta-info.model';
-import { CollectionKey } from '../../enums/collection-key.enum';
+import { CollectionType } from '../../enums/collection-key.enum';
 import { addMultipleSeriesMetaInfosAction } from '../../reducers/series-meta-info.reducer';
 import { Logger } from '../../../shared/services/logger';
 
@@ -22,7 +22,8 @@ export function* loadSimilarSeriesSaga(action: ReturnType<typeof setSelectedSeri
 
 
         const similarSeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: CollectionKey.SIMILAR_SERIES_MODAL,
+            key: CollectionType.SIMILAR_SERIES_MODAL,
+            type: CollectionType.SIMILAR_SERIES_MODAL,
             title: 'Ähnliche Serien',
             data: similarSeries.map(series => series.key),
         };

@@ -8,7 +8,7 @@ import { StateModel } from '../models/state.model';
 import { LANGUAGE } from '../enums/language.enum';
 import { NamedCollection } from '../models/collection.model';
 import { SeriesMetaInfo } from '../models/series-meta-info.model';
-import { CollectionKey } from '../enums/collection-key.enum';
+import { CollectionType } from '../enums/collection-key.enum';
 
 const initialState: AppControlStateModel = {
     seriesCollections: {},
@@ -59,7 +59,7 @@ function addOrReplaceSeriesCollection(state: AppControlStateModel, { collection 
 
 function setSelectedSeries(state: AppControlStateModel, {selectedSeriesKey}: { selectedSeriesKey: Series['key'] }): void {
     state.selectedSeriesKey = selectedSeriesKey;
-    delete state.seriesCollections[CollectionKey.SIMILAR_SERIES_MODAL];
+    delete state.seriesCollections[CollectionType.SIMILAR_SERIES_MODAL];
 }
 
 function toggleMutePreviewVideoState(state: AppControlStateModel): void {
@@ -68,6 +68,10 @@ function toggleMutePreviewVideoState(state: AppControlStateModel): void {
 
 function setSearchText(state: AppControlStateModel, payload: { searchText: string }) {
     state.searchText = payload.searchText;
+}
+
+function removeSeriesCollection(state: AppControlStateModel, { collectionKey }: { collectionKey: NamedCollection<SeriesMetaInfo>['key'] }) {
+    delete state.seriesCollections[collectionKey];
 }
 
 export const appControlStateSlice = createSlice({
@@ -79,6 +83,8 @@ export const appControlStateSlice = createSlice({
         setSelectedSeriesAction: (state: AppControlStateModel, action: PayloadAction<{ selectedSeriesKey: Series['key'] }>) => setSelectedSeries(state, action.payload),
         setSelectedSeasonForAppAction: (state: AppControlStateModel, action: PayloadAction<SeriesSeason['key']>) => setSelectedSeason(state, action.payload),
         setSelectedLanguageAction: (state: AppControlStateModel, action: PayloadAction<{ selectedLanguage: LANGUAGE }>) => setSelectedLanguage(state, action.payload),
+        removeSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collectionKey: NamedCollection<SeriesMetaInfo>['key'] }>) =>
+            removeSeriesCollection(state, action.payload),
         addOrReplaceSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collection: NamedCollection<SeriesMetaInfo> }>) =>
             addOrReplaceSeriesCollection(state, action.payload),
         addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<SeriesMetaInfo>[] }>) =>
@@ -100,6 +106,7 @@ export const {
     setSelectedLanguageAction,
     resetAppControlStateAction,
     addOrReplaceSeriesCollectionAction,
+    removeSeriesCollectionAction,
     addOrReplaceMultipleSeriesCollectionAction,
     setSelectedSeriesAction,
     toggleMutePreviewVideoStateAction,

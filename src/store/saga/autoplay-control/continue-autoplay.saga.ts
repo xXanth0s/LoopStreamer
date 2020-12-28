@@ -1,18 +1,18 @@
 import { put, select } from 'redux-saga/effects';
-import { startPreviousEpisodeAction } from '../actions/shared.actions';
-import { getSeriesForEpisode } from '../selectors/series.selector';
-import { stopPlayer } from '../utils/stop-player.util';
+import { startPreviousEpisodeAction } from '../../actions/shared.actions';
+import { getSeriesForEpisode } from '../../selectors/series.selector';
+import { stopPlayer } from '../../utils/stop-player.util';
 import { startEpisode } from './start-episode.saga';
-import { getPortalLinkForNextEpisode } from './portal-load-series-data/load-neighbour-series-episode.saga';
+import { getPortalLinkForNextEpisode } from '../portal-load-series-data/load-neighbour-series-episode.saga';
 import {
     addAsyncInteractionAction,
     raisePlayedEpisodesAction,
     removeAsyncInteractionAction,
     resetPlayedEpisodesAction,
-} from '../reducers/control-state.reducer';
-import { Logger } from '../../shared/services/logger';
-import { LinkModel } from '../models/link.model';
-import { continueAutoplayAsyncInteraction } from '../actions/async-interactions';
+} from '../../reducers/control-state.reducer';
+import { Logger } from '../../../shared/services/logger';
+import { LinkModel } from '../../models/link.model';
+import { continueAutoplayAsyncInteraction } from '../../actions/async-interactions';
 
 export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpisodeAction>) {
     stopPlayer();

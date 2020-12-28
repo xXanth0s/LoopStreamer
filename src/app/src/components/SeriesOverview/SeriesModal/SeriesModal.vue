@@ -6,13 +6,13 @@
              hide-footer
              hide-header
              title="Using Component Methods">
-        <div class="modal-container bg-gray-900 text-white relative">n
+        <div class="modal-container bg-gray-900 text-white relative">
             <div v-if="series">
                 <series-modal-header
-                    class="font-mono ls-modal-header"
-                    :series="series"
-                    :language="activeLanguage"
-                    @close-modal="closeModal"/>
+                        class="font-mono ls-modal-header"
+                        :series="series"
+                        :language="activeLanguage"
+                        @close-modal="closeModal"/>
 
                 <div class="px-4">
                     <series-modal-description class="mt-4"
@@ -31,58 +31,58 @@
                                      @seriesClicked="similarSeriesSelected"/>
                 </div>
             </div>
-            <div v-else class="absolute w-100 h-100">
-                <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="sr-only"></span>
-                </div>
-                <span>Serie wird geladen...</span>
-            </div>
+            <spinner v-else class="w-100 h-100 absolute" text="Serie wird geladen..."/>
         </div>
     </b-modal>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { Emit, Inject } from 'vue-property-decorator';
-import { BvComponent } from 'bootstrap-vue';
-import { Subject } from 'rxjs';
-import { filter, switchMap, takeUntil, tap, } from 'rxjs/operators';
-import Series from '../../../../../store/models/series.model';
-import { SeriesSeason } from '../../../../../store/models/series-season.model';
-import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
-import { StoreService } from '../../../../../shared/services/store.service';
-import { MessageService } from '../../../../../shared/services/message.service';
-import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
-import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
-import { getSelectedSeasonKey, getSeriesCollection, } from '../../../../../store/selectors/app-control-state.selector';
-import SeriesEpisode from '../../../../../store/models/series-episode.model';
-import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
-import { LANGUAGE } from '../../../../../store/enums/language.enum';
-import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
-import SeriesModalHeader from './SeriesModalHeader.vue';
-import SeriesModalDescription from './SeriesModalDescription.vue';
-import SeriesListRow from '../../SeriesSearchList/SeriesListRow.vue';
-import SeasonsList from './SeasonsList.vue';
-import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
-import SeriesEpisodeList from './SeriesEpisodeList.vue';
-import { setSelectedSeasonForAppAction } from '../../../../../store/reducers/app-control-state.reducer';
-import { CollectionKey } from '../../../../../store/enums/collection-key.enum';
-import { NamedCollection } from '../../../../../store/models/collection.model';
-import { SeriesMetaInfo } from '../../../../../store/models/series-meta-info.model';
-import SeriesCarousel from '../SeriesCarousel.vue';
+    import Vue from 'vue';
+    import Component from 'vue-class-component';
+    import { Emit, Inject } from 'vue-property-decorator';
+    import { BvComponent } from 'bootstrap-vue';
+    import { Subject } from 'rxjs';
+    import { filter, switchMap, takeUntil, tap, } from 'rxjs/operators';
+    import Series from '../../../../../store/models/series.model';
+    import { SeriesSeason } from '../../../../../store/models/series-season.model';
+    import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
+    import { StoreService } from '../../../../../shared/services/store.service';
+    import { MessageService } from '../../../../../shared/services/message.service';
+    import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
+    import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
+    import {
+        getCollectionsForTypes,
+        getSelectedSeasonKey,
+    } from '../../../../../store/selectors/app-control-state.selector';
+    import SeriesEpisode from '../../../../../store/models/series-episode.model';
+    import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
+    import { LANGUAGE } from '../../../../../store/enums/language.enum';
+    import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';
+    import SeriesModalHeader from './SeriesModalHeader.vue';
+    import SeriesModalDescription from './SeriesModalDescription.vue';
+    import SeriesListRow from '../../SeriesSearchList/SeriesListRow.vue';
+    import SeasonsList from './SeasonsList.vue';
+    import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
+    import SeriesEpisodeList from './SeriesEpisodeList.vue';
+    import { setSelectedSeasonForAppAction } from '../../../../../store/reducers/app-control-state.reducer';
+    import { CollectionType } from '../../../../../store/enums/collection-key.enum';
+    import { NamedCollection } from '../../../../../store/models/collection.model';
+    import { SeriesMetaInfo } from '../../../../../store/models/series-meta-info.model';
+    import SeriesCarousel from '../SeriesCarousel.vue';
+    import Spinner from '../../Shared/Spinner.vue';
 
-@Component({
-    name: 'series-modal',
-    components: {
-        SeriesCarousel,
-        SeriesEpisodeList,
-        SeriesEpisodeTile,
-        SeasonsList,
-        SeriesListRow,
-        SeriesModalDescription,
-        SeriesModalHeader,
-    },
+    @Component({
+        name: 'series-modal',
+        components: {
+            SeriesCarousel,
+            SeriesEpisodeList,
+            SeriesEpisodeTile,
+            SeasonsList,
+            SeriesListRow,
+            SeriesModalDescription,
+            SeriesModalHeader,
+            Spinner,
+        },
     })
     export default class SeriesModal extends Vue {
         private readonly seriesChanged$ = new Subject();
@@ -149,9 +149,9 @@ import SeriesCarousel from '../SeriesCarousel.vue';
         }
 
         public loadSimilarSeriesData(): void {
-            this.store.selectBehaviour(getSeriesCollection, CollectionKey.SIMILAR_SERIES_MODAL).pipe(
+            this.store.selectBehaviour(getCollectionsForTypes, [ CollectionType.SIMILAR_SERIES_MODAL ]).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(collection => this.similarSeriesCollection = collection);
+            ).subscribe(collections => this.similarSeriesCollection = collections[0] || null);
         }
 
         public seasonSelected(seasonKey: SeriesSeason['key']): void {

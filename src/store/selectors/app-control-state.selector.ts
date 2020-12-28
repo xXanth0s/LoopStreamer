@@ -7,8 +7,7 @@ import { LANGUAGE } from '../enums/language.enum';
 import { SeriesSeason } from '../models/series-season.model';
 import { NamedCollection } from '../models/collection.model';
 import { SeriesMetaInfo } from '../models/series-meta-info.model';
-import { filterObject } from '../utils/selector.utils';
-import { CollectionKey } from '../enums/collection-key.enum';
+import { CollectionType } from '../enums/collection-key.enum';
 
 export const getExpandedSeries = (state: StateModel): Series['key'] => state.appControlState.selectedSeriesKey;
 
@@ -44,11 +43,7 @@ export const getSelectedLanguageOrLastUsedSeriesLanguage = (state: StateModel, s
 
 export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);
 
-export const getSeriesCollectionsForOverview = (state: StateModel): NamedCollection<SeriesMetaInfo>[] => {
-    const collectionsWithoutModalColletion = filterObject(state.appControlState.seriesCollections, collection => collection.key !== CollectionKey.SIMILAR_SERIES_MODAL);
-    return Object.values(collectionsWithoutModalColletion);
-};
-
-export const getSeriesCollection = (state: StateModel, key: NamedCollection<SeriesMetaInfo>['key']): NamedCollection<SeriesMetaInfo> => {
-    return state.appControlState.seriesCollections[key];
+export const getCollectionsForTypes = (state: StateModel, types: CollectionType[]): NamedCollection<SeriesMetaInfo>[] => {
+    const collections = Object.values(state.appControlState.seriesCollections);
+    return types.flatMap(type => collections.filter(collection => collection.type === type));
 };

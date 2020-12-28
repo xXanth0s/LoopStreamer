@@ -1,9 +1,5 @@
 import { Responses } from 'node-themoviedb';
-import {
-    getKeyForSeriesEpisode,
-    getKeyForSeriesSeason,
-    getKeyForSeriesTitle
-} from '../store/utils/key.utils';
+import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from '../store/utils/key.utils';
 import { LANGUAGE } from '../store/enums/language.enum';
 import Series, { getEmptySeries } from '../store/models/series.model';
 import { mapLanguage } from './language-mapper';
@@ -24,7 +20,6 @@ export type MovieDbMetaInfo = {
     backdrop_path: string | null;
     overview: string;
     first_air_date: string;
-    genre_ids: number[];
     original_language: string;
 }
 

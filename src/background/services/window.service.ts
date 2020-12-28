@@ -12,7 +12,7 @@ import * as path from 'path';
 import { ElectronBlocker } from '@cliqz/adblocker-electron';
 import fetch from 'cross-fetch';
 import { fromEvent, merge } from 'rxjs';
-import { first, takeUntil } from 'rxjs/operators';
+import { debounceTime, first, takeUntil } from 'rxjs/operators';
 import { Windows } from 'webextension-polyfill-ts';
 import { getWindowStateForWindowId, getWindowStateForWindowType } from '../../store/selectors/control-state.selector';
 import { setWindowSizeAction, setWindowStateAction } from '../../store/reducers/control-state.reducer';
@@ -195,6 +195,7 @@ export class WindowService {
             fromEvent(window, 'restore'),
         ).pipe(
             takeUntil(fromEvent(window, 'closed')),
+            debounceTime(500)
         ).subscribe(() => {
             let state: WindowState = 'normal';
             if (window.isFullScreen()) {

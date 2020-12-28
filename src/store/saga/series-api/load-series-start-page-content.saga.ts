@@ -6,7 +6,7 @@ import { addOrReplaceMultipleSeriesCollectionAction } from '../../reducers/app-c
 import { Logger } from '../../../shared/services/logger';
 import { SeriesMetaInfo } from '../../models/series-meta-info.model';
 import { addMultipleSeriesMetaInfosAction } from '../../reducers/series-meta-info.reducer';
-import { CollectionKey } from '../../enums/collection-key.enum';
+import { CollectionType } from '../../enums/collection-key.enum';
 import { getWatchedSeries } from '../../selectors/watched-series.selector';
 import { reduceArraySize } from '../../../utils/array.utils';
 import { getMovieDbApiKeysForSeries, getSeriesByKey } from '../../selectors/series.selector';
@@ -25,27 +25,31 @@ export function* loadSeriesStartPageContentSaga() {
             ]);
 
         const popularSeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: CollectionKey.MOST_POPULAR_SERIES,
+            key: CollectionType.MOST_POPULAR_SERIES,
+            type: CollectionType.MOST_POPULAR_SERIES,
             title: 'Populärste Serien',
             data: popularSeries.map(series => series.key),
         };
 
         const topRatedSeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: CollectionKey.TOP_RATED_SERIES,
+            key: CollectionType.TOP_RATED_SERIES,
+            type: CollectionType.TOP_RATED_SERIES,
             title: 'Best bewertete Serien',
             data: topRatedSeries.map(series => series.key),
         };
 
         const airingTodaySeriesCollection: NamedCollection<SeriesMetaInfo> = {
-            key: CollectionKey.IN_TV_SERIES,
+            key: CollectionType.IN_TV_SERIES,
+            type: CollectionType.IN_TV_SERIES,
             title: 'Aktuell im Fernsehen',
             data: airingTodaySeries.map(series => series.key),
         };
 
-        const similarSeriesCollections = similarSeries.map((seriesCollection, index) => {
+        const similarSeriesCollections: NamedCollection<SeriesMetaInfo>[] = similarSeries.map((seriesCollection, index) => {
             const series = getSeriesByKey(state, watchedSeries[index]);
             return {
-                key: `${CollectionKey.SIMILAR_SERIES_OVERVIEW}_${index}`,
+                key: `${CollectionType.SIMILAR_SERIES_OVERVIEW}_${index}`,
+                type: CollectionType.SIMILAR_SERIES_OVERVIEW,
                 title: `Weil Sie ${series.titles[language]} gesehen haben`,
                 data: seriesCollection.map(_series => _series.key),
             };
