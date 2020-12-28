@@ -42,7 +42,9 @@
     import { Emit, Inject } from 'vue-property-decorator';
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
-    import { filter, switchMap, takeUntil, tap, } from 'rxjs/operators';
+    import {
+        filter, switchMap, takeUntil, tap,
+    } from 'rxjs/operators';
     import Series from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';

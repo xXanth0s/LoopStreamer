@@ -30,7 +30,7 @@
     import SeriesPanelFront from '../components/MySeries/SeriesPanelFront.vue';
     import { NamedCollection } from '../../../store/models/collection.model';
     import Series from '../../../store/models/series.model';
-    import { getCollectionsForTypes, } from '../../../store/selectors/app-control-state.selector';
+    import { getCollectionsForTypes } from '../../../store/selectors/app-control-state.selector';
     import SeriesCarousel from '../components/SeriesOverview/SeriesCarousel.vue';
     import { LANGUAGE } from '../../../store/enums/language.enum';
     import { setSearchTextAction, setSelectedSeriesAction } from '../../../store/reducers/app-control-state.reducer';
