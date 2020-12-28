@@ -30,8 +30,6 @@ export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: S
     return getSeriesSeasonByKey(state, seasonKey);
 };
 
-export const getNextSeason = (state: StateModel, seasonKey: SeriesSeason['key']): SeriesSeason => getSeasonWithOffset(state, seasonKey, 1);
-
 export const getSeasonWithOffset = (state: StateModel, seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
     const currentSeason = getSeriesSeasonByKey(state, seasonKey);
 
@@ -47,22 +45,3 @@ export const hasSeasonAlreadyPlayedEpisodes = (state: StateModel, seasonKey: Ser
     const episodes = getSeriesEpisodesForSeason(state, seasonKey);
     return episodes.some(episode => Boolean(episode.timestamp));
 };
-
-export function getAvailableLanguagesForSeasonAndActivePortal(state: StateModel, seasonKey: SeriesSeason['key']): LANGUAGE[] {
-    let portal = state.appControlState.activePortal;
-    if (!portal) {
-        const series = getSeriesForSeason(state, seasonKey);
-        portal = series.lastUsedPortal;
-    }
-    const links = getLinksForSeriesSeasonAndPortal(state, seasonKey, portal);
-
-    const languages = links
-        .map(link => link.language)
-        .filter(language => language !== LANGUAGE.NONE);
-
-    return [ ...new Set(languages) ];
-}
-
-export function getFirstSeasonForSeries(state: StateModel, seriesKey: Series['key']): SeriesSeason {
-    return getSeasonsForSeries(state, seriesKey)[0];
-}

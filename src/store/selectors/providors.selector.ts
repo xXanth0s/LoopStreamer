@@ -18,14 +18,3 @@ export const getProvidorForName = (state: StateModel, providorName: string): Pro
     const providors = getAllProvidors(state);
     return providors.filter(providor => providor.names.some(name => name.toLocaleLowerCase() === providorName.trim().toLocaleLowerCase()))[0];
 };
-
-export const getActiveSortedProvidors = (state: StateModel): Providor[] => getAllProvidors(state).filter(providor => providor.isUsed)
-    .sort((providorA: Providor, providorB: Providor) => providorA.index - providorB.index);
-
-export const getActiveProvidor = (state: StateModel): Providor | null => {
-    if (state.controlState.activeProvidor) {
-        return getProvidorForKey(state, state.controlState.activeProvidor);
-    }
-
-    return null;
-};

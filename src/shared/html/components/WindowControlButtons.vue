@@ -31,7 +31,7 @@
     import { debounceTime, filter, tap } from 'rxjs/operators';
     import { Prop } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
-    import { optionsContainer } from '../../../app/src/container/container';
+    import { appContainer } from '../../../app/src/container/container';
     import { StoreService } from '../../services/store.service';
     import { SHARED_TYPES } from '../../constants/SHARED_TYPES';
     import { MessageService } from '../../services/message.service';
@@ -61,8 +61,8 @@
         private hideButtons$ = new Subject();
 
         public beforeCreate(): void {
-            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
+            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         public mounted(): void {

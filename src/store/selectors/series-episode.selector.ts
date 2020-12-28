@@ -2,9 +2,8 @@ import { StateModel } from '../models/state.model';
 import SeriesEpisode from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { sortArrayForKey } from '../../utils/array.utils';
-import { getSelectedLanguageOrLastUsedSeriesLanguageForEpisode } from './app-control-state.selector';
-import { getActiveOrLastUsedPortalForSeries, getSeriesForEpisode } from './series.selector';
-import { getLinksForEpisode, getPortalLinksForSeriesEpisodePortalAndLanguage } from './línk.selector';
+import { getSeriesForEpisode } from './series.selector';
+import { getLinksForEpisode } from './línk.selector';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
 import { Logger } from '../../shared/services/logger';
 import { LANGUAGE } from '../enums/language.enum';
@@ -93,14 +92,6 @@ export const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisod
     const seasonEpisodes = getSeriesEpisodesForSeason(state, episode.seasonKey);
 
     return seasonEpisodes.find(seasonEpisode => seasonEpisode.episodeNumber === (episode.episodeNumber + offset));
-};
-
-export const hasEpisodeLinksForSelectedLanguageAndPortal = (state: StateModel, episodeKey: SeriesEpisode['key']): boolean => {
-    const episode = getSeriesEpisodeByKey(state, episodeKey);
-    const portal = getActiveOrLastUsedPortalForSeries(state, episode.seriesKey);
-    const language = getSelectedLanguageOrLastUsedSeriesLanguageForEpisode(state, episodeKey);
-
-    return getPortalLinksForSeriesEpisodePortalAndLanguage(state, episode.key, portal, language).length > 0;
 };
 
 export const getFallbackLanguageForEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): LANGUAGE => {

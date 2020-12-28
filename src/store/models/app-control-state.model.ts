@@ -6,10 +6,8 @@ import { NamedCollection } from './collection.model';
 import { SeriesMetaInfo } from './series-meta-info.model';
 
 export default interface AppControlStateModel {
-    activePortal?: PORTALS;
     selectedSeriesKey?: Series['key'];
     selectedSeason?: SeriesSeason['key'];
-    selectedLanguage?: LANGUAGE;
     mutePreviewVideo: boolean;
     searchText: string;
     seriesCollections: Record<string, NamedCollection<SeriesMetaInfo>>;

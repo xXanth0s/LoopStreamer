@@ -27,7 +27,7 @@
     import { takeUntil } from 'rxjs/operators';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { MessageService } from '../../../../../shared/services/message.service';
-    import { optionsContainer } from '../../../container/container';
+    import { appContainer } from '../../../container/container';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../../store/utils/series.utils';
     import { StoreService } from '../../../../../shared/services/store.service';
@@ -87,8 +87,8 @@
         }
 
         public beforeCreate(): void {
-            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
+            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         @Watch('seriesKey', { immediate: true })

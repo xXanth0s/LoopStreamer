@@ -12,12 +12,10 @@ export const getAsyncInteractions = <T>(state: StateModel, creator: AsyncInterac
         .filter<AsyncInteraction<T>>(creator.isInstanceOf);
 };
 
-
 export const isPreparingEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): boolean => {
     const asyncInteractions = getAsyncInteractions(state, startEpisodeAsyncInteraction);
     return asyncInteractions.some(action => action.payload.episodeKey === episodeKey);
 };
-
 
 export const isPreparingVideo = (state: StateModel): boolean => Boolean(getAsyncInteractions(state, startEpisodeAsyncInteraction).length);
 

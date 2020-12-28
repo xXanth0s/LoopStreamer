@@ -19,7 +19,7 @@
     import { takeUntil } from 'rxjs/operators';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { StoreService } from '../../../../../shared/services/store.service';
-    import { optionsContainer } from '../../../container/container';
+    import { appContainer } from '../../../container/container';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { isLoadingSeason } from '../../../../../store/selectors/async-interaction.selector';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
@@ -49,7 +49,7 @@
         }
 
         public beforeCreate(): void {
-            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
         }
 
         public mounted(): void {

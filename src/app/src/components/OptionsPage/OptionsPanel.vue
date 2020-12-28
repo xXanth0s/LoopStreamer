@@ -32,7 +32,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import Options from '../../../../store/models/options.model';
-    import { optionsContainer } from '../../container/container';
+    import { appContainer } from '../../container/container';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../../shared/services/message.service';
@@ -68,8 +68,8 @@
         private messageService: MessageService;
 
         public beforeCreate(): void {
-            this.store = optionsContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = optionsContainer.get<MessageService>(SHARED_TYPES.MessageService);
+            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
         public created(): void {

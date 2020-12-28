@@ -17,5 +17,3 @@ export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean 
 
     return episodesToPlay !== 0 && playedEpisodes >= episodesToPlay;
 };
-
-export const getActiveEpisode = (state: StateModel): ControlState['activeEpisode'] => state.controlState.activeEpisode;

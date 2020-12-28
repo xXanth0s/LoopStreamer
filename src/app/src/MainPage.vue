@@ -16,7 +16,7 @@
     import Component from 'vue-class-component';
     import NavBar from './components/NavBar.vue';
     import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
-    import { optionsContainer } from './container/container';
+    import { appContainer } from './container/container';
     import { StoreService } from '../../shared/services/store.service';
     import { MessageService } from '../../shared/services/message.service';
 
@@ -25,8 +25,8 @@
             NavBar,
         },
         provide: {
-            [SHARED_TYPES.StoreService]: optionsContainer.get<StoreService>(SHARED_TYPES.StoreService),
-            [SHARED_TYPES.MessageService]: optionsContainer.get<MessageService>(SHARED_TYPES.MessageService),
+            [SHARED_TYPES.StoreService]: appContainer.get<StoreService>(SHARED_TYPES.StoreService),
+            [SHARED_TYPES.MessageService]: appContainer.get<MessageService>(SHARED_TYPES.MessageService),
         },
     })
     export default class MainPage extends Vue {

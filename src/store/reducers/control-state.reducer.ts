@@ -10,24 +10,9 @@ import { getWindowStateForWindowIdWithControlstate } from '../selectors/control-
 import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
-    activeProvidor: PROVIDORS.Vivo,
     playedEpisodes: 0,
     controllerWindowState: {},
     asyncInteractions: {},
-};
-
-const updateControlState = function (state: ControlState, newControlState: Partial<ControlState>): ControlState {
-    return {
-        ...state,
-        ...newControlState,
-    };
-};
-
-const setActiveProvidor = function (state: ControlState, activeProvidor: Providor['key']): ControlState {
-    return {
-        ...state,
-        activeProvidor,
-    };
 };
 
 const resetControlState = (state: ControlState): ControlState => ({
@@ -35,7 +20,6 @@ const resetControlState = (state: ControlState): ControlState => ({
     asyncInteractions: {},
     activeEpisode: '',
     playedEpisodes: 0,
-    activeProvidor: null,
 });
 
 function setWindowIdForWindowType(state: ControlState, { windowType, windowId }: { windowType: WindowType; windowId: number }): ControlState {
@@ -98,8 +82,6 @@ export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
     reducers: {
-        updateControlStateAction: (state: ControlState, action: PayloadAction<Partial<ControlState>>) => updateControlState(state, action.payload),
-        setActiveProvidorAction: (state: ControlState, action: PayloadAction<Providor['key']>) => setActiveProvidor(state, action.payload),
         resetControlStateAction: (state: ControlState) => resetControlState(state),
         raisePlayedEpisodesAction: (state: ControlState) => raisePlayedEpisodes(state),
         resetPlayedEpisodesAction: (state: ControlState) => resetPlayedEpisodes(state),
@@ -114,8 +96,6 @@ export const controlStateSlice = createSlice({
 });
 
 export const {
-    updateControlStateAction,
-    setActiveProvidorAction,
     resetControlStateAction,
     setWindowIdForWindowTypeAction,
     setActiveEpisodeAction,
