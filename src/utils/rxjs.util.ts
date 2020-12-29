@@ -1,6 +1,10 @@
-import { defer, fromEvent, MonoTypeOperatorFunction, Observable, } from 'rxjs';
+import {
+    defer, fromEvent, MonoTypeOperatorFunction, Observable,
+} from 'rxjs';
 import { BrowserWindow } from 'electron';
-import { finalize, mapTo, switchMap, tap, } from 'rxjs/operators';
+import {
+    finalize, mapTo, switchMap, tap,
+} from 'rxjs/operators';
 
 export function waitTillPageLoadFinished(): MonoTypeOperatorFunction<BrowserWindow> {
     return $source => defer(() => $source.pipe(

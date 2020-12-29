@@ -1,7 +1,11 @@
 import { inject, injectable } from 'inversify';
-import { fromEvent, Observable, race, Subject, timer, } from 'rxjs';
+import {
+    fromEvent, Observable, race, Subject, timer,
+} from 'rxjs';
 import { app, BrowserWindow, OnSendHeadersListenerDetails } from 'electron';
-import { filter, map, mapTo, startWith, switchMap, takeUntil, } from 'rxjs/operators';
+import {
+    filter, map, mapTo, startWith, switchMap, takeUntil,
+} from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';

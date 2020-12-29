@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { fromEvent, merge, Observable, Subject, timer, } from 'rxjs';
+import {
+    fromEvent, merge, Observable, Subject, timer,
+} from 'rxjs';
 import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';

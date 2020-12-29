@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { catchError, debounceTime, filter, first, takeUntil, } from 'rxjs/operators';
+import {
+    catchError, debounceTime, filter, first, takeUntil,
+} from 'rxjs/operators';
 import { fromEvent, Observable } from 'rxjs';
 import { BrowserWindow } from 'electron';
 import { StoreService } from '../../shared/services/store.service';

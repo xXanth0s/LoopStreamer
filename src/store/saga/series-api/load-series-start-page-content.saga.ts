@@ -1,4 +1,6 @@
-import { all, call, put, select, } from 'redux-saga/effects';
+import {
+    all, call, put, select,
+} from 'redux-saga/effects';
 import { MovieDBService } from '../../../shared/services/movie-db.service';
 import { StateModel } from '../../models/state.model';
 import { NamedCollection } from '../../models/collection.model';

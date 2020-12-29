@@ -1,4 +1,6 @@
-import { all, call, put, select, } from 'redux-saga/effects';
+import {
+    all, call, put, select,
+} from 'redux-saga/effects';
 import { setSelectedSeasonForAppAction } from '../../reducers/app-control-state.reducer';
 import { getSeriesSeasonByKey } from '../../selectors/series-season.selector';
 import { PORTALS } from '../../enums/portals.enum';
