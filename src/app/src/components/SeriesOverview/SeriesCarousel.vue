@@ -50,7 +50,7 @@
     export default class SeriesCarousel extends Vue {
         private readonly takeUntil$ = new Subject();
 
-        private series: SeriesMetaInfo[] = [];
+        private series: SeriesMetaInfo[];
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;

@@ -14,7 +14,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import { Emit, Prop } from 'vue-property-decorator';
+    import { Emit, Inject, Prop } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
@@ -34,22 +34,20 @@
     export default class SeriesSeasonButton extends Vue {
         private readonly takeUntil$ = new Subject();
 
+        @Inject(SHARED_TYPES.StoreService)
+        private store: StoreService;
+
         @Prop(Object)
         private seasonInfo: SeriesSeason;
 
         @Prop(String)
         private activeSeasonKey: string;
 
-        private store: StoreService;
         private isSeasonLoading = false;
         private hasPlayedEpisodes = false;
 
         public get progress(): number {
             return this.hasPlayedEpisodes ? 100 : 0;
-        }
-
-        public beforeCreate(): void {
-            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
         }
 
         public mounted(): void {

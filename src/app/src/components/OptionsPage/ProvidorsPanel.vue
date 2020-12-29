@@ -63,10 +63,9 @@
     import Draggable from 'vuedraggable';
     import Vue from 'vue';
     import Component from 'vue-class-component';
+    import { Inject } from 'vue-property-decorator';
     import Providor from '../../../../store/models/providor.model';
     import { StoreService } from '../../../../shared/services/store.service';
-    import { MessageService } from '../../../../shared/services/message.service';
-    import { appContainer } from '../../container/container';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { getAllProvidors } from '../../../../store/selectors/providors.selector';
     import { updateProvidorsAction } from '../../../../store/reducers/providors.reducer';
@@ -92,13 +91,8 @@
         private usedProvidors: Providor[] = [];
         private unusedProvidors: Providor[] = [];
 
+        @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
-        private messageService: MessageService;
-
-        public beforeCreate(): void {
-            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
-        }
 
         public created(): void {
             const providors = this.store.selectSync(getAllProvidors);

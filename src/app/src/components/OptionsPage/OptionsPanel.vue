@@ -45,6 +45,7 @@
     import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
     import { Context } from '../../enums/context.enum';
     import Toast from '../Shared/Toast.vue';
+    import { Inject } from 'vue-property-decorator';
 
     @Component({
         name: 'options-panel',
@@ -64,13 +65,8 @@
 
         private options: Options;
 
+        @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
-        private messageService: MessageService;
-
-        public beforeCreate(): void {
-            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
-        }
 
         public created(): void {
             this.options = {

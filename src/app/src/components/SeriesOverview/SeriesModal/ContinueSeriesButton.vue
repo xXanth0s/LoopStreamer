@@ -40,10 +40,10 @@
         name: 'continue-series-button',
     })
     export default class ContinueSeriesButton extends Vue {
+        private readonly takeUntil$ = new Subject();
+
         @Prop(String)
         public seriesKey: Series['key'];
-
-        private readonly takeUntil$ = new Subject();
 
         private messageService: MessageService;
         private store: StoreService;
@@ -91,16 +91,16 @@
             this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
         }
 
+        public destroyed(): void {
+            this.takeUntil$.next();
+        }
+
         @Watch('seriesKey', { immediate: true })
         public seriesChanged(): void {
             this.takeUntil$.next();
             this.fetchLastWatchedOrFirstEpisode();
             this.fetchSeasonLoadingStateFromStore();
             this.fetchVideoLoadingStateFromStore();
-        }
-
-        public destroyed(): void {
-            this.takeUntil$.next();
         }
 
         public continueEpisode(): void {

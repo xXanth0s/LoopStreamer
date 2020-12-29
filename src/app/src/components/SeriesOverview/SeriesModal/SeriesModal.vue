@@ -43,7 +43,7 @@
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
     import {
-        filter, switchMap, takeUntil, tap,
+        filter, first, switchMap, takeUntil, tap,
     } from 'rxjs/operators';
     import Series from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
@@ -109,6 +109,10 @@
             this.activeLanguage = this.store.selectSync(getDefaultLanguage);
         }
 
+        updated(): void {
+            console.count('updated modal');
+        }
+
         public openModal(seriesKey: Series['key']): void {
             this.reset();
             this.$refs.modalRef.show();
@@ -125,9 +129,7 @@
         }
 
         public loadSeriesData(seriesKey: Series['key']): void {
-            this.store.selectBehaviour(getSeriesByKey, seriesKey).pipe(
-                takeUntil(this.seriesChanged$),
-            ).subscribe(series => this.series = series);
+            this.series = this.store.selectSync(getSeriesByKey, seriesKey);
         }
 
         public loadSeriesSeason(seriesKey: Series['key']): void {
@@ -145,7 +147,10 @@
                 }),
                 filter<SeriesSeason['key']>(Boolean),
                 switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason)),
-            ).subscribe(episodes => this.episodes = episodes);
+                first(),
+            ).subscribe(episodes => {
+                this.episodes = episodes;
+            });
         }
 
         public loadSimilarSeriesData(): void {
@@ -164,6 +169,7 @@
         }
 
         private reset(): void {
+            this.takeUntil$.next();
             this.seasons = [];
             this.episodes = [];
             this.selectedSeason = null;

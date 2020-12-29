@@ -19,6 +19,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
+    import { Inject } from 'vue-property-decorator';
     import { appContainer } from '../container/container';
     import { StoreService } from '../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
@@ -34,13 +35,11 @@
         name: 'test-page',
     })
     export default class TestPage extends Vue {
+        @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
-        private messageService: MessageService;
 
-        public beforeCreate(): void {
-            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
-            this.messageService = appContainer.get<MessageService>(SHARED_TYPES.MessageService);
-        }
+        @Inject(SHARED_TYPES.MessageService)
+        private messageService: MessageService;
 
         public startTestEpisodeOverBs(): void {
             this.messageService.sendMessageToBackground(createStartTestEpisodeOverBSMessage());
