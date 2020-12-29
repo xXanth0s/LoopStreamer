@@ -27,8 +27,7 @@ export class TestController {
     public initializeHandler(): void {
         ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA, (): void => {
             this.startTestPage().subscribe(window => {
-                this.messageService.sendMessageToBrowserWindow(window.id,
-                    createStartTestRecaptchaMessage());
+                this.messageService.sendMessageToBrowserWindow(window.id, createStartTestRecaptchaMessage());
             });
         });
 
@@ -38,8 +37,7 @@ export class TestController {
                     windowId: window.id,
                     windowType: WindowType.VIDEO,
                 }));
-                this.messageService.sendMessageToBrowserWindow(window.id,
-                    createTestNotificationMessage());
+                this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
             });
         });
 

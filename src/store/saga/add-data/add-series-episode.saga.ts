@@ -16,9 +16,10 @@ export function* addMultipleEpisodesSaga(seriesKey: Series['key'], episodes: Por
         return;
     }
 
-    const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(seriesKey,
-        episode,
-        LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
+    const episodeLinks = episodes.map(episode => {
+        return generateLinkForSeriesEpisodeDto(seriesKey, episode, LINK_TYPE.PORTAL_EPISODE_LINK);
+    }).flat();
+
     yield put(updateOrAddMultipleLinksAction(episodeLinks));
 }
 

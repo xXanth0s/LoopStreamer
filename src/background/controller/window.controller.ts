@@ -62,10 +62,10 @@ export class WindowController {
                 window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
                 if (!this.isUrlValid(url, allowedPage, validLink)) {
                     sub$.next(false);
-            } else {
-                sub$.next(true);
-            }
-        });
+                } else {
+                    sub$.next(true);
+                }
+            });
 
         return race(sub$, timeout$);
     }

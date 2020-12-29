@@ -7,26 +7,25 @@ import {
     startEpisodeAsyncInteraction,
 } from '../actions/async-interactions';
 
-export const getAsyncInteractions = <T>(state: StateModel,
-                                        creator: AsyncInteractionCreator<T>): AsyncInteraction<T>[] => {
+export function getAsyncInteractions<T>(state: StateModel, creator: AsyncInteractionCreator<T>): AsyncInteraction<T>[] {
     return Object.values(state.controlState.asyncInteractions)
         .filter<AsyncInteraction<T>>(creator.isInstanceOf);
-};
+}
 
-export const isPreparingEpisode = (state: StateModel, episodeKey: SeriesEpisode['key']): boolean => {
+export function isPreparingEpisode(state: StateModel, episodeKey: SeriesEpisode['key']): boolean {
     const asyncInteractions = getAsyncInteractions(state, startEpisodeAsyncInteraction);
     return asyncInteractions.some(action => action.payload.episodeKey === episodeKey);
-};
+}
 
-export const isPreparingVideo = (state: StateModel): boolean => {
+export function isPreparingVideo(state: StateModel): boolean {
     return Boolean(getAsyncInteractions(state, startEpisodeAsyncInteraction).length);
-};
+}
 
-export const isLoadingSeason = (state: StateModel): boolean => {
+export function isLoadingSeason(state: StateModel): boolean {
     return Boolean(getAsyncInteractions(state, loadingSeasonAsyncInteraction).length);
-};
+}
 
 // @ts-ignore
-export const isLoadingSearchResult = (state: StateModel): boolean => {
+export function isLoadingSearchResult(state: StateModel): boolean {
     return Boolean(getAsyncInteractions(state, loadingSeriesSearchResult).length);
-};
+}

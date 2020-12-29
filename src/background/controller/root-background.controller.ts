@@ -58,40 +58,36 @@ export class RootBackgroundController {
     }
 
     public initializeHandler(): void {
-        ipcMain.handle(MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
-            (event, message: RecaptchaRecognizedMessage): void => {
+        ipcMain.handle(
+            MessageType.BACKGROUND_RECAPTCHA_RECOGNIZED,
+            (event, message: RecaptchaRecognizedMessage,
+            ): void => {
                 this.recaptchaRecognizedHandler(event, message);
             });
 
-        ipcMain.handle(MessageType.BACKGROUND_CLOSE_WINDOW,
-            (event): void => {
-                this.closeWindowEventHandler(event);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_CLOSE_WINDOW, (event): void => {
+            this.closeWindowEventHandler(event);
+        });
 
-        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN,
-            (event): void => {
-                this.toggleWindowFullscreenEventHandler(event);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_FULLSCREEN, (event): void => {
+            this.toggleWindowFullscreenEventHandler(event);
+        });
 
-        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION,
-            (event): void => {
-                this.toggleWindowMaximizationEventHandler(event);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_TOGGLE_WINDOW_MAXIMIZATION, (event): void => {
+            this.toggleWindowMaximizationEventHandler(event);
+        });
 
-        ipcMain.handle(MessageType.BACKGROUND_MINIMIZE_WINDOW,
-            (event): void => {
-                this.minimizeWindowEventHandler(event);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_MINIMIZE_WINDOW, (event): void => {
+            this.minimizeWindowEventHandler(event);
+        });
 
-        ipcMain.handle(MessageType.BACKGROUND_START_VIDEO_IN_VIDEO,
-            (event): void => {
-                this.startVideoInVideo(event);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_START_VIDEO_IN_VIDEO, (event): void => {
+            this.startVideoInVideo(event);
+        });
 
-        ipcMain.handle(MessageType.BACKGROUND_EXECUTE_SCRIPT,
-            (event, message: ExecuteScriptMessage): void => {
-                this.executeScriptEventHandler(event, message);
-            });
+        ipcMain.handle(MessageType.BACKGROUND_EXECUTE_SCRIPT, (event, message: ExecuteScriptMessage): void => {
+            this.executeScriptEventHandler(event, message);
+        });
     }
 
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
