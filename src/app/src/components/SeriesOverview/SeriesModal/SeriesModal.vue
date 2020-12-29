@@ -42,7 +42,9 @@
     import { Emit, Inject } from 'vue-property-decorator';
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
-    import { filter, first, switchMap, takeUntil, tap, } from 'rxjs/operators';
+    import {
+      filter, first, switchMap, takeUntil, tap,
+    } from 'rxjs/operators';
     import { Series } from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
@@ -51,8 +53,8 @@
     import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
     import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
     import {
-        getCollectionsForTypes,
-        getSelectedSeasonKey,
+      getCollectionsForTypes,
+      getSelectedSeasonKey,
     } from '../../../../../store/selectors/app-control-state.selector';
     import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';

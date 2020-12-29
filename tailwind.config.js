@@ -689,7 +689,7 @@ module.exports = {
             ping: {
                 '75%, 100%': {
                     transform: 'scale(2)',
-                    opacity: '0'
+                    opacity: '0',
                 },
             },
             pulse: {

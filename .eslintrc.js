@@ -37,6 +37,7 @@ module.exports = {
       'no-param-reassign': 'off',
       'implicit-arrow-linebreak': 'off',
       '@typescript-eslint/no-use-before-define': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
       'import/no-cycle': 'off',
       'arrow-body-style': 'off',
       'no-useless-constructor': 'off',

@@ -22,6 +22,7 @@
     "postuninstall": "electron-builder install-app-deps",
     "remote-dev-tools": "remotedev --hostname=localhost --port=8800"
   },
+  "pre-commit": [ "lint" ],
   "main": "background.js",
   "dependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",

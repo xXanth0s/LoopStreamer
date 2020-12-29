@@ -6,4 +6,5 @@ node_modules/
 tests/
 types/
 
-./*.js
+**/*.js
+**/*.d.ts

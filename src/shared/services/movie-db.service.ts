@@ -141,7 +141,7 @@ export class MovieDBService {
         );
 
         const mappedSeasons = seasonData.map(([ season ]) => season);
-        const mappedEpisodes = seasonData.flatMap(([ season, episodes ]) => episodes);
+        const mappedEpisodes = seasonData.flatMap((data) => data[1]);
 
         return [ mappedSeries, mappedSeasons, mappedEpisodes ];
     }

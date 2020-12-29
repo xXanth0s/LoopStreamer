@@ -20,15 +20,14 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Inject } from 'vue-property-decorator';
-    import { appContainer } from '../container/container';
     import { StoreService } from '../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
     import { MessageService } from '../../../shared/services/message.service';
     import {
-        createOpenTestPageMessage,
-        createShowAllWindowsMessage,
-        createStartTestEpisodeOverBSMessage,
-        createStartTestRecaptchaBackgroundMessage,
+      createOpenTestPageMessage,
+      createShowAllWindowsMessage,
+      createStartTestEpisodeOverBSMessage,
+      createStartTestRecaptchaBackgroundMessage,
     } from '../../../browserMessages/messages/test.messages';
 
     @Component({
