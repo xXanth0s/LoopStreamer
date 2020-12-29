@@ -14,15 +14,15 @@ export function* getPortalLinkForNextEpisode(startEpisodeKey: SeriesEpisode['key
     }
 
     let portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
-        nextEpisode.key,
-        portalKey,
-        language);
+                                                                      nextEpisode.key,
+                                                                      portalKey,
+                                                                      language);
     if (!portalLinks.length) {
         yield updateSeriesSeasonForPortal(nextEpisode.seasonKey, portalKey, language);
         portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
-            nextEpisode.key,
-            portalKey,
-            language);
+                                                                      nextEpisode.key,
+                                                                      portalKey,
+                                                                      language);
     }
 
     return portalLinks[0];
@@ -37,15 +37,15 @@ export function* getPortalLinkForPreviousEpisode(startEpisodeKey: SeriesEpisode[
     }
 
     let portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
-        previousEpisode.key,
-        portalKey,
-        language);
+                                                                      previousEpisode.key,
+                                                                      portalKey,
+                                                                      language);
     if (!portalLinks.length) {
         yield updateSeriesSeasonForPortal(previousEpisode.seasonKey, portalKey, language);
         portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
-            previousEpisode.key,
-            portalKey,
-            language);
+                                                                      previousEpisode.key,
+                                                                      portalKey,
+                                                                      language);
     }
 
     return portalLinks[0];

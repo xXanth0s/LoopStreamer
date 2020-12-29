@@ -27,8 +27,8 @@ export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof s
         yield updateSeriesSeasonForPortal(seasonKey, portal);
 
         const languages = getLinksForSeriesSeasonAndPortal(yield select(),
-            seasonKey,
-            portal).map(link => link.language);
+                                                           seasonKey,
+                                                           portal).map(link => link.language);
 
         yield all(languages.map(language => updateSeriesSeasonForPortal(seasonKey, portal, language)));
     } catch (error) {

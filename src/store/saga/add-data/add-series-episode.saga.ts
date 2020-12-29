@@ -33,10 +33,10 @@ export function* addSeriesEpisodeProvidorLinks(providorLinks: ProvidorLink[],
     }
 
     const links = providorLinks.map(link => generateLinkForProvidorLink(episodeKey,
-        link,
-        language,
-        LINK_TYPE.PORTAL_EPISODE_LINK,
-        portalKey));
+                                                                        link,
+                                                                        language,
+                                                                        LINK_TYPE.PORTAL_EPISODE_LINK,
+                                                                        portalKey));
 
     yield put(updateOrAddMultipleLinksAction(links));
 }

@@ -27,16 +27,16 @@ export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStart
 
     try {
         const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey,
-            series.lastUsedPortal,
-            series.lastUsedLanguage);
+                                                                             series.lastUsedPortal,
+                                                                             series.lastUsedLanguage);
         yield put(setSeriesEpisodeNextEpisodeStateAction({
             seriesEpisodeKey,
             hasNextEpisode: Boolean(nextEpisodeLink),
         }));
 
         const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey,
-            series.lastUsedPortal,
-            series.lastUsedLanguage);
+                                                                                     series.lastUsedPortal,
+                                                                                     series.lastUsedLanguage);
         yield put(setSeriesEpisodePreviousEpisodeStateAction({
             seriesEpisodeKey,
             hasPreviousEpisode: Boolean(previousEpisodeLink),

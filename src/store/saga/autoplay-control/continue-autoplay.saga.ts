@@ -27,8 +27,8 @@ export function* continueAutoplaySaga(action: ReturnType<typeof startPreviousEpi
         const series = getSeriesForEpisode(yield select(), episodeKey);
 
         const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(episodeKey,
-            series.lastUsedPortal,
-            series.lastUsedLanguage);
+                                                                             series.lastUsedPortal,
+                                                                             series.lastUsedLanguage);
         if (!nextEpisodeLink) {
             return;
         }

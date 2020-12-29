@@ -20,11 +20,11 @@ export function* loadSeriesStartPageContentSaga() {
         const language = state.options.defaultLanguage;
         const [ popularSeries, topRatedSeries, airingTodaySeries, similarSeries ]:
             [ SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[][] ] = yield all([
-            call(MovieDBService.getPopularSeries, language),
-            call(MovieDBService.getTopRatedSeries, language),
-            call(MovieDBService.getAiringTodaySeries, language),
-            ...getSimilarSeriesForLastWatchedSeries(state),
-        ]);
+                call(MovieDBService.getPopularSeries, language),
+                call(MovieDBService.getTopRatedSeries, language),
+                call(MovieDBService.getAiringTodaySeries, language),
+                ...getSimilarSeriesForLastWatchedSeries(state),
+            ]);
 
         const popularSeriesCollection: NamedCollection<SeriesMetaInfo> = {
             key: CollectionType.MOST_POPULAR_SERIES,

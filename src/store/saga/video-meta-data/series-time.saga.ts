@@ -36,8 +36,8 @@ export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisod
     }));
 
     const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey,
-        series.lastUsedPortal,
-        series.lastUsedLanguage);
+                                                                         series.lastUsedPortal,
+                                                                         series.lastUsedLanguage);
     if (nextEpisodeLink) {
         yield put(setLastWatchedEpisodeAction({ seriesKey: series.key, seriesEpisodeKey: nextEpisodeLink.parentKey }));
     }

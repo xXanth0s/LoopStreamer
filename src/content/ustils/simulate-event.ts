@@ -29,12 +29,12 @@ export function simulateEvent(element: HTMLElement, eventName: string, eventOpti
             oEvent.initEvent(eventName, options.bubbles, options.cancelable);
         } else {
             (oEvent as MouseEvent).initMouseEvent(eventName, options.bubbles,
-                options.cancelable, document.defaultView,
-                options.button, options.pointerX,
-                options.pointerY, options.pointerX, options.pointerY,
-                options.ctrlKey, options.altKey,
-                options.shiftKey, options.metaKey,
-                options.button, element);
+                                                  options.cancelable, document.defaultView,
+                                                  options.button, options.pointerX,
+                                                  options.pointerY, options.pointerX, options.pointerY,
+                                                  options.ctrlKey, options.altKey,
+                                                  options.shiftKey, options.metaKey,
+                                                  options.button, element);
         }
         element.dispatchEvent(oEvent);
     } else {

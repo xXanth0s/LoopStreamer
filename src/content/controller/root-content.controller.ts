@@ -37,39 +37,39 @@ export class RootContentController {
 
     public init(): void {
         ipcRenderer.on(MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
-            (event, message: GetResolvedProvidorLinkForEpisode) => {
-                this.getResolvedProvidorLinkHandler(event, message);
-            });
+                       (event, message: GetResolvedProvidorLinkForEpisode) => {
+                           this.getResolvedProvidorLinkHandler(event, message);
+                       });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL,
-            (event, message: GetSeriesLinkForPortal) => {
-                console.log(message);
-                this.getLinkForSeriesFromPortalHandler(event, message);
-            });
+                       (event, message: GetSeriesLinkForPortal) => {
+                           console.log(message);
+                           this.getLinkForSeriesFromPortalHandler(event, message);
+                       });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION,
-            (event, message: GetDetailedSeriesInformationMessage) => {
-                console.log(message);
-                this.getDetailedSeriesInformationHandler(event, message);
-            });
+                       (event, message: GetDetailedSeriesInformationMessage) => {
+                           console.log(message);
+                           this.getDetailedSeriesInformationHandler(event, message);
+                       });
 
         ipcRenderer.on(MessageType.PORTAL_GET_SEASON_INFO,
-            (event, message: GetSeasonInfoMessage) => {
-                console.log(message);
-                this.getSeasonsEpisodeInformationHandler(event, message);
-            });
+                       (event, message: GetSeasonInfoMessage) => {
+                           console.log(message);
+                           this.getSeasonsEpisodeInformationHandler(event, message);
+                       });
 
         ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO,
-            (event, message: StartVideoMessage) => {
-                console.log(message);
-                this.startVideoForProvidorHandler(event, message);
-            });
+                       (event, message: StartVideoMessage) => {
+                           console.log(message);
+                           this.startVideoForProvidorHandler(event, message);
+                       });
 
         ipcRenderer.on(MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS,
-            (event, message: GetAllProvidorLinksForEpisodeMessage) => {
-                console.log(message);
-                this.getAllProvidorLinksForEpisode(event, message);
-            });
+                       (event, message: GetAllProvidorLinksForEpisodeMessage) => {
+                           console.log(message);
+                           this.getAllProvidorLinksForEpisode(event, message);
+                       });
     }
 
     private async getResolvedProvidorLinkHandler(event: IpcRendererEvent,
