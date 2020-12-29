@@ -8,7 +8,7 @@ import { MessageService } from '../../shared/services/message.service';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
 import { PopupController } from './popup.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { getSeriesByKey } from '../../store/selectors/series.selector';
 import {
     seriesEpisodeStartedAction,

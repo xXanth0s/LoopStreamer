@@ -1,5 +1,5 @@
-import SeriesEpisode from '../models/series-episode.model';
-import Series from '../models/series.model';
+import { SeriesEpisode } from '../models/series-episode.model';
+import { Series } from '../models/series.model';
 import { END_TIME_BUFFER, TIME_FOR_NEXT_EPISODE_POPUP, TIME_FOR_SET_ENDTIME_POPUP } from '../../constants/popup-config';
 
 export function getProgressForEpisode(seriesEpisode: SeriesEpisode): number {
@@ -21,7 +21,7 @@ export function getSeriesEpisodeTitle(seriesEpisode: SeriesEpisode): string {
 
 function addLeadingZero(digit: string | number): string {
     const stringValue = `${digit}`;
-    if (isNaN(+stringValue)) {
+    if (Number.isNaN(+stringValue)) {
         return stringValue;
     }
     if (stringValue.length === 1) {

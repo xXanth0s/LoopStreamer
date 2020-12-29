@@ -11,17 +11,17 @@ export class PortalFactory {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
-    private _portalController: IPortalController;
+    private portalController: IPortalController;
 
     public getPortalController(portalKey: PORTALS): IPortalController {
-        if (!this._portalController) {
+        if (!this.portalController) {
             const symbol = getContentTypeForPortal(portalKey);
-            this._portalController = inversifyContentContainer.get<IPortalController>(symbol);
+            this.portalController = inversifyContentContainer.get<IPortalController>(symbol);
         }
-        if (!this._portalController) {
+        if (!this.portalController) {
             console.error('PortalService.getPortalController: No controller found');
         }
 
-        return this._portalController;
+        return this.portalController;
     }
 }

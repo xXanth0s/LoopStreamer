@@ -11,7 +11,7 @@ import { getWindowIdForWindowType } from '../../store/selectors/control-state.se
 import { createStartVideoMessage } from '../../browserMessages/messages/providor.messages';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowService } from '../services/window.service';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { getProvidorForKey } from '../../store/selectors/providors.selector';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
@@ -39,7 +39,8 @@ export class VideoController {
             ).subscribe(async window => {
                 let hasVideo = false;
                 try {
-                    hasVideo = await this.messageService.sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorLink.providor));
+                    hasVideo = await this.messageService
+                        .sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorLink.providor));
                 } catch (e) {
                     Logger.error('[VideoController->startVideo] Exception occurred', e);
                 }

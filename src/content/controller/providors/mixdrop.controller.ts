@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { IProvidorController } from './providor.controller.interface';
 import { CONTENT_TYPES } from '../../container/CONTENT_TYPES';
 import { VideoController } from '../video.controller';
-import SeriesEpisode from '../../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../../store/models/series-episode.model';
 
 @injectable()
 export class MIXDropController implements IProvidorController {

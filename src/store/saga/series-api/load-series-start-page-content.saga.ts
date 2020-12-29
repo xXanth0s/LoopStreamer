@@ -16,13 +16,13 @@ export function* loadSeriesStartPageContentSaga() {
         const state: StateModel = yield select();
         const watchedSeries = getWatchedSeries(state);
         const language = state.options.defaultLanguage;
-        const [ popularSeries, topRatedSeries, airingTodaySeries, similarSeries ]: [ SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[][] ] =
-            yield all([
-                call(MovieDBService.getPopularSeries, language),
-                call(MovieDBService.getTopRatedSeries, language),
-                call(MovieDBService.getAiringTodaySeries, language),
-                ...getSimilarSeriesForLastWatchedSeries(state)
-            ]);
+        const [ popularSeries, topRatedSeries, airingTodaySeries, similarSeries ]:
+            [ SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[], SeriesMetaInfo[][] ] = yield all([
+            call(MovieDBService.getPopularSeries, language),
+            call(MovieDBService.getTopRatedSeries, language),
+            call(MovieDBService.getAiringTodaySeries, language),
+            ...getSimilarSeriesForLastWatchedSeries(state),
+        ]);
 
         const popularSeriesCollection: NamedCollection<SeriesMetaInfo> = {
             key: CollectionType.MOST_POPULAR_SERIES,
@@ -45,23 +45,24 @@ export function* loadSeriesStartPageContentSaga() {
             data: airingTodaySeries.map(series => series.key),
         };
 
-        const similarSeriesCollections: NamedCollection<SeriesMetaInfo>[] = similarSeries.map((seriesCollection, index) => {
-            const series = getSeriesByKey(state, watchedSeries[index]);
-            return {
-                key: `${CollectionType.SIMILAR_SERIES_OVERVIEW}_${index}`,
-                type: CollectionType.SIMILAR_SERIES_OVERVIEW,
-                title: `Weil Sie ${series.titles[language]} gesehen haben`,
-                data: seriesCollection.map(_series => _series.key),
-            };
-        });
+        const similarSeriesCollections: NamedCollection<SeriesMetaInfo>[] = similarSeries
+            .map((seriesCollection, index) => {
+                const series = getSeriesByKey(state, watchedSeries[index]);
+                return {
+                    key: `${CollectionType.SIMILAR_SERIES_OVERVIEW}_${index}`,
+                    type: CollectionType.SIMILAR_SERIES_OVERVIEW,
+                    title: `Weil Sie ${series.titles[language]} gesehen haben`,
+                    data: seriesCollection.map(_series => _series.key),
+                };
+            });
 
         yield put(addMultipleSeriesMetaInfosAction({
             seriesMetaInfos: [
                 ...popularSeries,
                 ...topRatedSeries,
                 ...airingTodaySeries,
-                ...similarSeries.flat()
-            ]
+                ...similarSeries.flat(),
+            ],
         }));
 
         yield put(addOrReplaceMultipleSeriesCollectionAction({
@@ -69,7 +70,7 @@ export function* loadSeriesStartPageContentSaga() {
                 popularSeriesCollection,
                 topRatedSeriesCollection,
                 airingTodaySeriesCollection,
-                ...similarSeriesCollections
+                ...similarSeriesCollections,
             ],
         }));
     } catch (error) {
@@ -81,5 +82,6 @@ function* getSimilarSeriesForLastWatchedSeries(state: StateModel) {
     const watchedSeriesKeys = reduceArraySize(getWatchedSeries(state), 3);
     const watchedSeriesApiKeys = getMovieDbApiKeysForSeries(state, watchedSeriesKeys);
 
-    return yield all(watchedSeriesApiKeys.map(apiKey => call(MovieDBService.getSimilarSeries, apiKey, state.options.defaultLanguage)));
+    return yield all(watchedSeriesApiKeys
+        .map(apiKey => call(MovieDBService.getSimilarSeries, apiKey, state.options.defaultLanguage)));
 }

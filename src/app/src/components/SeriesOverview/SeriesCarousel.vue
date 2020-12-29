@@ -23,15 +23,13 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import {
-        Emit, Inject, Prop, Watch,
-    } from 'vue-property-decorator';
+    import { Emit, Inject, Prop, Watch, } from 'vue-property-decorator';
     import { takeUntil } from 'rxjs/operators';
     import { Swiper, SwiperSlide } from 'vue-awesome-swiper';
     import { Subject } from 'rxjs';
     import { SwiperOptions } from 'swiper';
     import { NamedCollection } from '../../../../store/models/collection.model';
-    import Series from '../../../../store/models/series.model';
+    import { Series } from '../../../../store/models/series.model';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../shared/services/store.service';
     import SeriesPanelFront from './SeriesPanelFront.vue';

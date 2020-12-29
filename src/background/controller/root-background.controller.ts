@@ -136,7 +136,8 @@ export class RootBackgroundController {
 
     private startVideoInVideo(event: Electron.IpcMainInvokeEvent): void {
         const window = BrowserWindow.fromWebContents(event.sender);
-        window.webContents.executeJavaScript(`document.querySelector('.${VIDEO_IN_VIDEO_CSS_CLASS}').requestPictureInPicture()`, true);
+        const jsCode = `document.querySelector('.${VIDEO_IN_VIDEO_CSS_CLASS}').requestPictureInPicture()`;
+        window.webContents.executeJavaScript(jsCode, true);
     }
 
     private executeScriptEventHandler(event: Electron.IpcMainInvokeEvent, message: ExecuteScriptMessage): void {

@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { ipcRenderer } from 'electron';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
-import { StartTestRecaptchaMessage, TestNotificationMessage } from '../../browserMessages/messages/test.messages';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { NotificationService } from '../services/notification.service';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
@@ -14,10 +13,10 @@ export class TestController {
     }
 
     public initialize(): void {
-        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_RECAPTCHA, (event, message: StartTestRecaptchaMessage) => {
+        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_RECAPTCHA, () => {
             this.executeRecaptchaChallenge();
         });
-        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, (event, message: TestNotificationMessage) => {
+        ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, () => {
             this.notificationService.openTestPopup();
             addVideoButtons('1983-S1-E3');
         });
@@ -25,6 +24,8 @@ export class TestController {
 
     public executeRecaptchaChallenge(): void {
         const button = this.inivisibleButtonSelector();
-        button?.click();
+        if (button) {
+            button.click();
+        }
     }
 }

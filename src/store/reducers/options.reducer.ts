@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Options from '../models/options.model';
+import { Options } from '../models/options.model';
 import { LANGUAGE } from '../enums/language.enum';
 
 const initialOptionsData: Options = {
@@ -10,9 +10,9 @@ const initialOptionsData: Options = {
     defaultLanguage: LANGUAGE.GERMAN,
 };
 
-const updateOptions = function (options: Options): Options {
+function updateOptions(options: Options): Options {
     return options;
-};
+}
 
 export const optionsSlice = createSlice({
     name: 'options',

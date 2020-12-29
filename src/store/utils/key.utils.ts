@@ -1,4 +1,4 @@
-import Series from '../models/series.model';
+import { Series } from '../models/series.model';
 import { LinkModel } from '../models/link.model';
 
 type linkKeyData = {
@@ -12,7 +12,10 @@ export const getKeyForSeriesTitle = (seriesTitle: string): string => seriesTitle
 
 export const getKeyForSeriesSeason = (seriesKey: Series['key'], season: string): string => `${seriesKey}-S${season}`;
 
-export const getKeyForSeriesEpisode = (seriesKey: string, seasonNumber: string, episodeNumber: number): string => `${seriesKey}-S${seasonNumber}-E${episodeNumber}`;
+export const getKeyForSeriesEpisode = (seriesKey: string,
+                                       seasonNumber: string,
+                                       // eslint-disable-next-line max-len
+                                       episodeNumber: number): string => `${seriesKey}-S${seasonNumber}-E${episodeNumber}`;
 
 export function getKeyForLink(data: linkKeyData): string {
     const {

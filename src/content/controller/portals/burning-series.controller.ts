@@ -1,13 +1,13 @@
 import { inject, injectable } from 'inversify';
 import { IPortalController } from './portal.controller.interface';
-import Providor from '../../../store/models/providor.model';
+import { Providor } from '../../../store/models/providor.model';
 import { PORTALS } from '../../../store/enums/portals.enum';
 import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../../shared/services/store.service';
 import { getAllUsedProvidors, getProvidorForName } from '../../../store/selectors/providors.selector';
-import SeriesEpisode from '../../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
@@ -27,6 +27,7 @@ export class BurningSeriesController implements IPortalController {
         [LANGUAGE.NONE]: '',
     };
 
+    /* eslint-disable max-len */
     private readonly activeProvidorSelector = () => document.querySelector('ul.hoster-tabs.top > li.active > a');
     private readonly videoContainerSelector = () => document.querySelector('section > div.hoster-player');
     private readonly videoIframeSelector = (): HTMLIFrameElement => document.querySelector('section > div.hoster-player > iframe');
@@ -35,47 +36,51 @@ export class BurningSeriesController implements IPortalController {
     private readonly seriesSeasonSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seasons').querySelectorAll('a');
     private readonly activeSeriesSeasonSelector = (): HTMLAnchorElement => document.querySelector('#seasons').querySelector('.active > a');
     private readonly episodesSelector = (): NodeListOf<HTMLElement> => document.querySelector('.episodes').querySelectorAll('tr');
-    private readonly seriesOverviewListLinkSelector = (): NodeListOf<HTMLAnchorElement> => document.querySelector('#seriesContainer')?.querySelectorAll('a');
     private readonly providerContainerSelector = (): HTMLElement => document.querySelector('#root > section > ul.hoster-tabs.top');
+
+    /* eslint-enable max-len */
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
 
-    public async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> {
-        if (this.getActiveProvidor()?.controllerName === providor) {
-            const link = this.getVideoUrl();
-            if (link) {
-                return link;
-            }
-            if (this.isVideoOpenWithProvidor()) {
-                const playButtonElement = this.videoContainerSelector() as HTMLElement;
-                this.videoContainerSelector.toString();
-                const scriptToBeExecuted = `window.simulateEvent((${this.videoContainerSelector.toString()})(),
+    public async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode,
+                                                   providor: PROVIDORS): Promise<string> {
+        if (this.getActiveProvidor()?.controllerName !== providor) {
+            return '';
+        }
+
+        const videoUrl = this.getVideoUrl();
+        if (videoUrl) {
+            return videoUrl;
+        }
+        if (this.isVideoOpenWithProvidor()) {
+            const playButtonElement = this.videoContainerSelector() as HTMLElement;
+            this.videoContainerSelector.toString();
+            const scriptToBeExecuted = `window.simulateEvent((${this.videoContainerSelector.toString()})(),
                     'click',
                     { pointerX: ${playButtonElement.clientLeft}, pointerY: ${playButtonElement.clientTop} }
                 )`;
-                this.messageService.sendMessageToBackground(createExecuteScriptMessage(scriptToBeExecuted));
-                return new Promise((resolve) => {
-                    const videoContainer = this.videoContainerSelector();
+            this.messageService.sendMessageToBackground(createExecuteScriptMessage(scriptToBeExecuted));
+            return new Promise<string>((resolve) => {
+                const videoContainer = this.videoContainerSelector();
 
-                    const config = { attributes: false, childList: true, subtree: true };
+                const config = { attributes: false, childList: true, subtree: true };
 
-                    const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
-                        const link = this.getVideoUrl();
-                        if (link) {
-                            resolve(link);
-                            observer.disconnect();
-                        }
-                    };
+                const callback = (mutations: MutationRecord[], observer: MutationObserver) => {
+                    const link = this.getVideoUrl();
+                    if (link) {
+                        resolve(link);
+                        observer.disconnect();
+                    }
+                };
 
-                    const observer = new MutationObserver(callback);
-                    observer.observe(videoContainer, config);
-                });
-            }
-        } else {
-            return '';
+                const observer = new MutationObserver(callback);
+                observer.observe(videoContainer, config);
+            });
         }
+
+        return '';
     }
 
     public getAllPortalProviderLinksForEpisode(language: LANGUAGE): ProvidorLink[] {
@@ -91,7 +96,6 @@ export class BurningSeriesController implements IPortalController {
     }
 
     public getSeriesMetaInformation(): PortalSeriesInfoDto {
-        const link = window.location.href;
         const seasonsLinksElements = [ ...this.seriesSeasonSelector() ];
         const seasonsLinks: PortalSeriesInfoDto['seasonsLinks'] = seasonsLinksElements.reduce((obj, link) => {
             const language = this.getLanguageForLink(link.href);
@@ -105,7 +109,7 @@ export class BurningSeriesController implements IPortalController {
 
         return {
             seasonsLinks,
-            link,
+            link: window.location.href,
             portal: this.portalKey,
         };
     }
@@ -205,6 +209,7 @@ export class BurningSeriesController implements IPortalController {
     }
 
     private getLanguageForLink(link: string): LANGUAGE {
+        // eslint-disable-next-line no-restricted-syntax
         for (const language of Object.keys(this.languageMap)) {
             const lang = language as LANGUAGE;
             const regex = this.getLinkRegexForLanguage(lang);
@@ -216,10 +221,11 @@ export class BurningSeriesController implements IPortalController {
     }
 
     private getLinkRegexForLanguage(language: LANGUAGE): RegExp {
-        return new RegExp(`([^\/]*${this.languageMap[language]}$)`);
+        return new RegExp(`([^/]*${this.languageMap[language]}$)`);
     }
 
     private stringToLanguage(languageString: string): LANGUAGE {
+        // eslint-disable-next-line no-restricted-syntax
         for (const language of Object.keys(this.languageMap)) {
             if (languageString === this.languageMap[language]) {
                 return language as LANGUAGE;

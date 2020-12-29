@@ -24,11 +24,11 @@ import { ProvidorLink } from '../models/providor-link.model';
 import { WindowController } from './window.controller';
 import { finalizeWithValue, waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
-import Series from '../../store/models/series.model';
+import { Series } from '../../store/models/series.model';
 import { PROVIDORS } from '../../store/enums/providors.enum';
 import { Logger } from '../../shared/services/logger';
 import { getLinkForSeriesAndPortal, getLinksByKeys } from '../../store/selectors/línk.selector';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
 import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { LinkModel } from '../../store/models/link.model';
@@ -51,7 +51,8 @@ export class PortalController {
         );
     }
 
-    public async getDetailedSeriesInformation(seriesKey: Series['key'], portalKey: PORTALS): Promise<PortalSeriesInfoDto> {
+    public async getDetailedSeriesInformation(seriesKey: Series['key'],
+                                              portalKey: PORTALS): Promise<PortalSeriesInfoDto> {
         const link = this.store.selectSync(getLinkForSeriesAndPortal, seriesKey, portalKey);
         if (!link) {
             Logger.error(`[PortalController->getDetailedSeriesInformation] tried to load link info for series ${seriesKey} and ${portalKey}, but no valid data found. Data found:`);
@@ -91,7 +92,10 @@ export class PortalController {
         );
     }
 
-    public async getProvidorLinkForEpisode(episodeKey: string, portalKey: PORTALS, providor: PROVIDORS, language: LANGUAGE): Promise<ProvidorLink> {
+    public async getProvidorLinkForEpisode(episodeKey: string,
+                                           portalKey: PORTALS,
+                                           providor: PROVIDORS,
+                                           language: LANGUAGE): Promise<ProvidorLink> {
         const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const links = this.store.selectSync(getLinksByKeys, episode.portalLinks);
         const portalLink = links.find(link => link.portal === portalKey
@@ -126,7 +130,9 @@ export class PortalController {
         );
     }
 
-    private async openPageAndGetDataForMessage<T, R>(portalUrl: string, portalKey: PORTALS, message: Message<T, R>): Promise<R> {
+    private async openPageAndGetDataForMessage<T, R>(portalUrl: string,
+                                                     portalKey: PORTALS,
+                                                     message: Message<T, R>): Promise<R> {
         return new Promise<R>(resolve => {
             const sub = this.openPortalUrl(portalUrl, portalKey).pipe(
                 catchError(err => {

@@ -1,4 +1,4 @@
-import { all, call, put, select } from 'redux-saga/effects';
+import { all, call, put, select, } from 'redux-saga/effects';
 import { setSelectedSeasonForAppAction } from '../../reducers/app-control-state.reducer';
 import { getSeriesSeasonByKey } from '../../selectors/series-season.selector';
 import { PORTALS } from '../../enums/portals.enum';
@@ -24,7 +24,9 @@ export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof s
     try {
         yield updateSeriesSeasonForPortal(seasonKey, portal);
 
-        const languages = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portal).map(link => link.language);
+        const languages = getLinksForSeriesSeasonAndPortal(yield select(),
+            seasonKey,
+            portal).map(link => link.language);
 
         yield all(languages.map(language => updateSeriesSeasonForPortal(seasonKey, portal, language)));
     } catch (error) {
@@ -71,7 +73,10 @@ function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkMo
 
     const season = getSeriesSeasonByKey(state, seasonKey);
     const portalController = getPortalController();
-    const portalDataData: PortalSeriesSeasonDto = yield call([ portalController, portalController.getSeasonInfoForLink ], link, season.seasonNumber);
+    const portalDataData: PortalSeriesSeasonDto = yield call([
+        portalController,
+        portalController.getSeasonInfoForLink,
+    ], link, season.seasonNumber);
 
     yield addSeriesSeasonSaga(season, portalDataData);
 }

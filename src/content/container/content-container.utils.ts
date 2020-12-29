@@ -13,6 +13,8 @@ export const getContentTypeForPortal = (portal: PORTALS): symbol => {
     switch (portal) {
         case PORTALS.BS:
             return CONTENT_TYPES.BurningSeries;
+        default:
+            return null;
     }
 };
 
@@ -22,5 +24,7 @@ export const getContentTypeForProvidor = (providor: PROVIDORS): symbol => {
             return CONTENT_TYPES.Vivo;
         case PROVIDORS.MIXdrop:
             return CONTENT_TYPES.MIXDrop;
+        default:
+            return null;
     }
 };

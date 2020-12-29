@@ -42,10 +42,8 @@
     import { Emit, Inject } from 'vue-property-decorator';
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
-    import {
-        filter, first, switchMap, takeUntil, tap,
-    } from 'rxjs/operators';
-    import Series from '../../../../../store/models/series.model';
+    import { filter, first, switchMap, takeUntil, tap, } from 'rxjs/operators';
+    import { Series } from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';
@@ -56,7 +54,7 @@
         getCollectionsForTypes,
         getSelectedSeasonKey,
     } from '../../../../../store/selectors/app-control-state.selector';
-    import SeriesEpisode from '../../../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
     import { getDefaultLanguage } from '../../../../../store/selectors/options.selector';

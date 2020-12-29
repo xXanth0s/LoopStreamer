@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Providor from '../models/providor.model';
+import { Providor } from '../models/providor.model';
 import { mapArrayToObject } from '../utils/selector.utils';
 import { PROVIDORS } from '../enums/providors.enum';
 
@@ -42,7 +42,8 @@ export const providorsSlice = createSlice({
     name: 'providors',
     initialState,
     reducers: {
-        updateProvidorsAction: (state: { [key: string]: Providor }, action: PayloadAction<Providor[]>) => updateProvidors(action.payload),
+        updateProvidorsAction: (state: { [key: string]: Providor }, action: PayloadAction<Providor[]>) =>
+            updateProvidors(action.payload),
     },
 });
 

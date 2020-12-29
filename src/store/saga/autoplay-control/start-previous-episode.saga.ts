@@ -17,7 +17,9 @@ export function* startPreviousEpisodeSaga(action: ReturnType<typeof startPreviou
     try {
         const series = getSeriesForEpisode(yield select(), seriesEpisodeKey);
 
-        const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey,
+            series.lastUsedPortal,
+            series.lastUsedLanguage);
         if (previousEpisodeLink) {
             yield startEpisode({ episodeKey: previousEpisodeLink.parentKey, language: series.lastUsedLanguage });
         }

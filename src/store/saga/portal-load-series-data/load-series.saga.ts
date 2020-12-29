@@ -2,7 +2,7 @@ import { call, put, select } from 'redux-saga/effects';
 import { getPortalController } from '../../../background/container/container.utils';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PORTALS } from '../../enums/portals.enum';
-import Series from '../../models/series.model';
+import { Series } from '../../models/series.model';
 import { addSeriesLinksToStoreSaga } from '../add-data/add-series-links-to-store.saga';
 import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 import { Logger } from '../../../shared/services/logger';
@@ -11,7 +11,6 @@ import { LinkModel } from '../../models/link.model';
 import { generateLinkForSeries } from '../../utils/link.utils';
 import { updateOrAddLinkAction } from '../../reducers/link.reducer';
 import { loadingSeriesAsyncInteraction } from '../../actions/async-interactions';
-
 
 /*
     Loads and stores all Links for Series with Seasons
@@ -46,7 +45,11 @@ export function* loadSeriesInformationForPortalSaga(seriesKey: string, portalKey
 
 export function* loadCompleteSeriesInformationForPortal(seriesKey: Series['key'], portalKey: PORTALS) {
     const portalController = getPortalController();
-    const seriesInfo: PortalSeriesInfoDto = yield call([ portalController, portalController.getDetailedSeriesInformation ], seriesKey, portalKey);
+    const seriesInfo: PortalSeriesInfoDto = yield call([
+        portalController,
+        portalController.getDetailedSeriesInformation,
+    ], seriesKey, portalKey);
+
     if (!seriesInfo) {
         return false;
     }
@@ -69,13 +72,16 @@ function* getSeriesLinkForPortalSaga(seriesKey: string, portalKey: PORTALS) {
 
     const portalController = getPortalController();
     try {
-        const seriesLink: string = yield call([ portalController, portalController.getSeriesLinkForPortal ], seriesKey, portalKey);
+        const seriesLink: string = yield call([
+            portalController,
+            portalController.getSeriesLinkForPortal,
+        ], seriesKey, portalKey);
 
         if (seriesLink) {
-            const link = generateLinkForSeries(seriesKey, portalKey, seriesLink);
+            const finalLink = generateLinkForSeries(seriesKey, portalKey, seriesLink);
 
-            yield put(updateOrAddLinkAction(link));
-            return link;
+            yield put(updateOrAddLinkAction(finalLink));
+            return finalLink;
         }
 
         return null;
@@ -83,5 +89,3 @@ function* getSeriesLinkForPortalSaga(seriesKey: string, portalKey: PORTALS) {
         Logger.error('[getSeriesLinkForPortal] error occurred', error);
     }
 }
-
-

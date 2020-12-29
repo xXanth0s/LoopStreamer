@@ -28,7 +28,9 @@ export class NotificationService {
         iziToast.destroy();
     }
 
-    public openSetStartTimePopup(setStartTime: () => void, doNotSetStarttime: () => void, onClosedFn: () => void): void {
+    public openSetStartTimePopup(setStartTime: () => void,
+                                 doNotSetStarttime: () => void,
+                                 onClosedFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             title: 'Intro definieren',
@@ -47,7 +49,10 @@ export class NotificationService {
         });
     }
 
-    public openSetEndTimePopup(timeoutSeconds: number, setEndTime: () => void, doNotSetStarttime: () => void, closedFn: () => void): void {
+    public openSetEndTimePopup(timeoutSeconds: number,
+                               setEndTime: () => void,
+                               doNotSetStarttime: () => void,
+                               closedFn: () => void): void {
         iziToast.show({
             ...this.defaultConfig,
             timeout: timeoutSeconds * 1000,
@@ -132,6 +137,7 @@ export class NotificationService {
     private closeToast(instance: IziToast, htmlElement: HTMLDivElement): void {
         instance.hide({
             transitionOut: 'fadeOut',
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             onClosed: () => {
             },
         }, htmlElement, 'button');

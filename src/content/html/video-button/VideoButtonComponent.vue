@@ -57,7 +57,7 @@
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
     // eslint-disable-next-line import/no-cycle
     import { inversifyContentContainer } from '../../container/container';
-    import SeriesEpisode from '../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../store/models/series-episode.model';
     import { createToggleWindowFullscreenMessage } from '../../../browserMessages/messages/background.messages';
     import { getWindowStateForWindowId } from '../../../store/selectors/control-state.selector';
     import { BrowserWindowStateModel } from '../../../store/models/browser-window-state.model';

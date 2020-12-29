@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { StateModel } from '../models/state.model';
-import Series from '../models/series.model';
+import { Series } from '../models/series.model';
 import { filterObject } from '../utils/selector.utils';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { updateOrAddLinkAction, updateOrAddMultipleLinksAction } from './link.reducer';
@@ -12,7 +12,7 @@ import { Logger } from '../../shared/services/logger';
 
 const initialState: StateModel['seriesEpisodes'] = {};
 
-const updateOrAddSeriesEpisode = function (state: StateModel['seriesEpisodes'], seriesEpisode: SeriesEpisode): void {
+function updateOrAddSeriesEpisode(state: StateModel['seriesEpisodes'], seriesEpisode: SeriesEpisode): void {
     const oldEpisode = state[seriesEpisode.key];
 
     if (!oldEpisode) {
@@ -31,17 +31,21 @@ const updateOrAddSeriesEpisode = function (state: StateModel['seriesEpisodes'], 
             ],
         };
     }
-};
+}
 
-const updateOrAddMultipleSeriesEpisode = function (state: StateModel['seriesEpisodes'], seriesEpisodes: SeriesEpisode[]): void {
+function updateOrAddMultipleSeriesEpisode(state: StateModel['seriesEpisodes'], seriesEpisodes: SeriesEpisode[]): void {
     seriesEpisodes.forEach(episode => updateOrAddSeriesEpisode(state, episode));
-};
+}
 
-function setSeriesEpisodeFinished(state: StateModel['seriesEpisodes'], payload: { seriesEpisodeKey: SeriesEpisode['key']; isFinished: boolean }): void {
+function setSeriesEpisodeFinished(state: StateModel['seriesEpisodes'],
+                                  payload: {
+                                      seriesEpisodeKey: SeriesEpisode['key'];
+                                      isFinished: boolean;
+                                  }): void {
     const { seriesEpisodeKey, isFinished } = payload;
     const episode = state[seriesEpisodeKey];
     if (!episode) {
-        console.error(`[SeriesEpisodeReducer->setSeriesEpisodeFinished]: no episode found for key: ${seriesEpisodeKey}`);
+        Logger.error(`[SeriesEpisodeReducer->setSeriesEpisodeFinished]: no episode found for key: ${seriesEpisodeKey}`);
         return;
     }
 
@@ -49,10 +53,13 @@ function setSeriesEpisodeFinished(state: StateModel['seriesEpisodes'], payload: 
 }
 
 function setSeriesEpisodeStarted(state: StateModel['seriesEpisodes'],
-                                 { seriesEpisodeKey, duration }: { seriesEpisodeKey: SeriesEpisode['key']; duration: SeriesEpisode['duration'] }): StateModel['seriesEpisodes'] {
+                                 { seriesEpisodeKey, duration }: {
+                                     seriesEpisodeKey: SeriesEpisode['key'];
+                                     duration: SeriesEpisode['duration'];
+                                 }): StateModel['seriesEpisodes'] {
     const episode = state[seriesEpisodeKey];
     if (!episode) {
-        console.error(`[SeriesEpisodeReducer->setSeriesEpisodeStarted]: no episode found for key: ${seriesEpisodeKey}`);
+        Logger.error(`[SeriesEpisodeReducer->setSeriesEpisodeStarted]: no episode found for key: ${seriesEpisodeKey}`);
         return state;
     }
 
@@ -68,7 +75,10 @@ function setSeriesEpisodeStarted(state: StateModel['seriesEpisodes'],
 }
 
 function setTimestamp(state: StateModel['seriesEpisodes'],
-                      payload: { seriesEpisodeKey: SeriesEpisode['key']; timestamp: number }): StateModel['seriesEpisodes'] {
+                      payload: {
+                          seriesEpisodeKey: SeriesEpisode['key'];
+                          timestamp: number;
+                      }): StateModel['seriesEpisodes'] {
     const { seriesEpisodeKey, timestamp } = payload;
     const seriesEpisode = state[seriesEpisodeKey];
     if (!seriesEpisode) {
@@ -85,12 +95,14 @@ function setTimestamp(state: StateModel['seriesEpisodes'],
     };
 }
 
-function deleteAllEpisodesFromSeries(state: StateModel['seriesEpisodes'], seriesKey: string): StateModel['seriesEpisodes'] {
+function deleteAllEpisodesFromSeries(state: StateModel['seriesEpisodes'],
+                                     seriesKey: string): StateModel['seriesEpisodes'] {
     return filterObject(state, episode => episode.seriesKey !== seriesKey);
 }
 
 function setNextEpisodeState(state: StateModel['seriesEpisodes'],
-                             { seriesEpisodeKey, hasNextEpisode }: { seriesEpisodeKey: SeriesEpisode['key']; hasNextEpisode: boolean }) {
+                             { seriesEpisodeKey, hasNextEpisode }:
+                                 { seriesEpisodeKey: SeriesEpisode['key']; hasNextEpisode: boolean }) {
     const episode = state[seriesEpisodeKey];
     if (!episode) {
         console.error(`[SeriesEpisodeReducer->setNextEpisodeState]: no episode found for key: ${seriesEpisodeKey}`);
@@ -101,7 +113,8 @@ function setNextEpisodeState(state: StateModel['seriesEpisodes'],
 }
 
 function setPreviousEpisodeState(state: StateModel['seriesEpisodes'],
-                                 { seriesEpisodeKey, hasPreviousEpisode }: { seriesEpisodeKey: SeriesEpisode['key']; hasPreviousEpisode: boolean }) {
+                                 { seriesEpisodeKey, hasPreviousEpisode }:
+                                     { seriesEpisodeKey: SeriesEpisode['key']; hasPreviousEpisode: boolean }) {
     const episode = state[seriesEpisodeKey];
     if (!episode) {
         console.error(`[SeriesEpisodeReducer->setPreviousEpisodeState]: no episode found for key: ${seriesEpisodeKey}`);
@@ -134,7 +147,8 @@ function addLink(state: Record<string, SeriesEpisode>, link: LinkModel): Record<
                 portalLinks: addToArrayIfNotExists(episode.portalLinks, link.key),
             },
         };
-    } else if (link.type === LINK_TYPE.PROVIDER_LINK) {
+    }
+    if (link.type === LINK_TYPE.PROVIDER_LINK) {
         const episode = state[link.parentKey];
         return {
             ...state,
@@ -148,6 +162,7 @@ function addLink(state: Record<string, SeriesEpisode>, link: LinkModel): Record<
     return state;
 }
 
+/* eslint-disable max-len */
 const seriesEpisodesReducer = createSlice({
     name: 'seriesEpisodes',
     initialState,
@@ -166,6 +181,7 @@ const seriesEpisodesReducer = createSlice({
         builder.addCase(updateOrAddLinkAction, (state: StateModel['seriesEpisodes'], action: PayloadAction<LinkModel>) => addLink(state, action.payload));
     },
 });
+/* eslint-enable max-len */
 
 export const {
     updateOrAddSeriesEpisodeAction,

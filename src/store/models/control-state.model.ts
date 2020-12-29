@@ -1,5 +1,5 @@
 import { BrowserWindowStateModel } from './browser-window-state.model';
-import SeriesEpisode from './series-episode.model';
+import { SeriesEpisode } from './series-episode.model';
 import { AsyncInteraction } from './async-interaction.model';
 import { WindowType } from '../enums/window-type.enum';
 

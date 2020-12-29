@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Series from '../models/series.model';
+import { Series } from '../models/series.model';
 import { StateModel } from '../models/state.model';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { Logger } from '../../shared/services/logger';
 import { deleteSeriesAction } from '../actions/shared.actions';
@@ -33,7 +33,9 @@ const resetSeries = (state: { [key: string]: Series }, key: Series['key']): { [k
     return state;
 };
 
-const setStartTimeForSeries = (state: { [key: string]: Series }, key: Series['key'], scipStartTime?: Series['scipStartTime']): { [key: string]: Series } => {
+const setStartTimeForSeries = (state: { [key: string]: Series },
+                               key: Series['key'],
+                               scipStartTime?: Series['scipStartTime']): { [key: string]: Series } => {
     const series = state[key];
     state[key] = {
         ...series,
@@ -43,7 +45,9 @@ const setStartTimeForSeries = (state: { [key: string]: Series }, key: Series['ke
     return state;
 };
 
-const setEndTimeForSeries = (state: { [key: string]: Series }, key: Series['key'], scipEndTime?: Series['scipStartTime']): { [key: string]: Series } => {
+const setEndTimeForSeries = (state: { [key: string]: Series },
+                             key: Series['key'],
+                             scipEndTime?: Series['scipStartTime']): { [key: string]: Series } => {
     const series = state[key];
     state[key] = {
         ...series,
@@ -94,12 +98,11 @@ function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series)
 }
 
 function updateOrAddMultipleSeries(state: { [key: string]: Series }, seriesInfos: Series[]): void {
-    for (const series of seriesInfos) {
-        updateOrAddSeries(state, series);
-    }
+    seriesInfos.forEach(series => updateOrAddSeries(state, series));
 }
 
-function setLastWatchedEpisode(state: StateModel['series'], actionData: { seriesKey: Series['key']; seriesEpisodeKey: SeriesEpisode['key'] }): void {
+function setLastWatchedEpisode(state: StateModel['series'],
+                               actionData: { seriesKey: Series['key']; seriesEpisodeKey: SeriesEpisode['key'] }): void {
     const { seriesEpisodeKey, seriesKey } = actionData;
     if (!state[seriesKey]) {
         console.error(`[SeriesReducer->seriesStarted] tried to update series ${seriesKey} but no series found`);
@@ -109,7 +112,8 @@ function setLastWatchedEpisode(state: StateModel['series'], actionData: { series
     state[seriesKey].lastEpisodeWatched = seriesEpisodeKey;
 }
 
-function setLastUsedPortalForSeries(state: StateModel['series'], { seriesKey, portal }: { seriesKey: Series['key']; portal: PORTALS }): void {
+function setLastUsedPortalForSeries(state: StateModel['series'],
+                                    { seriesKey, portal }: { seriesKey: Series['key']; portal: PORTALS }): void {
     if (!state[seriesKey]) {
         Logger.error(`[SeriesReducer->setLastUsedPortalForSeries] tried to update series ${seriesKey} but no series found`);
         return;
@@ -142,7 +146,8 @@ function addLink(state: StateModel['series'], link: LinkModel): void {
     series.portalLinks = addToArrayIfNotExists(series.portalLinks, link.key);
 }
 
-function setLastUsedLanguageForSeries(state: { [key: string]: Series }, { seriesKey, language }: { seriesKey: Series['key']; language: LANGUAGE }) {
+function setLastUsedLanguageForSeries(state: { [key: string]: Series },
+                                      { seriesKey, language }: { seriesKey: Series['key']; language: LANGUAGE }) {
     const series = state[seriesKey];
     if (!series) {
         Logger.error(`[SeriesReducerducer->setLastUsedLanguageForSeries] try to add link to series ${seriesKey}, but no series found`);
@@ -166,6 +171,7 @@ function addSeasons(state: Record<string, Series>, season: SeriesSeason) {
     series.seasons = addToArrayIfNotExists(series.seasons, season.key);
 }
 
+/* eslint-disable max-len */
 const seriesSlice = createSlice({
     name: 'series',
     initialState,
@@ -188,6 +194,7 @@ const seriesSlice = createSlice({
         builder.addCase(updateOrAddSeriesSeasonAction, (state: StateModel['series'], action: PayloadAction<SeriesSeason>) => addSeasons(state, action.payload));
     },
 });
+/* eslint-enable max-len */
 
 export const {
     removeSeriesAction,

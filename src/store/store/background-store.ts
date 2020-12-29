@@ -1,12 +1,12 @@
 import { applyMiddleware, configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import { forwardToRenderer, replayActionMain, triggerAlias } from 'electron-redux';
+import { composeWithDevTools } from 'remote-redux-devtools';
 import { StateModel } from '../models/state.model';
 // @ts-ignore
 import { getStorageData, StorageMiddlerware } from '../middleware/storage.middlerware';
 import { sagaErrorHandler, watcherSaga } from '../saga/watcher.saga';
 import { storeReducers } from '../reducers/reducer.collection';
-import { composeWithDevTools } from 'remote-redux-devtools';
 import { environment } from '../../environments/environment';
 
 const preloadedState = getStorageData();
@@ -23,7 +23,7 @@ const backgroundStore = configureStore<StateModel>({
     reducer: storeReducers,
     preloadedState,
     devTools: environment.isDev,
-    enhancers: [ composeEnhancer ]
+    enhancers: [ composeEnhancer ],
 });
 
 console.log('background store loaded ');

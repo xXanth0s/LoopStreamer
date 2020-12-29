@@ -5,19 +5,15 @@ import { tap } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
-import { WindowService } from '../services/window.service';
 import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { MessageService } from '../../shared/services/message.service';
-import { RootBackgroundController } from './root-background.controller';
 import {
     createStartTestRecaptchaMessage,
     createTestNotificationMessage,
-    OpenTestPageMessage,
-    StartTestEpisodeOverBSMessage,
 } from '../../browserMessages/messages/test.messages';
 import { WindowController } from './window.controller';
 import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
-import Website from '../../store/models/website';
+import { Website } from '../../store/models/website';
 import { setWindowIdForWindowTypeAction } from '../../store/reducers/control-state.reducer';
 import { WindowType } from '../../store/enums/window-type.enum';
 
@@ -25,39 +21,31 @@ import { WindowType } from '../../store/enums/window-type.enum';
 export class TestController {
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
                 @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
-                @inject(BACKGROUND_TYPES.RootController) private readonly rootController: RootBackgroundController,
-                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController,
-                @inject(BACKGROUND_TYPES.WindowService) private readonly windowService: WindowService) {
+                @inject(BACKGROUND_TYPES.WindowController) private readonly windowController: WindowController) {
     }
 
     public initializeHandler(): void {
-        ipcMain.handle(MessageType.TEST_BACKGROUND_START_TEST_EPISODE_OVER_BS,
-            (event, message: StartTestEpisodeOverBSMessage): void => {
-                // this.rootController.startEpisodeHandler(createStartEpisodeMessage('24-S5-E4', PORTALS.BS));
+        ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA, (): void => {
+            this.startTestPage().subscribe(window => {
+                this.messageService.sendMessageToBrowserWindow(window.id,
+                    createStartTestRecaptchaMessage());
             });
+        });
 
-        ipcMain.handle(MessageType.TEST_BACKGROUND_START_RECAPTCHA,
-            (event, message: StartTestEpisodeOverBSMessage): void => {
-                this.startTestPage().subscribe(window => {
-                    this.messageService.sendMessageToBrowserWindow(window.id, createStartTestRecaptchaMessage());
-                });
+        ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE, (): void => {
+            this.startTestPage().subscribe(window => {
+                this.store.dispatch(setWindowIdForWindowTypeAction({
+                    windowId: window.id,
+                    windowType: WindowType.VIDEO,
+                }));
+                this.messageService.sendMessageToBrowserWindow(window.id,
+                    createTestNotificationMessage());
             });
+        });
 
-        ipcMain.handle(MessageType.TEST_BACKGROUND_OPEN_TEST_PAGE,
-            (event, message: OpenTestPageMessage): void => {
-                this.startTestPage().subscribe(window => {
-                    this.store.dispatch(setWindowIdForWindowTypeAction({
-                        windowId: window.id,
-                        windowType: WindowType.VIDEO,
-                    }));
-                    this.messageService.sendMessageToBrowserWindow(window.id, createTestNotificationMessage());
-                });
-            });
-
-        ipcMain.handle(MessageType.TEST_BACKGROUND_SHOW_ALL_WINDOWS,
-            (event, message: OpenTestPageMessage): void => {
-                BrowserWindow.getAllWindows().forEach(window => window.show());
-            });
+        ipcMain.handle(MessageType.TEST_BACKGROUND_SHOW_ALL_WINDOWS, (): void => {
+            BrowserWindow.getAllWindows().forEach(window => window.show());
+        });
     }
 
     private startTestPage(): Observable<BrowserWindow> {

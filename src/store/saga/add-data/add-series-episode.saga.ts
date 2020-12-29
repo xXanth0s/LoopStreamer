@@ -4,11 +4,11 @@ import { generateLinkForProvidorLink, generateLinkForSeriesEpisodeDto } from '..
 import { LINK_TYPE } from '../../enums/link-type.enum';
 import { updateOrAddMultipleLinksAction } from '../../reducers/link.reducer';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
-import SeriesEpisode from '../../models/series-episode.model';
+import { SeriesEpisode } from '../../models/series-episode.model';
 import { PORTALS } from '../../enums/portals.enum';
 import { LANGUAGE } from '../../enums/language.enum';
 import { Logger } from '../../../shared/services/logger';
-import Series from '../../models/series.model';
+import { Series } from '../../models/series.model';
 
 export function* addMultipleEpisodesSaga(seriesKey: Series['key'], episodes: PortalSeriesEpisodeDto[]) {
     if (!episodes || episodes.length === 0) {
@@ -16,7 +16,9 @@ export function* addMultipleEpisodesSaga(seriesKey: Series['key'], episodes: Por
         return;
     }
 
-    const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(seriesKey, episode, LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
+    const episodeLinks = episodes.map(episode => generateLinkForSeriesEpisodeDto(seriesKey,
+        episode,
+        LINK_TYPE.PORTAL_EPISODE_LINK)).flat();
     yield put(updateOrAddMultipleLinksAction(episodeLinks));
 }
 
@@ -29,7 +31,11 @@ export function* addSeriesEpisodeProvidorLinks(providorLinks: ProvidorLink[],
         return false;
     }
 
-    const links = providorLinks.map(link => generateLinkForProvidorLink(episodeKey, link, language, LINK_TYPE.PORTAL_EPISODE_LINK, portalKey));
+    const links = providorLinks.map(link => generateLinkForProvidorLink(episodeKey,
+        link,
+        language,
+        LINK_TYPE.PORTAL_EPISODE_LINK,
+        portalKey));
 
     yield put(updateOrAddMultipleLinksAction(links));
 }
