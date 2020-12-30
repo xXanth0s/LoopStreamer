@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "eslint": "eslint . --ext .ts --ignore-path .eslintignore",
+    "eslint": "eslint . --ext .ts,.vue --ignore-path .eslintignore",
     "eslint:fix": "eslint . --ext .ts --ignore-path .eslintignore --fix",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
