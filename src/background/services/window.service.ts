@@ -188,7 +188,7 @@ export class WindowService {
             fromEvent(window, 'maximize'),
             fromEvent(window, 'unmaximize'),
             fromEvent(window, 'minimize'),
-            fromEvent(window, 'restore'),
+            fromEvent(window, 'restore')
         ).pipe(
             takeUntil(fromEvent(window, 'closed')),
             debounceTime(500),
