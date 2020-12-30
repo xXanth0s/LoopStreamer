@@ -7,4 +7,5 @@ export const environment: EnvironmentType = {
     showNewWindows: false,
     autoPlayPreviewVideos: true,
     linkCacheTimeInMinutes: 10,
+    videoButtonVisibilityTime: 5000,
 };

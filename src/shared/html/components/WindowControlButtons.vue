@@ -40,13 +40,12 @@
       createMinimizeWindowMessage,
       createToggleWindowMaximizationMessage,
     } from '../../../browserMessages/messages/background.messages';
+    import { environment } from '../../../environments/environment';
 
     @Component({
         name: 'WindowControlButtons',
     })
     export default class WindowControlButtons extends Vue {
-        private readonly buttonsVisibilityTime = 5000;
-
         @Prop(Boolean)
         private hideButtons: boolean;
 
@@ -89,7 +88,7 @@
 
             this.hideButtons$.pipe(
                 tap(() => this.showButtons = true),
-                debounceTime(this.buttonsVisibilityTime),
+                debounceTime(environment.videoButtonVisibilityTime),
                 filter(() => !this.isMouseOnButton),
             ).subscribe(() => {
                 this.showButtons = false;

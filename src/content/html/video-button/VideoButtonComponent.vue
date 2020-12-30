@@ -68,6 +68,7 @@
     import { setPictureInPictureAction } from '../../../store/reducers/control-state.reducer';
     import { isVideoPictureInPicture } from '../../../store/selectors/app-control-state.selector';
     import { isPreparingVideo } from '../../../store/selectors/async-interaction.selector';
+    import { environment } from '../../../environments/environment';
 
     @Component({
         name: 'ls-video-buttons',
@@ -102,8 +103,6 @@
 
         private isMouseOnButton = false;
 
-        private readonly buttonsVisibilityTime = 1500;
-
         public previous(): void {
             this.isStartingPrevious = true;
             this.store.dispatch(startPreviousEpisodeAction(this.episodeKey));
@@ -123,7 +122,7 @@
         public mounted(): void {
             this.windowId = remote.getCurrentWindow().id;
 
-            setTimeout(() => this.showButtons = false, this.buttonsVisibilityTime);
+            setTimeout(() => this.showButtons = false, environment.videoButtonVisibilityTime);
 
             this.initMouseEventListeners();
             this.initKeyboardListener();

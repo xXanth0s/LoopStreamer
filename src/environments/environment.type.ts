@@ -5,4 +5,5 @@ export type EnvironmentType = {
     showNewWindows: boolean;
     autoPlayPreviewVideos: boolean;
     linkCacheTimeInMinutes: number;
+    videoButtonVisibilityTime: number;
 };
