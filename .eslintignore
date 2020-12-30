@@ -1,7 +1,6 @@
 build/
 custom_frameworks/
 dist_electron/
-extensions/
 node_modules/
 tests/
 types/
