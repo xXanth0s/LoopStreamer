@@ -1,5 +1,5 @@
 import { Responses } from 'node-themoviedb';
-import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from '../store/utils/key.utils';
+import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitleAndDate } from '../store/utils/key.utils';
 import { LANGUAGE } from '../store/enums/language.enum';
 import { getEmptySeries, Series } from '../store/models/series.model';
 import { mapLanguage } from './language-mapper';
@@ -31,10 +31,11 @@ export function mapSeriesMetaInfoFromMovieDB(series: MovieDbMetaInfo, activeLang
         original_language,
         original_name,
         poster_path,
+        first_air_date,
     } = series;
 
     const seriesLanguage = mapLanguage(original_language);
-    const key = getKeyForSeriesTitle(original_name);
+    const key = getKeyForSeriesTitleAndDate(original_name, first_air_date?.substring(0, 4));
 
     return {
         key,
