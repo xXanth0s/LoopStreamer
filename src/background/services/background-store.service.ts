@@ -10,7 +10,7 @@ export class BackgroundStoreService implements IStoreService<StateModel> {
     }
 
     getState(): StateModel {
-        return backgroundStore.getState()
+        return backgroundStore.getState();
     }
 
     subscribe(listener: () => void): () => void {

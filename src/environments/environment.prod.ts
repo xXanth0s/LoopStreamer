@@ -2,8 +2,8 @@ import { EnvironmentType } from './environment.type';
 
 export const environment: EnvironmentType = {
     isDev: false,
-    openAppDevTools: true,
-    openDevTools: true,
+    openAppDevTools: false,
+    openDevTools: false,
     showNewWindows: false,
     autoPlayPreviewVideos: true,
     linkCacheTimeInMinutes: 5,
