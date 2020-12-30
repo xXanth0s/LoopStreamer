@@ -25,7 +25,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Prop } from 'vue-property-decorator';
-    import SeriesEpisode from '../../../../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../../../../store/models/series-episode.model';
     import { LANGUAGE } from '../../../../../../store/enums/language.enum';
     import EpisodePlayButton from './EpisodePlayButton.vue';
     import { getProgressForEpisode } from '../../../../../../store/utils/series.utils';

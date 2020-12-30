@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { StateModel } from '../models/state.model';
 import { SeriesSeason } from '../models/series-season.model';
-import Series from '../models/series.model';
+import { Series } from '../models/series.model';
 import { filterObject } from '../utils/selector.utils';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { updateOrAddLinkAction, updateOrAddMultipleLinksAction } from './link.reducer';
@@ -9,12 +9,12 @@ import { LinkModel } from '../models/link.model';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { addToArrayIfNotExists } from '../../utils/array.utils';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { updateOrAddMultipleSeriesEpisodeAction, updateOrAddSeriesEpisodeAction } from './series-episode.reducer';
 
 const initialState: StateModel['seriesSeasons'] = {};
 
-const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): void {
+function updateOrAddSeriesSeason(state: StateModel['seriesSeasons'], seriesSeason: SeriesSeason): void {
     const oldSeasonObject = state[seriesSeason.key];
 
     if (oldSeasonObject) {
@@ -33,11 +33,11 @@ const updateOrAddSeriesSeason = function (state: StateModel['seriesSeasons'], se
     } else {
         state[seriesSeason.key] = seriesSeason;
     }
-};
+}
 
-const updateOrAddMultipleSeriesSeason = function (state: StateModel['seriesSeasons'], seriesSeasons: SeriesSeason[]): void {
+function updateOrAddMultipleSeriesSeason(state: StateModel['seriesSeasons'], seriesSeasons: SeriesSeason[]): void {
     seriesSeasons.forEach(season => updateOrAddSeriesSeason(state, season));
-};
+}
 
 function deleteAllSeasonsForSeries(state: StateModel['seriesSeasons'], seriesKey: string): StateModel['seriesSeasons'] {
     return filterObject(state, season => season.seriesKey !== seriesKey);
@@ -77,6 +77,7 @@ function addEpisode(state: StateModel['seriesSeasons'], episode: SeriesEpisode):
     season.episodes = addToArrayIfNotExists(season.episodes, episode.key);
 }
 
+/* eslint-disable max-len */
 const seriesSeasonsReducer = createSlice({
     name: 'seriesSeasons',
     initialState,
@@ -92,6 +93,7 @@ const seriesSeasonsReducer = createSlice({
         builder.addCase(updateOrAddSeriesEpisodeAction, (state: StateModel['seriesSeasons'], action: PayloadAction<SeriesEpisode>) => addEpisode(state, action.payload));
     },
 });
+/* eslint-enable max-len */
 
 export const {
     updateOrAddSeriesSeasonAction,

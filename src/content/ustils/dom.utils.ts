@@ -7,7 +7,7 @@ import {
     LS_CONTENT_CONTAINER,
     VIDEO_IN_VIDEO_CSS_CLASS,
 } from '../constants/class-names';
-import Providor from '../../store/models/providor.model';
+import { Providor } from '../../store/models/providor.model';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 
 export function isDomElementVisible(domElement: HTMLElement): boolean {
@@ -33,7 +33,7 @@ function getNumberFromPixelString(pixelString: string): number {
     const pixelRegex = /px/g;
     const value = +pixelString.replace(pixelRegex, '');
 
-    return isNaN(value) ? 0 : value;
+    return Number.isNaN(value) ? 0 : value;
 }
 
 export function hideNotLsElement(htmlElement: HTMLElement): void {
@@ -59,9 +59,9 @@ export function checkForMutations<T extends Element>(container: Node, selector: 
     const sub$ = new Subject<T>();
 
     const callback = () => {
-        const container = document.querySelector<T>(selector);
-        if (container) {
-            sub$.next(container);
+        const nodeContainer = document.querySelector<T>(selector);
+        if (nodeContainer) {
+            sub$.next(nodeContainer);
         }
     };
 
@@ -80,9 +80,9 @@ export function isPictureInPicture(): boolean {
 
 export function getElementWithTitle<T extends Element>(element: Element, titles: string[]): T {
     let result: T = null;
-    for (const title of titles) {
+    titles.forEach(title => {
         result = element.querySelector(`[title^="${title}" i]`);
-    }
+    });
 
     return result;
 }
@@ -90,13 +90,16 @@ export function getElementWithTitle<T extends Element>(element: Element, titles:
 export function getLinksForProviders(providers: Providor[], providorContainer?: HTMLElement): ProvidorLink[] {
     const container = providorContainer || document.body;
     return providers.map(providor => {
-        const linkElement = getLinkWithText(container, providor.names) || getElementWithTitle(container, providor.names);
+        const linkElement = getLinkWithText(container, providor.names)
+            || getElementWithTitle(container, providor.names);
         if (linkElement) {
             return {
                 link: linkElement.href,
                 providor: providor.key,
             };
         }
+
+        return null;
     }).filter(Boolean);
 }
 
@@ -116,5 +119,4 @@ export function getLinkWithText(containerElement: Element, textPossibilities: st
     }
 
     return filteredLinks[0];
-
 }

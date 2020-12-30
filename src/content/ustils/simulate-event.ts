@@ -8,11 +8,12 @@ const eventMatchers = {
     [EventTypes.MouseEvents]: /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/,
 };
 
-export const simulateEvent = function (element: HTMLElement, eventName: string, eventOptions?: Partial<EventOptions>) {
+export function simulateEvent(element: HTMLElement, eventName: string, eventOptions?: Partial<EventOptions>) {
     const options = { ...defaultOptions, ...eventOptions };
     let oEvent: MouseEvent | Event;
     let eventType: EventTypes;
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const name in EventTypes) {
         if (eventMatchers[name].test(eventName)) {
             eventType = name as EventTypes;
@@ -24,12 +25,16 @@ export const simulateEvent = function (element: HTMLElement, eventName: string, 
 
     if (document.createEvent) {
         oEvent = document.createEvent(eventType);
-        if (eventType == 'HTMLEvents') {
+        if (eventType === 'HTMLEvents') {
             oEvent.initEvent(eventName, options.bubbles, options.cancelable);
         } else {
-            (oEvent as MouseEvent).initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
-                options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
-                options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+            (oEvent as MouseEvent).initMouseEvent(eventName, options.bubbles,
+                                                  options.cancelable, document.defaultView,
+                                                  options.button, options.pointerX,
+                                                  options.pointerY, options.pointerX, options.pointerY,
+                                                  options.ctrlKey, options.altKey,
+                                                  options.shiftKey, options.metaKey,
+                                                  options.button, element);
         }
         element.dispatchEvent(oEvent);
     } else {
@@ -40,13 +45,6 @@ export const simulateEvent = function (element: HTMLElement, eventName: string, 
         element.fireEvent(`on${eventName}`, oEvent);
     }
     return element;
-};
-
-function extend(destination, source) {
-    for (const property in source) {
-        destination[property] = source[property];
-    }
-    return destination;
 }
 
 const defaultOptions: EventOptions = {

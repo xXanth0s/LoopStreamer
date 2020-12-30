@@ -1,4 +1,4 @@
-import { call, put, select, } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import { addOrReplaceSeriesCollectionAction, setSelectedSeriesAction } from '../../reducers/app-control-state.reducer';
 import { getSeriesMetaInfo } from '../../selectors/series-meta-info.selector';
 import { getDefaultLanguage } from '../../selectors/options.selector';
@@ -18,8 +18,10 @@ export function* loadSimilarSeriesSaga(action: ReturnType<typeof setSelectedSeri
         const seriesMetaInfo = getSeriesMetaInfo(yield select(), selectedSeriesKey);
         const language = getDefaultLanguage(state);
 
-        const similarSeries = yield call(MovieDBService.getSimilarSeries, seriesMetaInfo.apiKeys[MovieApi.TMDB], language);
-
+        const similarSeries = yield call(
+            MovieDBService.getSimilarSeries,
+            seriesMetaInfo.apiKeys[MovieApi.TMDB],
+            language);
 
         const similarSeriesCollection: NamedCollection<SeriesMetaInfo> = {
             key: CollectionType.SIMILAR_SERIES_MODAL,
@@ -29,7 +31,7 @@ export function* loadSimilarSeriesSaga(action: ReturnType<typeof setSelectedSeri
         };
 
         yield put(addMultipleSeriesMetaInfosAction({
-            seriesMetaInfos: similarSeries
+            seriesMetaInfos: similarSeries,
         }));
 
         yield put(addOrReplaceSeriesCollectionAction({

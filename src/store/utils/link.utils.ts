@@ -1,19 +1,18 @@
+import differenceInMinutes from 'date-fns/differenceInMinutes';
 import { PortalSeriesInfoDto } from '../../dto/portal-series-info.dto';
 import { getEmptyLinkModel, LinkModel } from '../models/link.model';
-import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason, } from './key.utils';
+import { getKeyForLink, getKeyForSeriesEpisode, getKeyForSeriesSeason } from './key.utils';
 import { LANGUAGE } from '../enums/language.enum';
 import { LINK_TYPE } from '../enums/link-type.enum';
 import { PortalSeriesEpisodeDto } from '../../dto/portal-series-episode.dto';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { ProvidorLink } from '../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../dto/portal-series-season.dto';
 import { Logger } from '../../shared/services/logger';
 import { environment } from '../../environments/environment';
-import differenceInMinutes from 'date-fns/differenceInMinutes';
 import { SeriesSeason } from '../models/series-season.model';
-import Series from '../models/series.model';
-
+import { Series } from '../models/series.model';
 
 export function generateLinkForSeries(seriesKey: string, portal: PORTALS, href: string): LinkModel {
     const key = getKeyForLink({ parentKey: seriesKey, portal, language: LANGUAGE.NONE });
@@ -28,19 +27,20 @@ export function generateLinkForSeries(seriesKey: string, portal: PORTALS, href: 
     };
 }
 
-export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeriesInfoDto, seriesKey: string): LinkModel[] {
+export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeriesInfoDto,
+                                                          seriesKey: string): LinkModel[] {
     const { portal, seasonsLinks } = seriesInfo;
 
     return Object.entries(seasonsLinks).reduce((accumulator, value) => {
         const seasonNumber = value[0];
         const parentKey = getKeyForSeriesSeason(seriesKey, seasonNumber);
 
-        return Object.entries(value[1]).reduce<LinkModel[]>((accumulator, linkValue) => {
+        return Object.entries(value[1]).reduce<LinkModel[]>((acc, linkValue) => {
             const language = linkValue[0] as LANGUAGE;
             const href = linkValue[1];
             const key = getKeyForLink({ parentKey, portal, language });
             return [
-                ...accumulator,
+                ...acc,
                 {
                     ...getEmptyLinkModel(),
                     key,
@@ -55,13 +55,14 @@ export function generateLinksForSeriesSeasonFromSeriesDto(seriesInfo: PortalSeri
     }, []);
 }
 
-export function generateLinksForSeriesSeasonDto(season: SeriesSeason, seriesSeasonDto: PortalSeriesSeasonDto): LinkModel[] {
+export function generateLinksForSeriesSeasonDto(season: SeriesSeason,
+                                                seriesSeasonDto: PortalSeriesSeasonDto): LinkModel[] {
     const {
         seasonLinks, portal,
     } = seriesSeasonDto;
 
     const {
-        seriesKey, seasonNumber
+        seriesKey, seasonNumber,
     } = season;
 
     if (!seasonLinks) {
@@ -86,30 +87,33 @@ export function generateLinksForSeriesSeasonDto(season: SeriesSeason, seriesSeas
     });
 }
 
-export function generateLinkForSeriesEpisodeDto(seriesKey: Series['key'], seriesEpisode: PortalSeriesEpisodeDto, type: LINK_TYPE): LinkModel[] {
+export function generateLinkForSeriesEpisodeDto(seriesKey: Series['key'],
+                                                seriesEpisode: PortalSeriesEpisodeDto,
+                                                type: LINK_TYPE): LinkModel[] {
     const {
         episodeNumber, seasonNumber, portalLinks, portal,
     } = seriesEpisode;
     const parentKey = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);
 
-    return Object.keys(portalLinks).map((language: LANGUAGE) => portalLinks[language].map(({ link, providor }: ProvidorLink) => {
-        if (!link) {
-            return;
-        }
-        const key = getKeyForLink({
-            parentKey, portal, providor, language,
-        });
-        return {
-            ...getEmptyLinkModel(),
-            key,
-            parentKey,
-            language,
-            providor,
-            portal,
-            type,
-            href: link,
-        };
-    }).filter(Boolean)).flat();
+    return Object.keys(portalLinks)
+        .map((language: LANGUAGE) => portalLinks[language].map(({ link, providor }: ProvidorLink) => {
+            if (!link) {
+                return null;
+            }
+            const key = getKeyForLink({
+                parentKey, portal, providor, language,
+            });
+            return {
+                ...getEmptyLinkModel(),
+                key,
+                parentKey,
+                language,
+                providor,
+                portal,
+                type,
+                href: link,
+            };
+        }).filter(Boolean)).flat();
 }
 
 export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key'],

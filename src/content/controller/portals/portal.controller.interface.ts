@@ -1,13 +1,14 @@
-import Providor from '../../../store/models/providor.model';
-import SeriesEpisode from '../../../store/models/series-episode.model';
+import { Providor } from '../../../store/models/providor.model';
+import { SeriesEpisode } from '../../../store/models/series-episode.model';
 import { PortalSeriesInfoDto } from '../../../dto/portal-series-info.dto';
 import { PortalSeriesEpisodeDto } from '../../../dto/portal-series-episode.dto';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
-import Series from '../../../store/models/series.model';
+import { Series } from '../../../store/models/series.model';
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IPortalController {
 
     getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string>;

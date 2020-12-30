@@ -36,61 +36,73 @@ export class RootContentController {
     }
 
     public init(): void {
-        ipcRenderer.on(MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE, (event, message: GetResolvedProvidorLinkForEpisode) => {
-            this.getResolvedProvidorLinkHandler(event, message);
-        });
+        ipcRenderer.on(MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
+                       (event, message: GetResolvedProvidorLinkForEpisode) => {
+                           this.getResolvedProvidorLinkHandler(event, message);
+                       });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL, (event, message: GetSeriesLinkForPortal) => {
-            console.log(message);
-            this.getLinkForSeriesFromPortalHandler(event, message);
-        });
+        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_LINK_FOR_PORTAL,
+                       (event, message: GetSeriesLinkForPortal) => {
+                           console.log(message);
+                           this.getLinkForSeriesFromPortalHandler(event, message);
+                       });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION, (event, message: GetDetailedSeriesInformationMessage) => {
-            console.log(message);
-            this.getDetailedSeriesInformationHandler(event, message);
-        });
+        ipcRenderer.on(MessageType.PORTAL_GET_SERIES_META_INFORMATION,
+                       (event, message: GetDetailedSeriesInformationMessage) => {
+                           console.log(message);
+                           this.getDetailedSeriesInformationHandler(event, message);
+                       });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_SEASON_INFO, (event, message: GetSeasonInfoMessage) => {
-            console.log(message);
-            this.getSeasonsEpisodeInformationHandler(event, message);
-        });
+        ipcRenderer.on(MessageType.PORTAL_GET_SEASON_INFO,
+                       (event, message: GetSeasonInfoMessage) => {
+                           console.log(message);
+                           this.getSeasonsEpisodeInformationHandler(event, message);
+                       });
 
-        ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO, (event, message: StartVideoMessage) => {
-            console.log(message);
-            this.startVideoForProvidorHandler(event, message);
-        });
+        ipcRenderer.on(MessageType.PROVIDOR_START_VIDEO,
+                       (event, message: StartVideoMessage) => {
+                           console.log(message);
+                           this.startVideoForProvidorHandler(event, message);
+                       });
 
-        ipcRenderer.on(MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS, (event, message: GetAllProvidorLinksForEpisodeMessage) => {
-            console.log(message);
-            this.getAllProvidorLinksForEpisode(event, message);
-        });
+        ipcRenderer.on(MessageType.PORTAL_GET_ALL_PROVIDOR_LINKS,
+                       (event, message: GetAllProvidorLinksForEpisodeMessage) => {
+                           console.log(message);
+                           this.getAllProvidorLinksForEpisode(event, message);
+                       });
     }
 
-    private async getResolvedProvidorLinkHandler(event: IpcRendererEvent, message: GetResolvedProvidorLinkForEpisode): Promise<void> {
+    private async getResolvedProvidorLinkHandler(event: IpcRendererEvent,
+                                                 message: GetResolvedProvidorLinkForEpisode): Promise<void> {
         const { providor, episodeInfo, portal } = message.payload;
-        const result = await this.portalService.getPortalController(portal).getResolvedProvidorLinkForEpisode(episodeInfo, providor);
+        const result = await this.portalService.getPortalController(portal)
+            .getResolvedProvidorLinkForEpisode(episodeInfo, providor);
         this.messageService.replyToSender(message, event.sender, result);
     }
 
-    private getAllProvidorLinksForEpisode(event: IpcRendererEvent, message: GetAllProvidorLinksForEpisodeMessage): void {
+    private getAllProvidorLinksForEpisode(event: IpcRendererEvent,
+                                          message: GetAllProvidorLinksForEpisodeMessage): void {
         const { language, portal } = message.payload;
         const result = this.portalService.getPortalController(portal).getAllPortalProviderLinksForEpisode(language);
         this.messageService.replyToSender(message, event.sender, result);
     }
 
-    private async getLinkForSeriesFromPortalHandler(event: IpcRendererEvent, message: GetSeriesLinkForPortal): Promise<void> {
+    private async getLinkForSeriesFromPortalHandler(event: IpcRendererEvent,
+                                                    message: GetSeriesLinkForPortal): Promise<void> {
         const { portal, seriesKey } = message.payload;
         const seriesLink = await this.portalService.getPortalController(portal)?.getLinkForSeries(seriesKey);
         this.messageService.replyToSender(message, event.sender, seriesLink);
     }
 
-    private async getDetailedSeriesInformationHandler(event: IpcRendererEvent, message: GetDetailedSeriesInformationMessage): Promise<void> {
+    private async getDetailedSeriesInformationHandler(event: IpcRendererEvent,
+                                                      message: GetDetailedSeriesInformationMessage): Promise<void> {
         const { portal } = message.payload;
         const seriesInfo = await this.portalService.getPortalController(portal)?.getSeriesMetaInformation();
         this.messageService.replyToSender(message, event.sender, seriesInfo);
     }
 
-    private async getSeasonsEpisodeInformationHandler(event: IpcRendererEvent, message: GetSeasonInfoMessage): Promise<void> {
+    private async getSeasonsEpisodeInformationHandler(event: IpcRendererEvent,
+                                                      message: GetSeasonInfoMessage): Promise<void> {
         const { portal, seasonNumber } = message.payload;
         const seasonInfo = await this.portalService.getPortalController(portal)?.getSeasonInfo(seasonNumber);
         this.messageService.replyToSender(message, event.sender, seasonInfo);

@@ -1,6 +1,6 @@
-import Series from './series.model';
+import { Series } from './series.model';
 import { LinkModel } from './link.model';
-import SeriesEpisode from './series-episode.model';
+import { SeriesEpisode } from './series-episode.model';
 
 export interface SeriesSeason {
     key: string;

@@ -19,7 +19,7 @@
     import Component from 'vue-class-component';
     import Vue from 'vue';
     import { Inject, Prop, Watch } from 'vue-property-decorator';
-    import Series from '../../../../../store/models/series.model';
+    import { Series } from '../../../../../store/models/series.model';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';

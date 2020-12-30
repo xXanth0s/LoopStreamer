@@ -96,6 +96,7 @@ export class Logger {
 enum logType {
     error,
     warn,
+    // eslint-disable-next-line no-shadow
     log,
     info,
     verbose,

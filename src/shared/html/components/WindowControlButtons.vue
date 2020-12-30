@@ -36,9 +36,9 @@
     import { SHARED_TYPES } from '../../constants/SHARED_TYPES';
     import { MessageService } from '../../services/message.service';
     import {
-        createCloseWindowMessage,
-        createMinimizeWindowMessage,
-        createToggleWindowMaximizationMessage,
+      createCloseWindowMessage,
+      createMinimizeWindowMessage,
+      createToggleWindowMaximizationMessage,
     } from '../../../browserMessages/messages/background.messages';
 
     @Component({

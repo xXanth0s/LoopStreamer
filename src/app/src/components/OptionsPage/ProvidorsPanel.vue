@@ -64,7 +64,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Inject } from 'vue-property-decorator';
-    import Providor from '../../../../store/models/providor.model';
+    import { Providor } from '../../../../store/models/providor.model';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
     import { getAllProvidors } from '../../../../store/selectors/providors.selector';

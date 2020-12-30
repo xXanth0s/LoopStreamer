@@ -8,18 +8,19 @@ import {
     mapSeasonFromMovieDB,
     mapSeriesFromMovieDB,
     mapSeriesMetaInfoFromMovieDB,
-    orderByMovieDBPopularity
+    orderByMovieDBPopularity,
 } from '../../utils/movie-db-mapper';
-import Series from '../../store/models/series.model';
+import { Series } from '../../store/models/series.model';
 import { LANGUAGE } from '../../store/enums/language.enum';
 import { SeriesSeason } from '../../store/models/series-season.model';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { MovieApi } from '../../store/enums/movie-api.enum';
 import { Genre } from '../../store/models/genre.model';
 import { SeriesMetaInfo } from '../../store/models/series-meta-info.model';
 
 type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders }
 
+/* eslint @typescript-eslint/camelcase: 0 */
 @injectable()
 export class MovieDBService {
     public static async getPopularSeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
@@ -36,7 +37,7 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getPopularSeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+        return series.map((_series) => mapSeriesMetaInfoFromMovieDB(_series, language));
     }
 
     public static async getTopRatedSeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
@@ -54,7 +55,7 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getTopRatedSeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+        return series.map((_series) => mapSeriesMetaInfoFromMovieDB(_series, language));
     }
 
     public static async getAiringTodaySeries(language: LANGUAGE): Promise<SeriesMetaInfo[]> {
@@ -72,7 +73,7 @@ export class MovieDBService {
             Logger.error('[MovieDDService->getAiringTodaySeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+        return series.map((_series) => mapSeriesMetaInfoFromMovieDB(_series, language));
     }
 
     public static async getSimilarSeries(movieDbId: string, language: LANGUAGE): Promise<SeriesMetaInfo[]> {
@@ -87,35 +88,37 @@ export class MovieDBService {
             // @ts-ignore
             series = results.flatMap(data => data.data.results);
             series = orderByMovieDBPopularity(series);
-            debugger
+            debugger;
         } catch (error) {
             Logger.error('[MovieDDService->getSimilarSeries] error occurred', error);
         }
 
-        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+        return series.map((_series) => mapSeriesMetaInfoFromMovieDB(_series, language));
     }
 
     public static async searchSeries(searchString: string, language: LANGUAGE): Promise<SeriesMetaInfo[]> {
         let series: MovieDB.Objects.TVShow[] = [];
         const client = MovieDBService.getClient(language);
         try {
-            const videoResponse = await client.search.TVShows({query: {query: searchString}})
+            const videoResponse = await client.search.TVShows({ query: { query: searchString } });
 
             series = orderByMovieDBPopularity(videoResponse.data.results);
         } catch (error) {
             Logger.error('[MovieDDService->getVideo] error occurred', error);
             return [];
         }
-        return series.map((series) => mapSeriesMetaInfoFromMovieDB(series, language));
+        return series.map((_series) => mapSeriesMetaInfoFromMovieDB(_series, language));
     }
 
-    public static async getDetailedSeriesInformation(movieDbId: string, language: LANGUAGE): Promise<[ Series, SeriesSeason[], SeriesEpisode[] ]> {
+    public static async getDetailedSeriesInformation(movieDbId: string,
+                                                     language: LANGUAGE):
+        Promise<[ Series, SeriesSeason[], SeriesEpisode[] ]> {
         const client = MovieDBService.getClient(language);
         let videoUrl: string;
         let series: Responses.TV.GetDetails;
         try {
             const [ seriesResponse, video ]: [ MovieDbResponse<Responses.TV.GetDetails>, string ] = await Promise.all([
-                client.tv.getDetails({pathParameters: {tv_id: movieDbId}}),
+                client.tv.getDetails({ pathParameters: { tv_id: movieDbId } }),
                 MovieDBService.getVideo(movieDbId, language),
             ]);
 
@@ -137,13 +140,15 @@ export class MovieDBService {
                 .map(season => MovieDBService.getSeasonInfo(mappedSeries, `${season.season_number}`, language)),
         );
 
-        const mappedSeasons = seasonData.map(([ season, episodes ]) => season);
-        const mappedEpisodes = seasonData.flatMap(([ season, episodes ]) => episodes);
+        const mappedSeasons = seasonData.map(([ season ]) => season);
+        const mappedEpisodes = seasonData.flatMap((data) => data[1]);
 
         return [ mappedSeries, mappedSeasons, mappedEpisodes ];
     }
 
-    public static async getSeasonInfo(series: Series, seasonNumber: string, language: LANGUAGE): Promise<[ SeriesSeason, SeriesEpisode[] ]> {
+    public static async getSeasonInfo(series: Series,
+                                      seasonNumber: string,
+                                      language: LANGUAGE): Promise<[ SeriesSeason, SeriesEpisode[] ]> {
         const client = MovieDBService.getClient(language);
         let season: Responses.TV.Season.GetDetails;
         try {
@@ -184,8 +189,8 @@ export class MovieDBService {
             const videoResponse = await client.tv.getVideos({ pathParameters: { tv_id: movieDbId } });
 
             const video = videoResponse.data.results
-                .filter(video => video.site.toLowerCase() === 'youtube')
-                .find(video => video.type === 'Trailer' || video.type === 'Teaser');
+                .filter(_video => _video.site.toLowerCase() === 'youtube')
+                .find(_video => _video.type === 'Trailer' || video.type === 'Teaser');
             videoUrl = video?.key;
         } catch (error) {
             Logger.error('[MovieDDService->getVideo] error occurred', error);

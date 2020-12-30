@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents, } from 'electron';
+import {
+    BrowserWindow, ipcMain, ipcRenderer, IpcRenderer, WebContents,
+} from 'electron';
 import { SHARED_TYPES } from '../constants/SHARED_TYPES';
 import { StoreService } from './store.service';
 import { ControllerType } from '../../browserMessages/enum/controller.type';

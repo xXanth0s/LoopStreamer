@@ -2,7 +2,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { globalRoutes } from '../constants/globalRoutes';
 import SettingsPage from '../views/SettingsPage.vue';
-import InfoPage from '../views/InfoPage.vue';
 import TestPage from '../views/TestPage.vue';
 import { environment } from '../../../environments/environment';
 import SeriesPage from '../views/SeriesPage.vue';
@@ -17,10 +16,6 @@ let routes = [
     {
         path: `/${globalRoutes.SETTINGS_PAGE}`,
         component: SettingsPage,
-    },
-    {
-        path: `/${globalRoutes.FAQ_PAGE}`,
-        component: InfoPage,
     },
     {
         path: `/${globalRoutes.TEST_PAGE}`,

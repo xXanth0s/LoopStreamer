@@ -3,9 +3,9 @@ import { setSelectedSeasonForAppAction, setSelectedSeriesAction } from '../../re
 import { Logger } from '../../../shared/services/logger';
 import { MovieDBService } from '../../../shared/services/movie-db.service';
 import { MovieApi } from '../../enums/movie-api.enum';
-import Series from '../../models/series.model';
+import { Series } from '../../models/series.model';
 import { SeriesSeason } from '../../models/series-season.model';
-import SeriesEpisode from '../../models/series-episode.model';
+import { SeriesEpisode } from '../../models/series-episode.model';
 import { updateOrAddSeriesAction } from '../../reducers/series.reducer';
 import { updateOrAddMutlipleSeriesSeasonAction } from '../../reducers/series-season.reducer';
 import { updateOrAddMultipleSeriesEpisodeAction } from '../../reducers/series-episode.reducer';
@@ -17,10 +17,13 @@ import { getSeriesSeasonForEpisode } from '../../selectors/series-season.selecto
 export function* loadDetailedSeriesInformationFromApiSaga(action: ReturnType<typeof setSelectedSeriesAction>) {
     const { selectedSeriesKey } = action.payload;
     try {
-
         let state = yield select();
         const stateSeries: SeriesMetaInfo = getSeriesMetaInfo(state, selectedSeriesKey);
-        const [ series, seasons, episodes ]: [ Series, SeriesSeason[], SeriesEpisode[] ] = yield call(MovieDBService.getDetailedSeriesInformation, stateSeries.apiKeys[MovieApi.TMDB], state.options.defaultLanguage);
+        const [ series, seasons, episodes ]: [ Series, SeriesSeason[], SeriesEpisode[] ] = yield call(
+            MovieDBService.getDetailedSeriesInformation,
+            stateSeries.apiKeys[MovieApi.TMDB],
+            state.options.defaultLanguage,
+        );
 
         yield put(updateOrAddSeriesAction(series));
         yield put(updateOrAddMutlipleSeriesSeasonAction(seasons));

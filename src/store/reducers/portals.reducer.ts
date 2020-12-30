@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Portal from '../models/portal.model';
+import { Portal } from '../models/portal.model';
 import { mapArrayToObject } from '../utils/selector.utils';
 import { PORTALS } from '../enums/portals.enum';
 import { StateModel } from '../models/state.model';
@@ -32,6 +32,7 @@ function addMultipleLinks(state: Partial<Record<PORTALS, Portal>>, links: LinkMo
     state[filteredLinks[0].portal].series = filteredLinks.map(link => link.parentKey);
 }
 
+/* eslint-disable max-len */
 const portalsSlice = createSlice({
     name: 'portals',
     initialState: initialPortalsData,
@@ -42,6 +43,7 @@ const portalsSlice = createSlice({
         builder.addCase(updateOrAddMultipleLinksAction, (state: StateModel['portals'], action: PayloadAction<LinkModel[]>) => addMultipleLinks(state, action.payload));
     },
 });
+/* eslint-enable max-len */
 
 export const { updatePortalsAction } = portalsSlice.actions;
 

@@ -10,9 +10,12 @@ export const getSelectedSeason = (state: StateModel): SeriesSeason => state.seri
 
 export const getMutePreviewVideoState = (state: StateModel): boolean => state.appControlState.mutePreviewVideo;
 
-export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);
+export const isVideoPictureInPicture = (state: StateModel): boolean => {
+    return Boolean(state.controlState.isVideoPictureInPicture);
+};
 
-export const getCollectionsForTypes = (state: StateModel, types: CollectionType[]): NamedCollection<SeriesMetaInfo>[] => {
+export const getCollectionsForTypes = (state: StateModel,
+                                       types: CollectionType[]): NamedCollection<SeriesMetaInfo>[] => {
     const collections = Object.values(state.appControlState.seriesCollections);
     return types.flatMap(type => collections.filter(collection => collection.type === type));
 };

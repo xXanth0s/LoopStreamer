@@ -3,7 +3,7 @@ import { startEpisodeAction } from '../../actions/shared.actions';
 import { getFallbackLanguageForEpisode, getSeriesEpisodeByKey } from '../../selectors/series-episode.selector';
 import { StateModel } from '../../models/state.model';
 import { getPortalController, getVideoController } from '../../../background/container/container.utils';
-import SeriesEpisode from '../../models/series-episode.model';
+import { SeriesEpisode } from '../../models/series-episode.model';
 import { PORTALS } from '../../enums/portals.enum';
 import { getAllUsedProvidors } from '../../selectors/providors.selector';
 import { PROVIDORS } from '../../enums/providors.enum';
@@ -51,7 +51,6 @@ export function* startEpisodeSaga(action: ReturnType<typeof startEpisodeAction>)
     if (episodeStartSuccessful) {
         yield put(raisePlayedEpisodesAction());
     }
-
 }
 
 export function* startEpisode(options: StartEpisodeOptions) {
@@ -87,10 +86,12 @@ export function* startEpisode(options: StartEpisodeOptions) {
     } finally {
         yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
-
 }
 
-function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLink, linkSourcePortal: PORTALS, language: LANGUAGE) {
+function* startVideo(episodeKey: SeriesEpisode['key'],
+                     providorLink: ProvidorLink,
+                     linkSourcePortal: PORTALS,
+                     language: LANGUAGE) {
     const videoController = getVideoController();
     const series = getSeriesForEpisode(yield select(), episodeKey);
     const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
@@ -105,15 +106,20 @@ function* startVideo(episodeKey: SeriesEpisode['key'], providorLink: ProvidorLin
     return success;
 }
 
-function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey: PORTALS, providersToIgnore: PROVIDORS[], language: LANGUAGE) {
+function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'],
+                                    portalKey: PORTALS,
+                                    providersToIgnore: PROVIDORS[],
+                                    language: LANGUAGE) {
     const portalController = getPortalController();
 
     const state: StateModel = yield select();
     const seriesEpisode = getSeriesEpisodeByKey(state, episodeKey);
 
     const providors = getAllUsedProvidors(state).filter(providor => !providersToIgnore.includes(providor.key));
-    const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks).filter(link => link.language === language);
+    const episodeProvidorLinks = getLinksByKeys(yield select(), seriesEpisode.providorLinks)
+        .filter(link => link.language === language);
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const provider of providors) {
         const providorLink = episodeProvidorLinks.find(link => link.providor === provider.key);
         if (providorLink) {
@@ -125,7 +131,10 @@ function* getPrivodorLinkForEpisode(episodeKey: SeriesEpisode['key'], portalKey:
             return result;
         }
 
-        const link: ProvidorLink = yield call([ portalController, portalController.getProvidorLinkForEpisode ], episodeKey, portalKey, provider.key, language);
+        const link: ProvidorLink = yield call([
+            portalController,
+            portalController.getProvidorLinkForEpisode,
+        ], episodeKey, portalKey, provider.key, language);
 
         if (link) {
             return link;

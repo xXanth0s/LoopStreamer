@@ -8,4 +8,4 @@ export const environment: EnvironmentType = {
     autoPlayPreviewVideos: true,
     reduxDevToolsVersion: '2.17.0_0',
     linkCacheTimeInMinutes: 10,
-}
+};

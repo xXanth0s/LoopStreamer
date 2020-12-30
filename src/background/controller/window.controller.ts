@@ -1,12 +1,16 @@
 import { inject, injectable } from 'inversify';
-import { fromEvent, Observable, race, Subject, timer, } from 'rxjs';
+import {
+    fromEvent, Observable, race, Subject, timer,
+} from 'rxjs';
 import { app, BrowserWindow, OnSendHeadersListenerDetails } from 'electron';
-import { filter, map, mapTo, startWith, switchMap, takeUntil, } from 'rxjs/operators';
+import {
+    filter, map, mapTo, startWith, switchMap, takeUntil,
+} from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { WindowService } from '../services/window.service';
-import Website from '../../store/models/website';
+import { Website } from '../../store/models/website';
 
 type WebContensCreatedEvent = [ Event, BrowserWindow ];
 
@@ -25,43 +29,47 @@ export class WindowController {
             takeUntil(this.store.playerHasStopped()),
             map(data => data[1]),
             filter(Boolean),
-            switchMap((window: BrowserWindow) => this.isWindowOpeningValidPage(window, allowedPage, linkToOpen).pipe(
-                map(isValid => {
-                    if (isValid) {
-                        this.windowService.addDefaultHandlingForNewWindow(window);
-                        window.setParentWindow(originalWindow);
-                        return window;
-                    }
-                    this.windowService.closeWindow(window.id);
-                    return null;
-                }),
-            )),
+            switchMap((window: BrowserWindow) => this.isWindowOpeningValidPage(window, allowedPage, linkToOpen)
+                .pipe(
+                    map(isValid => {
+                        if (isValid) {
+                            this.windowService.addDefaultHandlingForNewWindow(window);
+                            window.setParentWindow(originalWindow);
+                            return window;
+                        }
+                        this.windowService.closeWindow(window.id);
+                        return null;
+                    }),
+                )),
             filter<BrowserWindow>(Boolean),
             startWith(originalWindow),
         );
     }
 
-    private isWindowOpeningValidPage(window: BrowserWindow, allowedPage: Website, validLink: string): Observable<boolean> {
+    private isWindowOpeningValidPage(window: BrowserWindow,
+                                     allowedPage: Website,
+                                     validLink: string): Observable<boolean> {
         const sub$ = new Subject<boolean>();
         const timeout$ = timer(100).pipe(
             mapTo(false),
         );
 
-        window.webContents.session.webRequest.onSendHeaders(this.requestFilter, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
-            if (resourceType !== 'mainFrame') {
-                return;
-            }
-            if (window.isDestroyed()) {
-                return;
-            }
+        window.webContents.session.webRequest
+            .onSendHeaders(this.requestFilter, ({ resourceType, url }: OnSendHeadersListenerDetails): void => {
+                if (resourceType !== 'mainFrame') {
+                    return;
+                }
+                if (window.isDestroyed()) {
+                    return;
+                }
 
-            window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
-            if (!this.isUrlValid(url, allowedPage, validLink)) {
-                sub$.next(false);
-            } else {
-                sub$.next(true);
-            }
-        });
+                window.webContents.session.webRequest.onSendHeaders(this.requestFilter, null);
+                if (!this.isUrlValid(url, allowedPage, validLink)) {
+                    sub$.next(false);
+                } else {
+                    sub$.next(true);
+                }
+            });
 
         return race(sub$, timeout$);
     }

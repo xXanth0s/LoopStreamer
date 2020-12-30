@@ -6,7 +6,7 @@ import {
 } from '../../reducers/series-episode.reducer';
 import {
     getPortalLinkForNextEpisode,
-    getPortalLinkForPreviousEpisode
+    getPortalLinkForPreviousEpisode,
 } from '../portal-load-series-data/load-neighbour-series-episode.saga';
 import { getSeriesForEpisode } from '../../selectors/series.selector';
 import { Logger } from '../../../shared/services/logger';
@@ -26,13 +26,17 @@ export function* episodeStartedSaga(action: ReturnType<typeof seriesEpisodeStart
     yield createLastWatchedSeriesCollectionSaga();
 
     try {
-        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(seriesEpisodeKey,
+                                                                             series.lastUsedPortal,
+                                                                             series.lastUsedLanguage);
         yield put(setSeriesEpisodeNextEpisodeStateAction({
             seriesEpisodeKey,
             hasNextEpisode: Boolean(nextEpisodeLink),
         }));
 
-        const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        const previousEpisodeLink: LinkModel = yield getPortalLinkForPreviousEpisode(seriesEpisodeKey,
+                                                                                     series.lastUsedPortal,
+                                                                                     series.lastUsedLanguage);
         yield put(setSeriesEpisodePreviousEpisodeStateAction({
             seriesEpisodeKey,
             hasPreviousEpisode: Boolean(previousEpisodeLink),

@@ -1,8 +1,8 @@
-import { call, put, select, } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import {
     addOrReplaceSeriesCollectionAction,
     removeSeriesCollectionAction,
-    setSearchTextAction
+    setSearchTextAction,
 } from '../../reducers/app-control-state.reducer';
 import { getDefaultLanguage } from '../../selectors/options.selector';
 import { MovieDBService } from '../../../shared/services/movie-db.service';
@@ -39,7 +39,7 @@ export function* loadSeriesSearchResultSaga(action: ReturnType<typeof setSearchT
         };
 
         yield put(addMultipleSeriesMetaInfosAction({
-            seriesMetaInfos: searchResult
+            seriesMetaInfos: searchResult,
         }));
 
         yield put(addOrReplaceSeriesCollectionAction({

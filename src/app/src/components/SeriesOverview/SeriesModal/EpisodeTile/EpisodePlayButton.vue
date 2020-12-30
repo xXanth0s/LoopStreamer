@@ -31,7 +31,7 @@
     import { Inject, Prop } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
-    import SeriesEpisode from '../../../../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../../../../store/models/series-episode.model';
     import { SHARED_TYPES } from '../../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../../shared/services/store.service';
     import { MessageService } from '../../../../../../shared/services/message.service';

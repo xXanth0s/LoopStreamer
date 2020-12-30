@@ -33,14 +33,16 @@ export function* startNextEpisodeSaga(action: ReturnType<typeof startNextEpisode
 
         const series = getSeriesForEpisode(state, episodeKey);
 
-        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(episodeKey, series.lastUsedPortal, series.lastUsedLanguage);
+        const nextEpisodeLink: LinkModel = yield getPortalLinkForNextEpisode(episodeKey,
+                                                                             series.lastUsedPortal,
+                                                                             series.lastUsedLanguage);
         if (!nextEpisodeLink) {
             return;
         }
         if (!userAction) {
             yield put(setSeriesEpisodeTimeStampAction({
                 seriesEpisodeKey: nextEpisodeLink.parentKey,
-                timestamp: null
+                timestamp: null,
             }));
         }
 

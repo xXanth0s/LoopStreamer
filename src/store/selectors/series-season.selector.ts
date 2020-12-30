@@ -1,17 +1,17 @@
 import { StateModel } from '../models/state.model';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-episode.selector';
 import { getKeyForSeriesSeason } from '../utils/key.utils';
-import { LANGUAGE } from '../enums/language.enum';
-import { getLinksForSeriesSeasonAndPortal } from './línk.selector';
-import { getSeriesByKey, getSeriesForSeason } from './series.selector';
+import { getSeriesByKey } from './series.selector';
 import { Logger } from '../../shared/services/logger';
-import Series from '../models/series.model';
 
-export const getMultipleSeriesSeasonByKeys = (state: StateModel, keys: SeriesSeason['key'][]): SeriesSeason[] => keys.map(key => getSeriesSeasonByKey(state, key));
+export const getMultipleSeriesSeasonByKeys = (state: StateModel,
+                                              keys: SeriesSeason['key'][]):
+    SeriesSeason[] => keys.map(key => getSeriesSeasonByKey(state, key));
 
-export const getSeriesSeasonByKey = (state: StateModel, key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
+export const getSeriesSeasonByKey = (state: StateModel,
+                                     key: SeriesSeason['key']): SeriesSeason => state.seriesSeasons[key];
 
 export const getSeasonsForSeries = (state: StateModel, seriesKey: SeriesSeason['seriesKey']): SeriesSeason[] => {
     const series = getSeriesByKey(state, seriesKey);
@@ -23,14 +23,16 @@ export const getSeasonsForSeries = (state: StateModel, seriesKey: SeriesSeason['
     return getMultipleSeriesSeasonByKeys(state, series.seasons);
 };
 
-export const getSeriesSeasonForEpisode = (state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): SeriesSeason => {
+export const getSeriesSeasonForEpisode = (state: StateModel,
+                                          seriesEpisodeKey: SeriesEpisode['key']): SeriesSeason => {
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
     const seasonKey = getKeyForSeriesSeason(episode.seriesKey, `${episode.season}`);
 
     return getSeriesSeasonByKey(state, seasonKey);
 };
 
-export const getSeasonWithOffset = (state: StateModel, seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
+export const getSeasonWithOffset = (state: StateModel,
+                                    seasonKey: SeriesSeason['key'], offset: number): SeriesSeason => {
     const currentSeason = getSeriesSeasonByKey(state, seasonKey);
 
     if (!currentSeason) {

@@ -19,6 +19,7 @@ function updateOrAddLink(state: StateModel['links'], linkModel: LinkModel): Stat
     };
 }
 
+/* eslint-disable max-len */
 const linkSlice = createSlice({
     name: 'links',
     initialState,
@@ -27,6 +28,7 @@ const linkSlice = createSlice({
         updateOrAddLinkAction: (state: StateModel['links'], action: PayloadAction<LinkModel>) => updateOrAddLink(state, action.payload),
     },
 });
+/* eslint-enable max-len */
 
 export const {
     updateOrAddLinkAction,

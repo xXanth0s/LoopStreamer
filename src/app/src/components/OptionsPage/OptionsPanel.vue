@@ -31,11 +31,10 @@
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
-    import Options from '../../../../store/models/options.model';
-    import { appContainer } from '../../container/container';
+    import { Inject } from 'vue-property-decorator';
+    import { Options } from '../../../../store/models/options.model';
     import { StoreService } from '../../../../shared/services/store.service';
     import { SHARED_TYPES } from '../../../../shared/constants/SHARED_TYPES';
-    import { MessageService } from '../../../../shared/services/message.service';
     import { getOptions } from '../../../../store/selectors/options.selector';
     import { DEFAULT_COLOR } from '../../../../constants/style-variables';
     import InfoTooltip from '../Shared/InfoTooltip.vue';
@@ -45,7 +44,6 @@
     import { DEAD_EPISODES_TOOLTIP, EPISODE_COUNT_TOOLTIP } from '../../constants/tooltip-texts';
     import { Context } from '../../enums/context.enum';
     import Toast from '../Shared/Toast.vue';
-    import { Inject } from 'vue-property-decorator';
 
     @Component({
         name: 'options-panel',

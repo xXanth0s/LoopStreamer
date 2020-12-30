@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import AppControlStateModel from '../models/app-control-state.model';
-import Series from '../models/series.model';
+import { AppControlStateModel } from '../models/app-control-state.model';
+import { Series } from '../models/series.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { deleteSeriesAction } from '../actions/shared.actions';
 import { StateModel } from '../models/state.model';
@@ -24,18 +24,21 @@ function setSelectedSeason(state: AppControlStateModel, seasonKey: SeriesSeason[
     state.selectedSeason = seasonKey;
 }
 
-function addOrReplaceMultipleSeriesCollection(state: AppControlStateModel, { collections }: { collections: NamedCollection<SeriesMetaInfo>[] }) {
+function addOrReplaceMultipleSeriesCollection(state: AppControlStateModel,
+                                              { collections }: { collections: NamedCollection<SeriesMetaInfo>[] }) {
     collections.forEach(collection => addOrReplaceSeriesCollection(state, { collection }));
 }
 
-function addOrReplaceSeriesCollection(state: AppControlStateModel, { collection }: { collection: NamedCollection<SeriesMetaInfo> }) {
+function addOrReplaceSeriesCollection(state: AppControlStateModel,
+                                      { collection }: { collection: NamedCollection<SeriesMetaInfo> }) {
     state.seriesCollections = {
         ...state.seriesCollections,
         [collection.key]: collection,
     };
 }
 
-function setSelectedSeries(state: AppControlStateModel, {selectedSeriesKey}: { selectedSeriesKey: Series['key'] }): void {
+function setSelectedSeries(state: AppControlStateModel,
+                           { selectedSeriesKey }: { selectedSeriesKey: Series['key'] }): void {
     state.selectedSeriesKey = selectedSeriesKey;
     delete state.seriesCollections[CollectionType.SIMILAR_SERIES_MODAL];
 }
@@ -48,29 +51,29 @@ function setSearchText(state: AppControlStateModel, payload: { searchText: strin
     state.searchText = payload.searchText;
 }
 
-function removeSeriesCollection(state: AppControlStateModel, { collectionKey }: { collectionKey: NamedCollection<SeriesMetaInfo>['key'] }) {
+function removeSeriesCollection(state: AppControlStateModel,
+                                { collectionKey }: { collectionKey: NamedCollection<SeriesMetaInfo>['key'] }) {
     delete state.seriesCollections[collectionKey];
 }
 
+/* eslint-disable max-len */
 export const appControlStateSlice = createSlice({
     name: 'appControlState',
     initialState,
     reducers: {
         setSelectedSeriesAction: (state: AppControlStateModel, action: PayloadAction<{ selectedSeriesKey: Series['key'] }>) => setSelectedSeries(state, action.payload),
         setSelectedSeasonForAppAction: (state: AppControlStateModel, action: PayloadAction<SeriesSeason['key']>) => setSelectedSeason(state, action.payload),
-        removeSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collectionKey: NamedCollection<SeriesMetaInfo>['key'] }>) =>
-            removeSeriesCollection(state, action.payload),
-        addOrReplaceSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collection: NamedCollection<SeriesMetaInfo> }>) =>
-            addOrReplaceSeriesCollection(state, action.payload),
-        addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<SeriesMetaInfo>[] }>) =>
-            addOrReplaceMultipleSeriesCollection(state, action.payload),
+        removeSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collectionKey: NamedCollection<SeriesMetaInfo>['key'] }>) => removeSeriesCollection(state, action.payload),
+        addOrReplaceSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collection: NamedCollection<SeriesMetaInfo> }>) => addOrReplaceSeriesCollection(state, action.payload),
+        addOrReplaceMultipleSeriesCollectionAction: (state: AppControlStateModel, action: PayloadAction<{ collections: NamedCollection<SeriesMetaInfo>[] }>) => addOrReplaceMultipleSeriesCollection(state, action.payload),
         toggleMutePreviewVideoStateAction: (state: AppControlStateModel) => toggleMutePreviewVideoState(state),
-        setSearchTextAction: (state: AppControlStateModel, action: PayloadAction<{ searchText: string }>) => setSearchText(state, action.payload)
+        setSearchTextAction: (state: AppControlStateModel, action: PayloadAction<{ searchText: string }>) => setSearchText(state, action.payload),
     },
     extraReducers: (builder) => {
         builder.addCase(deleteSeriesAction, (state: StateModel['appControlState']) => toggleSelectedSeries(state, null));
     },
 });
+/* eslint-enable max-len */
 
 export const {
     setSelectedSeasonForAppAction,
@@ -79,5 +82,5 @@ export const {
     addOrReplaceMultipleSeriesCollectionAction,
     setSelectedSeriesAction,
     toggleMutePreviewVideoStateAction,
-    setSearchTextAction
+    setSearchTextAction,
 } = appControlStateSlice.actions;

@@ -1,4 +1,4 @@
-export default interface Website {
+export interface Website {
     baseUrl: string;
     urlRegex: string;
 }

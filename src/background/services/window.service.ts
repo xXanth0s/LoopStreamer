@@ -28,6 +28,7 @@ import WindowState = Windows.WindowState;
 
 @injectable()
 export class WindowService {
+    // eslint-disable-next-line max-len
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
@@ -112,9 +113,9 @@ export class WindowService {
         this.listenToWindowSizeChanges(window);
     }
 
-    private addDefaultHandlingForSession(session: Session): void {
-        this.manipulateSession(session);
-        this.addAdblockerForSession(session);
+    private addDefaultHandlingForSession(sessionInstance: Session): void {
+        this.manipulateSession(sessionInstance);
+        this.addAdblockerForSession(sessionInstance);
     }
 
     public setOldWindowState(windowId: number, windowType: WindowType): void {
@@ -134,9 +135,9 @@ export class WindowService {
         }
     }
 
-    private addAdblockerForSession(session: Session): void {
+    private addAdblockerForSession(sessionInstance: Session): void {
         ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
-            blocker.enableBlockingInSession(session);
+            blocker.enableBlockingInSession(sessionInstance);
         });
     }
 
@@ -163,7 +164,8 @@ export class WindowService {
     }
 
     private manipulateSession(newSession: Session): void {
-        newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: BeforeSendResponse) => void) => {
+        newSession.webRequest.onBeforeSendHeaders((details: OnBeforeSendHeadersListenerDetails,
+                                                   callback: (beforeSendResponse: BeforeSendResponse) => void) => {
             if (details.requestHeaders.Referer?.includes('localhost')) {
                 const { host } = new URL(details.url);
 
@@ -189,7 +191,7 @@ export class WindowService {
             fromEvent(window, 'restore'),
         ).pipe(
             takeUntil(fromEvent(window, 'closed')),
-            debounceTime(500)
+            debounceTime(500),
         ).subscribe(() => {
             let state: WindowState = 'normal';
             if (window.isFullScreen()) {

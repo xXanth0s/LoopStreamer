@@ -1,16 +1,17 @@
 import { Responses } from 'node-themoviedb';
 import { getKeyForSeriesEpisode, getKeyForSeriesSeason, getKeyForSeriesTitle } from '../store/utils/key.utils';
 import { LANGUAGE } from '../store/enums/language.enum';
-import Series, { getEmptySeries } from '../store/models/series.model';
+import { getEmptySeries, Series } from '../store/models/series.model';
 import { mapLanguage } from './language-mapper';
 import { MovieApi } from '../store/enums/movie-api.enum';
 import { SeriesSeason } from '../store/models/series-season.model';
-import SeriesEpisode, { getEmptySeriesEpisode } from '../store/models/series-episode.model';
+import { getEmptySeriesEpisode, SeriesEpisode } from '../store/models/series-episode.model';
 import { Hoster } from '../store/enums/hoster.enum';
 import { Genre } from '../store/models/genre.model';
 import { getYearFromDateString } from './date.utils';
 import { SeriesMetaInfo } from '../store/models/series-meta-info.model';
 
+/* eslint @typescript-eslint/camelcase: 0 */
 export type MovieDbMetaInfo = {
     poster_path: string | null;
     popularity: number;
@@ -29,9 +30,8 @@ export function mapSeriesMetaInfoFromMovieDB(series: MovieDbMetaInfo, activeLang
         name,
         original_language,
         original_name,
-        poster_path
+        poster_path,
     } = series;
-
 
     const seriesLanguage = mapLanguage(original_language);
     const key = getKeyForSeriesTitle(original_name);
@@ -50,14 +50,15 @@ export function mapSeriesMetaInfoFromMovieDB(series: MovieDbMetaInfo, activeLang
     };
 }
 
-
-export function mapSeriesFromMovieDB(series: Responses.TV.GetDetails, activeLanguage: LANGUAGE, videoKey?: string): Series {
+export function mapSeriesFromMovieDB(
+    series: Responses.TV.GetDetails,
+    activeLanguage: LANGUAGE,
+    videoKey?: string): Series {
     const {
         overview,
         backdrop_path,
-        first_air_date
+        first_air_date,
     } = series;
-
 
     const previewVideos = !videoKey ? {} : {
         [Hoster.YOUTUBE]: videoKey,
@@ -74,7 +75,7 @@ export function mapSeriesFromMovieDB(series: Responses.TV.GetDetails, activeLang
         startYear: getYearFromDateString(first_air_date),
         descriptions: {
             [activeLanguage]: overview,
-        }
+        },
     };
 }
 
@@ -93,7 +94,10 @@ export function mapSeasonFromMovieDB(season: Responses.TV.Season.GetDetails, ser
     };
 }
 
-export function mapSeasonEpisodesFromMovieDB(season: Responses.TV.Season.GetDetails, seriesKey: string, language: LANGUAGE): SeriesEpisode[] {
+export function mapSeasonEpisodesFromMovieDB(
+    season: Responses.TV.Season.GetDetails,
+    seriesKey: string,
+    language: LANGUAGE): SeriesEpisode[] {
     const { season_number, episodes } = season;
 
     const seasonNumber = `${season_number}`;
@@ -126,7 +130,7 @@ export function mapGenreFromMovieDB(genre: Responses.Genre.Common['genres'][numb
     return {
         key: `${genre.id}`,
         translations: {
-            [language]: genre.name
+            [language]: genre.name,
         },
     };
 }

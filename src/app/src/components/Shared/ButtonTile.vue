@@ -42,7 +42,8 @@
         private title: string;
 
         @Emit('clicked')
-        public clicked(): void {
+        public clicked(): boolean {
+            return true;
         }
 
         public clickHandler(): void {

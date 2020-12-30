@@ -3,7 +3,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { PopupConfig } from '../models/popup-config.model';
 import { getSeriesByKey, isEndTimeConfiguredForSeries } from '../../store/selectors/series.selector';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { Popup } from '../enum/popup.enum';
 import { getPopupEndTimeForSeriesEpisode } from '../../store/utils/series.utils';
 

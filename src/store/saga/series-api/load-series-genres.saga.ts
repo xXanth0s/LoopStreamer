@@ -16,5 +16,4 @@ export function* loadSeriesGenresSaga() {
     } catch (error) {
         Logger.error('[loadSeriesGenresSaga] error occurred', error);
     }
-
 }

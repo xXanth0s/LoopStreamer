@@ -12,6 +12,7 @@ type SelectorArguments<T, P> = P extends (state: T, ...args: infer A) => any ? A
 
 type Selector = (state: StateModel, ...args: any[]) => any;
 
+/* eslint-disable max-len */
 @injectable()
 export class StoreService {
     constructor(@inject(SHARED_TYPES.Store) private readonly store: IStoreService<StateModel>) {
@@ -64,3 +65,5 @@ export class StoreService {
         this.dispatch(setActiveEpisodeAction(null));
     }
 }
+
+/* eslint-enable max-len */

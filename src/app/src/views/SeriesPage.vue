@@ -29,7 +29,7 @@
     import { SHARED_TYPES } from '../../../shared/constants/SHARED_TYPES';
     import SeriesPanelFront from '../components/SeriesOverview/SeriesPanelFront.vue';
     import { NamedCollection } from '../../../store/models/collection.model';
-    import Series from '../../../store/models/series.model';
+    import { Series } from '../../../store/models/series.model';
     import { getCollectionsForTypes } from '../../../store/selectors/app-control-state.selector';
     import SeriesCarousel from '../components/SeriesOverview/SeriesCarousel.vue';
     import { LANGUAGE } from '../../../store/enums/language.enum';

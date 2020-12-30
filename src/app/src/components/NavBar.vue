@@ -4,7 +4,6 @@
         <b-nav tabs align="center">
             <b-nav-item exact exact-active-class="active" :to="routesConst.SERIES_PAGE">Serien</b-nav-item>
             <b-nav-item exact exact-active-class="active" :to="routesConst.SETTINGS_PAGE">Einstellungen</b-nav-item>
-            <b-nav-item exact exact-active-class="active" :to="routesConst.FAQ_PAGE">FAQ</b-nav-item>
             <b-nav-item v-if="isDev" exact exact-active-class="active" :to="routesConst.TEST_PAGE">Test</b-nav-item>
         </b-nav>
         <WindowControlButtons class="no-drag spacer-right" :hide-buttons="false"/>

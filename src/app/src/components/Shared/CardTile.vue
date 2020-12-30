@@ -18,7 +18,7 @@
     })
     export default class CardTile extends Vue {
         @Prop(String)
-        private title: string;
+        private title: string
     }
 </script>
 

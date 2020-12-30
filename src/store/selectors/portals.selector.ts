@@ -1,5 +1,5 @@
 import { StateModel } from '../models/state.model';
-import Portal from '../models/portal.model';
+import { Portal } from '../models/portal.model';
 import { Logger } from '../../shared/services/logger';
 
 export const getPortalForKey = (state: StateModel, portalKey: Portal['key']): Portal => {

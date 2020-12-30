@@ -1,7 +1,10 @@
-export function convertArrayToChunks<T>(data: Array<T>, length: number): T[][] {
+export function convertArrayToChunks<T>(data: Array<T>,
+                                        length: number): T[][] {
     return data.reduce((result, value, currentIndex) => {
         const index = Math.floor(currentIndex / length);
         const previous = result[index] || [];
+
+        // eslint-disable-next-line no-param-reassign
         result[index] = [
             ...previous,
             value,
@@ -10,7 +13,7 @@ export function convertArrayToChunks<T>(data: Array<T>, length: number): T[][] {
     }, []);
 }
 
-export function sortArrayForKey<T>(array: Array<T>, getValue: (T) => any): T[] {
+export function sortArrayForKey<T, P>(array: Array<T>, getValue: (T) => P): T[] {
     return array.sort((a, b) => {
         const valA = getValue(a);
         const valB = getValue(b);

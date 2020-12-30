@@ -3,7 +3,9 @@ import { asyncScheduler, fromEvent, Observable } from 'rxjs';
 import { first, switchMap, throttleTime } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { MessageService } from '../../shared/services/message.service';
-import { checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement, } from '../ustils/dom.utils';
+import {
+    checkForMutations, getDomElementSize, hideNotLsElement, isBodyElement,
+} from '../ustils/dom.utils';
 import { createRecaptchaRecognizedMessage } from '../../browserMessages/messages/background.messages';
 import { NodeTypes } from '../../shared/enum/node-types.enum';
 

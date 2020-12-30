@@ -1,6 +1,6 @@
 import { LANGUAGE } from '../enums/language.enum';
 
-export default interface Options {
+export interface Options {
     episodesToPlay: number;
     timeTillSetEndtimePopup: number;
     timeForEndtimeCountdown: number;

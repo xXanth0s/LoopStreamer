@@ -1,8 +1,8 @@
-import Series from './series.model';
+import { Series } from './series.model';
 import { LinkModel } from './link.model';
 import { LANGUAGE } from '../enums/language.enum';
 
-export default interface SeriesEpisode {
+export interface SeriesEpisode {
     key: string;
     seriesKey: string;
     seasonKey: Series['key'];

@@ -2,7 +2,7 @@ import { debounce, takeLatest } from 'redux-saga/effects';
 import {
     setSearchTextAction,
     setSelectedSeasonForAppAction,
-    setSelectedSeriesAction
+    setSelectedSeriesAction,
 } from '../reducers/app-control-state.reducer';
 import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './video-meta-data/series-time.saga';

@@ -40,10 +40,12 @@
 <script lang="ts">
     import Component from 'vue-class-component';
     import Vue from 'vue';
-    import { Emit, Inject, Prop, Watch, } from 'vue-property-decorator';
+    import {
+      Emit, Inject, Prop, Watch,
+    } from 'vue-property-decorator';
     import { takeUntil } from 'rxjs/operators';
     import { Subject } from 'rxjs';
-    import Series from '../../../../../store/models/series.model';
+    import { Series } from '../../../../../store/models/series.model';
     import { Hoster } from '../../../../../store/enums/hoster.enum';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
@@ -97,7 +99,8 @@
         }
 
         @Emit('close-modal')
-        private closeModal(): void {
+        private closeModal(): boolean {
+            return true;
         }
 
         private onVideoFinished(): void {

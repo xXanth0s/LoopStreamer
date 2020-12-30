@@ -1,5 +1,5 @@
 import { StateModel } from '../models/state.model';
-import SeriesEpisode from '../models/series-episode.model';
+import { SeriesEpisode } from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { sortArrayForKey } from '../../utils/array.utils';
 import { getSeriesForEpisode } from './series.selector';
@@ -9,11 +9,15 @@ import { Logger } from '../../shared/services/logger';
 import { LANGUAGE } from '../enums/language.enum';
 import { getDefaultLanguage } from './options.selector';
 
-export const getMultipleSeriesEpisodeByKeys = (state: StateModel, keys: SeriesEpisode['key'][]): SeriesEpisode[] => keys.map(key => getSeriesEpisodeByKey(state, key));
+export const getMultipleSeriesEpisodeByKeys = (state: StateModel,
+                                               keys: SeriesEpisode['key'][]):
+    SeriesEpisode[] => keys.map(key => getSeriesEpisodeByKey(state, key));
 
-export const getSeriesEpisodeByKey = (state: StateModel, key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
+export const getSeriesEpisodeByKey = (state: StateModel,
+                                      key: SeriesEpisode['key']): SeriesEpisode => state.seriesEpisodes[key];
 
-export const getSeriesEpisodesForSeason = (state: StateModel, seasonKey: SeriesEpisode['seasonKey']): SeriesEpisode[] => {
+export const getSeriesEpisodesForSeason = (state: StateModel,
+                                           seasonKey: SeriesEpisode['seasonKey']): SeriesEpisode[] => {
     const season = getSeriesSeasonByKey(state, seasonKey);
     if (!season) {
         Logger.error(`[getSeriesEpisodesForSeason] no season found for key ${seasonKey}`);
@@ -49,7 +53,7 @@ export const getNextEpisode = (state: StateModel, episodeKey: SeriesEpisode['key
         console.error('[Series Episode Selector => getNextEpisode] no episode found for key', episodeKey);
     }
 
-    let nextEpisode = getEpisodeWithOffset(state, episodeKey, 1);
+    const nextEpisode = getEpisodeWithOffset(state, episodeKey, 1);
     if (nextEpisode) {
         return nextEpisode;
     }
@@ -68,7 +72,7 @@ export const getPreviousEpisode = (state: StateModel, episodeKey: SeriesEpisode[
         console.error('[Series Episode Selector => getNextEpisode] no episode found for key', episodeKey);
     }
 
-    let previousEpisode = getEpisodeWithOffset(state, episodeKey, -1);
+    const previousEpisode = getEpisodeWithOffset(state, episodeKey, -1);
     if (previousEpisode) {
         return previousEpisode;
     }
@@ -81,7 +85,8 @@ export const getPreviousEpisode = (state: StateModel, episodeKey: SeriesEpisode[
     return getLastEpisodeForSeason(state, previousSeason.key);
 };
 
-export const getEpisodeWithOffset = (state: StateModel, episodeKey: SeriesEpisode['key'], offset: number): SeriesEpisode => {
+export const getEpisodeWithOffset = (state: StateModel,
+                                     episodeKey: SeriesEpisode['key'], offset: number): SeriesEpisode => {
     const episode = getSeriesEpisodeByKey(state, episodeKey);
 
     if (!episode) {

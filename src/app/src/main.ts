@@ -2,11 +2,15 @@ import './container/container';
 import '../styles/options.scss';
 import Vue from 'vue';
 import VueScrollTo from 'vue-scrollto';
-import { Collapse, CollapseItem, Menu, MenuItem, } from 'element-ui';
+import {
+    Collapse, CollapseItem, Menu, MenuItem,
+} from 'element-ui';
 import BootstrapVue from 'bootstrap-vue';
 import VueCarousel from 'vue-carousel';
 import { ToggleButton } from 'vue-js-toggle-button';
-import { Autoplay, Mousewheel, Navigation, Pagination, Swiper as SwiperClass, } from 'swiper/swiper.esm';
+import {
+    Autoplay, Mousewheel, Navigation, Pagination, Swiper as SwiperClass,
+} from 'swiper/swiper.esm';
 import getAwesomeSwiper from 'vue-awesome-swiper/dist/exporter';
 import VueYouTubeEmbed from 'vue-youtube-embed';
 import MainPage from './MainPage.vue';

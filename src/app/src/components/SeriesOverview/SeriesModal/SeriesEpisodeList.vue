@@ -13,7 +13,7 @@
     import Vue from 'vue';
     import Component from 'vue-class-component';
     import { Prop } from 'vue-property-decorator';
-    import SeriesEpisode from '../../../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import SeriesEpisodeTile from './EpisodeTile/SeriesEpisodeTile.vue';
     import { LANGUAGE } from '../../../../../store/enums/language.enum';
 

@@ -25,13 +25,13 @@
     import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
     import { takeUntil } from 'rxjs/operators';
-    import SeriesEpisode from '../../../../../store/models/series-episode.model';
+    import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import { MessageService } from '../../../../../shared/services/message.service';
     import { appContainer } from '../../../container/container';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { getProgressForEpisode, getSeriesEpisodeTitle } from '../../../../../store/utils/series.utils';
     import { StoreService } from '../../../../../shared/services/store.service';
-    import Series from '../../../../../store/models/series.model';
+    import { Series } from '../../../../../store/models/series.model';
     import { getLastWatchedOrFirstEpisodeForActiveSeason } from '../../../../../store/selectors/series.selector';
     import { isLoadingSeason, isPreparingVideo } from '../../../../../store/selectors/async-interaction.selector';
     import { startEpisodeAction } from '../../../../../store/actions/shared.actions';

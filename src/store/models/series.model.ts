@@ -1,4 +1,4 @@
-import SeriesEpisode from './series-episode.model';
+import { SeriesEpisode } from './series-episode.model';
 import { PORTALS } from '../enums/portals.enum';
 import { LinkModel } from './link.model';
 import { LANGUAGE } from '../enums/language.enum';
@@ -7,7 +7,7 @@ import { Hoster } from '../enums/hoster.enum';
 import { Genre } from './genre.model';
 import { SeriesMetaInfo } from './series-meta-info.model';
 
-export default interface Series extends SeriesMetaInfo {
+export interface Series extends SeriesMetaInfo {
     previewVideos: Partial<Record<Hoster, string>>;
     descriptions: Partial<Record<LANGUAGE, string>>;
     lastEpisodeWatched?: SeriesEpisode['key'];

@@ -7,7 +7,7 @@ import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { MessageService } from '../../shared/services/message.service';
 import { Popup } from '../enum/popup.enum';
-import SeriesEpisode from '../../store/models/series-episode.model';
+import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { setEndTimeForSeriesAction, setStartTimeForSeriesAction } from '../../store/reducers/series.reducer';
 import { getOptions } from '../../store/selectors/options.selector';
 import { Logger } from '../../shared/services/logger';
@@ -29,7 +29,9 @@ export class PopupController {
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService) {
     }
 
-    public openPopupsForVideo(video: HTMLVideoElement, episodeKey: SeriesEpisode['key'], videoTimeUpdate$: Observable<number>): void {
+    public openPopupsForVideo(video: HTMLVideoElement,
+                              episodeKey: SeriesEpisode['key'],
+                              videoTimeUpdate$: Observable<number>): void {
         this.videoOnTimeUpdate$ = videoTimeUpdate$;
         const episodeInfo = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
         const configs = this.popupService.getPopupConfigsForEpisode(episodeInfo);
@@ -80,6 +82,9 @@ export class PopupController {
                 break;
             case Popup.SET_STARTTIME:
                 this.openSetStartTimePopup(video, episodeInfo);
+                break;
+            default:
+                Logger.error('[PopupController->openPopup] no popup for config found', config, episodeInfo);
                 break;
         }
     }

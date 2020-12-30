@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Windows } from 'webextension-polyfill-ts';
 import { ControlState } from '../models/control-state.model';
-import Providor from '../models/providor.model';
-import { PROVIDORS } from '../enums/providors.enum';
 import { WindowType } from '../enums/window-type.enum';
 import { StateModel } from '../models/state.model';
 import { AsyncInteraction } from '../models/async-interaction.model';
@@ -22,7 +20,9 @@ const resetControlState = (state: ControlState): ControlState => ({
     playedEpisodes: 0,
 });
 
-function setWindowIdForWindowType(state: ControlState, { windowType, windowId }: { windowType: WindowType; windowId: number }): ControlState {
+function setWindowIdForWindowType(state: ControlState,
+                                  { windowType, windowId }:
+                                      { windowType: WindowType; windowId: number }): ControlState {
     const oldValue = state.controllerWindowState ? state.controllerWindowState[windowType] : {};
 
     return {
@@ -78,6 +78,7 @@ function setPictureInPictureState(state: ControlState, isPictureInPicture: boole
     state.isVideoPictureInPicture = isPictureInPicture;
 }
 
+/* eslint-disable max-len */
 export const controlStateSlice = createSlice({
     name: 'controlState',
     initialState: initialControlState as ControlState,
@@ -94,6 +95,7 @@ export const controlStateSlice = createSlice({
         setPictureInPictureAction: (state: ControlState, action: PayloadAction<boolean>) => setPictureInPictureState(state, action.payload),
     },
 });
+/* eslint-enable max-len */
 
 export const {
     resetControlStateAction,

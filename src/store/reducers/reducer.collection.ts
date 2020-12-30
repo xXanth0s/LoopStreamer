@@ -1,3 +1,4 @@
+import { ReducersMapObject } from 'redux';
 import { controlStateSlice } from './control-state.reducer';
 import { appControlStateSlice } from './app-control-state.reducer';
 import { optionsSlice } from './options.reducer';
@@ -9,7 +10,6 @@ import seriesEpisodesReducer from './series-episode.reducer';
 import linkSlice from './link.reducer';
 import { genreReducer } from './genre.reducer';
 import { seriesMetaInfoReducer } from './series-meta-info.reducer';
-import { ReducersMapObject } from 'redux';
 import { StateModel } from '../models/state.model';
 import { watchedSeriesReducer } from './watchedSeries.reducer';
 
