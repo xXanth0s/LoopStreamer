@@ -7,25 +7,31 @@
              hide-header
              title="Using Component Methods">
         <div class="modal-container bg-gray-900 text-white relative">
-            <div v-if="series">
+            <div v-if="showModalContent" :key="series.key">
                 <series-modal-header
                         class="font-mono ls-modal-header"
                         :series="series"
+                        :key="series.key"
                         :language="activeLanguage"
                         @close-modal="closeModal"/>
 
                 <div class="px-4">
                     <series-modal-description class="mt-4"
                                               :series="series"
+                                              :key="series.key"
                                               :language="activeLanguage"/>
 
-                    <seasons-list class="mt-4" :seasons="seasons" @seasonClicked="seasonSelected"/>
+                    <seasons-list class="mt-4"
+                                  :seasons="seasons"
+                                  :key="seasons[0].key"
+                                  @seasonClicked="seasonSelected"/>
                     <hr>
-                    <series-episode-list :episodes="episodes" :language="activeLanguage"/>
+                    <series-episode-list v-if="episodes.length" :key="episodes[0].key" :episodes="episodes" :language="activeLanguage"/>
                 </div>
                 <div v-if="similarSeriesCollection" class="px-4 pt-4 relative">
                     <series-carousel class="text-left"
                                      :fixed-slides-count="5"
+                                     :key="series.key"
                                      :language="activeLanguage"
                                      :seriesCollection="similarSeriesCollection"
                                      @seriesClicked="similarSeriesSelected"/>
@@ -43,7 +49,7 @@
     import { BvComponent } from 'bootstrap-vue';
     import { Subject } from 'rxjs';
     import {
-        filter, first, switchMap, takeUntil, tap,
+      filter, switchMap, takeUntil, tap,
     } from 'rxjs/operators';
     import Series from '../../../../../store/models/series.model';
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
@@ -53,8 +59,8 @@
     import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
     import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
     import {
-        getCollectionsForTypes,
-        getSelectedSeasonKey,
+      getCollectionsForTypes,
+      getSelectedSeason,
     } from '../../../../../store/selectors/app-control-state.selector';
     import SeriesEpisode from '../../../../../store/models/series-episode.model';
     import { getSeriesEpisodesForSeason } from '../../../../../store/selectors/series-episode.selector';
@@ -91,7 +97,7 @@
         public series: Series = null;
         public seasons: SeriesSeason[] = [];
         public episodes: SeriesEpisode[] = [];
-        public selectedSeason: SeriesSeason['key'] = null;
+        public selectedSeason: SeriesSeason = null;
         public activeLanguage: LANGUAGE = LANGUAGE.ENGLISH;
         public similarSeriesCollection: NamedCollection<SeriesMetaInfo> = null;
 
@@ -105,12 +111,18 @@
         @Inject(SHARED_TYPES.MessageService)
         private messageService: MessageService;
 
+        public get showModalContent(): boolean {
+            return Boolean(this.series)
+                && Boolean(this.selectedSeason)
+                && this.series.key === this.selectedSeason.seriesKey;
+        }
+
         public mounted(): void {
             this.activeLanguage = this.store.selectSync(getDefaultLanguage);
         }
 
-        updated(): void {
-            console.count('updated modal');
+        public destroyed(): void {
+            this.takeUntil$.next();
         }
 
         public openModal(seriesKey: Series['key']): void {
@@ -120,7 +132,6 @@
             this.loadSeriesSeason(seriesKey);
             this.loadActiveSeason();
             this.loadSimilarSeriesData();
-            this.scrollToTop();
         }
 
         public closeModal(): void {
@@ -129,7 +140,9 @@
         }
 
         public loadSeriesData(seriesKey: Series['key']): void {
-            this.series = this.store.selectSync(getSeriesByKey, seriesKey);
+            this.store.selectBehaviour(getSeriesByKey, seriesKey).pipe(
+                takeUntil(this.seriesChanged$),
+            ).subscribe(series => this.series = series);
         }
 
         public loadSeriesSeason(seriesKey: Series['key']): void {
@@ -139,18 +152,16 @@
         }
 
         public loadActiveSeason(): void {
-            this.store.selectBehaviour(getSelectedSeasonKey).pipe(
+            this.store.selectBehaviour(getSelectedSeason).pipe(
                 takeUntil(this.takeUntil$),
                 tap(selectedSeason => {
+                    console.log('selectedSeason', selectedSeason);
                     this.selectedSeason = selectedSeason;
                     this.episodes = [];
                 }),
-                filter<SeriesSeason['key']>(Boolean),
-                switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason)),
-                first(),
-            ).subscribe(episodes => {
-                this.episodes = episodes;
-            });
+                filter<SeriesSeason>(Boolean),
+                switchMap(selectedSeason => this.store.selectBehaviour(getSeriesEpisodesForSeason, selectedSeason.key)),
+            ).subscribe(episodes => this.episodes = episodes);
         }
 
         public loadSimilarSeriesData(): void {
@@ -174,14 +185,6 @@
             this.episodes = [];
             this.selectedSeason = null;
             this.series = null;
-        }
-
-        private scrollToTop(): void {
-            this.$scrollTo('.ls-modal-header', {
-                container: '.modal',
-                easing: 'ease',
-                duration: 1000,
-            });
         }
     }
 </script>
