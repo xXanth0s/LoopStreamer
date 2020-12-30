@@ -6,6 +6,8 @@ import { CollectionType } from '../enums/collection-key.enum';
 
 export const getSelectedSeasonKey = (state: StateModel): SeriesSeason['key'] => state.appControlState.selectedSeason;
 
+export const getSelectedSeason = (state: StateModel): SeriesSeason => state.seriesSeasons[state.appControlState.selectedSeason];
+
 export const getMutePreviewVideoState = (state: StateModel): boolean => state.appControlState.mutePreviewVideo;
 
 export const isVideoPictureInPicture = (state: StateModel): boolean => Boolean(state.controlState.isVideoPictureInPicture);
