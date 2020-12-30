@@ -4,6 +4,5 @@ export type EnvironmentType = {
     openDevTools: boolean;
     showNewWindows: boolean;
     autoPlayPreviewVideos: boolean;
-    reduxDevToolsVersion: string;
     linkCacheTimeInMinutes: number;
 };

@@ -6,6 +6,5 @@ export const environment: EnvironmentType = {
     openDevTools: true,
     showNewWindows: false,
     autoPlayPreviewVideos: true,
-    reduxDevToolsVersion: '2.17.0_0',
     linkCacheTimeInMinutes: 5,
 };
