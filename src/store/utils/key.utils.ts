@@ -8,7 +8,10 @@ type linkKeyData = {
     language: LinkModel['language'];
 }
 
-export const getKeyForSeriesTitle = (seriesTitle: string): string => seriesTitle?.toLowerCase().replace(/\s/g, '-');
+export const getKeyForSeriesTitleAndDate = (seriesTitle: string, firstAiredYear: string): string => {
+    const titleKey = seriesTitle?.toLowerCase().replace(/\s/g, '-');
+    return `${titleKey}-${firstAiredYear}`;
+};
 
 export const getKeyForSeriesSeason = (seriesKey: Series['key'], season: string): string => `${seriesKey}-S${season}`;
 
