@@ -2,7 +2,9 @@ import { inject, injectable } from 'inversify';
 import {
     fromEvent, merge, Observable, Subject, timer,
 } from 'rxjs';
-import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
+import {
+    distinctUntilChanged, filter, first, takeUntil, tap,
+} from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
@@ -89,7 +91,10 @@ export class VideoController {
     }
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
-        videoTimeUpdate$.subscribe(timestamp => {
+        videoTimeUpdate$.pipe(
+            tap((time) => console.log('timeUpdate', time)),
+            filter(time => time % 5 === 0),
+        ).subscribe(timestamp => {
             this.store.dispatch(setSeriesEpisodeTimeStampAction({ seriesEpisodeKey: key, timestamp }));
         });
     }
