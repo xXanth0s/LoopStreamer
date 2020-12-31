@@ -47,3 +47,9 @@ export const hasSeasonAlreadyPlayedEpisodes = (state: StateModel, seasonKey: Ser
     const episodes = getSeriesEpisodesForSeason(state, seasonKey);
     return episodes.some(episode => Boolean(episode.timestamp));
 };
+
+export function getEpisodeOffsetForSeriesSeason(state: StateModel, seasonKey: SeriesSeason['key']): number {
+    const seriesEpisodes = getSeriesEpisodesForSeason(state, seasonKey);
+
+    return seriesEpisodes[0]?.episodeNumber - 1;
+}
