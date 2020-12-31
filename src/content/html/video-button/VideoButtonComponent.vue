@@ -140,7 +140,7 @@
         private initMouseEventListeners(): void {
             fromEvent(document.body, 'mousemove').pipe(
                 tap(() => this.showButtons = true),
-                debounceTime(this.buttonsVisibilityTime),
+                debounceTime(environment.videoButtonVisibilityTime),
                 filter(() => !this.isMouseOnButton),
             ).subscribe(() => this.showButtons = false);
         }
