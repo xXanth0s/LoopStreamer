@@ -4,7 +4,6 @@ on:
   pull_request:
       types: [opened, edited]
 
-
 jobs:
   eslint:
     runs-on: ubuntu-latest
