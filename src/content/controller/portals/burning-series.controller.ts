@@ -24,6 +24,7 @@ export class BurningSeriesController implements IPortalController {
     private readonly languageMap: Partial<{ [key in LANGUAGE]: string }> = {
         [LANGUAGE.GERMAN]: 'de',
         [LANGUAGE.ENGLISH]: 'en',
+        [LANGUAGE.ENGLISH_GERMAN_SUB]: 'des',
         [LANGUAGE.NONE]: '',
     };
 
