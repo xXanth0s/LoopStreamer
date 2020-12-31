@@ -89,11 +89,13 @@ export function generateLinksForSeriesSeasonDto(season: SeriesSeason,
 
 export function generateLinkForSeriesEpisodeDto(seriesKey: Series['key'],
                                                 seriesEpisode: PortalSeriesEpisodeDto,
-                                                type: LINK_TYPE): LinkModel[] {
+                                                type: LINK_TYPE,
+                                                episodeNumberOffset: number): LinkModel[] {
     const {
         episodeNumber, seasonNumber, portalLinks, portal,
     } = seriesEpisode;
-    const parentKey = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumber);
+    const episodeNumberWithOffset = episodeNumber + episodeNumberOffset;
+    const parentKey = getKeyForSeriesEpisode(seriesKey, seasonNumber, episodeNumberWithOffset);
 
     return Object.keys(portalLinks)
         .map((language: LANGUAGE) => portalLinks[language].map(({ link, providor }: ProvidorLink) => {
