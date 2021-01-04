@@ -9,8 +9,6 @@
     "eslint:fix": "npm run eslint -- --fix",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint",
-    "lint:fix": "vue-cli-service lint --fix",
     "build:dev": "webpack --watch --config webpack.dev.js",
     "build:prod": "webpack --config webpack.prod.js",
     "electron:build": "vue-cli-service electron:build",

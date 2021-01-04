@@ -8,21 +8,28 @@
                 </div>
             </div>
         </div>
+        <async-interaction-spinner :async-interaction="asyncInteraction"/>
     </div>
 </template>
 
 <script lang="ts">
     import Vue from 'vue';
     import Component from 'vue-class-component';
+    import { takeUntil } from 'rxjs/operators';
+    import { Subject } from 'rxjs';
     import NavBar from './components/NavBar.vue';
     import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
     import { appContainer } from './container/container';
     import { StoreService } from '../../shared/services/store.service';
     import { MessageService } from '../../shared/services/message.service';
+    import AsyncInteractionSpinner from './components/AsyncInteractionSpinner.vue';
+    import { AsyncInteraction } from '../../store/models/async-interaction.model';
+    import { getAllAsyncInteractions } from '../../store/selectors/async-interaction.selector';
 
     @Component({
         components: {
             NavBar,
+            AsyncInteractionSpinner,
         },
         provide: {
             [SHARED_TYPES.StoreService]: appContainer.get<StoreService>(SHARED_TYPES.StoreService),
@@ -30,6 +37,29 @@
         },
     })
     export default class MainPage extends Vue {
+        private readonly takeUntil$ = new Subject();
+
+        private asyncInteraction: AsyncInteraction<any>;
+
+        private store: StoreService;
+
+        public mounted(): void {
+            this.store = appContainer.get<StoreService>(SHARED_TYPES.StoreService);
+            this.fetchAsyncInteractionsFromStore();
+        }
+
+        public destroyed(): void {
+            this.takeUntil$.next();
+        }
+
+        private fetchAsyncInteractionsFromStore(): void {
+            this.store.selectBehaviour(getAllAsyncInteractions).pipe(
+                takeUntil(this.takeUntil$),
+            ).subscribe(asyncInteractions => {
+                this.asyncInteraction = asyncInteractions[0];
+                this.$forceUpdate();
+            });
+        }
     }
 
 </script>

@@ -13,9 +13,13 @@ import { getSeriesMetaInfo } from '../../selectors/series-meta-info.selector';
 import { SeriesMetaInfo } from '../../models/series-meta-info.model';
 import { getSeriesByKey } from '../../selectors/series.selector';
 import { getSeriesSeasonForEpisode } from '../../selectors/series-season.selector';
+import { loadingDetailedSeriesInformation } from '../../actions/async-interactions';
+import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../reducers/control-state.reducer';
 
 export function* loadDetailedSeriesInformationFromApiSaga(action: ReturnType<typeof setSelectedSeriesAction>) {
     const { selectedSeriesKey } = action.payload;
+    const asyncInteraction = loadingDetailedSeriesInformation({ seriesKey: selectedSeriesKey });
+    yield put(addAsyncInteractionAction(asyncInteraction));
     try {
         let state = yield select();
         const stateSeries: SeriesMetaInfo = getSeriesMetaInfo(state, selectedSeriesKey);
@@ -42,5 +46,7 @@ export function* loadDetailedSeriesInformationFromApiSaga(action: ReturnType<typ
         yield put(setSelectedSeasonForAppAction(seasonKey));
     } catch (error) {
         Logger.error('[loadSeriesStartPageContentSaga] error occurred', error);
+    } finally {
+        yield put(removeAsyncInteractionAction(asyncInteraction.key));
     }
 }

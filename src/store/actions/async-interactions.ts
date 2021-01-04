@@ -11,7 +11,9 @@ export const continueAutoplayAsyncInteraction = createAsyncInteraction<{ episode
 
 export const loadingSeriesSearchResult = createAsyncInteraction<{ searchText: string }>(AsyncInteractionType.SAGA_LOADING_SERIES_SEARCH);
 
-export const loadingSeriesAsyncInteraction = createAsyncInteraction<{ seriesKey: Series['key']; portalKey: PORTALS }>(AsyncInteractionType.SAGA_LOADING_SERIES);
+export const loadingDetailedSeriesInformation = createAsyncInteraction<{ seriesKey: string }>(AsyncInteractionType.SAGA_LOADING_SERIES_INFORMATION_FROM_API);
+
+export const loadingSeriesAsyncInteraction = createAsyncInteraction<{ seriesKey: Series['key']; portalKey: PORTALS }>(AsyncInteractionType.SAGA_LOADING_SERIES_INFORMATION_FROM_PORTAL);
 
 export const loadingSeasonAsyncInteraction = createAsyncInteraction<{ seasonKey: SeriesSeason['key'] }>(AsyncInteractionType.SAGA_LOADING_SEASON);
 
