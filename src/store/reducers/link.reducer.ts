@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { StateModel } from '../models/state.model';
 import { LinkModel } from '../models/link.model';
 import { mapArrayToObject } from '../utils/selector.utils';
+import { deleteSeriesAction } from '../actions/shared.actions';
+import { Series } from '../models/series.model';
 
 const initialState: StateModel['links'] = {};
 
@@ -19,6 +21,16 @@ function updateOrAddLink(state: StateModel['links'], linkModel: LinkModel): Stat
     };
 }
 
+function deleteLinksForSeries(state: StateModel['links'], seriesKey: string): StateModel['links'] {
+    return Object.values(state).reduce((obj, link) => {
+        if (!link.key.startsWith(seriesKey)) {
+            obj[link.key] = link;
+        }
+
+        return obj;
+    }, {});
+}
+
 /* eslint-disable max-len */
 const linkSlice = createSlice({
     name: 'links',
@@ -26,6 +38,9 @@ const linkSlice = createSlice({
     reducers: {
         updateOrAddMultipleLinksAction: (state: StateModel['links'], action: PayloadAction<LinkModel[]>) => updateOrAddMultipleLinks(state, action.payload),
         updateOrAddLinkAction: (state: StateModel['links'], action: PayloadAction<LinkModel>) => updateOrAddLink(state, action.payload),
+    },
+    extraReducers: (builder) => {
+        builder.addCase(deleteSeriesAction, (state: StateModel['links'], action: PayloadAction<Series['key']>) => deleteLinksForSeries(state, action.payload));
     },
 });
 /* eslint-enable max-len */

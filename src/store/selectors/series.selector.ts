@@ -52,3 +52,10 @@ export const getMovieDbApiKeysForSeries = (state: StateModel,
     const series = getMultipleSeriesByKey(state, seriesKeys);
     return series.map(serie => serie.apiKeys[MovieApi.TMDB]);
 };
+
+export const getAllNotWatchedSeries = (state: StateModel): Series['key'][] => {
+    const { watchedSeries, series } = state;
+    const seriesKeys = Object.keys(series);
+
+    return seriesKeys.filter(seriesKey => !watchedSeries.includes(seriesKey));
+};
