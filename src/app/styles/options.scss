@@ -53,28 +53,6 @@ body {
   }
 }
 
-.cont-box {
-  padding-top: 15px;
-  padding-left: 15px;
-  border: 1px solid $borderColor;
-  border-radius: 5px;
-  background-color: lighten($background-white, 8%);
-
-  .btn {
-    width: 90px
-  }
-
-  .center{
-    text-align: center;
-  }
-}
-
-.series-panel{
-  .clickable{
-    cursor: pointer;
-  }
-}
-
 .content-block {
   span {
     display: block;
@@ -86,85 +64,8 @@ body {
   }
 }
 
-.toggle-enter-active, .toggle-leave-active {
-  transition: opacity .5s
-}
-.toggle-enter, .toggle-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0
-}
-
-.cd-faq-group, .cd-faq-items {
-  padding-left: 0;
-}
-
-.cd-faq-group{
-  li {
-    list-style-type: none;
-  }
-}
-
-.modal-body{
-  text-align: center  ;
-}
-
-.row-bg {
-  padding: 10px 0;
-}
-
-.el-row{
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.el-input-number--small{
-  width: 110px !important;
-}
-
-.scroll-button {
-  background-color: lighten($primary-color, 20%);
-  position: fixed;
-  right: 100px;
-  bottom: 150px;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  text-align: center;
-  cursor: pointer;
-  opacity: .4;
-
-  .el-icon-caret-top{
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 22px;
-    color: white;
-  }
-}
-
-.el-notification__content {
-  text-align: left !important;
-}
-
-.el-switch {
-  transform: translateY(25%);
-}
-
-.portal-selector {
-  margin-bottom: 30px;
-}
-
-
 .row [class*='col-'] {
   transition: flex 0.5s ease-in-out, max-width .5s ease-in-out;
-}
-
-.default-title-text {
-  font-size: 1em;
-  font-weight: 100;
-
-  .active {
-    font-weight: 500;
-  }
 }
 
 button:disabled {

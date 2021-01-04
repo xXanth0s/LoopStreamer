@@ -55,7 +55,7 @@ body {
     left: 0;
 }
 .ls-video-overlay {
-
+    pointer-events: none;
     z-index: 99998;
     position: fixed;
     width: 100%;
