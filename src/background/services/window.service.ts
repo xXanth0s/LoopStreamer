@@ -113,6 +113,14 @@ export class WindowService {
         this.listenToWindowSizeChanges(window);
     }
 
+    public moveVideoWindowToTop(): void {
+        const videoWindowType = this.store.selectSync(getWindowStateForWindowType, WindowType.VIDEO);
+        const window = BrowserWindow.fromId(videoWindowType?.windowId);
+        if (window) {
+            setTimeout(() => window.moveTop());
+        }
+    }
+
     private addDefaultHandlingForSession(sessionInstance: Session): void {
         this.manipulateSession(sessionInstance);
         this.addAdblockerForSession(sessionInstance);

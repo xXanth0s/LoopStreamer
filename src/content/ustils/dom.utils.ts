@@ -73,7 +73,7 @@ export function checkForMutations<T extends Element>(container: Node, selector: 
     );
 }
 
-export function isPictureInPicture(): boolean {
+export function getPictureInPictureState(): boolean {
     // @ts-ignore
     return Boolean(document.pictureInPictureElement);
 }

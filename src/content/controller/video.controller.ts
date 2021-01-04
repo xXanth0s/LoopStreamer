@@ -21,7 +21,7 @@ import {
 import { getSeriesEpisodeByKey } from '../../store/selectors/series-episode.selector';
 import { isVideoPictureInPicture } from '../../store/selectors/app-control-state.selector';
 import { setPictureInPictureAction } from '../../store/reducers/control-state.reducer';
-import { addClassForVideoInVideoClass, isPictureInPicture } from '../ustils/dom.utils';
+import { addClassForVideoInVideoClass, getPictureInPictureState } from '../ustils/dom.utils';
 import {
     createStartVideoInVideoMessage,
     createToggleWindowFullscreenMessage,
@@ -118,7 +118,7 @@ export class VideoController {
             isProgrammatically = true;
             if (isPictureInPictureValue) {
                 this.messageService.sendMessageToBackground(createStartVideoInVideoMessage());
-            } else if (isPictureInPicture()) {
+            } else if (getPictureInPictureState()) {
                 // @ts-ignore
                 document.exitPictureInPicture();
             }
@@ -129,7 +129,8 @@ export class VideoController {
             fromEvent(video, 'leavepictureinpicture'),
         ).subscribe(() => {
             if (!isProgrammatically) {
-                this.store.dispatch(setPictureInPictureAction(isPictureInPicture()));
+                const isPictureInPicture = getPictureInPictureState();
+                this.store.dispatch(setPictureInPictureAction({ isPictureInPicture }));
             }
 
             isProgrammatically = false;

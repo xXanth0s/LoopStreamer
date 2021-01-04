@@ -88,7 +88,6 @@ export class MovieDBService {
             // @ts-ignore
             series = results.flatMap(data => data.data.results);
             series = orderByMovieDBPopularity(series);
-            debugger;
         } catch (error) {
             Logger.error('[MovieDDService->getSimilarSeries] error occurred', error);
         }

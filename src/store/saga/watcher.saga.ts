@@ -26,6 +26,8 @@ import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/l
 import { loadSimilarSeriesSaga } from './series-api/load-similar-series.saga';
 import { loadSeriesSearchResultSaga } from './series-api/load-series-search-result.saga';
 import { createLastWatchedSeriesCollectionSaga } from './video-meta-data/last-watched-series-collection.saga';
+import { setPictureInPictureAction } from '../reducers/control-state.reducer';
+import { pictureInPictureSaga } from './video-meta-data/picture-in-picture.saga';
 
 export function* watcherSaga() {
     try {
@@ -49,6 +51,7 @@ export function* watcherSaga() {
         yield takeLatest(startNextEpisodeAction.type, startNextEpisodeSaga);
         yield takeLatest(startPreviousEpisodeAction.type, startPreviousEpisodeSaga);
         yield takeLatest(continueAutoplayAction.type, continueAutoplaySaga);
+        yield takeLatest(setPictureInPictureAction.type, pictureInPictureSaga);
     } catch (e) {
         Logger.error('[WatcherSaga] Error occurred', e);
         throw new Error(e);

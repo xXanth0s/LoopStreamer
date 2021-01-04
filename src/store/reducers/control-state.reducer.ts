@@ -74,7 +74,7 @@ function resetPlayedEpisodes(state: ControlState): void {
     state.playedEpisodes = 0;
 }
 
-function setPictureInPictureState(state: ControlState, isPictureInPicture: boolean): void {
+function setPictureInPictureState(state: ControlState, { isPictureInPicture }: { isPictureInPicture: boolean }): void {
     state.isVideoPictureInPicture = isPictureInPicture;
 }
 
@@ -92,7 +92,7 @@ export const controlStateSlice = createSlice({
         removeAsyncInteractionAction: (state: ControlState, action: PayloadAction<AsyncInteraction<any>['key']>) => removeAsyncInteraction(state, action.payload),
         setWindowStateAction: (state: ControlState, action: PayloadAction<{ windowId: number; windowState: WindowState }>) => setWindowState(state, action.payload),
         setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number; height: number; width: number }>) => setWindowSize(state, action.payload),
-        setPictureInPictureAction: (state: ControlState, action: PayloadAction<boolean>) => setPictureInPictureState(state, action.payload),
+        setPictureInPictureAction: (state: ControlState, action: PayloadAction<{ isPictureInPicture: boolean }>) => setPictureInPictureState(state, action.payload),
     },
 });
 /* eslint-enable max-len */

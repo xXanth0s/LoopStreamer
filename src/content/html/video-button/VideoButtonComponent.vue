@@ -183,7 +183,8 @@
         }
 
         private togglePictureInPicture(): void {
-            this.store.dispatch(setPictureInPictureAction(!this.isPictureInPicture));
+            const isPictureInPicture = !this.isPictureInPicture;
+            this.store.dispatch(setPictureInPictureAction({ isPictureInPicture }));
         }
 
         private fetchVideoLoadingState(): void {
