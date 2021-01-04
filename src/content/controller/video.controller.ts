@@ -13,7 +13,7 @@ import { addVideoButtons } from '../html/video-button/video-buttons.component';
 import { PopupController } from './popup.controller';
 import { ControllerType } from '../../browserMessages/enum/controller.type';
 import { SeriesEpisode } from '../../store/models/series-episode.model';
-import { getSeriesByKey } from '../../store/selectors/series.selector';
+import { getSeriesByKey, getSeriesForEpisode } from '../../store/selectors/series.selector';
 import {
     seriesEpisodeStartedAction,
     setSeriesEpisodeTimeStampAction,
@@ -27,6 +27,8 @@ import {
     createToggleWindowFullscreenMessage,
 } from '../../browserMessages/messages/background.messages';
 import { addVideoOverlay } from '../html/video-overlay/video-overlay.component';
+import { getDefaultLanguage } from '../../store/selectors/options.selector';
+import { getSeriesEpisodeTitle } from '../../store/utils/series.utils';
 
 @injectable()
 export class VideoController {
@@ -51,7 +53,16 @@ export class VideoController {
             videoElement.play().then(() => this.onVideoStarted(videoElement, seriesEpisodeKey));
             this.startErrorTimer(this.timeout);
             this.preventVideoFullscreen();
+            this.setVideoTitle(seriesEpisodeKey);
         }
+    }
+
+    private setVideoTitle(episodeKey: SeriesEpisode['key']): void {
+        const language = this.store.selectSync(getDefaultLanguage);
+        const episode = this.store.selectSync(getSeriesEpisodeByKey, episodeKey);
+        const series = this.store.selectSync(getSeriesForEpisode, episodeKey);
+
+        window.document.title = `${series.titles[language]} ${getSeriesEpisodeTitle(episode)}`;
     }
 
     private async onVideoStarted(video: HTMLVideoElement, seriesEpisodeKey: SeriesEpisode['key']): Promise<void> {
