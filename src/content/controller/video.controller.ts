@@ -26,6 +26,7 @@ import {
     createStartVideoInVideoMessage,
     createToggleWindowFullscreenMessage,
 } from '../../browserMessages/messages/background.messages';
+import { addVideoOverlay } from '../html/video-overlay/video-overlay.component';
 
 @injectable()
 export class VideoController {
@@ -70,6 +71,7 @@ export class VideoController {
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
             this.setPictureInPictureState(video);
             addVideoButtons(episodeData.key);
+            addVideoOverlay(episodeData.key);
         });
     }
 

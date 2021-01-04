@@ -49,6 +49,35 @@ body {
     }
 }
 
+.ls-on-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.ls-video-overlay {
+
+    z-index: 99998;
+    position: fixed;
+    width: 100%;
+    background: linear-gradient(to bottom, $gray, transparent 30%);
+    height: 30rem;
+    .text {
+        color: white;
+        position: absolute;
+        top: 2rem;
+        left: 3rem;
+
+        .series-title {
+          font-size: 2rem;
+        }
+
+        .episode-tile {
+            font-size: 1.5rem;
+        }
+    }
+
+}
+
 .ls-invisible {
     visibility: hidden;
     max-width: 0;

@@ -4,6 +4,7 @@ import { MessageType } from '../../browserMessages/enum/message-type.enum';
 import { CONTENT_TYPES } from '../container/CONTENT_TYPES';
 import { NotificationService } from '../services/notification.service';
 import { addVideoButtons } from '../html/video-button/video-buttons.component';
+import { addVideoOverlay } from '../html/video-overlay/video-overlay.component';
 
 @injectable()
 export class TestController {
@@ -18,7 +19,8 @@ export class TestController {
         });
         ipcRenderer.on(MessageType.TEST_CONTENT_START_TEST_NOTIFICATION, () => {
             this.notificationService.openTestPopup();
-            addVideoButtons('1983-S1-E3');
+            addVideoButtons('ワンパンマン-2015-S1-E3');
+            addVideoOverlay('ワンパンマン-2015-S1-E3');
         });
     }
 
