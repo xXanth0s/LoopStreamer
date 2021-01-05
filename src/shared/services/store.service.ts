@@ -45,7 +45,7 @@ export class StoreService {
         });
 
         return subject.pipe(
-            distinctUntilChanged(),
+            distinctUntilChanged((val1, val2) => this.checkForEquality(val1, val2)),
             finalize(() => {
                 unsubscribe();
             }),
@@ -63,6 +63,20 @@ export class StoreService {
 
     public resetControlState(): void {
         this.dispatch(setActiveEpisodeAction(null));
+    }
+
+    private checkForEquality<T>(val1: T, val2: T): boolean {
+        if (!(Array.isArray(val1) && Array.isArray(val2))) {
+            return val1 === val2;
+        }
+
+        if (val1.length !== val2.length) {
+            return false;
+        }
+
+        return val1.every((val, index) => {
+            return val === val2[index];
+        });
     }
 }
 

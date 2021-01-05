@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { fromEvent } from 'rxjs';
-import { first, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, first, takeUntil } from 'rxjs/operators';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
@@ -16,6 +16,7 @@ import { OpenWindowConfig } from '../data/types/open-window-config.type';
 import { DefaultOpenWindowConfig } from '../data/open-window-config-default.data';
 import { VIDEO_IN_VIDEO_CSS_CLASS } from '../../content/constants/class-names';
 import { appStartedAction } from '../../store/actions/shared.actions';
+import { getSeriesByKey } from '../../store/selectors/series.selector';
 
 @injectable()
 export class RootBackgroundController {
@@ -54,6 +55,12 @@ export class RootBackgroundController {
             window.webContents.openDevTools();
         }
 
+        this.store.selectBehaviour(getSeriesByKey, 'the-mandalorian-2019').pipe(
+            distinctUntilChanged((val1, val2) => {
+                debugger;
+                return val1 === val2;
+            }),
+        ).subscribe(data => console.log(data));
         this.store.dispatch(appStartedAction());
     }
 

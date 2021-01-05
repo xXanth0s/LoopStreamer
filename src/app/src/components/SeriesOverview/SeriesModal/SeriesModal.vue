@@ -155,7 +155,6 @@
             this.store.selectBehaviour(getSelectedSeason).pipe(
                 takeUntil(this.takeUntil$),
                 tap(selectedSeason => {
-                    console.log('selectedSeason', selectedSeason);
                     this.selectedSeason = selectedSeason;
                     this.episodes = [];
                 }),
