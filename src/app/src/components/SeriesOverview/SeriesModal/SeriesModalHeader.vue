@@ -34,6 +34,13 @@
                 <i v-else class="fas fa-volume-up"></i>
             </button>
         </div>
+        <div class="absolute settings-button" v-if="showSettings">
+            <button type="button"
+                    class="btn btn-outline-primary rounded-full h-12 w-12"
+                    @click.stop="settingsClicked">
+            <i class="fas fa-cog"></i>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -63,6 +70,9 @@
 
         @Prop(String)
         private language: LANGUAGE;
+
+        @Prop(Boolean)
+        private showSettings: boolean;
 
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
@@ -100,6 +110,11 @@
 
         @Emit('close-modal')
         private closeModal(): boolean {
+            return true;
+        }
+
+        @Emit('settings-clicked')
+        private settingsClicked(): boolean {
             return true;
         }
 
@@ -146,5 +161,10 @@
     .mute-button {
         right: 5rem;
         top: 1rem;
+    }
+
+    .settings-button {
+        right: 1rem;
+        bottom: 2rem;
     }
 </style>

@@ -21,16 +21,22 @@ const removeSeries = (state: { [key: string]: Series }, key: Series['key']): { [
     return state;
 };
 
-const resetSeries = (state: { [key: string]: Series }, key: Series['key']): { [key: string]: Series } => {
-    const series = state[key];
-    state[key] = {
+const resetSeriesStartTime = (state: { [key: string]: Series }, { seriesKey }: { seriesKey: Series['key'] }): void => {
+    const series = state[seriesKey];
+    state[seriesKey] = {
         ...series,
-        isEndTimeConfigured: false,
         isStartTimeConfigured: false,
-        scipEndTime: 0,
         scipStartTime: 0,
     };
-    return state;
+};
+
+const resetSeriesEndTime = (state: { [key: string]: Series }, { seriesKey }: { seriesKey: Series['key'] }): void => {
+    const series = state[seriesKey];
+    state[seriesKey] = {
+        ...series,
+        isEndTimeConfigured: false,
+        scipEndTime: 0,
+    };
 };
 
 const setStartTimeForSeries = (state: { [key: string]: Series },
@@ -54,7 +60,6 @@ const setEndTimeForSeries = (state: { [key: string]: Series },
         isEndTimeConfigured: true,
         scipEndTime: Math.trunc(scipEndTime),
     };
-    return state;
 };
 
 function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): void {
@@ -171,6 +176,17 @@ function addSeasons(state: Record<string, Series>, season: SeriesSeason) {
     series.seasons = addToArrayIfNotExists(series.seasons, season.key);
 }
 
+function setTimesForSeries(state: StateModel['series'],
+                           data: {
+                                    key: Series['key'];
+                                    scipStartTime?: Series['scipStartTime'];
+                                    scipEndTime?: Series['scipStartTime'];
+                            }) {
+    const { key, scipStartTime, scipEndTime } = data;
+    setStartTimeForSeries(state, key, scipStartTime);
+    setEndTimeForSeries(state, key, scipEndTime);
+}
+
 /* eslint-disable max-len */
 const seriesSlice = createSlice({
     name: 'series',
@@ -179,7 +195,9 @@ const seriesSlice = createSlice({
         removeSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => removeSeries(state, action.payload),
         setStartTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipStartTime?: Series['scipStartTime'] }>) => setStartTimeForSeries(state, action.payload.key, action.payload.scipStartTime),
         setEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipEndTime?: Series['scipStartTime'] }>) => setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
-        resetSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => resetSeries(state, action.payload),
+        setTimesForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipStartTime?: Series['scipStartTime']; scipEndTime?: Series['scipStartTime'] }>) => setTimesForSeries(state, action.payload),
+        resetSeriesStartTimeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'] }>) => resetSeriesStartTime(state, action.payload),
+        resetSeriesEndTimeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'] }>) => resetSeriesEndTime(state, action.payload),
         updateOrAddSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series>) => updateOrAddSeries(state, action.payload),
         updateOrAddMultipleSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series[]>) => updateOrAddMultipleSeries(state, action.payload),
         setLastUsedPortalForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key']; portal: PORTALS }>) => setLastUsedPortalForSeries(state, action.payload),
@@ -198,9 +216,11 @@ const seriesSlice = createSlice({
 
 export const {
     removeSeriesAction,
-    resetSeriesAction,
+    resetSeriesStartTimeAction,
+    resetSeriesEndTimeAction,
     setStartTimeForSeriesAction,
     setEndTimeForSeriesAction,
+    setTimesForSeriesAction,
     updateOrAddSeriesAction,
     updateOrAddMultipleSeriesAction,
     setLastUsedPortalForSeriesAction,
