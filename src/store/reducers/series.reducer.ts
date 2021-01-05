@@ -51,16 +51,16 @@ const setStartTimeForSeries = (state: { [key: string]: Series },
     return state;
 };
 
-const setEndTimeForSeries = (state: { [key: string]: Series },
+function setEndTimeForSeries(state: { [key: string]: Series },
                              key: Series['key'],
-                             scipEndTime?: Series['scipStartTime']): { [key: string]: Series } => {
+                             scipEndTime?: Series['scipStartTime']): void {
     const series = state[key];
     state[key] = {
         ...series,
         isEndTimeConfigured: true,
         scipEndTime: Math.trunc(scipEndTime),
     };
-};
+}
 
 function updateOrAddSeries(state: { [key: string]: Series }, seriesInfo: Series): void {
     const { key } = seriesInfo;

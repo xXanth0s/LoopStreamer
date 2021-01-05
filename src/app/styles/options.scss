@@ -13,12 +13,11 @@ $themeColor: $primary-color;
 @import '~vue-slider-component/lib/theme/default.scss';
 
 
-$brand-primary:         darken(#46acca, 6.5%) !default;
+$brand-primary: darken(#46acca, 6.5%) !default;
 
-$--color-primary:  darken(#46acca, 6.5%);
+$--color-primary: darken(#46acca, 6.5%);
 
 body {
-  //font-family: 'Gotu', serif;
   background-color: #e3e7ed;
 }
 
@@ -33,39 +32,6 @@ body {
   height:5px;
   padding:5px;
   bottom:15px;
-}
-
-
-.col-row{
-  margin-bottom: 15px;
-  vertical-align: bottom;
-  height: 35px;
-  line-height: 35px;
-
-
-  .col-label{
-    vertical-align: middle;
-  }
-
-  label{
-    vertical-align: middle;
-    font-weight: normal;
-  }
-
-  .btn-col{
-    margin-top: 15px;
-  }
-}
-
-.content-block {
-  span {
-    display: block;
-  }
-  h2{
-    text-align: center;
-    margin-top: 30px;
-    margin-bottom: 25px;
-  }
 }
 
 .row [class*='col-'] {

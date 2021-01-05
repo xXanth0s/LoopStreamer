@@ -4,7 +4,7 @@
 
         <p class="title">Verwendete Hoster:</p>
 
-        <div class="prov-row drop-area drop-area-not-used">
+        <div class="drop-area mb-2">
             <draggable :list="usedProvidors"
                        :options="dragableConfig"
                        class="dragable">
@@ -20,12 +20,12 @@
 
         <p class="title">Nicht zu verwendende Hoster:</p>
 
-        <div class="prov-row drop-area drop-area-not-used">
+        <div class="drop-area mb-2">
             <draggable :list="unusedProvidors"
                        :options="dragableConfig"
                        class="dragable">
                 <div :key="providor.key"
-                     class="drag-item"
+                     class="cursor-move drag-item"
                      v-for="providor in unusedProvidors">
                     <div class="drop-item text-center">
                         <span class="item-name">{{providor.key}}</span>
@@ -33,9 +33,7 @@
                 </div>
             </draggable>
         </div>
-        <div class="row col-row" style="">
-            <b-button variant="primary" class="btn-bottom" @click="save">Speichern</b-button>
-        </div>
+        <b-button variant="primary" class="float-right mt-4" @click="save">Speichern</b-button>
 
         <b-toast id="error-toast" solid>
             <template #toast-title>
@@ -94,14 +92,14 @@
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
 
-        public created(): void {
+        public mounted(): void {
             const providors = this.store.selectSync(getAllProvidors);
 
             this.usedProvidors = providors.filter(providor => providor.isUsed);
             this.unusedProvidors = providors.filter(providor => !providor.isUsed);
         }
 
-        save(): void {
+        public save(): void {
             if (!this.usedProvidors.length) {
                 this.$bvToast.show('error-toast');
             } else {
@@ -130,17 +128,7 @@
 <style lang="scss" scoped>
     @import "src/styles/variables";
 
-    $dropItemSize: 25px;
-
-    .btn-bottom {
-        position: absolute;
-        bottom: 24px;
-        right: 24px;
-    }
-
-    .drag-item {
-        cursor: move;
-    }
+    $dropItemSize: 1.5rem;
 
     .drop-area {
         border: $border;
@@ -158,7 +146,6 @@
         padding-left: 5px;
 
         span {
-
             font-weight: bold;
         }
     }
@@ -176,19 +163,5 @@
 
     .dragable {
         min-height: $dropItemSize;
-    }
-
-    .red {
-        color: $red;
-    }
-
-    .green {
-        color: $green;
-    }
-
-    .flex-row {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
     }
 </style>

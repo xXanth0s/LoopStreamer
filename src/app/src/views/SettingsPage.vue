@@ -1,14 +1,10 @@
 <template>
     <div>
-        <div class="content-block">
-            <h2>Einstellungen</h2>
+        <h2 class="text-center mb-4">Einstellungen</h2>
+        <div class="flex flex-1 tile-container">
+            <options-panel class="flex-1 mx-2"/>
+            <providors-panel class="flex-1 mx-2"/>
         </div>
-        <br>
-        <br>
-        <b-row>
-            <options-panel class="col mx-3"/>
-            <providors-panel class="col mx-3"/>
-        </b-row>
     </div>
 </template>
 
@@ -28,3 +24,10 @@
 
     }
 </script>
+
+<style lang="scss" scoped>
+    .tile-container {
+        width: 920px;
+        margin: 0 auto;
+    }
+</style>

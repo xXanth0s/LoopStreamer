@@ -1,25 +1,28 @@
 <template>
-    <card-tile :title="'Allgemein'">
-        <div class="flex-row">
-            <label>
-                Tote Episoden überspringen:
-                <info-tooltip :text="deadEpisodeTooltipText"/>
-            </label>
-            <toggle-button :labels="false"
-                           :style="toggleButtonColor"
-                           v-model="options.scipIfNoVideo"/>
-        </div>
-        <div class="flex-row pt-3">
+    <card-tile :title="'Allgemein'" class="flex flex-column">
+        <div class="flex-1 flex flex-column justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <label>
+                        Tote Episoden überspringen:
+                        <info-tooltip :text="deadEpisodeTooltipText"/>
+                    </label>
+                    <toggle-button :labels="false"
+                                   :style="toggleButtonColor"
+                                   v-model="options.scipIfNoVideo"/>
+                </div>
+                <div class="flex justify-between items-center">
                 <span>
                     Episodenanzahl:
                     <info-tooltip :text="episodeCountTooltipText"/>
                 </span>
-            <minus-plus-input v-model="options.episodesToPlay"></minus-plus-input>
+                    <minus-plus-input v-model="options.episodesToPlay"></minus-plus-input>
+                </div>
+            </div>
+            <div>
+                <b-button variant="primary" class="float-right" @click="save">Speichern</b-button>
+            </div>
         </div>
-        <div class="row col-row">
-            <b-button variant="primary" class="btn-bottom" @click="save">Speichern</b-button>
-        </div>
-
         <toast :context="context.SUCCESS"
                :selector="successToastSelector"
                title="Einstellungen Gespeichert">
@@ -78,24 +81,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    @import "src/styles/variables";
-
-    .btn-bottom {
-        position: absolute;
-        bottom: 24px;
-        right: 24px;
-    }
-
-    .flex-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .green {
-        color: $green;
-    }
-</style>
