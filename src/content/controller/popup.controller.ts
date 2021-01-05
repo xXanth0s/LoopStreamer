@@ -101,7 +101,7 @@ export class PopupController {
             () => {
                 this.store.dispatch(setStartTimeForSeriesAction({
                     key: episodeInfo.seriesKey,
-                    scipStartTime: undefined,
+                    scipStartTime: 0,
                 }));
                 this.popupFinallyClosed$.next(Popup.SET_STARTTIME);
             }, () => {

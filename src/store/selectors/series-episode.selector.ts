@@ -2,12 +2,13 @@ import { StateModel } from '../models/state.model';
 import { SeriesEpisode } from '../models/series-episode.model';
 import { SeriesSeason } from '../models/series-season.model';
 import { sortArrayForKey } from '../../utils/array.utils';
-import { getSeriesForEpisode } from './series.selector';
+import { getSeriesByKey, getSeriesForEpisode } from './series.selector';
 import { getLinksForEpisode } from './línk.selector';
 import { getSeasonWithOffset, getSeriesSeasonByKey } from './series-season.selector';
 import { Logger } from '../../shared/services/logger';
 import { LANGUAGE } from '../enums/language.enum';
 import { getDefaultLanguage } from './options.selector';
+import { Series } from '../models/series.model';
 
 export const getMultipleSeriesEpisodeByKeys = (state: StateModel,
                                                keys: SeriesEpisode['key'][]):
@@ -119,3 +120,8 @@ export const getFallbackLanguageForEpisode = (state: StateModel, episodeKey: Ser
 
     return availableLanguages[0];
 };
+
+export function getAllEpisodesForSeries(state: StateModel, seriesKey: Series['key']): SeriesEpisode[] {
+    const series = getSeriesByKey(state, seriesKey);
+    return series.seasons.flatMap(season => getSeriesEpisodesForSeason(state, season));
+}

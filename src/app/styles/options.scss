@@ -9,7 +9,11 @@
 @import '~bootstrap-vue/src/index.scss';
 @import '~swiper/swiper-bundle';
 
-$brand-primary:         darken(#46acca, 6.5%) !default; //
+$themeColor: $primary-color;
+@import '~vue-slider-component/lib/theme/default.scss';
+
+
+$brand-primary:         darken(#46acca, 6.5%) !default;
 
 $--color-primary:  darken(#46acca, 6.5%);
 

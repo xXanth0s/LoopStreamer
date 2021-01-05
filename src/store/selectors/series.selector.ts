@@ -1,6 +1,10 @@
 import { StateModel } from '../models/state.model';
 import { Series } from '../models/series.model';
-import { getMultipleSeriesEpisodeByKeys, getSeriesEpisodeByKey } from './series-episode.selector';
+import {
+    getAllEpisodesForSeries,
+    getMultipleSeriesEpisodeByKeys,
+    getSeriesEpisodeByKey,
+} from './series-episode.selector';
 import { SeriesEpisode } from '../models/series-episode.model';
 import { getSeriesSeasonByKey } from './series-season.selector';
 import { SeriesSeason } from '../models/series-season.model';
@@ -59,3 +63,19 @@ export const getAllNotWatchedSeries = (state: StateModel): Series['key'][] => {
 
     return seriesKeys.filter(seriesKey => !watchedSeries.includes(seriesKey));
 };
+
+export function getAverageDurationForSeries(state: StateModel, seriesKey: Series['key']): number {
+    const episodes = getAllEpisodesForSeries(state, seriesKey);
+
+    const averageTime = episodes.filter(episode => episode.duration)
+        .reduce((tmpAverageTime, episode) => {
+            const newVal = tmpAverageTime + episode.duration;
+            if (tmpAverageTime === 0) {
+                return newVal;
+            }
+
+            return newVal / 2;
+        }, 0);
+
+    return Math.round(averageTime);
+}

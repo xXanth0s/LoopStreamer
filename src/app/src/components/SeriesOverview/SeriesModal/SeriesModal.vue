@@ -13,6 +13,8 @@
                         :series="series"
                         :key="series.key"
                         :language="activeLanguage"
+                        :show-settings="isSeriesConfiguable"
+                        @settings-clicked="toggleSettings"
                         @close-modal="closeModal"/>
 
                 <div class="px-4">
@@ -21,6 +23,9 @@
                                               :key="series.key"
                                               :language="activeLanguage"/>
 
+                    <b-collapse v-if="isSeriesConfiguable" v-model="areSettingsOpen" >
+                        <series-settings :series="series" class="mt-5"/>
+                    </b-collapse>
                     <seasons-list class="mt-4"
                                   :seasons="seasons"
                                   :key="seasons[0].key"
@@ -55,7 +60,6 @@
     import { SeriesSeason } from '../../../../../store/models/series-season.model';
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';
-    import { MessageService } from '../../../../../shared/services/message.service';
     import { getSeriesByKey } from '../../../../../store/selectors/series.selector';
     import { getSeasonsForSeries } from '../../../../../store/selectors/series-season.selector';
     import {
@@ -77,10 +81,12 @@
     import { SeriesMetaInfo } from '../../../../../store/models/series-meta-info.model';
     import SeriesCarousel from '../SeriesCarousel.vue';
     import Spinner from '../../Shared/Spinner.vue';
+    import SeriesSettings from './SeriesSettings.vue';
 
     @Component({
         name: 'series-modal',
         components: {
+            SeriesSettings,
             SeriesCarousel,
             SeriesEpisodeList,
             SeriesEpisodeTile,
@@ -100,6 +106,7 @@
         public selectedSeason: SeriesSeason = null;
         public activeLanguage: LANGUAGE = LANGUAGE.ENGLISH;
         public similarSeriesCollection: NamedCollection<SeriesMetaInfo> = null;
+        public areSettingsOpen = false;
 
         $refs!: {
             modalRef: BvComponent;
@@ -108,13 +115,14 @@
         @Inject(SHARED_TYPES.StoreService)
         private store: StoreService;
 
-        @Inject(SHARED_TYPES.MessageService)
-        private messageService: MessageService;
-
         public get showModalContent(): boolean {
             return Boolean(this.series)
                 && Boolean(this.selectedSeason)
                 && this.series.key === this.selectedSeason.seriesKey;
+        }
+
+        public get isSeriesConfiguable(): boolean {
+            return Boolean(this.series.lastEpisodeWatched);
         }
 
         public mounted(): void {
@@ -137,6 +145,10 @@
         public closeModal(): void {
             this.$refs.modalRef.hide();
             this.reset();
+        }
+
+        public toggleSettings(): void {
+            this.areSettingsOpen = !this.areSettingsOpen;
         }
 
         public loadSeriesData(seriesKey: Series['key']): void {
@@ -184,6 +196,7 @@
             this.episodes = [];
             this.selectedSeason = null;
             this.series = null;
+            this.areSettingsOpen = false;
         }
     }
 </script>

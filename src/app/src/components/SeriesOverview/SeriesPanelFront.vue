@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div>
 
         <div class="flex-column bordered">
             <div class="image-container relative">

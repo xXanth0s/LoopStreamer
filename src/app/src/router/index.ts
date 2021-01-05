@@ -23,7 +23,7 @@ let routes = [
     },
     {
         path: '/',
-        redirect: environment.isDev ? `/${globalRoutes.TEST_PAGE}` : `/${globalRoutes.SERIES_PAGE}`,
+        redirect: `/${globalRoutes.SERIES_PAGE}`,
     },
 ];
 
