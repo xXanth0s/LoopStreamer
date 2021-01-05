@@ -7,6 +7,10 @@ import {
     startEpisodeAsyncInteraction,
 } from '../actions/async-interactions';
 
+export function getFirstAsyncInteraction(state: StateModel): AsyncInteraction<any> {
+    return getAllAsyncInteractions(state)[0];
+}
+
 export function getAllAsyncInteractions(state: StateModel): AsyncInteraction<any>[] {
     return Object.values(state.controlState.asyncInteractions);
 }

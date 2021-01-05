@@ -24,7 +24,7 @@
     import { MessageService } from '../../shared/services/message.service';
     import AsyncInteractionSpinner from './components/AsyncInteractionSpinner.vue';
     import { AsyncInteraction } from '../../store/models/async-interaction.model';
-    import { getAllAsyncInteractions } from '../../store/selectors/async-interaction.selector';
+    import { getFirstAsyncInteraction } from '../../store/selectors/async-interaction.selector';
 
     @Component({
         components: {
@@ -39,7 +39,7 @@
     export default class MainPage extends Vue {
         private readonly takeUntil$ = new Subject();
 
-        private asyncInteraction: AsyncInteraction<any>;
+        private asyncInteraction: AsyncInteraction<any> = null;
 
         private store: StoreService;
 
@@ -53,11 +53,10 @@
         }
 
         private fetchAsyncInteractionsFromStore(): void {
-            this.store.selectBehaviour(getAllAsyncInteractions).pipe(
+            this.store.selectBehaviour(getFirstAsyncInteraction).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(asyncInteractions => {
-                this.asyncInteraction = asyncInteractions[0];
-                this.$forceUpdate();
+            ).subscribe(asyncInteraction => {
+                this.asyncInteraction = asyncInteraction;
             });
         }
     }
