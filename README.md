@@ -1,4 +1,6 @@
-# loopstreamer_ui
+# LoopStreamer
+
+Application for streaming Series in german and english 
 
 ## Project setup
 ```
@@ -8,27 +10,16 @@ npm install
 ### Compiles and hot-reloads for development
 ```
 npm run serve
+npm run preload:dev
 ```
 
-### Compiles and minifies for production
+### Compiles and builds executable for the running OS 
 ```
 npm run build
 ```
 
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Run your end-to-end tests
-```
-npm run test:e2e
-```
 
 ### Lints and fixes files
 ```
-npm run lint
+npm run eslint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
