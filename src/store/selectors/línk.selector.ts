@@ -9,10 +9,13 @@ import { LANGUAGE } from '../enums/language.enum';
 import { getSeriesEpisodeByKey, getSeriesEpisodesForSeason } from './series-episode.selector';
 import { SeriesEpisode } from '../models/series-episode.model';
 import { isLinkOutdated } from '../utils/link.utils';
+import { getAllUsedProvidors } from './providors.selector';
 
 export function getLinksForEpisode(state: StateModel, seriesEpisodeKey: SeriesEpisode['key']): LinkModel[] {
+    const usedProvidors = getAllUsedProvidors(state);
     const episode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
-    return getLinksByKeys(state, episode?.portalLinks) || [];
+    return getLinksByKeys(state, episode?.portalLinks)
+        .filter(link => usedProvidors.some(providor => providor.key === link.providor));
 }
 
 export function getLinkForSeriesAndPortal(state: StateModel, seriesKey: Series['key'], portal: PORTALS): LinkModel {

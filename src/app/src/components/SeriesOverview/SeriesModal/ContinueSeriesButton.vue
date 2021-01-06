@@ -24,7 +24,11 @@
     import Component from 'vue-class-component';
     import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
-    import { takeUntil } from 'rxjs/operators';
+    import {
+      debounceTime,
+      filter,
+      map, switchMap, takeUntil, tap,
+    } from 'rxjs/operators';
     import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import { MessageService } from '../../../../../shared/services/message.service';
     import { appContainer } from '../../../container/container';
@@ -35,6 +39,8 @@
     import { getLastWatchedOrFirstEpisodeForActiveSeason } from '../../../../../store/selectors/series.selector';
     import { isLoadingSeason, isPreparingVideo } from '../../../../../store/selectors/async-interaction.selector';
     import { startEpisodeAction } from '../../../../../store/actions/shared.actions';
+    import { LinkModel } from '../../../../../store/models/link.model';
+    import { getLinksForEpisode } from '../../../../../store/selectors/línk.selector';
 
     @Component({
         name: 'continue-series-button',
@@ -49,11 +55,12 @@
         private store: StoreService;
 
         private seriesEpisode: SeriesEpisode = null;
+        private links: LinkModel[] = [];
         private isVideoLoading = false;
         private isSeasonLoading = false;
 
         public get hasValidLinks(): boolean {
-            return Boolean(this.seriesEpisode?.portalLinks.length);
+            return Boolean(this.links.length);
         }
 
         public get buttonText(): string {
@@ -98,7 +105,7 @@
         @Watch('seriesKey', { immediate: true })
         public seriesChanged(): void {
             this.takeUntil$.next();
-            this.fetchLastWatchedOrFirstEpisode();
+            this.fetchLastWatchedOrFirstEpisodeWithLinks();
             this.fetchSeasonLoadingStateFromStore();
             this.fetchVideoLoadingStateFromStore();
         }
@@ -119,10 +126,12 @@
             ).subscribe(isLoading => this.isVideoLoading = isLoading);
         }
 
-        private fetchLastWatchedOrFirstEpisode(): void {
+        private fetchLastWatchedOrFirstEpisodeWithLinks(): void {
             this.store.selectBehaviour(getLastWatchedOrFirstEpisodeForActiveSeason, this.seriesKey).pipe(
                 takeUntil(this.takeUntil$),
-            ).subscribe(episode => this.seriesEpisode = episode);
+                tap(episode => this.seriesEpisode = episode),
+                switchMap(episode => this.store.selectBehaviour(getLinksForEpisode, episode?.key)),
+            ).subscribe((links) => this.links = links);
         }
     }
 </script>
