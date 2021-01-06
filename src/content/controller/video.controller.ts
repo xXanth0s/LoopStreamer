@@ -3,7 +3,7 @@ import {
     fromEvent, merge, Observable, Subject, timer,
 } from 'rxjs';
 import {
-    distinctUntilChanged, filter, first, takeUntil, tap,
+    distinctUntilChanged, filter, first, takeUntil,
 } from 'rxjs/operators';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
