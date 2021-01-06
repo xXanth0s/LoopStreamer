@@ -3,6 +3,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { fromEvent } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
+import { autoUpdater } from 'electron-updater';
 import { BACKGROUND_TYPES } from '../container/BACKGROUND_TYPES';
 import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
 import { StoreService } from '../../shared/services/store.service';
@@ -53,7 +54,9 @@ export class RootBackgroundController {
         if (openAppDevTools) {
             window.webContents.openDevTools();
         }
-
+        if (!isDev) {
+            autoUpdater.checkForUpdatesAndNotify();
+        }
         this.store.dispatch(appStartedAction());
     }
 

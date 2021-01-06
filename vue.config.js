@@ -54,17 +54,20 @@ module.exports = {
     pluginOptions: {
         electronBuilder: {
 
+            builderOptions: {
+                publish: ['github']
+            },
             chainWebpackMainProcess: (config) => {
                 config.module
-          .rule('file-replace')
-          .test(path.resolve('src/environments/environment.ts'))
-          .use('file')
-          .loader('file-replace-loader')
-          .options({
-              condition: isProd,
-              replacement: path.resolve('src/environments/environment.prod.ts'),
-              async: false,
-          });
+                .rule('file-replace')
+                .test(path.resolve('src/environments/environment.ts'))
+                .use('file')
+                .loader('file-replace-loader')
+                .options({
+                  condition: isProd,
+                  replacement: path.resolve('src/environments/environment.prod.ts'),
+                  async: false,
+                });
             },
             nodeIntegration: true,
             mainProcessFile: 'src/background/background.ts',
