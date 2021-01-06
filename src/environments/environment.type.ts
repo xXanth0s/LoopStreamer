@@ -1,3 +1,5 @@
+import { MovieApi } from '../store/enums/movie-api.enum';
+
 export type EnvironmentType = {
     isDev: boolean;
     openAppDevTools: boolean;
@@ -6,4 +8,5 @@ export type EnvironmentType = {
     autoPlayPreviewVideos: boolean;
     linkCacheTimeInMinutes: number;
     videoButtonVisibilityTime: number;
+    movieApiKeys: Partial<Record<MovieApi, string>>;
 };

@@ -17,6 +17,7 @@ import { SeriesEpisode } from '../../store/models/series-episode.model';
 import { MovieApi } from '../../store/enums/movie-api.enum';
 import { Genre } from '../../store/models/genre.model';
 import { SeriesMetaInfo } from '../../store/models/series-meta-info.model';
+import { environment } from '../../environments/environment';
 
 type MovieDbResponse<T> = { data: T; headers: IncomingHttpHeaders }
 
@@ -205,7 +206,7 @@ export class MovieDBService {
 
     private static getClient(usedLanguage: LANGUAGE): MovieDB {
         const language = MovieDBService.mapLanguage(usedLanguage);
-        return new MovieDB('daa63aa8627cfd8c6ab8733fa2561153', { language });
+        return new MovieDB(environment.movieApiKeys[MovieApi.TMDB], { language });
     }
 
     private static mapLanguage(language: LANGUAGE): string {
