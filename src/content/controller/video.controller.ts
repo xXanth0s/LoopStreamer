@@ -105,7 +105,6 @@ export class VideoController {
 
     private setActiveTimestamp({ key }: SeriesEpisode, videoTimeUpdate$: Observable<number>): void {
         videoTimeUpdate$.pipe(
-            tap((time) => console.log('timeUpdate', time)),
             filter(time => time % 5 === 0),
         ).subscribe(timestamp => {
             this.store.dispatch(setSeriesEpisodeTimeStampAction({ seriesEpisodeKey: key, timestamp }));

@@ -69,52 +69,42 @@
                 320: {
                     slidesPerView: 2,
                     slidesPerGroup: 2,
-                    loop: this.series.length > 2,
                 },
                 480: {
                     slidesPerView: 3,
                     slidesPerGroup: 3,
-                    loop: this.series.length > 3,
                 },
                 640: {
                     slidesPerView: 4,
                     slidesPerGroup: 4,
-                    loop: this.series.length > 4,
                 },
                 800: {
                     slidesPerView: 5,
                     slidesPerGroup: 5,
-                    loop: this.series.length > 5,
                 },
                 960: {
                     slidesPerView: 6,
                     slidesPerGroup: 6,
-                    loop: this.series.length > 6,
                 },
                 1120: {
                     slidesPerView: 7,
                     slidesPerGroup: 7,
-                    loop: this.series.length > 7,
                 },
                 1280: {
                     slidesPerView: 8,
                     slidesPerGroup: 8,
-                    loop: this.series.length > 8,
                 },
                 1440: {
                     slidesPerView: 9,
                     slidesPerGroup: 9,
-                    loop: this.series.length > 9,
                 },
                 1600: {
                     slidesPerView: 10,
                     slidesPerGroup: 10,
-                    loop: this.series.length > 10,
                 },
                 1760: {
                     slidesPerView: 11,
                     slidesPerGroup: 11,
-                    loop: this.series.length > 11,
                 },
             };
 
