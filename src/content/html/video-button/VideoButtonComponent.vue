@@ -46,7 +46,7 @@
 <script lang="ts">
     // eslint-disable-next-line import/no-extraneous-dependencies
     import { remote } from 'electron';
-    import { fromEvent } from 'rxjs';
+    import { fromEvent, race } from 'rxjs';
     import { debounceTime, filter, tap } from 'rxjs/operators';
 
     import Vue from 'vue';
@@ -155,7 +155,11 @@
                 this.toggleFullscreenMode();
             });
 
-            fromEvent<KeyboardEvent>(document.body, 'keyup').pipe(
+            race(
+                fromEvent<KeyboardEvent>(document.body, 'keyup'),
+                fromEvent<KeyboardEvent>(document.body, 'keypress'),
+                fromEvent<KeyboardEvent>(document.body, 'keyup'),
+            ).pipe(
                 filter(event => event.key === 'f'),
             ).subscribe(event => {
                 event.preventDefault();
