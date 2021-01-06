@@ -24,11 +24,7 @@
     import Component from 'vue-class-component';
     import { Prop, Watch } from 'vue-property-decorator';
     import { Subject } from 'rxjs';
-    import {
-      debounceTime,
-      filter,
-      map, switchMap, takeUntil, tap,
-    } from 'rxjs/operators';
+    import { switchMap, takeUntil, tap } from 'rxjs/operators';
     import { SeriesEpisode } from '../../../../../store/models/series-episode.model';
     import { MessageService } from '../../../../../shared/services/message.service';
     import { appContainer } from '../../../container/container';
