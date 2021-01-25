@@ -19,3 +19,5 @@ export const startNextEpisodeAction = createAction<{
 export const startPreviousEpisodeAction = createAction<string>('video/startPreviousEpisode');
 
 export const continueAutoplayAction = createAction<string>('video/continueAutoPlay');
+
+const t = deleteSeriesAction();
