@@ -3,6 +3,7 @@ const CONTENT_TYPES = {
     VideoController: Symbol.for('VideoController'),
     TestController: Symbol.for('TestController'),
     PopupController: Symbol.for('PopupController'),
+    NotificationController: Symbol.for('NotificationController'),
 
     // Services
     NotificationService: Symbol.for('NotificationService'),

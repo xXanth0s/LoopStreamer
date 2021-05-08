@@ -187,6 +187,14 @@ function setTimesForSeries(state: StateModel['series'],
     setEndTimeForSeries(state, key, scipEndTime);
 }
 
+function setNoStartTimeForSeries(state: StateModel['series'], seriesKey: Series['key']) {
+    setStartTimeForSeries(state, seriesKey, 0);
+}
+
+function setNoEndTimeForSeries(state: StateModel['series'], seriesKey: Series['key']) {
+    setEndTimeForSeries(state, seriesKey, 0);
+}
+
 /* eslint-disable max-len */
 const seriesSlice = createSlice({
     name: 'series',
@@ -194,7 +202,9 @@ const seriesSlice = createSlice({
     reducers: {
         removeSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<Series['key']>) => removeSeries(state, action.payload),
         setStartTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipStartTime?: Series['scipStartTime'] }>) => setStartTimeForSeries(state, action.payload.key, action.payload.scipStartTime),
+        setNoStartTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key'] }>) => setNoStartTimeForSeries(state, action.payload.key),
         setEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipEndTime?: Series['scipStartTime'] }>) => setEndTimeForSeries(state, action.payload.key, action.payload.scipEndTime),
+        setNoEndTimeForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key'] }>) => setNoEndTimeForSeries(state, action.payload.key),
         setTimesForSeriesAction: (state: { [key: string]: Series }, action: PayloadAction<{ key: Series['key']; scipStartTime?: Series['scipStartTime']; scipEndTime?: Series['scipStartTime'] }>) => setTimesForSeries(state, action.payload),
         resetSeriesStartTimeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'] }>) => resetSeriesStartTime(state, action.payload),
         resetSeriesEndTimeAction: (state: { [key: string]: Series }, action: PayloadAction<{ seriesKey: Series['key'] }>) => resetSeriesEndTime(state, action.payload),
@@ -219,7 +229,9 @@ export const {
     resetSeriesStartTimeAction,
     resetSeriesEndTimeAction,
     setStartTimeForSeriesAction,
+    setNoStartTimeForSeriesAction,
     setEndTimeForSeriesAction,
+    setNoEndTimeForSeriesAction,
     setTimesForSeriesAction,
     updateOrAddSeriesAction,
     updateOrAddMultipleSeriesAction,

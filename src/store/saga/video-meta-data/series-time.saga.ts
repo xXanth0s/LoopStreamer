@@ -9,9 +9,13 @@ import { getPopupEndTimeForSeriesEpisode } from '../../utils/series.utils';
 import { getPortalLinkForNextEpisode } from '../portal-load-series-data/load-neighbour-series-episode.saga';
 import { setLastWatchedEpisodeAction } from '../../reducers/series.reducer';
 import { LinkModel } from '../../models/link.model';
+import { videoNotificationSaga } from '../notifications/video-notification.saga';
 
 export function* episodeTimeUpdateSaga(action: ReturnType<typeof setSeriesEpisodeTimeStampAction>) {
     const { seriesEpisodeKey, timestamp } = action.payload;
+
+    yield videoNotificationSaga(seriesEpisodeKey);
+
     const state = yield select();
     const seriesEpisode = getSeriesEpisodeByKey(state, seriesEpisodeKey);
     const series = getSeriesByKey(state, seriesEpisode.seriesKey);

@@ -2,6 +2,8 @@ import { StateModel } from '../models/state.model';
 import { ControlState } from '../models/control-state.model';
 import { WindowType } from '../enums/window-type.enum';
 import { BrowserWindowStateModel } from '../models/browser-window-state.model';
+import { Notifications } from '../../notifications/constants/notifications.enum';
+import { NotificationModel } from '../models/notification.model';
 
 export const getWindowIdForWindowType = (state: StateModel,
                                          windowType: WindowType): number => {
@@ -28,4 +30,12 @@ export const isMaximumPlayedEpisodesLimitReached = (state: StateModel): boolean 
     const { episodesToPlay } = state.options;
 
     return episodesToPlay !== 0 && playedEpisodes >= episodesToPlay;
+};
+
+export const getClosedNotificationsForWindowType = (state: StateModel, windowType: WindowType): Notifications[] => {
+    return state.controlState.windowNotificationState[windowType]?.closedNotifications || [];
+};
+
+export const getActiveNotificationsForWindowType = (state: StateModel, windowType: WindowType): NotificationModel => {
+    return state.controlState.windowNotificationState[windowType]?.activeNotification;
 };

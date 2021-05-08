@@ -5,12 +5,16 @@ import { WindowType } from '../enums/window-type.enum';
 import { StateModel } from '../models/state.model';
 import { AsyncInteraction } from '../models/async-interaction.model';
 import { getWindowStateForWindowIdWithControlstate } from '../selectors/control-state.selector';
+import { NotificationModel } from '../models/notification.model';
+import { removeDuplicatesFromArray } from '../../utils/array.utils';
+import { Notifications } from '../../notifications/constants/notifications.enum';
 import WindowState = Windows.WindowState;
 
 const initialControlState: StateModel['controlState'] = {
     playedEpisodes: 0,
     controllerWindowState: {},
     asyncInteractions: {},
+    windowNotificationState: {},
 };
 
 const resetControlState = (state: ControlState): ControlState => ({
@@ -78,6 +82,36 @@ function setPictureInPictureState(state: ControlState, { isPictureInPicture }: {
     state.isVideoPictureInPicture = isPictureInPicture;
 }
 
+function setActiveNotification(state: ControlState, action: { notification: NotificationModel; window: WindowType }) {
+    const { notification, window } = action;
+
+    return {
+        ...state,
+        [window]: {
+
+            key: window,
+            closedNotifications: state.windowNotificationState[window]?.closedNotifications || [],
+            activeNotification: notification,
+        },
+    };
+}
+
+function addClosedNotification(state: ControlState, action: {notification: Notifications; window: WindowType}) {
+    const { notification, window } = action;
+
+    return {
+        ...state,
+        [window]: {
+            key: window,
+            closedNotifications: removeDuplicatesFromArray([
+                ...state.windowNotificationState[window]?.closedNotifications || [],
+                notification,
+            ]),
+            activeNotification: state.windowNotificationState[window]?.activeNotification,
+        },
+    };
+}
+
 /* eslint-disable max-len */
 export const controlStateSlice = createSlice({
     name: 'controlState',
@@ -93,6 +127,8 @@ export const controlStateSlice = createSlice({
         setWindowStateAction: (state: ControlState, action: PayloadAction<{ windowId: number; windowState: WindowState }>) => setWindowState(state, action.payload),
         setWindowSizeAction: (state: ControlState, action: PayloadAction<{ windowId: number; height: number; width: number }>) => setWindowSize(state, action.payload),
         setPictureInPictureAction: (state: ControlState, action: PayloadAction<{ isPictureInPicture: boolean }>) => setPictureInPictureState(state, action.payload),
+        setActiveNotificationAction: (state: ControlState, action: PayloadAction<{ notification: NotificationModel; window: WindowType }>) => setActiveNotification(state, action.payload),
+        addClosedNotificationAction: (state: ControlState, action: PayloadAction<{ notification: NotificationModel['key']; window: WindowType }>) => addClosedNotification(state, action.payload),
     },
 });
 /* eslint-enable max-len */
@@ -108,4 +144,6 @@ export const {
     raisePlayedEpisodesAction,
     resetPlayedEpisodesAction,
     setPictureInPictureAction,
+    setActiveNotificationAction,
+    addClosedNotificationAction,
 } = controlStateSlice.actions;
