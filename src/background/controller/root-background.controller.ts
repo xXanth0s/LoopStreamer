@@ -55,7 +55,14 @@ export class RootBackgroundController {
             window.webContents.openDevTools();
         }
         if (!isDev) {
-            autoUpdater.checkForUpdatesAndNotify();
+            // Checks for updates and installs it in the background
+            autoUpdater.checkForUpdates();
+
+            // Notifies User, that Update is available and will be installed
+            autoUpdater.checkForUpdatesAndNotify({
+                body: 'A new cool Version is available',
+                title: 'title',
+            });
         }
         this.store.dispatch(appStartedAction());
     }

@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import iziToast, {
     IziToast,
     IziToastPosition,
@@ -6,6 +6,12 @@ import iziToast, {
     IziToastTransitionIn,
     IziToastTransitionOut,
 } from '../../../custom_frameworks/izitoast/1.4.0';
+import { NotificationButton, NotificationModel } from '../../store/models/notification.model';
+import { StoreService } from '../../shared/services/store.service';
+import { SHARED_TYPES } from '../../shared/constants/SHARED_TYPES';
+
+// eslint-disable-next-line max-len
+type iziToastButton = ([ string, (instance: IziToast, toast: HTMLDivElement, button: HTMLButtonElement, event: MouseEvent, inputs: Array<HTMLInputElement>) => void, boolean ]);
 
 @injectable()
 export class NotificationService {
@@ -24,8 +30,40 @@ export class NotificationService {
         timeout: 0,
     };
 
+    constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
+    }
+
     public closeAllPopups(): void {
         iziToast.destroy();
+    }
+
+    public openNotification(notification: NotificationModel): void {
+        const {
+            title, text, closable, duration, buttons, closeAction,
+        } = notification;
+
+        iziToast.show(
+            {
+                ...this.defaultConfig,
+                title,
+                message: text,
+                close: closable,
+                timeout: duration,
+                buttons: buttons.map(button => this.mapButton(button)),
+                onClosed: () => {
+                    if (closeAction) {
+                        this.store.dispatch(closeAction);
+                    }
+                },
+            },
+        );
+    }
+
+    private mapButton({ text, clickAction }: NotificationButton): iziToastButton {
+        return [ `<button>${text}</button>`, (instance, toast) => {
+            this.store.dispatch(clickAction);
+            this.closeToast(instance, toast);
+        }, false ];
     }
 
     public openSetStartTimePopup(setStartTime: () => void,

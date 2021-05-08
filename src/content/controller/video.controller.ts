@@ -29,12 +29,14 @@ import {
 import { addVideoOverlay } from '../html/video-overlay/video-overlay.component';
 import { getDefaultLanguage } from '../../store/selectors/options.selector';
 import { getSeriesEpisodeTitle } from '../../store/utils/series.utils';
+import { NotificationController } from './notification.controller';
 
 @injectable()
 export class VideoController {
     constructor(
         @inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
         @inject(CONTENT_TYPES.PopupController) private readonly popupController: PopupController,
+        @inject(CONTENT_TYPES.NotificationController) private readonly notificationController: NotificationController,
         @inject(SHARED_TYPES.MessageService) private readonly messageService: MessageService,
     ) {
         this.messageService.setControllerType(ControllerType.PROVIDOR);
@@ -78,7 +80,8 @@ export class VideoController {
             const videoTimeUpdate$ = this.getVideoTimeChanges(video);
 
             this.setStartTime(video, episodeData);
-            this.popupController.openPopupsForVideo(video, seriesEpisodeKey, videoTimeUpdate$);
+            // this.popupController.openPopupsForVideo(video, seriesEpisodeKey, videoTimeUpdate$);
+            this.notificationController.start();
             this.setActiveTimestamp(episodeData, videoTimeUpdate$);
             this.setPictureInPictureState(video);
             addVideoButtons(episodeData.key);
