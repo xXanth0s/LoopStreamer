@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service electron:serve",
     "build": "npm run preload:prod && npm run electron:build",
+    "build:utils": "webpack --config webpack.utils.js",
     "eslint": "eslint . --ext .ts,.vue --ignore-path .eslintignore",
     "eslint:fix": "npm run eslint -- --fix",
     "preload:dev": "webpack --watch --config webpack.dev.js",

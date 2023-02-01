@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "ts-build",
     "target": "es2018",
     "module": "esnext",
     "strict": false,

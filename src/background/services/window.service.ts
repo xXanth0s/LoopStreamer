@@ -38,6 +38,7 @@ export class WindowService {
         try {
             const finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
             const windowConfig = this.getConfig(finalConfig);
+            windowConfig.show = true
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
             this.addDefaultHandlingForNewWindow(window, finalConfig.mutePage);

@@ -90,8 +90,9 @@ export function getElementWithTitle<T extends Element>(element: Element, titles:
 export function getLinksForProviders(providers: Providor[], providorContainer?: HTMLElement): ProvidorLink[] {
     const container = providorContainer || document.body;
     return providers.map(providor => {
-        const linkElement = getLinkWithText(container, providor.names)
+        const linkElement = getLinkWithText(providor.names, container)
             || getElementWithTitle(container, providor.names);
+        console.log(`link for provider ${providor}: ${linkElement.href}`);
         if (linkElement) {
             return {
                 link: linkElement.href,
@@ -103,20 +104,30 @@ export function getLinksForProviders(providers: Providor[], providorContainer?: 
     }).filter(Boolean);
 }
 
-export function getLinkWithText(containerElement: Element, textPossibilities: string[]): HTMLAnchorElement {
-    const links: HTMLAnchorElement[] = Array.from(containerElement.querySelectorAll('a'));
-    const lowerCaseTextPossibilities = textPossibilities.map(text => text.toLowerCase());
-    const filteredLinks = links.filter(link => {
-        const content = link.textContent.toLowerCase();
-        return lowerCaseTextPossibilities.some(text => content.includes(text));
-    });
+export function getAllLinksWithTextOrProperty(textPossibilities: string[],
+                                              containerElement?: Element): HTMLAnchorElement[] {
+    return textPossibilities.flatMap(linkText => {
+        const nestedElementsXpath = `//a[@*[contains(., '${linkText}')] or .//@*[contains(., '${linkText}')]]`;
+        return getAllElementsByXPath<HTMLAnchorElement>(nestedElementsXpath, containerElement);
+    }).filter(Boolean);
+}
 
-    if (filteredLinks.length > 1) {
-        return links.find(link => {
-            const content = link.textContent.toLowerCase();
-            return lowerCaseTextPossibilities.some(text => content === text);
-        });
+export function getLinkWithText(textPossibilities: string[], containerElement?: Element): HTMLAnchorElement {
+    const allLinks = getAllLinksWithTextOrProperty(textPossibilities, containerElement);
+    return allLinks[0];
+}
+
+(() => {
+    // @ts-ignore
+    window.domUtils = this;
+})();
+
+export function getAllElementsByXPath<T extends HTMLElement>(xpath: string, parent?: Element): T[] {
+    const results = [];
+    const query = document.evaluate(xpath, parent || document,
+                                    null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    for (let i = 0, length = query.snapshotLength; i < length; ++i) {
+        results.push(query.snapshotItem(i));
     }
-
-    return filteredLinks[0];
+    return results;
 }

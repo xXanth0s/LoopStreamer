@@ -136,6 +136,7 @@ export class BurningSeriesController implements IPortalController {
     }
 
     public getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[] {
+        debugger;
         const providors = this.store.selectSync(getAllUsedProvidors);
         const activeLanguage = this.getActiveLanguage();
         const episodesHtmlContainer = [ ...this.episodesSelector() ];
@@ -154,13 +155,6 @@ export class BurningSeriesController implements IPortalController {
         });
     }
 
-    public getLinkForSeries(seriesKey: string): string {
-        const series = this.store.selectSync(getSeriesByKey, seriesKey);
-        const titles = Object.values(series.titles);
-        const link = getLinkWithText(document.body, titles);
-        return link?.href;
-    }
-
     public isVideoOpenWithProvidor(): Providor | null {
         return this.videoContainerSelector() ? this.getActiveProvidor() : null;
     }
@@ -173,6 +167,13 @@ export class BurningSeriesController implements IPortalController {
         }
 
         return null;
+    }
+
+    public getLinkForSeries(seriesKey: string): string {
+        const series = this.store.selectSync(getSeriesByKey, seriesKey);
+        const titles = Object.values(series.titles);
+        const link = getLinkWithText(titles);
+        return link?.href;
     }
 
     private getVideoUrl(): string {

@@ -11,7 +11,7 @@ import { Series } from '../../../store/models/series.model';
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IPortalController {
 
-    getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string>;
+    getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providor: PROVIDORS): Promise<string> | string;
 
     getAllPortalProviderLinksForEpisode(language: LANGUAGE): ProvidorLink[];
 
