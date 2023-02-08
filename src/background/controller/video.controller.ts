@@ -17,6 +17,8 @@ import { waitTillPageLoadFinished } from '../../utils/rxjs.util';
 import { WindowType } from '../../store/enums/window-type.enum';
 import { Logger } from '../../shared/services/logger';
 import { ProvidorLink } from '../models/providor-link.model';
+import { PORTALS } from '../../store/enums/portals.enum';
+import { VIDEO_PREPARATION_STATUS } from '../../browserMessages/enum/video-preparation-status.enum';
 
 @injectable()
 export class VideoController {
@@ -29,7 +31,9 @@ export class VideoController {
 
     private readonly takeUntil$ = new Subject();
 
-    public async startVideo(seriesEpisodeKey: SeriesEpisode['key'], providorLink: ProvidorLink): Promise<boolean> {
+    public async startVideo(seriesEpisodeKey: SeriesEpisode['key'],
+                            providorLink: ProvidorLink,
+                            linkSourcePortal: PORTALS): Promise<boolean> {
         const oldWindowId = this.store.selectSync(getWindowIdForWindowType, WindowType.VIDEO);
 
         return new Promise<boolean>(resolve => {
@@ -37,22 +41,27 @@ export class VideoController {
                 takeUntil(this.takeUntil$),
                 takeUntil(this.store.playerHasStopped()),
             ).subscribe(async window => {
-                let hasVideo = false;
+                let videoStatus = VIDEO_PREPARATION_STATUS.NoVideo;
                 try {
-                    hasVideo = await this.messageService
-                        .sendMessageToVideoWindow(createStartVideoMessage(seriesEpisodeKey, providorLink.providor));
+                    const message = createStartVideoMessage(seriesEpisodeKey, providorLink.providor, linkSourcePortal);
+                    videoStatus = await this.messageService.sendMessageToVideoWindow(message);
                 } catch (e) {
                     Logger.error('[VideoController->startVideo] Exception occurred', e);
                 }
 
-                this.windowService.closeWindow(oldWindowId, true);
-
-                if (hasVideo) {
-                    window.show();
-                    window.webContents.setAudioMuted(false);
+                if (videoStatus === VIDEO_PREPARATION_STATUS.VideoPreparing) {
+                    return;
                 }
 
-                resolve(hasVideo);
+                this.windowService.closeWindow(oldWindowId, true);
+
+                if (videoStatus === VIDEO_PREPARATION_STATUS.VideoExists) {
+                    window.show();
+                    window.webContents.setAudioMuted(false);
+                    resolve(true);
+                }
+
+                resolve(false);
             });
         });
     }

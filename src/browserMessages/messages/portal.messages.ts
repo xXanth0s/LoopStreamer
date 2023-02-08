@@ -12,12 +12,15 @@ import { Series } from '../../store/models/series.model';
 
 export const createGetResolvedProvidorLinkForEpisodeMessage = (episodeInfo: SeriesEpisode,
                                                                providor: PROVIDORS,
-                                                               portal: PORTALS):
-    Message<{ providor: PROVIDORS; episodeInfo: SeriesEpisode; portal: PORTALS }, string> => ({
+                                                               portal: PORTALS,
+                                                               language: LANGUAGE):
+    Message<{ providor: PROVIDORS; episodeInfo: SeriesEpisode; portal: PORTALS; language: LANGUAGE }, string> => ({
     type: MessageType.PORTAL_GET_RESOLVED_PROVIDOR_LINK_FOR_EPISODE,
     destinationController: ControllerType.PORTAL,
     hasReply: true,
-    payload: { providor, episodeInfo, portal },
+    payload: {
+        providor, episodeInfo, portal, language,
+    },
 });
 export type GetResolvedProvidorLinkForEpisode = ReturnType<typeof createGetResolvedProvidorLinkForEpisodeMessage>;
 

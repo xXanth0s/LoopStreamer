@@ -13,6 +13,8 @@ export const getContentTypeForPortal = (portal: PORTALS): symbol => {
     switch (portal) {
         case PORTALS.BS:
             return CONTENT_TYPES.BurningSeries;
+        case PORTALS.STO:
+            return CONTENT_TYPES.SerienStream;
         default:
             return null;
     }

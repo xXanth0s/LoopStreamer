@@ -12,6 +12,7 @@ const CONTENT_TYPES = {
 
     // Portals
     BurningSeries: Symbol.for('BurningSeries'),
+    SerienStream: Symbol.for('SerienStream'),
 
     // Providors
     Vivo: Symbol.for('Vivo'),

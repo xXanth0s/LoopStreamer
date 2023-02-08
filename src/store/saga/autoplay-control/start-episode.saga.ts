@@ -62,7 +62,7 @@ export function* startEpisode(options: StartEpisodeOptions) {
     try {
         const usedProvidors = [];
 
-        const portal = PORTALS.BS;
+        const portal = PORTALS.STO;
 
         let providorLink: ProvidorLink = yield getPrivodorLinkForEpisode(episodeKey, portal, [], language);
         while (providorLink) {
@@ -94,7 +94,9 @@ function* startVideo(episodeKey: SeriesEpisode['key'],
                      language: LANGUAGE) {
     const videoController = getVideoController();
     const series = getSeriesForEpisode(yield select(), episodeKey);
-    const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink);
+    // eslint-disable-next-line max-len
+    const success = yield call([ videoController, videoController.startVideo ], episodeKey, providorLink, linkSourcePortal);
+
     if (success) {
         const link = generateLinkForProvidorLink(episodeKey, providorLink, language, LINK_TYPE.PROVIDER_LINK);
         yield put(updateOrAddLinkAction(link));

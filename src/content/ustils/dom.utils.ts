@@ -54,6 +54,26 @@ export function isBodyElement(htmlElement: HTMLElement): boolean {
     return htmlElement === document.querySelector('body');
 }
 
+// eslint-disable-next-line max-len
+export function checkForMutationsXpath<T extends HTMLElement>(container: Node, selectorOptions: SelectorOptions): Observable<T> {
+    const mutationObserverConfig = { attributes: true, childList: true, subtree: true };
+    const sub$ = new Subject<T>();
+
+    const callback = () => {
+        const nodeContainer = getAllElementsWithTextOrProperty<T>(selectorOptions);
+        if (nodeContainer.length > 0) {
+            sub$.next(nodeContainer[0]);
+        }
+    };
+
+    const observer = new MutationObserver(callback);
+    observer.observe(container, mutationObserverConfig);
+
+    return sub$.asObservable().pipe(
+        finalize(() => observer.disconnect()),
+    );
+}
+
 export function checkForMutations<T extends Element>(container: Node, selector: string): Observable<T> {
     const mutationObserverConfig = { attributes: true, childList: true, subtree: true };
     const sub$ = new Subject<T>();
@@ -90,8 +110,10 @@ export function getElementWithTitle<T extends Element>(element: Element, titles:
 export function getLinksForProviders(providers: Providor[], providorContainer?: HTMLElement): ProvidorLink[] {
     const container = providorContainer || document.body;
     return providers.map(providor => {
-        const linkElement = getLinkWithText(providor.names, container)
-            || getElementWithTitle(container, providor.names);
+        const linkElement = getLinkWithTextOrProperty({
+            textPossibilities: providor.names,
+            containerElement: container,
+        }) || getElementWithTitle(container, providor.names);
         console.log(`link for provider ${providor}: ${linkElement.href}`);
         if (linkElement) {
             return {
@@ -104,16 +126,44 @@ export function getLinksForProviders(providers: Providor[], providorContainer?: 
     }).filter(Boolean);
 }
 
-export function getAllLinksWithTextOrProperty(textPossibilities: string[],
-                                              containerElement?: Element): HTMLAnchorElement[] {
-    return textPossibilities.flatMap(linkText => {
-        const nestedElementsXpath = `//a[@*[contains(., '${linkText}')] or .//@*[contains(., '${linkText}')]]`;
-        return getAllElementsByXPath<HTMLAnchorElement>(nestedElementsXpath, containerElement);
+export interface SelectorOptions {
+    textPossibilities: string[];
+    containerElementSelectors?: string[];
+    containerElement?: Element;
+    parentElementSelector?: string;
+}
+
+export function isElementWithTextOrPropertyAvailable(selectorOptions: SelectorOptions): boolean {
+    return getAllElementsWithTextOrProperty(selectorOptions).length > 0;
+}
+
+// eslint-disable-next-line max-len
+export function getAllElementsWithTextOrProperty<T extends HTMLElement = HTMLElement>(selectorOptions: SelectorOptions): T[] {
+    const {
+        containerElement, containerElementSelectors, parentElementSelector, textPossibilities,
+    } = selectorOptions;
+
+    const containerSelector = (containerElementSelectors ?? ['*']).join('//');
+
+    return textPossibilities.flatMap((linkText: string) => {
+        // eslint-disable-next-line max-len
+        let nestedElementsXpath = `descendant::${containerSelector}[.//text()[contains(., '${linkText}')] or .//@*[contains(., '${linkText}')]]`;
+        if (parentElementSelector) {
+            nestedElementsXpath = `${nestedElementsXpath}/ancestor::${parentElementSelector}`;
+        }
+        return getAllElementsByXPath<T>(nestedElementsXpath, containerElement);
     }).filter(Boolean);
 }
 
-export function getLinkWithText(textPossibilities: string[], containerElement?: Element): HTMLAnchorElement {
-    const allLinks = getAllLinksWithTextOrProperty(textPossibilities, containerElement);
+export function getLinkWithTextOrProperty(selectorOptions: SelectorOptions): HTMLAnchorElement {
+    const finalOptions: SelectorOptions = {
+        ...selectorOptions,
+        containerElementSelectors: [
+            ...(selectorOptions.containerElementSelectors || []),
+            'a',
+        ],
+    };
+    const allLinks = getAllElementsWithTextOrProperty<HTMLAnchorElement>(finalOptions);
     return allLinks[0];
 }
 
@@ -124,7 +174,8 @@ export function getLinkWithText(textPossibilities: string[], containerElement?: 
 
 export function getAllElementsByXPath<T extends HTMLElement>(xpath: string, parent?: Element): T[] {
     const results = [];
-    const query = document.evaluate(xpath, parent || document,
+    const context = parent ?? document;
+    const query = document.evaluate(xpath, context,
                                     null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0, length = query.snapshotLength; i < length; ++i) {
         results.push(query.snapshotItem(i));
