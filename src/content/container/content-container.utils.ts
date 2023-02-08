@@ -22,6 +22,8 @@ export const getContentTypeForProvidor = (providor: PROVIDORS): symbol => {
     switch (providor) {
         case PROVIDORS.Vivo:
             return CONTENT_TYPES.Vivo;
+        case PROVIDORS.VOE:
+            return CONTENT_TYPES.Voe;
         case PROVIDORS.MIXdrop:
             return CONTENT_TYPES.MIXDrop;
         default:

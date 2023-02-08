@@ -45,6 +45,7 @@ inversifyContentContainer.bind(CONTENT_TYPES.BurningSeries).to(BurningSeriesCont
 
 // Providor Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.Vivo).to(VivoController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.Voe).to(VoeController).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.MIXDrop).to(MIXDropController).inSingletonScope();
 
 export { inversifyContentContainer };
