@@ -96,9 +96,6 @@ export class RootBackgroundController {
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
-        console.log('=================================');
-        console.log('width ', width);
-        console.log('height ', height);
         if (width < 100 || height < 100) {
             return;
         }
