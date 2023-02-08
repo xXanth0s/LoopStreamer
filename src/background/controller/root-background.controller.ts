@@ -96,11 +96,16 @@ export class RootBackgroundController {
     private recaptchaRecognizedHandler(event: IpcMainInvokeEvent, message: RecaptchaRecognizedMessage): void {
         const window = BrowserWindow.fromWebContents(event.sender);
         const { width, height } = message.payload;
+        console.log('=================================');
+        console.log('width ', width);
+        console.log('height ', height);
         if (width < 100 || height < 100) {
             return;
         }
 
-        window.setSize(width, height);
+        const oldWindowWidth = window.getSize()[0];
+        const oldWindowHeight = window.getSize()[1];
+        this.windowService.setWindowSizeForRecaptcha(window.id, width, height);
         window.webContents.closeDevTools();
         window.show();
 
@@ -110,7 +115,10 @@ export class RootBackgroundController {
 
         fromEvent(window.webContents, 'will-navigate').pipe(
             takeUntil(takeUntil$),
-        ).subscribe(() => window.hide());
+        ).subscribe(() => {
+            this.windowService.setWindowSizeForRecaptcha(window.id, oldWindowWidth, oldWindowHeight);
+            window.hide();
+        });
     }
 
     private closeWindowEventHandler(event: IpcMainInvokeEvent): void {

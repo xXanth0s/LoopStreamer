@@ -31,6 +31,7 @@ export class WindowService {
     // eslint-disable-next-line max-len
     private readonly userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36';
 
+    private recaptchaWindowId?: number;
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService) {
     }
 
@@ -38,7 +39,6 @@ export class WindowService {
         try {
             const finalConfig: Required<OpenWindowConfig> = { ...DefaultOpenWindowConfig, ...config };
             const windowConfig = this.getConfig(finalConfig);
-            windowConfig.show = true
             const window = new BrowserWindow(windowConfig);
             window.loadURL(href);
             this.addDefaultHandlingForNewWindow(window, finalConfig.mutePage);
@@ -122,6 +122,21 @@ export class WindowService {
         }
     }
 
+    public setWindowSizeForRecaptcha(
+        windowId: number,
+        width: number,
+        height: number,
+    ): void {
+        const window = BrowserWindow.fromId(windowId);
+        if (!window) {
+            return;
+        }
+
+        this.recaptchaWindowId = windowId;
+
+        window.setSize(width, height);
+    }
+
     private addDefaultHandlingForSession(sessionInstance: Session): void {
         this.manipulateSession(sessionInstance);
         this.addAdblockerForSession(sessionInstance);
@@ -202,6 +217,10 @@ export class WindowService {
             takeUntil(fromEvent(window, 'closed')),
             debounceTime(500),
         ).subscribe(() => {
+            if (window.id === this.recaptchaWindowId) {
+                this.recaptchaWindowId = null;
+                return;
+            }
             let state: WindowState = 'normal';
             if (window.isFullScreen()) {
                 state = 'fullscreen';
