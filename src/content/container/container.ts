@@ -18,6 +18,8 @@ import { PopupService } from '../services/popup.service';
 import { PopupController } from '../controller/popup.controller';
 import { Logger } from '../../shared/services/logger';
 import { MIXDropController } from '../controller/providors/mixdrop.controller';
+import { SerienStreamController } from '../controller/portals/SerienStreamController';
+import { VoeController } from '../controller/providors/voe.controller';
 
 const inversifyContentContainer = new Container();
 
@@ -42,9 +44,11 @@ inversifyContentContainer.bind(CONTENT_TYPES.TestController).to(TestController).
 
 // Portal Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.BurningSeries).to(BurningSeriesController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.SerienStream).to(SerienStreamController).inSingletonScope();
 
 // Providor Controllers
 inversifyContentContainer.bind(CONTENT_TYPES.Vivo).to(VivoController).inSingletonScope();
+inversifyContentContainer.bind(CONTENT_TYPES.Voe).to(VoeController).inSingletonScope();
 inversifyContentContainer.bind(CONTENT_TYPES.MIXDrop).to(MIXDropController).inSingletonScope();
 
 export { inversifyContentContainer };

@@ -19,7 +19,7 @@ import { loadingSeasonAsyncInteraction } from '../../actions/async-interactions'
 
 export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
     const seasonKey = action.payload;
-    const portal = PORTALS.BS;
+    const portal = PORTALS.STO;
     const asyncInteraction = loadingSeasonAsyncInteraction({ seasonKey });
     yield put(addAsyncInteractionAction(asyncInteraction));
 

@@ -100,7 +100,9 @@ export class RootBackgroundController {
             return;
         }
 
-        window.setSize(width, height);
+        const oldWindowWidth = window.getSize()[0];
+        const oldWindowHeight = window.getSize()[1];
+        this.windowService.setWindowSizeForRecaptcha(window.id, width, height);
         window.webContents.closeDevTools();
         window.show();
 
@@ -110,7 +112,10 @@ export class RootBackgroundController {
 
         fromEvent(window.webContents, 'will-navigate').pipe(
             takeUntil(takeUntil$),
-        ).subscribe(() => window.hide());
+        ).subscribe(() => {
+            this.windowService.setWindowSizeForRecaptcha(window.id, oldWindowWidth, oldWindowHeight);
+            window.hide();
+        });
     }
 
     private closeWindowEventHandler(event: IpcMainInvokeEvent): void {

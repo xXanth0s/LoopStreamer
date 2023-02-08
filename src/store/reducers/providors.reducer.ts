@@ -14,6 +14,16 @@ const initialState: Partial<Record<PROVIDORS, Providor>> = {
         isUsed: true,
         icon: '/assets/images/providors/vivo.png',
     },
+    [PROVIDORS.VOE]: {
+        key: PROVIDORS.VOE,
+        names: [ 'VOE', 'voe', 'Voe' ],
+        index: 0,
+        urlRegex: '^https://321naturelikefurfuroid',
+        baseUrl: 'https://321naturelikefurfuroid.com/*',
+        controllerName: PROVIDORS.VOE,
+        isUsed: true,
+        icon: '/assets/images/providors/vivo.png',
+    },
     Openload: {
         key: PROVIDORS.Openload,
         names: [ 'OpenLoad' ],

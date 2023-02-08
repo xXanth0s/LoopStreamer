@@ -11,14 +11,14 @@ const updatePortals = (portals: Portal[]): { [key in PORTALS]: Portal } =>
 // @ts-ignore
     mapArrayToObject(portals, 'key');
 const initialPortalsData: { [key in PORTALS]?: Portal } = {
-    [PORTALS.BS]: {
-        key: PORTALS.BS,
+    [PORTALS.STO]: {
+        key: PORTALS.STO,
         index: 0,
-        urlRegex: '^https://burningseries.co',
-        controllerName: PORTALS.BS,
-        baseUrl: 'https://burningseries.co/',
-        seriesListUrl: 'https://burningseries.co/andere-serien',
-        name: 'Burning Series',
+        urlRegex: '^http://190.115.18.20/.to',
+        controllerName: PORTALS.STO,
+        baseUrl: 'http://190.115.18.20/',
+        seriesListUrl: 'http://190.115.18.20/serien',
+        name: 'Serien Stream',
         series: [],
     },
 };

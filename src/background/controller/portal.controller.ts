@@ -111,8 +111,9 @@ export class PortalController {
         const link = await this.openPageAndGetDataForMessage(
             portalLink.href,
             portalKey,
-            createGetResolvedProvidorLinkForEpisodeMessage(episode, providor, portalKey),
+            createGetResolvedProvidorLinkForEpisodeMessage(episode, providor, portalKey, language),
         );
+        debugger;
         return {
             providor,
             link,

@@ -11,12 +11,13 @@ import { SeriesEpisode } from '../../../store/models/series-episode.model';
 import { PROVIDORS } from '../../../store/enums/providors.enum';
 import { LANGUAGE } from '../../../store/enums/language.enum';
 import { LanguageLinkCollection } from '../../../store/models/language-link.model';
-import { getLinksForProviders, getLinkWithText } from '../../ustils/dom.utils';
+import { getLinksForProviders, getLinkWithTextOrProperty } from '../../ustils/dom.utils';
 import { ProvidorLink } from '../../../background/models/providor-link.model';
 import { PortalSeriesSeasonDto } from '../../../dto/portal-series-season.dto';
 import { MessageService } from '../../../shared/services/message.service';
 import { createExecuteScriptMessage } from '../../../browserMessages/messages/background.messages';
 import { getSeriesByKey } from '../../../store/selectors/series.selector';
+import { getPortalForKey } from '../../../store/selectors/portals.selector';
 
 @injectable()
 export class BurningSeriesController implements IPortalController {
@@ -135,7 +136,33 @@ export class BurningSeriesController implements IPortalController {
         };
     }
 
-    public getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[] {
+    public isProvidorVideoPreparing(): boolean {
+        const portal = this.store.selectSync(getPortalForKey, PORTALS.STO);
+        return window.location.href.includes(`${portal.baseUrl}`);
+    }
+
+    private isVideoOpenWithProvidor(): Providor | null {
+        return this.videoContainerSelector() ? this.getActiveProvidor() : null;
+    }
+
+    private getActiveProvidor(): Providor {
+        const activeProvidorElement = this.activeProvidorSelector() as HTMLElement;
+        if (activeProvidorElement) {
+            const providorName = activeProvidorElement.textContent.trim();
+            return this.store.selectSync(getProvidorForName, providorName);
+        }
+
+        return null;
+    }
+
+    public getLinkForSeries(seriesKey: string): string {
+        const series = this.store.selectSync(getSeriesByKey, seriesKey);
+        const titles = Object.values(series.titles);
+        const link = getLinkWithTextOrProperty({ textPossibilities: titles });
+        return link?.href;
+    }
+
+    private getSeasonEpisodes(seasonNumber: string): PortalSeriesEpisodeDto[] {
         const providors = this.store.selectSync(getAllUsedProvidors);
         const activeLanguage = this.getActiveLanguage();
         const episodesHtmlContainer = [ ...this.episodesSelector() ];
@@ -152,27 +179,6 @@ export class BurningSeriesController implements IPortalController {
                 portal: this.portalKey,
             };
         });
-    }
-
-    public getLinkForSeries(seriesKey: string): string {
-        const series = this.store.selectSync(getSeriesByKey, seriesKey);
-        const titles = Object.values(series.titles);
-        const link = getLinkWithText(document.body, titles);
-        return link?.href;
-    }
-
-    public isVideoOpenWithProvidor(): Providor | null {
-        return this.videoContainerSelector() ? this.getActiveProvidor() : null;
-    }
-
-    private getActiveProvidor(): Providor {
-        const activeProvidorElement = this.activeProvidorSelector() as HTMLElement;
-        if (activeProvidorElement) {
-            const providorName = activeProvidorElement.textContent.trim();
-            return this.store.selectSync(getProvidorForName, providorName);
-        }
-
-        return null;
     }
 
     private getVideoUrl(): string {

@@ -20,6 +20,7 @@ import { addCustomFrame } from '../html/custom-frame/custom-frame.component';
 import { DEFAULT_TITLE } from '../../constants/electron-variables';
 import { getProvidorController } from '../container/content-container.utils';
 import { addGlobalFunctions } from '../ustils/global.utils';
+import { VIDEO_PREPARATION_STATUS } from '../../browserMessages/enum/video-preparation-status.enum';
 
 @injectable()
 export class RootContentController {
@@ -74,9 +75,11 @@ export class RootContentController {
 
     private async getResolvedProvidorLinkHandler(event: IpcRendererEvent,
                                                  message: GetResolvedProvidorLinkForEpisode): Promise<void> {
-        const { providor, episodeInfo, portal } = message.payload;
+        const {
+            providor, episodeInfo, portal, language,
+        } = message.payload;
         const result = await this.portalService.getPortalController(portal)
-            .getResolvedProvidorLinkForEpisode(episodeInfo, providor);
+            .getResolvedProvidorLinkForEpisode(episodeInfo, providor, language);
         this.messageService.replyToSender(message, event.sender, result);
     }
 
@@ -109,8 +112,14 @@ export class RootContentController {
     }
 
     private startVideoForProvidorHandler(event: Electron.IpcRendererEvent, message: StartVideoMessage): void {
-        const { providor, episodeKey } = message.payload;
+        const { providor, episodeKey, linkSourcePortal } = message.payload;
+        const portalController = this.portalService.getPortalController(linkSourcePortal);
+        if (portalController.isProvidorVideoPreparing()) {
+            this.messageService.replyToSender(message, event.sender, VIDEO_PREPARATION_STATUS.VideoPreparing);
+        }
+
         const result = Boolean(getProvidorController(providor)?.startVideo(episodeKey));
-        this.messageService.replyToSender(message, event.sender, result);
+        const status = result ? VIDEO_PREPARATION_STATUS.VideoExists : VIDEO_PREPARATION_STATUS.NoVideo;
+        this.messageService.replyToSender(message, event.sender, status);
     }
 }
