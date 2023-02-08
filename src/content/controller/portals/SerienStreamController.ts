@@ -25,19 +25,25 @@ import { getPortalForKey } from '../../../store/selectors/portals.selector';
 
 @injectable()
 export class SerienStreamController implements IPortalController {
-    private readonly languageMap: Partial<{ [key in LANGUAGE]: string }> = {
+    private readonly languageStringMap: Partial<{ [key in LANGUAGE]: string }> = {
         [LANGUAGE.GERMAN]: 'Deutsch',
         [LANGUAGE.ENGLISH]: 'Englisch',
         [LANGUAGE.ENGLISH_GERMAN_SUB]: 'mit deutschen Untertiteln',
     };
 
+    private readonly languageKeyMap: Partial<{ [key in LANGUAGE]: string }> = {
+        [LANGUAGE.GERMAN]: '1',
+        [LANGUAGE.ENGLISH]: '2',
+    }
+
     private readonly languageContainerSelector = (): HTMLElement => getAllElementsWithTextOrProperty({
-        textPossibilities: ['Sprachen'],
-        containerElementSelectors: ['strong'],
+        textPossibilities: [ 'Sprachen' ],
+        containerElementSelectors: [ 'strong' ],
         parentElementSelector: 'div',
     })[0]
+
     /* eslint-disable max-len */
-    private readonly languageSelector = (): Array<HTMLImageElement> => [...this.languageContainerSelector().querySelectorAll('img')];
+    private readonly languageSelector = (): Array<HTMLImageElement> => [ ...this.languageContainerSelector().querySelectorAll('img') ];
     private readonly linkContainerSelector = () => document.querySelector('div.hosterSiteVideo');
 
     constructor(@inject(SHARED_TYPES.StoreService) private readonly store: StoreService,
@@ -60,20 +66,23 @@ export class SerienStreamController implements IPortalController {
     }
 
     async getResolvedProvidorLinkForEpisode(episodeInfo: SeriesEpisode, providorKey: PROVIDORS, language: LANGUAGE): Promise<string> {
-        const languageLink = this.getLanguageLink(language);
-        if (!languageLink) {
-            return Promise.resolve(null);
-        }
-        if (!languageLink.classList.contains('selectedLanguage')) {
-            languageLink.click();
-        }
-
         const providor = this.store.selectSync(getProvidorForKey, providorKey);
-        const result = getLinkWithTextOrProperty({
+        const results = getAllElementsWithTextOrProperty<HTMLElement>({
             textPossibilities: providor.names,
             containerElement: this.linkContainerSelector(),
+            parentElementSelector: 'li',
         });
-        return Promise.resolve(result.href);
+
+        const finalElement = results.find(element => element.dataset?.langKey === this.languageKeyMap[language]);
+        if (finalElement) {
+            const link = getLinkWithTextOrProperty({
+                textPossibilities: providor.names,
+                containerElement: finalElement,
+            });
+            return Promise.resolve(link.href);
+        }
+
+        return Promise.resolve(null);
     }
 
     private getSeasonEpisodesForActiveSeason(seasonNumber: string): PortalSeriesEpisodeDto[] {
@@ -81,8 +90,8 @@ export class SerienStreamController implements IPortalController {
         const providors = this.store.selectSync(getAllProvidors);
         for (let episodeNumber = 1; true; episodeNumber++) {
             const episodeElements = getAllElementsWithTextOrProperty({
-                textPossibilities: [`Folge ${episodeNumber}`, `Episode ${episodeNumber}`],
-                containerElementSelectors: ['table', 'td'],
+                textPossibilities: [ `Folge ${episodeNumber}`, `Episode ${episodeNumber}` ],
+                containerElementSelectors: [ 'table', 'td' ],
                 parentElementSelector: 'tr',
             });
             if (episodeElements.length === 0) {
@@ -91,7 +100,7 @@ export class SerienStreamController implements IPortalController {
             const episodeContainer = episodeElements[0];
 
             const link = getLinkWithTextOrProperty({
-                textPossibilities: [''],
+                textPossibilities: [ '' ],
                 containerElement: episodeContainer,
             }).href;
 
@@ -103,9 +112,9 @@ export class SerienStreamController implements IPortalController {
                 link,
             }));
 
-            const portalLinks = Object.entries(this.languageMap).map(([language, selector]: [LANGUAGE, string]) => {
+            const portalLinks = Object.entries(this.languageStringMap).map(([ language, selector ]: [ LANGUAGE, string ]) => {
                 const isLanguageAvailable = isElementWithTextOrPropertyAvailable({
-                    textPossibilities: [selector],
+                    textPossibilities: [ selector ],
                     containerElement: episodeContainer,
                 });
                 return isLanguageAvailable ? language : null;
@@ -127,7 +136,7 @@ export class SerienStreamController implements IPortalController {
 
     getSeasonInfo(seasonNumber: string): PortalSeriesSeasonDto {
         const seasonLink = getLinkWithTextOrProperty({
-            textPossibilities: [`Staffel ${seasonNumber}`],
+            textPossibilities: [ `Staffel ${seasonNumber}` ],
             containerElement: this.getSeasonLinkContainer(),
         });
         if (!seasonLink) {
@@ -135,7 +144,6 @@ export class SerienStreamController implements IPortalController {
         }
         if (!seasonLink.classList.contains('active')) {
             seasonLink.click();
-            return null;
         }
 
         const episodes = this.getSeasonEpisodesForActiveSeason(seasonNumber);
@@ -179,8 +187,8 @@ export class SerienStreamController implements IPortalController {
 
     private getSeasonLinkContainer(): HTMLElement {
         return getAllElementsWithTextOrProperty({
-            textPossibilities: ['Staffeln:'],
-            containerElementSelectors: ['ul', 'strong'],
+            textPossibilities: [ 'Staffeln:' ],
+            containerElementSelectors: [ 'ul', 'strong' ],
             parentElementSelector: 'ul',
         })[0];
     }
@@ -192,16 +200,16 @@ export class SerienStreamController implements IPortalController {
         }
 
         return getAllElementsWithTextOrProperty<HTMLAnchorElement>({
-            textPossibilities: ['Staffel'],
+            textPossibilities: [ 'Staffel' ],
             containerElement: seasonContainer,
-            containerElementSelectors: ['a'],
+            containerElementSelectors: [ 'a' ],
         });
     }
 
     private getEpisodeContainer(): HTMLElement {
         const episodeContainer = getAllElementsWithTextOrProperty({
-            textPossibilities: ['Episoden:'],
-            containerElementSelectors: ['ul', 'strong'],
+            textPossibilities: [ 'Episoden:' ],
+            containerElementSelectors: [ 'ul', 'strong' ],
             parentElementSelector: 'ul',
         });
 
@@ -214,8 +222,8 @@ export class SerienStreamController implements IPortalController {
 
     private stringToLanguage(languageString: string): LANGUAGE {
         // eslint-disable-next-line no-restricted-syntax
-        for (const language of Object.keys(this.languageMap)) {
-            if (languageString === this.languageMap[language]) {
+        for (const language of Object.keys(this.languageStringMap)) {
+            if (languageString === this.languageStringMap[language]) {
                 return language as LANGUAGE;
             }
         }
@@ -239,9 +247,9 @@ export class SerienStreamController implements IPortalController {
     private getLanguageLink(language: LANGUAGE): HTMLElement | null {
         const containerElement = this.languageContainerSelector();
         return getAllElementsWithTextOrProperty({
-            textPossibilities: [this.languageMap[language]],
+            textPossibilities: [ this.languageStringMap[language] ],
             containerElement,
-            containerElementSelectors: ['img'],
+            containerElementSelectors: [ 'img' ],
         })[0];
     }
 }

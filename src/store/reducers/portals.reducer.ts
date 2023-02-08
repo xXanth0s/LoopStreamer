@@ -14,7 +14,7 @@ const initialPortalsData: { [key in PORTALS]?: Portal } = {
     [PORTALS.STO]: {
         key: PORTALS.STO,
         index: 0,
-        urlRegex: '^http://190.115.18.20/.to',
+        urlRegex: '^http://190.115.18.20/',
         controllerName: PORTALS.STO,
         baseUrl: 'http://190.115.18.20/',
         seriesListUrl: 'http://190.115.18.20/serien',
