@@ -14,12 +14,26 @@ Almost all available series in German and English are supported.
 - Recaptcha detection
 - much more.
 
-## CAUTION
-Loopstreamer is still in beta, so the application may still contain bugs.
+![Alt-Text](videos/preview_readme.gif)
 
 ## Installation
 To install Loopstreamer, download the exe file of the latest release.
-You can find this on the right side. 
+You can find this on the right side.
+
+## CAUTION
+
+### Beta
+Loopstreamer is still in beta, so the application may still contain bugs.
+
+
+### Exclusion of liability
+It is illegal to stream series or films for which you do not own the rights of use. 
+Therefore, LoopStreamer only allows you to stream series of which you own an original copy. 
+The developers of LoopStreamer distance themselves from any further use of the application. 
+The LoopStreamer is also only a specially modified browser that accesses external content.
+The application itself as well as the development team have not and will not at any time upload and/or distribute video content to the internet.
+
+
 
 ##
 
