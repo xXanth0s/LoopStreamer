@@ -140,8 +140,6 @@ export function generateLinkForProvidorLink(seriesEpisodeKey: SeriesEpisode['key
     };
 }
 
-export function isLinkOutdated(link: LinkModel): boolean {
-    const { dateTimestamp } = link;
-
-    return differenceInMinutes(dateTimestamp, Date.now()) > environment.linkCacheTimeInMinutes;
+export function isLinkOutdated({ dateTimestamp }: LinkModel): boolean {
+    return differenceInMinutes(Date.now(), dateTimestamp) > environment.linkCacheTimeInMinutes;
 }
