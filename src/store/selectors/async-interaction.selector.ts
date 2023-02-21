@@ -2,7 +2,7 @@ import { StateModel } from '../models/state.model';
 import { AsyncInteraction, AsyncInteractionCreator } from '../models/async-interaction.model';
 import { SeriesEpisode } from '../models/series-episode.model';
 import {
-    loadingSeasonAsyncInteraction,
+    loadingSeasonAsyncInteraction, loadingSeasonForcedAsyncInteraction,
     loadingSeriesSearchResult,
     startEpisodeAsyncInteraction,
 } from '../actions/async-interactions';
@@ -15,9 +15,13 @@ export function getAllAsyncInteractions(state: StateModel): AsyncInteraction<any
     return Object.values(state.controlState.asyncInteractions);
 }
 
-export function getAsyncInteractions<T>(state: StateModel, creator: AsyncInteractionCreator<T>): AsyncInteraction<T>[] {
-    return Object.values(state.controlState.asyncInteractions)
-        .filter<AsyncInteraction<T>>(creator.isInstanceOf);
+export function getAsyncInteractions<T>(
+    state: StateModel,
+    creators: AsyncInteractionCreator<T> | AsyncInteractionCreator<T>[]): AsyncInteraction<T>[] {
+    return (Array.isArray(creators) ? creators : [creators]).flatMap(creator =>
+        Object.values(state.controlState.asyncInteractions)
+            .filter<AsyncInteraction<T>>(creator.isInstanceOf),
+    );
 }
 
 export function isPreparingEpisode(state: StateModel, episodeKey: SeriesEpisode['key']): boolean {
@@ -30,7 +34,11 @@ export function isPreparingVideo(state: StateModel): boolean {
 }
 
 export function isLoadingSeason(state: StateModel): boolean {
-    return Boolean(getAsyncInteractions(state, loadingSeasonAsyncInteraction).length);
+    const actions = [
+        loadingSeasonAsyncInteraction,
+        loadingSeasonForcedAsyncInteraction,
+    ];
+    return Boolean(getAsyncInteractions(state, actions).length);
 }
 
 // @ts-ignore

@@ -4,11 +4,15 @@ import {
     setSelectedSeasonForAppAction,
     setSelectedSeriesAction,
 } from '../reducers/app-control-state.reducer';
-import { seriesEpisodeStartedAction, setSeriesEpisodeTimeStampAction } from '../reducers/series-episode.reducer';
+import {
+    seriesEpisodeStartedAction,
+    setSeriesEpisodeTimeStampAction,
+} from '../reducers/series-episode.reducer';
 import { episodeTimeUpdateSaga } from './video-meta-data/series-time.saga';
 import {
     appStartedAction,
     continueAutoplayAction,
+    forceReloadSeasonInformationAction,
     startEpisodeAction,
     startNextEpisodeAction,
     startPreviousEpisodeAction,
@@ -20,12 +24,19 @@ import { episodeStartedSaga } from './video-meta-data/episode-started.saga';
 import { continueAutoplaySaga } from './autoplay-control/continue-autoplay.saga';
 import { Logger } from '../../shared/services/logger';
 import { loadSeriesStartPageContentSaga } from './series-api/load-series-start-page-content.saga';
-import { loadDetailedSeriesInformationFromApiSaga } from './series-api/load-detailed-series-information-from-api.saga';
+import {
+    loadDetailedSeriesInformationFromApiSaga,
+} from './series-api/load-detailed-series-information-from-api.saga';
 import { loadSeriesGenresSaga } from './series-api/load-series-genres.saga';
-import { loadSeasonInformationFromPortalSaga } from './portal-load-series-data/load-season.saga';
+import {
+    forceReloadSeasonInformationFromPortalSaga,
+    loadSeasonInformationFromPortalSaga,
+} from './portal-load-series-data/load-season.saga';
 import { loadSimilarSeriesSaga } from './series-api/load-similar-series.saga';
 import { loadSeriesSearchResultSaga } from './series-api/load-series-search-result.saga';
-import { createLastWatchedSeriesCollectionSaga } from './video-meta-data/last-watched-series-collection.saga';
+import {
+    createLastWatchedSeriesCollectionSaga,
+} from './video-meta-data/last-watched-series-collection.saga';
 import { cleanupSeriesSaga } from './cleanup-series.saga';
 import { setPictureInPictureAction } from '../reducers/control-state.reducer';
 import { pictureInPictureSaga } from './video-meta-data/picture-in-picture.saga';
@@ -48,6 +59,7 @@ export function* watcherSaga() {
 
         // control actions from app
         yield takeLatest(startEpisodeAction.type, startEpisodeSaga);
+        yield takeLatest(forceReloadSeasonInformationAction.type, forceReloadSeasonInformationFromPortalSaga);
 
         // control actions from video
         yield takeLatest(startNextEpisodeAction.type, startNextEpisodeSaga);

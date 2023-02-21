@@ -24,7 +24,7 @@
                                               :language="activeLanguage"/>
 
                     <b-collapse v-if="isSeriesConfiguable" v-model="areSettingsOpen" >
-                        <series-settings :series="series" class="mt-5"/>
+                        <series-settings :series="series" :season="selectedSeason" class="mt-5"/>
                     </b-collapse>
                     <seasons-list class="mt-4"
                                   :seasons="seasons"

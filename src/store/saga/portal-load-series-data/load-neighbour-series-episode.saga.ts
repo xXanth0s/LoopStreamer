@@ -18,7 +18,12 @@ export function* getPortalLinkForNextEpisode(startEpisodeKey: SeriesEpisode['key
                                                                       portalKey,
                                                                       language);
     if (!portalLinks.length) {
-        yield updateSeriesSeasonForPortal(nextEpisode.seasonKey, portalKey, language);
+        yield updateSeriesSeasonForPortal({
+            seasonKey: nextEpisode.seasonKey,
+            forceUpdate: false,
+            portalKey,
+            language,
+        });
         portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
                                                                       nextEpisode.key,
                                                                       portalKey,
@@ -41,7 +46,12 @@ export function* getPortalLinkForPreviousEpisode(startEpisodeKey: SeriesEpisode[
                                                                       portalKey,
                                                                       language);
     if (!portalLinks.length) {
-        yield updateSeriesSeasonForPortal(previousEpisode.seasonKey, portalKey, language);
+        yield updateSeriesSeasonForPortal({
+            seasonKey: previousEpisode.seasonKey,
+            forceUpdate: false,
+            portalKey,
+            language,
+        });
         portalLinks = getPortalLinksForSeriesEpisodePortalAndLanguage(yield select(),
                                                                       previousEpisode.key,
                                                                       portalKey,

@@ -9,4 +9,5 @@ export const ASYNC_INTERACTION_TEXT_MAP: Record<AsyncInteractionType, string> = 
     [AsyncInteractionType.SAGA_START_NEXT_EPISODE]: 'Episode wird gestartet',
     [AsyncInteractionType.SAGA_START_PREVIOUS_EPISODE]: 'Episode wird gestartet',
     [AsyncInteractionType.SAGA_START_CONTINUE_AUTOPLAY]: 'Episode wird gestartet',
+    [AsyncInteractionType.SAGA_LOADING_SEASON_FORCED]: 'Staffeldaten werden erneut geladen',
 };

@@ -17,6 +17,8 @@ export const loadingSeriesAsyncInteraction = createAsyncInteraction<{ seriesKey:
 
 export const loadingSeasonAsyncInteraction = createAsyncInteraction<{ seasonKey: SeriesSeason['key'] }>(AsyncInteractionType.SAGA_LOADING_SEASON);
 
+export const loadingSeasonForcedAsyncInteraction = createAsyncInteraction<{ seasonKey: SeriesSeason['key'] }>(AsyncInteractionType.SAGA_LOADING_SEASON_FORCED);
+
 export const startEpisodeAsyncInteraction = createAsyncInteraction<{ episodeKey: SeriesEpisode['key'] }>(AsyncInteractionType.SAGA_START_EPISODE);
 
 export const startNextEpisodeAsyncInteraction = createAsyncInteraction<{ episodeKey: SeriesEpisode['key'] }>(AsyncInteractionType.SAGA_START_NEXT_EPISODE);

@@ -13,5 +13,4 @@ export declare interface AsyncInteractionCreator<P extends Record<string, any> |
     type: string;
     match: (action: AsyncInteraction<any>) => boolean;
     isInstanceOf: (interaction: AsyncInteraction<any>) => interaction is AsyncInteraction<P>;
-
 }

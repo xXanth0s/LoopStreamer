@@ -1,6 +1,9 @@
 <template>
     <div>
-        <h5 class="pb-1">Start- und Endzeit konfigurieren</h5>
+        <h5 class="pb-1">Ladefunktionen</h5>
+            <b-button @click="reloadSeason" variant="primary">Staffel erneut laden</b-button>
+        <h5 class="pt-2 pb-1">Start- und Endzeit konfigurieren</h5>
+
         <div class="pb-2">
             Für eine Flüssige Wiedergabe, können das <b>Intro und Outro automatisch übersprungen</b> werden.
         </div>
@@ -52,6 +55,10 @@
     import { SHARED_TYPES } from '../../../../../shared/constants/SHARED_TYPES';
     import { StoreService } from '../../../../../shared/services/store.service';
     import { getAverageDurationForSeries } from '../../../../../store/selectors/series.selector';
+    import {
+      forceReloadSeasonInformationAction,
+    } from '../../../../../store/actions/shared.actions';
+    import { SeriesSeason } from '../../../../../store/models/series-season.model';
 
     @Component({
         name: 'series-settings',
@@ -79,6 +86,9 @@
 
         @Prop(Object)
         private series: Series;
+
+        @Prop(Object)
+        private season: SeriesSeason;
 
         private get sliderOptions(): [Partial<DotOption>, Partial<DotOption>] {
             const isStartTimeSaveable = !this.series.isStartTimeConfigured
@@ -124,6 +134,10 @@
 
         private resetEndTime(): void {
             this.store.dispatch(resetSeriesEndTimeAction({ seriesKey: this.series.key }));
+        }
+
+        private reloadSeason(): void {
+            this.store.dispatch(forceReloadSeasonInformationAction({ seasonKey: this.season.key }));
         }
 
         private resetStartTime(): void {

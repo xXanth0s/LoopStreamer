@@ -15,7 +15,11 @@ import { addAsyncInteractionAction, removeAsyncInteractionAction } from '../../r
 import { Logger } from '../../../shared/services/logger';
 import { loadSeriesInformationForPortalSaga } from './load-series.saga';
 import { getSeriesForSeason } from '../../selectors/series.selector';
-import { loadingSeasonAsyncInteraction } from '../../actions/async-interactions';
+import {
+    loadingSeasonAsyncInteraction,
+    loadingSeasonForcedAsyncInteraction,
+} from '../../actions/async-interactions';
+import { forceReloadSeasonInformationAction } from '../../actions/shared.actions';
 
 export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof setSelectedSeasonForAppAction>) {
     const seasonKey = action.payload;
@@ -24,13 +28,53 @@ export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof s
     yield put(addAsyncInteractionAction(asyncInteraction));
 
     try {
-        yield updateSeriesSeasonForPortal(seasonKey, portal);
+        yield updateSeriesSeasonForPortal({
+            portalKey: portal,
+            seasonKey,
+            forceUpdate: false,
+        });
 
         const languages = getLinksForSeriesSeasonAndPortal(yield select(),
                                                            seasonKey,
                                                            portal).map(link => link.language);
 
-        yield all(languages.map(language => updateSeriesSeasonForPortal(seasonKey, portal, language)));
+        yield all(languages.map(language => updateSeriesSeasonForPortal({
+            forceUpdate: false,
+            portalKey: portal,
+            seasonKey,
+            language,
+        })));
+    } catch (error) {
+        Logger.error('[loadSeasonInformationSaga] error occurred', error);
+    } finally {
+        yield put(removeAsyncInteractionAction(asyncInteraction.key));
+    }
+}
+
+export function* forceReloadSeasonInformationFromPortalSaga(
+    action: ReturnType<typeof forceReloadSeasonInformationAction>) {
+    const { seasonKey } = action.payload;
+    const portal = PORTALS.STO;
+    const asyncInteraction = loadingSeasonForcedAsyncInteraction({ seasonKey });
+    yield put(addAsyncInteractionAction(asyncInteraction));
+
+    try {
+        yield updateSeriesSeasonForPortal({
+            portalKey: portal,
+            seasonKey,
+            forceUpdate: true,
+        });
+
+        const languages = getLinksForSeriesSeasonAndPortal(yield select(),
+                                                           seasonKey,
+                                                           portal).map(link => link.language);
+
+        yield all(languages.map(language => updateSeriesSeasonForPortal({
+            forceUpdate: false,
+            seasonKey,
+            portalKey: portal,
+            language,
+        })));
     } catch (error) {
         Logger.error('[loadSeasonInformationSaga] error occurred', error);
     } finally {
@@ -42,7 +86,15 @@ export function* loadSeasonInformationFromPortalSaga(action: ReturnType<typeof s
     Loads and stores season information. It also checks, if series is available and updates series, if necessary
     @return boolean, if update was successfull
  */
-export function* updateSeriesSeasonForPortal(seasonKey: SeriesSeason['key'], portalKey: PORTALS, language?: LANGUAGE) {
+export function* updateSeriesSeasonForPortal(data: {
+    seasonKey: SeriesSeason['key'];
+    portalKey: PORTALS;
+    forceUpdate: boolean;
+    language?: LANGUAGE;
+}) {
+    const {
+        seasonKey, portalKey, forceUpdate, language,
+    } = data;
     const state = yield select();
     let links = getLinksForSeriesSeasonAndPortal(yield select(), seasonKey, portalKey);
     if (links.length === 0) {
@@ -62,14 +114,14 @@ export function* updateSeriesSeasonForPortal(seasonKey: SeriesSeason['key'], por
         return false;
     }
 
-    yield updateSeriesSeasonForLink(seasonKey, linkForLanguage);
+    yield updateSeriesSeasonForLink(seasonKey, linkForLanguage, forceUpdate);
     return true;
 }
 
-function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkModel) {
+function* updateSeriesSeasonForLink(seasonKey: SeriesSeason['key'], link: LinkModel, forceUpdate: boolean) {
     const state = yield select();
     const isSeasonStateUpToDate = isSeasonUpToDate(state, seasonKey, link.portal, link.language);
-    if (isSeasonStateUpToDate) {
+    if (!forceUpdate && isSeasonStateUpToDate) {
         return;
     }
 

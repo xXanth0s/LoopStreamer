@@ -1,6 +1,7 @@
 import { createAction } from '@reduxjs/toolkit';
 import { LANGUAGE } from '../enums/language.enum';
 import { SeriesEpisode } from '../models/series-episode.model';
+import { SeriesSeason } from '../models/series-season.model';
 
 export const appStartedAction = createAction<string>('global/AppStarted');
 
@@ -19,3 +20,7 @@ export const startNextEpisodeAction = createAction<{
 export const startPreviousEpisodeAction = createAction<string>('video/startPreviousEpisode');
 
 export const continueAutoplayAction = createAction<string>('video/continueAutoPlay');
+
+export const forceReloadSeasonInformationAction = createAction<{
+    seasonKey: SeriesSeason['key'];
+}>('app/forceReloadSeasonInformation');
